@@ -1,0 +1,13 @@
+This file contains information about the individual versions/releases
+of PyAstronomy.
+Each release is tagged according to its version; tags look like e.g. "v_0-1-2".
+
+0.1.2
+------
+The first release of PyAstronomy.
+
+0.1.3
+------
+Major bug in manual Gauss fit fixed.
+
+--> See the change log (What is new?) in documentation

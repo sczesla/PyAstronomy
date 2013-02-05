@@ -1,0 +1,22 @@
+From 0.3.0 to 0.4.0
+===================
+
+  ==================  =============
+  Concerns            What happened
+  ==================  =============
+  constants           **New subpackage**
+                        Provides easy access to a number of astronomical
+                        constants.
+  modelSuite          *New models*
+                        - Transit modeling relying on Mandel and Agol code.
+                      *Bug fix*
+                        - Fixed bug in *RmcL* class (Rossiter-McLaughlin effect)
+                          causing wrong models for large
+                          parameter lambda.                   
+  pyasl               *New routines*
+                        - A binning algorithm.
+                        - Transit timing routines.
+                        - F-test implementation.
+                        - Implementation of Keplerian orbit and solution of Kepler's equation.
+  pyTiming            Improvement of Generalized-Lomb-Scargle algorithm.
+  ==================  =============

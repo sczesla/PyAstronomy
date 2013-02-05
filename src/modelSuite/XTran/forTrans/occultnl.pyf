@@ -1,0 +1,27 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module occultnl ! in 
+    interface
+        subroutine occultnl(rl,c1,c2,c3,c4,b0,mulimb0,mulimbf,nb) ! in :occultnl:occultnl.f
+            real*8 intent(in) :: rl
+            real*8 intent(in) :: c1
+            real*8 intent(in) :: c2
+            real*8 intent(in) :: c3
+            real*8 intent(in) :: c4
+            real*8 dimension(nb),intent(in) :: b0
+            real*8 dimension(nb),intent(out),depend(nb) :: mulimb0
+            real*8 dimension(nb,5),intent(out),depend(nb) :: mulimbf
+            integer optional,check(len(b0)>=nb),depend(b0) :: nb=len(b0)
+        end subroutine occultnl
+        subroutine occultuniform(b0,w,muo1,nb) ! in :occultnl:occultnl.f
+            real*8 dimension(nb) :: b0
+            real*8 :: w
+            real*8 dimension(nb),depend(nb) :: muo1
+            integer optional,check(len(b0)>=nb),depend(b0) :: nb=len(b0)
+        end subroutine occultuniform
+    end interface 
+end python module occultnl
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

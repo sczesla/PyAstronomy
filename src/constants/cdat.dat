@@ -1,0 +1,129 @@
+
+[AstronomicalUnit]
+descr   = Astronomical Unit
+symbol  = AU
+valueSI = 1.49597870700e11
+errSI   = 3
+unitSI  = m
+unitcgs = cm
+source  = http://maia.usno.navy.mil/NSFA/IAU2009_consts.html
+
+[Parsec]
+descr   = Parsec
+symbol  = pc
+valueSI = 3.08568025e16
+errSI   = 0
+unitSI  = m
+unitcgs = cm
+source  = http://www.google.de
+
+
+
+[SpeedOfLight]
+descr   = Speed of light in vacuum
+symbol  = c
+valueSI = 2.99792458e8
+errSI   = 0
+unitSI  = m * s^-1
+unitcgs = cm * s^-1
+source  = http://maia.usno.navy.mil/NSFA/IAU2009_consts.html
+
+[NewtonGravitation]
+descr   = Newton's constant of gravitation
+symbol  = G
+valueSI = 6.67428e-11 
+errSI   = 6.7e-15
+unitSI  = m^3 * kg^-1 * s^-2
+unitcgs = cm^3 * g^-1 * s^-2
+source  = http://maia.usno.navy.mil/NSFA/IAU2009_consts.html
+
+[BoltzmannConst]
+descr   = Boltzmann constant                            
+symbol  = k
+valueSI = 1.3806488e-23
+errSI   = 0.0000013e-23
+unitSI  = J * K^-1
+unitcgs = erg * K^-1
+source  = http://physics.nist.gov/cuu/Constants/Table/allascii.txt
+
+[StefBoltz]
+descr   = Stefan-Boltzmann constant
+symbol  = sigma
+valueSI = 5.670373e-8
+errSI   = 0.000021e-8
+unitSI  = W * m^-2 * K^-4
+unitcgs = erg * s^-1 * cm^-2 * K^-4
+source  = http://physics.nist.gov/cuu/Constants/Table/allascii.txt
+
+[PlanckConstant]
+descr   = The Planck constant
+symbol  = h
+valueSI = 6.62606957e-34
+errSI   = 0.00000029e-34
+unitSI  = J * s
+unitcgs = erg * s
+source  = http://physics.nist.gov/cgi-bin/cuu/Value?h|search_for=planck
+
+[AtmicMassConstant]
+descr   = Atomic mass constant
+symbol  = Mu
+valueSI = 1.660538921e-27
+errSI   = 0.000000073e-27
+unitSI  = kg
+unitcgs = g
+source  = http://physics.nist.gov/cgi-bin/cuu/Value?u|search_for=mass
+
+
+[RadEqEarth]
+descr   = Equatorial radius of the Earth
+symbol  = REarth
+valueSI = 6.3781366e6
+errSI   = 0.1
+unitSI  = m
+unitcgs = cm
+source  = http://maia.usno.navy.mil/NSFA/NSFA_cbe.html#GaussianGrav2009
+
+[RadEqJupiter]
+descr   = Equatorial radius of Jupiter
+symbol  = RJ
+valueSI = 71492e3
+errSI   = 4e3
+unitSI  = m
+unitcgs = cm
+source  = Report of the IAU/IAG Working Group on cartographic coordinates and rotational elements: 2006, 2007CeMDA..98..155S
+
+[RadEqSun]
+descr   = Equatorial radius of the Sun
+symbol  = RSun
+valueSI = 6.95508e8
+errSI   = 0
+unitSI  = m
+unitcgs = cm
+source  = "Call to Adopt a Nominal Set of Astrophysical Parameters and Constants to Improve the Accuracy of Fundamental Physical Properties of Stars", 2011PASP..123..976H
+
+[MSun]
+descr   = Mass of the Sun
+symbol  = MSun
+valueSI = 1.988547e30
+errSI   = 0
+unitSI  = kg
+unitcgs = g
+source  = "Call to Adopt a Nominal Set of Astrophysical Parameters and Constants to Improve the Accuracy of Fundamental Physical Properties of Stars", 2011PASP..123..976H
+
+[LSun]
+descr   = Bolometric luminosity of the Sun
+symbol  = LSun
+valueSI = 3.846e26
+errSI   = 0
+unitSI  = W
+unitcgs = erg * s^-1
+source  = "Call to Adopt a Nominal Set of Astrophysical Parameters and Constants to Improve the Accuracy of Fundamental Physical Properties of Stars", 2011PASP..123..976H
+
+[MJupiter]
+descr   = Mass of Jupiter
+symbol  = MJ
+valueSI = 1898.6e24
+errSI   = 0
+unitSI  = kg
+unitcgs = g
+source  = http://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html

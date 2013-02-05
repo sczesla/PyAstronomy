@@ -1,0 +1,18 @@
+# The ``incl'' variable should contain the include paths to the boost libraries and,
+# if necessary, that of the Python sources.
+# The ``link'' variable should contain the linking path for the boost libraries (do not
+# forget to set the LD_LIBRARY_PATH accordingly).
+
+incl=-I/path-to-boost-include/ -I/path-to-python-include/
+link=-L/path-to-boost-lib-dir/ -lboost_python
+
+ifeq ($(incl),"")
+.PHONY : message
+message :
+	echo "Warning: You may have to specify the correct include and linking paths"
+endif
+
+ell.so : ell.o
+	g++ -shared -o ell.so ell.o $(link)
+ell.o : ell.cpp
+	g++ -c -fPIC ell.cpp -o ell.o $(incl)

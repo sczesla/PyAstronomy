@@ -1,0 +1,45 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module occultquad
+    interface
+        subroutine occultquad(z0,u1,u2,p,muo1,mu0,nz) ! in :occultquad:occultquad.f
+            double precision dimension(nz),intent(in) :: z0
+            double precision intent(in) :: u1
+            double precision intent(in) :: u2
+            double precision intent(in) :: p
+            double precision dimension(nz),intent(out),depend(nz) :: muo1
+            double precision dimension(nz),intent(out),depend(nz) :: mu0
+            integer optional,check(len(z0)>=nz),depend(z0) :: nz=len(z0)
+        end subroutine occultquad
+        function rc(x,y) ! in :occultquad:occultquad.f
+            real*8 :: x
+            real*8 :: y
+            real*8 :: rc
+        end function rc
+        function rj(x,y,z,p) ! in :occultquad:occultquad.f
+            real*8 :: x
+            real*8 :: y
+            real*8 :: z
+            real*8 :: p
+            real*8 :: rj
+        end function rj
+        function ellec(k) ! in :occultquad:occultquad.f
+            double precision :: k
+            double precision :: ellec
+        end function ellec
+        function ellk(k) ! in :occultquad:occultquad.f
+            double precision :: k
+            double precision :: ellk
+        end function ellk
+        function rf(x,y,z) ! in :occultquad:occultquad.f
+            real*8 :: x
+            real*8 :: y
+            real*8 :: z
+            real*8 :: rf
+        end function rf
+    end interface 
+end python module occultquad
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

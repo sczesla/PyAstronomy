@@ -1,0 +1,21 @@
+From 0.2.0 to 0.3.0
+===================
+
+  ==================  =============
+  Concerns            What happened
+  ==================  =============
+  Documentation       Docstrings should now follow the numpy/scipy standard.
+  funcFit             - **Naming of models**
+                            The package now supports a naming scheme for models.
+                            This makes it easier to identify and access variables
+                            in composed models.
+                      - **anaMCMCTrace**
+                            This new class can be used to analyze the outcome of an
+                            MCMC sampling run conveniently.
+                      - **SyncFit**
+                            Synchronous model fitting.
+                            This new class allows to have different models defined on
+                            different abscissa to be fitted together.
+  ==================  =============
+
+

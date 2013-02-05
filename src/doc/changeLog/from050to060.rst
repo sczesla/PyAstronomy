@@ -1,0 +1,21 @@
+From 0.5.0 to 0.6.0
+===================
+
+  ==================  =============================================
+  Concerns            What happened
+  ==================  =============================================
+  funcFit             *New functionality*
+                        - GUI tool for model exploration
+                        - Tutorial on TraceAnalysis
+  pyasl               *New routines*
+                        - Signal to Noise Ratio (SNR) estimator
+                        - Outlier detection
+                        - INTEP interpolation algorithm
+                        - Magnitude conversion
+                        - Access to Baraffe et al. 98 evolutionary tracks
+                        - Ported IDL Astrolib routines (sunpos, nutate, \
+                          co_nutate, co_aberration, ct2lst, hadec2altaz, \
+                          co_refract_forward, co_refract, eq2hor)
+  pyaC                *New functionality*
+                        - Invert index selection
+  ==================  =============================================

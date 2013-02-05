@@ -1,0 +1,24 @@
+From 0.4.0 to 0.5.0
+===================
+
+  ==================  =============
+  Concerns            What happened
+  ==================  =============
+  funcFit             *New functionality*
+                        - Now supports n-dimensional (nD) fitting
+                        - Tutorial for nD fitting added
+                        - Obtain confidence intervals via `steppar` and `errorConfInterval` methods
+  modelSuite          *New models*
+                        - Added a spectral model based on
+                          Gaussian lines (`LLGauss`).
+                        - Added a model to fitting the coordinates of a
+                          a Kepler ellipse (`KeplerEllipseModel`)         
+  pyasl               *New routines*
+                        - Ported `baryvel` from IDL.
+                        - A wrapper for numpy's Singular Value Decomposition (SVD)
+                        - A function to apply Doppler shift to a spectrum.
+                        - A function to apply rotational broadening to a spectrum.
+                        - Ported `unred` method from IDL.
+                        - Convert between flux units and photons number.
+                        - Introduced a `smooth` function for smoothing 1d data.
+  ==================  =============
