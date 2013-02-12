@@ -104,6 +104,8 @@ packages = ['PyAstronomy', \
             'PyAstronomy.funcFit.utils', \
             'PyAstronomy.pyasl', \
             'PyAstronomy.pyasl.asl', \
+            'PyAstronomy.pyasl.resBased', \
+            'PyAstronomy.pyasl.phoenixUtils', \
             'PyAstronomy.modelSuite', \
             'PyAstronomy.modelSuite.XTran', \
             'PyAstronomy.modelSuite.XTran.palTrans', \
@@ -113,13 +115,14 @@ packages = ['PyAstronomy', \
             'PyAstronomy.pyTiming.pyPeriod', \
             'PyAstronomy.pyaC', \
             'PyAstronomy.pyaC.pyaErrors', \
+            'PyAstronomy.pyaC.pyaPermanent', \
             'PyAstronomy.constants']
 
 # "doc/*/*.rst", "doc/*/*.png"],
 package_data = {"PyAstronomy":["setup.cfg"],
                 "PyAstronomy.modelSuite.XTran.palTrans":["ellint/makefile_template", "ellint/ell.cpp"], \
                 "PyAstronomy.modelSuite.XTran.forTrans":["*.f", "*.pyf"], \
-                "PyAstronomy.pyasl.asl":["testPro/*.pro"], \
+                "PyAstronomy.pyasl.asl":["testPro/*.pro", "*.cfg"], \
                 "PyAstronomy.constants":["*.dat"]
                 }
 
