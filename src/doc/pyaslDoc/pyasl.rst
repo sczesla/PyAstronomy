@@ -67,6 +67,7 @@ Useful algorithms
    aslDoc/aberration.rst
    aslDoc/altitude.rst
    aslDoc/eq2hor.rst
+   aslDoc/observatory.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~

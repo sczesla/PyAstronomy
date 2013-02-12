@@ -26,3 +26,4 @@ from intep import *
 from magnitudes import *
 from eq2hor import *
 from sunpos import *
+from observatory import *

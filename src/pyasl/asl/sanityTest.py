@@ -1040,3 +1040,27 @@ class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
     plt.xlabel("Julian date")
     plt.ylabel("Altitude [deg]")
 #    plt.show()
+
+
+class SanityOfObservatory(unittest.TestCase, SaniBase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_example(self):
+    """
+      Sanity of observatory example.
+    """
+    from PyAstronomy import pyasl
+
+    # List all available observatory data
+    pyasl.listObservatories()
+    
+    print
+    print "Data for Kitt Peak National Observatory"
+    print pyasl.observatory("kpno")
+    print "(longitude and latitude in degrees, altitude in meters, and"
+    print "time zone in hours West of Greenwich"
