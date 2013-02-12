@@ -4,3 +4,4 @@ src/doc/_build/
 .project
 .pydevproject
 .settings/
+build
