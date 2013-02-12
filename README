@@ -24,6 +24,14 @@ What is it?
     Timing:     Provides algorithms for timing analysis such as
                 the Lomb-Scargle and the Generalized Lomb-Scargle
                 periodogram
+
+Installation
+------------
+
+  Use "python setup.py [--with-ext] install"
+  
+  If you specify the --with-ext flag, setup will try to
+  compile non-Python modules. This is not mandatory.
    
 Documentation and further information
 -------------------------------------
