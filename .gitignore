@@ -5,3 +5,4 @@ src/doc/_build/
 .pydevproject
 .settings/
 build
+*.test
