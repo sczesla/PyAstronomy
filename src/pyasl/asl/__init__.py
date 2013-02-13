@@ -27,3 +27,4 @@ from magnitudes import *
 from eq2hor import *
 from sunpos import *
 from observatory import *
+from moonpos import *

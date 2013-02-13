@@ -8,6 +8,7 @@ import unittest
 from baryvel import baryvel
 import eq2hor
 import sunpos
+import moonpos
 
 class AstroTimeLegacyTest(unittest.TestCase):
 
@@ -293,7 +294,6 @@ class IDLTests(unittest.TestCase):
     """
       Testing sunpos
     """
-    return
     dat = self.getData("sunpos.test")[1]
     for i in xrange(len(dat[::,0])):
       jd, ra, dec, longmed, oblt = sunpos.sunpos(dat[i,0], full_output=True)
@@ -303,7 +303,6 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(oblt, dat[i,4], delta=self.p)
 
   def test_nutate(self):
-    return
     dat = self.getData("nutate.test")[1]
     for i in xrange(len(dat[::,0])):
       l, o = eq2hor.nutate(dat[i,0])
@@ -311,7 +310,6 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(o*3600.0, dat[i,2], delta=self.p)   
     
   def test_co_nutate(self):
-    return
     dat = self.getData("co_nutate.test")[1]
     for i in xrange(len(dat[::,0])):
       dra, ddec, o, dl, do = eq2hor.co_nutate(dat[i,0], dat[i,1], dat[i,2], full_output=True)
@@ -322,7 +320,6 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(do*3600./dat[i,7], 1.0, delta=self.p)
 
   def test_co_aberration(self):
-    return
     dat = self.getData("co_aberration.test")[1]
     for i in xrange(len(dat[::,0])):
       dra, ddec = eq2hor.co_aberration(dat[i,0], dat[i,1], dat[i,2])
@@ -330,7 +327,6 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(ddec*3600./dat[i,4], 1.0, delta=self.p)
 
   def test_co_refract_forward(self):
-    return
     dat = self.getData("co_refract_forward.test")[1]
     for i in xrange(len(dat[::,0])):
       r = eq2hor.co_refract_forward(dat[i,0], pressure=dat[i,1], temperature=dat[i,2]-273.15)
@@ -359,7 +355,20 @@ class IDLTests(unittest.TestCase):
       alt, az, ha = eq2hor.eq2hor(dat[i,2], dat[i,0], dat[i,1], lon=dat[i,3], lat=dat[i,4], alt=dat[i,5])
       self.assertAlmostEqual(alt/dat[i,6], 1.0, delta=self.p*100., msg="Altitude does not fit " + str(dat[i,::]))
       self.assertAlmostEqual(az/dat[i,7], 1.0, delta=self.p*100., msg="Azimuth does not fit " + str(dat[i,::]))
-    
+  
+  def test_moonpos(self):
+    """
+      Testing moonpos routine
+    """
+    dat = self.getData("moonpos.test")[1]
+    for i in xrange(len(dat[::,0])):
+      ra, dec, dist, glon, glat = moonpos.moonpos(dat[i,0], False)
+      self.assertAlmostEqual(ra/dat[i,1], 1.0, delta=self.p)
+      self.assertAlmostEqual(dec/dat[i,2], 1.0, delta=self.p)
+      self.assertAlmostEqual(dist/dat[i,3], 1.0, delta=self.p)
+      self.assertAlmostEqual(glon/dat[i,4], 1.0, delta=self.p)
+      self.assertAlmostEqual(glat/dat[i,5], 1.0, delta=self.p)
+  
 if __name__ == "__main__":
   suite = unittest.TestLoader().loadTestsFromTestCase(AstroTimeLegacyTest)
   unittest.TextTestRunner(verbosity=2).run(suite)

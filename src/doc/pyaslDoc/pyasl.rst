@@ -68,6 +68,7 @@ Useful algorithms
    aslDoc/altitude.rst
    aslDoc/eq2hor.rst
    aslDoc/observatory.rst
+   aslDoc/moon.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~

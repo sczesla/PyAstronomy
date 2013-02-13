@@ -1,3 +1,15 @@
+pro test_moonpos
+  openw, fw, 'moonpos.test', /get_lun, WIDTH=1000
+  printf, fw, "#jd, ra, dec, dis, geolong, geolat"
+  for i=0,1000 do begin
+    jd = randomu(seed) * 10000.0d + 2456024.0d
+    MOONPOS, jd, ra, dec, dis, geolong, geolat
+    printf, fw, jd, ra, dec, dis, geolong, geolat, FORMAT="(F20.10, F20.10, F20.10, F20.10, F20.10, F20.10)"
+  endfor
+  close, fw
+end
+
+
 pro test_hadec2altaz
   openw, fw, 'hadec2altaz.test', /get_lun, WIDTH=1000
   printf, fw, "#ha, dec, lat, alt, azt"
@@ -317,4 +329,5 @@ pro create_test_data
  test_co_refract_forward
  test_co_refract
  test_hadec2altaz
+ test_moonpos
 end
