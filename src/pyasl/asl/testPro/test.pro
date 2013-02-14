@@ -1,3 +1,15 @@
+pro test_mphase
+  openw, fw, 'mphase.test', /get_lun, WIDTH=1000
+  printf, fw, "#jd, illumfrac"
+  for i=0,1000 do begin
+    jd = randomu(seed) * 10000.0d + 2456024.0d
+    MPHASE, jd, f
+    printf, fw, jd, f, FORMAT="(F20.10, F20.10)"
+  endfor
+  close, fw
+end
+
+
 pro test_moonpos
   openw, fw, 'moonpos.test', /get_lun, WIDTH=1000
   printf, fw, "#jd, ra, dec, dis, geolong, geolat"
@@ -330,4 +342,5 @@ pro create_test_data
  test_co_refract
  test_hadec2altaz
  test_moonpos
+ test_mphase
 end

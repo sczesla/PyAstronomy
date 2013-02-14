@@ -1,5 +1,5 @@
 import numpy as np
-import moonpos
+from moonpos import moonpos
 from sunpos import sunpos
 
 
@@ -52,7 +52,7 @@ def moonphase(jd):
   # Earth-Sun distance (1 AU)
   edist = 1.49598e8         
   
-  mpos = moonpos.moonpos(jd)
+  mpos = moonpos(jd)
   ram = mpos[0]*np.pi/180.
   decm = mpos[1]*np.pi/180.
   dism = mpos[2]

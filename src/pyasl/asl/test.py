@@ -9,6 +9,7 @@ from baryvel import baryvel
 import eq2hor
 import sunpos
 import moonpos
+import moonphase
 
 class AstroTimeLegacyTest(unittest.TestCase):
 
@@ -368,7 +369,19 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(dist/dat[i,3], 1.0, delta=self.p)
       self.assertAlmostEqual(glon/dat[i,4], 1.0, delta=self.p)
       self.assertAlmostEqual(glat/dat[i,5], 1.0, delta=self.p)
-  
+
+  def test_mphase(self):
+    """
+      Testing moonphase (mphase) routine
+    """
+    dat = self.getData("mphase.test")[1]
+    for i in xrange(len(dat[::,0])):
+      f = moonphase.moonphase(dat[i,0])
+      if abs(dat[i,1]) < self.p:
+        self.assertAlmostEqual(abs(f), 0.0 , delta=self.p)
+        continue
+      self.assertAlmostEqual(f/dat[i,1], 1.0, delta=self.p)
+
 if __name__ == "__main__":
   suite = unittest.TestLoader().loadTestsFromTestCase(AstroTimeLegacyTest)
   unittest.TextTestRunner(verbosity=2).run(suite)

@@ -34,7 +34,7 @@ Example: Finding the position of the Moon
 .. autofunction:: moonphase
       
 
-Example: Find the illuminated fraction of the Moon
+Example: Find the Moon's illuminated fraction
 --------------------------------------------------
 
 ::
