@@ -11,7 +11,7 @@ def moonpos(jd, radian=False):
     Parameters
     ----------
     jd : float or array
-         The Julian date.
+        The Julian date.
     radian : boolean, optional
         If True, results are returned in RADIAN instead
         of DEGREES. Default is False.
