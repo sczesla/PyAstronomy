@@ -30,5 +30,26 @@ Example: Finding the position of the Moon
     print "%15.4f  %8.4f  %8.4f  %11.4f  %8.4f  %8.4f" % \
       (jd[i], res[0][i], res[1][i], res[2][i], res[3][i], res[4][i])
 
+
+.. autofunction:: moonphase
       
-      
+
+Example: Find the illuminated fraction of the Moon
+--------------------------------------------------
+
+::
+
+  import datetime
+  from PyAstronomy import pyasl
+  import numpy as np
+  
+  # Convert calendar date to JD
+  # using the datetime package
+  jd = datetime.datetime(2013, 4, 16)
+  jd = pyasl.jdcnv(jd)
+  jd = np.arange(jd, jd+20,1)
+  mp = pyasl.moonphase(jd)
+  
+  print "%15s  %3s" % ("JD", "Phase")
+  for i in range(jd.size):
+    print "%15.4f  %3d%%" % (jd[i], mp[i]*100.)
