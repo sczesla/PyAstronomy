@@ -13,6 +13,7 @@ Below you find the documentation of the following routines:
  * :py:func:`jdcnv <PyAstronomy.pyasl.asl.astroTimeLegacy.jdcnv>`
  * :py:func:`get_juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.get_juldate>`
  * :py:func:`juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.juldate>`
+ * :py:func:`localTime <PyAstronomy.pyasl.asl.localTime>`
 
 Example: daycnv, helio_jd, jdcnv, get_juldate, and juldate
 ------------------------------------------------------------
@@ -46,3 +47,5 @@ Routines
 
 .. automodule:: PyAstronomy.pyasl.asl.astroTimeLegacy
    :members:
+
+.. autofunction:: PyAstronomy.pyasl.asl.localTime
