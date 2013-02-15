@@ -100,7 +100,7 @@ class PyAFS:
       Parameters
       ----------
       fn : string
-          The filename wither relative to PyA's data path or
+          The filename either relative to PyA's data path or
           absolute.
       
       Returns
