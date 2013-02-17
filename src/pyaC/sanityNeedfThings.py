@@ -55,3 +55,20 @@ class SanityOfPyasl(unittest.TestCase):
     self.assertTrue(np.all(i1 == i2), "i1 and i2 are not the same.")
     i3 = pc.invertIndexSelection(x, i1)
     self.assertTrue(np.all(i3 == indi), "re-inverse of i1 does not match indi.")
+
+  def sanity_fuzzyMatchExample(self):
+    """
+      Check example for fuzzyMatch
+    """
+    from PyAstronomy import pyaC
+    
+    wordList = ["one", "two", "three", "four", "o-ne"]
+    
+    r = pyaC.fuzzyMatch("One", wordList)
+    print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+    
+    r = pyaC.fuzzyMatch("One", wordList, cutoff=0.4)
+    print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+    
+    r = pyaC.fuzzyMatch("One", wordList, caseSensitive=False)
+    print "Exact match: {em:}, close match(es): {cm:}".format(**r)

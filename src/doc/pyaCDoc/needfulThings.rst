@@ -60,4 +60,26 @@ Example
   print "Are indiInv and indiInvLen are the same? "
   print "  ", np.all(indiInvLen == indiInv)
 
+
+Fuzzy word matching
+--------------------
+
+.. autofunction:: fuzzyMatch
+
+Example
+~~~~~~~~~
+
+::
+
+  from PyAstronomy import pyaC
   
+  wordList = ["one", "two", "three", "four", "o-ne"]
+  
+  r = pyaC.fuzzyMatch("One", wordList)
+  print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+  
+  r = pyaC.fuzzyMatch("One", wordList, cutoff=0.4)
+  print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+  
+  r = pyaC.fuzzyMatch("One", wordList, caseSensitive=False)
+  print "Exact match: {em:}, close match(es): {cm:}".format(**r)
