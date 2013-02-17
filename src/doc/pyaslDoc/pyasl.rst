@@ -77,3 +77,4 @@ Resource based helpers
    :maxdepth: 1
    
    resBasedDoc/baraffe98tracks.rst
+   resBasedDoc/nasaExoplanetArchive.rst
