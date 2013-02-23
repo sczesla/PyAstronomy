@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from sunpos import sunpos
+from observatory import observatory as observatory_function
 from idlMod import idlMod
 from idlCirrange import cirrange
 from PyAstronomy.pyasl import _ic
@@ -1072,7 +1073,6 @@ def co_refract(alt, observer_alt=0.0, pressure=None, temperature=None, epsilon=0
        Allow arrays with more than 32767 elements W.Landsman/C.Dickinson Feb 2010
     
   """
-  
   old_alt = np.array(alt, ndmin=1)
     
   if observer_alt is not None:
@@ -1348,14 +1348,10 @@ def eq2hor(jd, ra, dec, observatory=None, lon=None, lat=None, alt=None, B1950=Fa
           solution="Use only one way to specify the observer's location."))
   
   if observatory is not None:
-    if observatory == "HS":
-      lon = 10.2414
-      lat = 53.48
-      alt = 40.0
-    else:
-      raise(PE.PyAValError("Unknown observatory: " + str(observatory), \
-            solution=["Use one of the specified observatory codes (see documentation)", \
-                      "Specify the observer's location via lon, lat, and alt"]))
+    obsdata = observatory_function(observatory)
+    lon = obsdata["longitude"]
+    lat = obsdata["latitude"]
+    alt = obsdata["altitude"]
   
   if (lon is None) or (lat is None) or (alt is None):
     raise(PE.PyAParameterConflict("You need to specify all of lon, lat, and alt", \
