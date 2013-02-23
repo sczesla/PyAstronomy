@@ -49,7 +49,7 @@ class NasaExoplanetArchive:
     table = "&table=exoplanets"
     select = "&select="
     for v in self._columns.itervalues():
-      select = select.join([select, ',', v[0]])
+      select = ''.join([select, ',', v[0]])
     outformat = "&format=csv"
     
     response = urllib2.urlopen(''.join((urlRoot, table+select, outformat)))
