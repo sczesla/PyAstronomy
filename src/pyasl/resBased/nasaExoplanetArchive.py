@@ -38,6 +38,13 @@ class NasaExoplanetArchive:
     pl_orbsmax    Semi-major-axis                      AU   
     pl_orbincl    Orbital inclination of planet        deg  
     st_rad        Stellar radii                        Solar
+    st_dist       Distance to star                     pc
+    st_mass       Stellar mass                         Solar
+    st_teff       Effective temperature of star        K    
+    st_vsini      Stellar vsin(i)                      km/s 
+    st_logg       Stellar surface gravity              cm/s**2
+    st_acts       Stellar S-Index                           
+    st_vj         Stellar V-band brightness            mag
     ===========   ===================================  ======
   """
   
@@ -82,6 +89,13 @@ class NasaExoplanetArchive:
     self._columns[11] = ["pl_orbsmax", "Semi-major-axis", "AU", np.float]
     self._columns[12] = ["pl_orbincl", "Orbital inclination of planet", "deg", np.float]
     self._columns[13] = ["st_rad", "Stellar radii", "Solar", np.float]
+    self._columns[14] = ["st_dist", "Distance to star", "pc", np.float]
+    self._columns[15] = ["st_mass", "Stellar mass", "Solar", np.float]
+    self._columns[16] = ["st_teff", "Effective temperature of star", "K", np.float]
+    self._columns[17] = ["st_vsini", "Stellar vsin(i)", "km/s", np.float]
+    self._columns[18] = ["st_logg", "Stellar surface gravity", "cm/s**2", np.float]
+    self._columns[19] = ["st_acts", "Stellar S-Index", "", np.float]
+    self._columns[20] = ["st_vj", "Stellar V-band brightness", "mag", np.float]
     # Check whether data file exists
     self._fs = pp.PyAFS()
     self.config = CP.RawConfigParser()
