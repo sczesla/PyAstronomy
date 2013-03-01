@@ -46,7 +46,7 @@ class GaussFit2d(OneDFit):
     if self["rho"] > 1.0:
       raise(PE.PyAValError("The correlation coefficient must be 0 <= rho <= 1.", \
                            solution="Change width ('sigx/y')."))
-    result = 1.0/(2.*pi*self["sigx"]*self["sigy"]*sqrt(1.-self["rho"]**2)) * \
+    result = self["A"]/(2.*pi*self["sigx"]*self["sigy"]*sqrt(1.-self["rho"]**2)) * \
         exp( ((co[::,::,0]-self["mux"])**2/self["sigx"]**2 + (co[::,::,1]-self["muy"])**2/self["sigy"]**2 - \
             2.*self["rho"]*(co[::,::,0]-self["mux"])*(co[::,::,1]-self["muy"])/(self["sigx"]*self["sigy"])) / \
             (-2.*(1.-self["rho"]**2)) )
