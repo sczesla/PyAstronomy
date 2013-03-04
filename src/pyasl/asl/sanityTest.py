@@ -1120,3 +1120,23 @@ class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
     for azimuth in azimuths:
       cp = pyasl.getCardinalPoint(azimuth)
       print "Azimuth: {0:6.2f} deg, Cardinal point: {1:1s}".format(azimuth, cp)
+
+
+class SanityOfTwilight(unittest.TestCase, SaniBase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_checkNumbers(self):
+    """
+      Check twilightName example
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    for alt in np.linspace(-20., 5., 15):
+      print "Altitude = {0:6.2f}, Twilight is called: ".format(alt), \
+            pyasl.twilightName(alt)
