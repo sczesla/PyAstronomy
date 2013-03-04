@@ -99,7 +99,7 @@ class GaussFit2dTuple(OneDFit):
       raise(PE.PyAValError("The correlation coefficient must be 0 <= rho <= 1.", \
                            solution="Change width ('sigx/y')."))
     xx, yy = meshgrid(co[0], co[1])
-    result = 1.0/(2.*pi*self["sigx"]*self["sigy"]*sqrt(1.-self["rho"]**2)) * \
+    result = self["A"]/(2.*pi*self["sigx"]*self["sigy"]*sqrt(1.-self["rho"]**2)) * \
         exp( ((xx-self["mux"])**2/self["sigx"]**2 + (yy-self["muy"])**2/self["sigy"]**2 - \
             2.*self["rho"]*(xx-self["mux"])*(yy-self["muy"])/(self["sigx"]*self["sigy"])) / \
             (-2.*(1.-self["rho"]**2)) )
