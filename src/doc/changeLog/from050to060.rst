@@ -18,6 +18,7 @@ From 0.5.0 to 0.6.0
                           co_refract_forward, co_refract, eq2hor, \
                           observatory)
                         - Access to NASA Exoplanet Archive
+                        - Azimuth to cardinal point conversion
   pyaC                *New functionality*
                         - Invert index selection
   ==================  =============================================

@@ -9,6 +9,7 @@ import datetime
 from dopplerShift import dopplerShift
 from fluxConversion import flux2photons, photons2flux
 from rotBroad import rotBroad, fastRotBroad
+from cardinalPoint import getCardinalPoint
 
 class SanityOfPyasl(unittest.TestCase, SaniBase):
   
@@ -1067,13 +1068,13 @@ class SanityOfObservatory(unittest.TestCase, SaniBase):
 
 
 class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
-  
+
   def setUp(self):
     pass
   
   def tearDown(self):
     pass
-  
+
   def sanity_example(self):
     """
       Checking example for converting damping constant into line width.
@@ -1085,3 +1086,37 @@ class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
     
     print "Width of H LyA line at 1215.67 A = %e cm" % \
           pyasl.convertDampingConstant(gLya, 1215.67)
+
+
+class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
+
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_checkNumbers(self):
+    """
+      Check some numbers for cardinal point
+    """
+    self.assertEqual(getCardinalPoint(0.0), "N")
+    self.assertEqual(getCardinalPoint(360.0), "N")
+    self.assertEqual(getCardinalPoint(135.0), "E")
+    self.assertEqual(getCardinalPoint(45.0), "N")
+    self.assertEqual(getCardinalPoint(225.0), "S")
+    self.assertEqual(getCardinalPoint(315.0), "W")
+    self.assertEqual(getCardinalPoint(217.0), "S")
+  
+  def sanity_checkExample(self):
+    """
+      Check cardinal point example
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    # Get the cardinal point for 10 azimuth angles
+    azimuths = np.random.random(10) * 360.
+    for azimuth in azimuths:
+      cp = pyasl.getCardinalPoint(azimuth)
+      print "Azimuth: {0:6.2f} deg, Cardinal point: {1:1s}".format(azimuth, cp)

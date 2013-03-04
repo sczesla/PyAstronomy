@@ -70,6 +70,7 @@ Useful algorithms
    aslDoc/observatory.rst
    aslDoc/moon.rst
    aslDoc/lineWidth.rst
+   aslDoc/cardinalPoint.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~

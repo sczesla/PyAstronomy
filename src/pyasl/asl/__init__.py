@@ -31,3 +31,4 @@ from moonpos import *
 from moonphase import *
 from localtime import *
 from lineWidth import *
+from cardinalPoint import *
