@@ -8,6 +8,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from nameIdentBase import ModelNameIdentBase
 from anneal import PyAAnneal
 from PyAstronomy import pyaC 
+from time import time as timestamp
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport
 if _pymcImport:
@@ -1243,7 +1244,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.updateModel() 
     self.MCMC.db.close()
     
-  def fit(self, x, y, yerr=None, X0=None, minAlgo=None, miniFunc=None, *fminPars, **fminArgs):
+  def fit(self, x, y, yerr=None, X0=None, minAlgo=None, miniFunc=None, printTime=False, *fminPars, **fminArgs):
     """
       Carries out a fit.
       
@@ -1274,6 +1275,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       fminArgs : dict 
           Keywords passed to the minimization method
           (e.g., `xtol` or `ftol` for scipy.optimize.fmin).
+      printTime: boolean, optional
+          If True, the number of seconds needed to carry out the fit
+          is printed. Default is False.     
       fminPars :
           Non-keyword arguments passed to the  minimization method
           (e.g., fprime in scipy.optimize.fmin_ncg).
@@ -1318,11 +1322,16 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.fminArgs = fminArgs
     self.fminPars = fminPars
     # Carry out fit
+    if printTime:
+      fitStartTime = timestamp()
     self.fitResult = self.minAlgo(self.miniFunc, self.pars.getFreeParams(), *self.fminPars, \
                              full_output=True, **self.fminArgs)
     self.pars.setFreeParams(self.fitResult[0])
     self.updateModel()
     self._stepparEnabled = True
+    
+    if printTime:
+      print "The fit took " + str(timestamp() - fitStartTime) + " seconds."
   
   def __extractFunctionValue(self, fr):
     """
