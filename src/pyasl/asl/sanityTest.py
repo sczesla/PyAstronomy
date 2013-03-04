@@ -1140,3 +1140,24 @@ class SanityOfTwilight(unittest.TestCase, SaniBase):
     for alt in np.linspace(-20., 5., 15):
       print "Altitude = {0:6.2f}, Twilight is called: ".format(alt), \
             pyasl.twilightName(alt)
+
+
+class SanityOfAngDist(unittest.TestCase, SaniBase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_checkNumbers(self):
+    """
+      Check angular distance example
+    """
+    from PyAstronomy import pyasl
+    
+    print "Angular distance between the poles (deg):"
+    print pyasl.getAngDist(98.0, -90.0, 100., +90.0)
+    
+    print "Angular distance between Vega and Altair (deg)"
+    print pyasl.getAngDist(279.23473479, +38.78368896,297.69582730, +08.86832120)

@@ -72,6 +72,7 @@ Useful algorithms
    aslDoc/lineWidth.rst
    aslDoc/cardinalPoint.rst
    aslDoc/twilight.rst
+   aslDoc/angularDistance.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~
