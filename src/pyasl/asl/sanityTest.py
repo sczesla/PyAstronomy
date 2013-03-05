@@ -1150,7 +1150,7 @@ class SanityOfAngDist(unittest.TestCase, SaniBase):
   def tearDown(self):
     pass
   
-  def sanity_checkNumbers(self):
+  def sanity_checkExample(self):
     """
       Check angular distance example
     """
