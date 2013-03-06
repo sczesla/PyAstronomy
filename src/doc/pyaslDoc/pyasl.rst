@@ -47,7 +47,6 @@ Useful algorithms
    aslDoc/baryvel.rst
    aslDoc/folding.rst
    aslDoc/keplerOrbit.rst
-   aslDoc/inTran.rst
    aslDoc/statTest.rst
    aslDoc/binning.rst
    aslDoc/planck.rst
@@ -73,6 +72,16 @@ Useful algorithms
    aslDoc/cardinalPoint.rst
    aslDoc/twilight.rst
    aslDoc/angularDistance.rst
+
+Transit routines
+~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+
+   aslDoc/transitDuration.rst
+   aslDoc/inTran.rst
+
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~

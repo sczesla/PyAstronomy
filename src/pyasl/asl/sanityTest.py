@@ -1161,3 +1161,27 @@ class SanityOfAngDist(unittest.TestCase, SaniBase):
     
     print "Angular distance between Vega and Altair (deg)"
     print pyasl.getAngDist(279.23473479, +38.78368896,297.69582730, +08.86832120)
+
+
+class SanityOfTransit:
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+
+  def sanity_transitDurationExample(self):
+    """
+      Transit duration example
+    """
+    from PyAstronomy import pyasl
+    from PyAstronomy import constants as pc
+    
+    # Earth radius expressed in Jovian radii
+    reJ = pc.REarth/pc.RJ
+    print "Earth radius in Jovian units: ", reJ
+    
+    # Estimate the duration of Earth's transit
+    td = pyasl.transitDuration(1.0, reJ, 1.0, 90.0, 365.0)
+    print "The transit of Earth lasts about: %5.3f days" % td
