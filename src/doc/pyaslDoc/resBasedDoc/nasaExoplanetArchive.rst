@@ -4,6 +4,7 @@ Access the "NASA Exoplanet Archive"
 .. currentmodule:: PyAstronomy.pyasl
 .. autoclass:: NasaExoplanetArchive
    :members:
+   :inherited-members:
 
 Example of usage
 ------------------

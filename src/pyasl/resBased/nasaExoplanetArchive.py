@@ -1,15 +1,13 @@
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE 
 import PyAstronomy.pyaC as pyaC
-import ConfigParser as CP
-import datetime as DT
 import os
 import urllib2
 import gzip
 import csv
 import numpy as np
 
-class NasaExoplanetArchive:
+class NasaExoplanetArchive(pp.PyAUpdateCycle):
   """
     Easy access to NASA's exoplanet archive.
     
@@ -62,16 +60,12 @@ class NasaExoplanetArchive:
     response = urllib2.urlopen(''.join((urlRoot, table+select, outformat)))
     data = response.read()
     self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
-    
-    # Write download date to file
-    self.config.set("NEXA", "DATA_DOWNLOAD_DATE", \
-                   DT.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    self.config.write(self._fs.requestFile(self.configFileName, 'w'))
   
   def __init__(self):
     self.data = None
     self.dataFileName = os.path.join("pyasl", "resBased", "NEXA.csv.gz")
-    self.configFileName = os.path.join("pyasl", "resBased", "NEXA.cfg")
+    configFileName = os.path.join("pyasl", "resBased", "NEXA.cfg")
+    pp.PyAUpdateCycle.__init__(self, configFileName, "NEXA")
     # Define columns to select
     # Column name, Description, Unit
     self._columns = {}
@@ -98,67 +92,22 @@ class NasaExoplanetArchive:
     self._columns[20] = ["st_vj", "Stellar V-band brightness", "mag", np.float]
     # Check whether data file exists
     self._fs = pp.PyAFS()
-    self.config = CP.RawConfigParser()
-    if not self._fs.fileExists(self.dataFileName):
-      # It does not yet exist
-      # Write config stub
-      self.config.add_section('NEXA')
-      # By default, reload every 7 days
-      self.config.set('NEXA', 'DATA_UPDATE_CYCLE_DAYS', 7)
-      self.config.write(self._fs.requestFile(self.configFileName, 'w'))
-      
+    
+    if self.needsUpdate():
+      # Data needs update
       print "Downloading exoplanet data from NASA exoplanet archive"
-      self._downloadData()
+      self._update(self._downloadData)
       print "Saved data to file: ", self.dataFileName, " in data directory,"
       print "  which has been configured as: ", self._fs.dpath
       print "By default, the data will be downloaded anew every 7 days."
       print "You can use the `changeDownloadCycle` to change this behavior."
-    else:
-      # Data file exists, check whether it is too old
-      self.config.readfp(self._fs.requestFile(self.configFileName, 'r'))
-      oldTimeStr = self.config.get("NEXA", "DATA_DOWNLOAD_DATE")
-      oldTime = DT.datetime.strptime(oldTimeStr, "%Y-%m-%d %H:%M")
-      delta = DT.datetime.now() - oldTime
-      # Convert to days
-      ddays = (delta.total_seconds()/86400.)
-      try:
-        ddaysLimit = self.config.getfloat("NEXA", "DATA_UPDATE_CYCLE_DAYS")
-      except ValueError:
-        ddaysLimit = None
-      if ddaysLimit is not None:
-        if ddays > ddaysLimit:
-          print "Download of exoplanet data. Last download was more than " \
-                + str(ddaysLimit) + " days ago."
-          self._downloadData()
     self._readData()
 
   def downloadData(self):
     """
       Trigger download of data.
     """
-    self._downloadData()
-
-  def changeDownloadCycle(self, c):
-    """
-      Change the time after which the data are re-downloaded.
-      
-      By default, the data will be downloaded if they are older
-      than seven days.
-      This method allows you to change that cycle.
-      
-      Parameters
-      ----------
-      c : float or None
-          The new download cycle in days. If `None` is
-          provided, re-downloading is switched off.
-    """
-    if c is not None:
-      if c < 0.0:
-        raise(PE.PyAValError("Update cycle needs to be a positive number of days."))
-      self.config.set("NEXA", "DATA_UPDATE_CYCLE_DAYS", c)
-    else:
-      self.config.set("NEXA", "DATA_UPDATE_CYCLE_DAYS")
-    self.config.write(self._fs.requestFile(self.configFileName, 'w'))
+    self._update(self._downloadData)
       
   def _readData(self):
     """
