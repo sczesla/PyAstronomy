@@ -65,3 +65,34 @@ class SanityOfNasaExoplanetArchive(unittest.TestCase):
     dat = nexa.getAllData()
     plt.plot(dat.ra, dat.dec, 'b.')
 #    plt.show()
+
+
+class SanityOfNasaExoplanetEU(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_example(self):
+    """
+      Exoplanet EU example
+    """
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    
+    eu = pyasl.ExoplanetEU()
+    
+    # See what information is available
+    cols = eu.availableColumns()
+    print cols
+    
+    print
+    # Get all data and plot planet Mass vs.
+    # semi-major axis in log-log plot
+    dat = eu.getAllData()
+    plt.xlabel("Planet Mass [RJ]")
+    plt.ylabel("Semi-major axis [AU]")
+    plt.loglog(dat.plMass, dat.sma, 'b.')
+#    plt.show()
