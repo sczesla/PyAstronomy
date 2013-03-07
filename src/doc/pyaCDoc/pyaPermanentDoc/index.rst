@@ -35,4 +35,5 @@ provides some useful classes, which offer some additional convenience and maybe
    :maxdepth: 1
    
    pyaConfig.rst
-   pyaFS.rst 
+   pyaFS.rst
+   updateCycler.rst
