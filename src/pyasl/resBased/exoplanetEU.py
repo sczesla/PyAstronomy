@@ -99,13 +99,22 @@ class ExoplanetEU(pp.PyAUpdateCycle):
   def availableColumns(self):
     """
       Show a summary of the available columns.
+      
+      Returns
+      -------
+      Column names : list of strings
+          The names of the columns.
     """
     print "-"*51
     print "%12s  %30s  %5s" % ("Column Name", "Description", "Unit")
     print "-"*51
+    cols = []
     for k, v in self._columns.iteritems():
       print "%12s  %30s  %5s" % tuple(v[0:3])
+      cols.append(v[0])
     print "-"*51
+    return cols
+    
   
   def getAllData(self):
     """
