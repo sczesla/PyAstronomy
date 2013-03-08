@@ -1230,7 +1230,7 @@ class SanityOfTransit:
     print pyasl.isInTransit(times, T0, period, duration/2.0, boolOutput=True)
 
 
-class SanityOfAirmass:
+class SanityOfAirmass(unittest.TestCase):
   
   def setUp(self):
     pass
@@ -1249,3 +1249,24 @@ class SanityOfAirmass:
     for za in range(0,90,10):
       print "Zenith angle: %2d, airmass = %7.2f" % \
         (za, pyasl.airmassSpherical(za, obsAlt))
+  
+  def sanity_airmassPPExample(self):
+    """
+      Example for plane-parallel airmass
+    """
+    from PyAstronomy import pyasl
+
+    print "Airmass for plane-parallel atmosphere"
+    for za in range(0,70,10):
+      print "Zenith angle: %2d deg, airmass = %7.2f" % \
+        (za, pyasl.airmassPP(za))
+  
+  def sanity_compAirmasses(self):
+    """
+      Compare different airmass calculations
+    """
+    from PyAstronomy import pyasl
+    for za in range(0,70,10):
+      ampp = pyasl.airmassPP(za)
+      amsp = pyasl.airmassSpherical(za, 0.0)
+      self.assertAlmostEqual(ampp/amsp, 1.0, delta=0.01)

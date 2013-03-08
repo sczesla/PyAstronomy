@@ -2,10 +2,32 @@ Calculate the airmass
 ======================
 
 .. currentmodule:: PyAstronomy.pyasl
+
+Plane-parallel atmosphere
+--------------------------- 
+
+.. autofunction:: airmassPP
+
+Example: Airmass with plane-parallel atmosphere
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+  from PyAstronomy import pyasl
+  
+  print "Airmass for plane-parallel atmosphere"
+  for za in range(0,70,10):
+    print "Zenith angle: %2d deg, airmass = %7.2f" % \
+      (za, pyasl.airmassPP(za))
+
+
+Airmass for spherical, homogeneous atmosphere
+------------------------------------------------
+
 .. autofunction:: airmassSpherical
 
 Example: Airmass with homogeneous, spherical atmosphere
----------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 

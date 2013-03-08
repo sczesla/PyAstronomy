@@ -2,6 +2,25 @@ import numpy as np
 from PyAstronomy import pyaC as PC
 from PyAstronomy.pyaC import pyaErrors as PE
 
+def airmassPP(zangle):
+  """
+    Calculate airmass for plane parallel atmosphere.
+    
+    Parameters
+    ----------
+    zangle : float or array
+        The zenith angle in degrees.
+    
+    Returns
+    -------
+    Airmass : float or array
+        The airmass assuming a plane parallel
+        atmosphere.
+  """
+  return 1.0/np.cos(PC.degtorad(zangle))
+  
+
+
 def airmassSpherical(zangle, obsAltitude, rearth=6371.0, yatm=10.0):
   """
     Calculate the airmass for a given zenith angle and observer altitude.
