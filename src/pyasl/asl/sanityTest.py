@@ -1228,3 +1228,24 @@ class SanityOfTransit:
     print "For each time point, a flag indicating whether it"
     print "is in- or off-transit:"
     print pyasl.isInTransit(times, T0, period, duration/2.0, boolOutput=True)
+
+
+class SanityOfAirmass:
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_airmassSphericalExample(self):
+    """
+      Example airmass spherical, homogeneous atmosphere.
+    """
+    from PyAstronomy import pyasl
+    
+    obsAlt = 2400.0
+    
+    for za in range(0,90,10):
+      print "Zenith angle: %2d, airmass = %7.2f" % \
+        (za, pyasl.airmassSpherical(za, obsAlt))

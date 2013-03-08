@@ -72,6 +72,7 @@ Useful algorithms
    aslDoc/cardinalPoint.rst
    aslDoc/twilight.rst
    aslDoc/angularDistance.rst
+   aslDoc/airmass.rst
 
 Transit routines
 ~~~~~~~~~~~~~~~~~
