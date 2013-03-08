@@ -83,3 +83,10 @@ Example
   
   r = pyaC.fuzzyMatch("One", wordList, caseSensitive=False)
   print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+
+  
+Convert degree into rad and vice versa
+---------------------------------------
+
+.. autofunction:: degtorad
+.. autofunction:: radtodeg
