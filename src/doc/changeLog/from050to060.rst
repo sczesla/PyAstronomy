@@ -18,9 +18,11 @@ From 0.5.0 to 0.6.0
                           co_refract_forward, co_refract, eq2hor, \
                           observatory)
                         - Access to NASA Exoplanet Archive
+                        - Access to exoplanet.eu data base
                         - Azimuth to cardinal point conversion
                         - Name twilight given solar altitude
                         - Calculate angular distance
+                        - Calculate airmass
   pyaC                *New functionality*
                         - Invert index selection
   ==================  =============================================
