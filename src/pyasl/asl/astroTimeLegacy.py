@@ -69,7 +69,7 @@ def daycnv(xjd):
 
   jd = int(xjd)                         #Truncate to integral day
   frac = float(xjd) - jd + 0.5          #Fractional part of calendar day
-  if frac > 1.0:                        #Is it really the next calendar day?
+  if frac >= 1.0:                        #Is it really the next calendar day?
     frac -= 1.0
     jd += 1
  
