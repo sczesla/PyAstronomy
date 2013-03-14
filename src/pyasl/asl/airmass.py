@@ -40,7 +40,7 @@ def airmassSpherical(zangle, obsAltitude, rearth=6371.0, yatm=10.0):
     rearth : float, optional
         Earth's radius in km.
     yatm : float, optional
-        Height of the atmosphere.
+        Height of the atmosphere in km.
 
     Returns
     -------
@@ -65,3 +65,5 @@ def airmassSpherical(zangle, obsAltitude, rearth=6371.0, yatm=10.0):
 
   return np.sqrt( ( r + y )**2 * np.cos(zangle)**2 + 2.*r*(1.-y) - y**2 + 1.0 ) - \
          (r+y)*np.cos(zangle)
+         
+
