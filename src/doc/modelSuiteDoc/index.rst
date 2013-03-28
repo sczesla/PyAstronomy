@@ -18,3 +18,4 @@ Contents:
     keplerEllipseModelDoc.rst
     lineListGaussModelDoc.rst
     astroVoigt.rst
+    LyAProfile.rst
