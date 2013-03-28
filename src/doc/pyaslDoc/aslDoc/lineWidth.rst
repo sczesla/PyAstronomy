@@ -6,7 +6,7 @@ Convert damping constant into natural line-width.
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: convertDampingConstant
 
-Example:
+Example
 ---------
 
 ::
