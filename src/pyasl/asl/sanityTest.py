@@ -1064,3 +1064,24 @@ class SanityOfObservatory(unittest.TestCase, SaniBase):
     print pyasl.observatory("kpno")
     print "(longitude and latitude in degrees, altitude in meters, and"
     print "time zone in hours West of Greenwich"
+
+
+class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_example(self):
+    """
+      Checking example for converting damping constant into line width.
+    """
+    from PyAstronomy import pyasl
+
+    # Einstein coefficient relevant for hydrogen LyA
+    gLya = 6.258085e8
+    
+    print "Width of H LyA line at 1215.67 A = %e cm" % \
+          pyasl.convertDampingConstant(gLya, 1215.67)

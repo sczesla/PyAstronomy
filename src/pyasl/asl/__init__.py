@@ -30,3 +30,4 @@ from observatory import *
 from moonpos import *
 from moonphase import *
 from localtime import *
+from lineWidth import *

@@ -69,6 +69,7 @@ Useful algorithms
    aslDoc/eq2hor.rst
    aslDoc/observatory.rst
    aslDoc/moon.rst
+   aslDoc/lineWidth.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~
