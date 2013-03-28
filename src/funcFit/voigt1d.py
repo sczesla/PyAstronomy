@@ -9,6 +9,9 @@ class Voigt1d(OneDFit):
     Implements a Voigt profile (convolution of Cauchy-Lorentz
     and Gaussian distribution).
     
+    .. note:: The profile is implemented so that `al` is half
+              the FWHM.
+    
     *Fit parameters*:
       - `A` - Amplitude
       - `al` - Scale parameter of the Cauchy-Lorentz distribution
