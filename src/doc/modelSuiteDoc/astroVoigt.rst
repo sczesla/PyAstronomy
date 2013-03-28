@@ -6,7 +6,7 @@ Voigt profile with astronomical parameterization
 .. autoclass:: VoigtAstroP
    :members:
 
-Example:
+Example
 ~~~~~~~~~
 
 ::
