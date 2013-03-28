@@ -6,3 +6,4 @@ src/doc/_build/
 .settings/
 build
 *.test
+*.so
