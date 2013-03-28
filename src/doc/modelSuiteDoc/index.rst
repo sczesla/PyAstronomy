@@ -17,3 +17,4 @@ Contents:
     radVelDoc/radVel.rst
     keplerEllipseModelDoc.rst
     lineListGaussModelDoc.rst
+    astroVoigt.rst

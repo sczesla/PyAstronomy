@@ -10,3 +10,4 @@ from planetBrightnessPhases import GeomPlanetBrightPhase
 from keplerEllipseModel import KeplerEllipseModel
 #from atanProfile import AtanProfile, AtanProfileDamped
 from lineListGaussModel import *
+from voigtAstro import VoigtAstroP
