@@ -17,7 +17,8 @@ class VoigtAstroP(fuf.OneDFit):
       w0      Wavelength of the transition                     A
       b       Doppler parameter (corresponds                   km/s
               to sqrt(2) times the velocity dispersion).
-      gamma   Damping width                                    cm
+      gamma   Damping width (full width at half maximum of
+              the Lorentzian)                                  cm
       f       Oscillator strength (unitless)                   --
       ======= ================================================ =====
       
@@ -51,7 +52,8 @@ class VoigtAstroP(fuf.OneDFit):
       bl = w0cm * (self["b"] * 100000.0) / 29979245800.0
       # The constant equals (pi e^2)/(m_e c^2)
       self._profile["A"] =  8.85282064473e-13 * self["f"]  * w0cm**2 / bl
-      self._profile["al"] = self["gamma"] / bl
+      # A factor of 2.0 because `al` defines the half FWHM in Voigt profile
+      self._profile["al"] = (self["gamma"] / bl) / 2.0
       self._profile["lin"] = self["lin"]
       self._profile["off"] = self["off"]
       # Convert the given wavelength axis into velocity units
