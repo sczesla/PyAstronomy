@@ -239,6 +239,8 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
           ------------    ----------------------------------------------------
           Planet name     Name of the planet
           Tmid            HJD of transit center
+          Transit jd      Array giving JD of start, mid-time, and end of
+                          transit.
           Obs jd          Array specifying the HJD of the start, center and
                           end of the observation.
           Obs cal         Equivalent to 'Obs jd', but in the form of the
@@ -451,6 +453,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       obs_end_hjd = Tmid + (dur/2.0) + obsOffset
       obs_end = daycnv(obs_end_hjd)
       time_temp = np.array([obs_start_hjd, Tmid, obs_end_hjd])
+      transit_only = np.array([Tmid - (dur/2.0), Tmid, Tmid + (dur/2.0)])
       
       # Get visibility
       if (lon is not None) and (lat is not None):
@@ -461,7 +464,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         # do not show transit
         if minAltitude is not None:
           minalt = np.where(altaz[0] >= minAltitude)[0]
-          if len(minalt) < 3:
+          if len(minalt) < time_temp.size:
             # Skip this transit
             continue
         # Get Sun position for current transit
@@ -490,18 +493,14 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         # Get Moon position for current transit
         mpos = moonpos(time_temp)
         mdists = []
-        for i in range(3):
+        for i in range(time_temp.size):
           mdists.append(getAngDist(mpos[0][i], mpos[1][i], ra, dec))
         mdist = min(mdists)
         # Check Moon distance, if not fulfilled, neglect the transit
-        if moonDist is not None:
-          moonind = np.where(mdist < moonDist)[0]
-          if len(moonind) > 0:
-            # Neglect transit for it violates the Moon distance limit
-            continue
+        if mdist < moonDist: continue
         # Get lunar phase in percent
         moonpha = moonphase(time_temp) * 100.
-        print "%3d %10.5f   %2d.%2d. %2d:%2d    [%3d°,%s(%3d°)]      %2d.%2d. %2d:%2d     [%3d°,%s(%3d°)]      %2d.%2d. %2d:%2d  [%3d°,%s(%3d°)]   %18s (%3d°,%3d°,%3d°)   (%3d°,%3d°,%3d°)  %3d%%" \
+        print "%3d %10.5f   %2d.%2d. %2d:%02d    [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d     [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d  [%3d°,%s(%3d°)]   %18s (%3d°,%3d°,%3d°)   (%3d°,%3d°,%3d°)  %3d%%" \
               %(trcounter, Tmid, obs_start[2], obs_start[1], np.floor(obs_start[3]), (obs_start[3]-np.floor(obs_start[3]))*60., \
                       altaz[0][0], getCardinalPoint(altaz[1][0]), altaz[1][0], \
                       obs_mid[2], obs_mid[1], np.floor(obs_mid[3]), (obs_mid[3]-np.floor(obs_mid[3]))*60., \
@@ -531,7 +530,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         trData["Obs coord"] = [lon, lat, alt]
       else:
         # If you do not specify the observer's location, return all transits of the object  
-        print "%3d %10.5f   %2d.%2d. %2d:%2d       %2d.%2d. %2d:%2d       %2d.%2d. %2d:%2d" \
+        print "%3d %10.5f   %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d" \
               %(trcounter, Tmid, obs_start[2], obs_start[1], np.floor(obs_start[3]), (obs_start[3]-np.floor(obs_start[3]))*60., \
                       obs_mid[2], obs_mid[1], np.floor(obs_mid[3]), (obs_mid[3]-np.floor(obs_mid[3]))*60., \
                       obs_end[2], obs_end[1], np.floor(obs_end[3]), (obs_end[3]-np.floor(obs_end[3]))*60. )
@@ -539,6 +538,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         trData["Obs jd"] = time_temp
         trData["Obs cal"] = [obs_start, obs_mid, obs_end]
       
+      trData["Transit jd"] = transit_only
       trData["Planet name"] = planetData["plName"]
       allData[trcounter] = trData
       trcounter += 1
