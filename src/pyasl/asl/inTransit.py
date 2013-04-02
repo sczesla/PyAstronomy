@@ -302,7 +302,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       pdin = planetData.copy()
       planetData = {}
       planetData["ra"] = pdin["ra"]
-      planetData["dec"] = pdin["ra"]
+      planetData["dec"] = pdin["dec"]
       planetData["orbPer"] = pdin["pl_orbper"]
       planetData["T0"] = pdin["pl_tranmid"]
       planetData["orbInc"] = pdin["pl_orbincl"]
