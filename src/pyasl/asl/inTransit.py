@@ -156,7 +156,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         for which the transit times should be calculated.
         The required keys are specified above.
     obs_offset : float, optional
-        Specifies additional time before AND after the transit.
+        Specifies additional time before AND after the transit in DAYS.
         This is useful if the observation should start and end
         some time before and after the actual transit.
     hjd : boolean, optional
