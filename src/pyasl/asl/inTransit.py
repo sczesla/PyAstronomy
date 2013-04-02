@@ -367,7 +367,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
     print "Transit duration: ", dur*24.*60., " minutes"
     print "Off-transit time before and after transit: ", obsOffset*24.*60., " minutes"
   
-    # First and last epoch contain in specified range
+    # First and last epoch contained in specified range
     trnum_start = np.floor( (tmin - T0)/period )
     trnum_end = np.ceil( (tmax - T0)/period )
     # Relevant transit epochs
@@ -386,7 +386,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       lat = observatory_data["latitude"]
       alt = observatory_data["altitude"]
   
-    # Check the observatory data are complete
+    # Check if the observatory data are complete
     obsCompl = (lon is None) + (lat is None) + (alt is None)
     if (obsCompl == 1) or (obsCompl == 2):
       raise(PE.PyAValError("Observatory data is incomplete. `lon`, `lat`, and `alt` must all be specified.\n" + \
