@@ -23,6 +23,8 @@ From 0.5.0 to 0.6.0
                         - Name twilight given solar altitude
                         - Calculate angular distance
                         - Calculate airmass
+                        - Transit time table
+                        - Transit visibility plot
   pyaC                *New functionality*
                         - Invert index selection
   ==================  =============================================
