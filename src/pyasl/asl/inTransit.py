@@ -408,6 +408,14 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
             where="transitTimes", \
             solution="Either specify the observer's location or set `showTwilight` to \"all\"."))
     
+    if (showTwilight != "all") and (showTwilight != "civil") and (showTwilight != "nautical") and \
+       (showTwilight != "astronomical") and (showTwilight != "night"):
+      # None of the possible choices for showTwilight have been used.
+      raise(PE.PyAValError("Wrong keyword given for showTwilight.\n" + \
+            "Current keyword is " + showTwilight, \
+            where="transitTimes", \
+            solution="Select a valid keyword for showTwilight: `all', `civil', `nautical', `astronomical', or `night'."))
+    
     if moonDist is None:
       # No limit on Moon distance
       moonDist = 0.0
@@ -417,7 +425,13 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
             "This parameter can only be used, if the observer's location is known.", \
             where="transitTimes", \
             solution="Either specify the observer's location or set `moonDist` to 0.0 or None."))
-  
+
+    if moonDist < 0.0:
+      # Moon distance below zero does not make sense
+      PE.warn("The specified `moonDist' is below zero ("+str(moonDist)+") which does not make sense.\n"+\
+              "It was changed to 0.0.\n"+\
+              "Please use a value >= 0.0 or None if specifying `moonDist'.")
+
     print
     if np.logical_and(lon != None, lat != None):
       print "No. Tmid [HJD]      Obs. start [UT] [ALT, DIR(AZI)]     Transit mid [UT] [ALT, DIR(AZI)]     Obs. end [UT] [ALT, DIR(AZI)]   twilight"+\
