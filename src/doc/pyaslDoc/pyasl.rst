@@ -82,6 +82,7 @@ Transit routines
 
    aslDoc/transitDuration.rst
    aslDoc/inTran.rst
+   aslDoc/transitVisibility.rst
 
 
 Resource based helpers

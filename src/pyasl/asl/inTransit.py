@@ -12,6 +12,8 @@ from moonphase import moonphase
 from angularDistance import getAngDist
 from cardinalPoint import getCardinalPoint
 import sys
+import airmass
+import localtime
 
 def isInTransit(time, T0, period, halfDuration, boolOutput=False):
   """
@@ -559,3 +561,298 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       sys.stdout = oldStdout
   
   return allData
+
+
+def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonDist=True, print2file=False):
+  """
+    Plot the visibility of transits.
+    
+    This function can conveniently be used with the output of
+    the transitTimes function.
+    
+    Parameters
+    ----------
+    allData : dictionary
+        Essentially the output of `transitTimes`.
+        A dictionary mapping consecutive numbers (one per transit) to
+        another dictionary providing the following keys:
+        
+          ============    ====================================================
+          Key             Description
+          ------------    ----------------------------------------------------
+          Planet name     Name of the planet
+          Transit jd      (Only if `markTransit is True)
+                          Array giving JD of start, mid-time, and end of
+                          transit.
+          Obs jd          Array specifying the HJD of the start, center and
+                          end of the observation.
+          Obs cal         Equivalent to 'Obs jd', but in the form of the
+                          calendar date. In particular, for each date, a list
+                          containing [Year, month, day, fractional hours]
+                          is given.
+          Obs coord       East longitude [deg], latitude [deg], and
+                          altitude [m] of the observatory.
+          Star ra         Right ascension of the star [deg].
+          Star dec        Declination of the star [deg].
+          ============    ====================================================
+
+        .. note:: To use the list created by transitTimes, the LONGITUDE and LATITUDE
+                  of the observatory location must have been specified.
+    markTransit : boolean, optional
+        If True (default is False), the in-transit times will
+        be clearly indicated in the plot.
+        Note that this would not be the case otherwise, which is particularly
+        important if extra off-transit time before and after the transit has been
+        requested. 
+    showMoonDist : boolean, optional
+        If True (default), the Moon distance will be shown.
+    print2file : boolean, optional
+        If True, the plot will be dumped to a png-file named:
+        "transitVis-"[planetName].png. The default is False.
+  """
+  from PyAstronomy.pyasl import _ic
+  if not _ic.check["matplotlib"]:
+    raise(PE.PyARequiredImport("matplotlib is not installed.", \
+          where="transitVisibilityPlot", \
+          solution="Install matplotlib (http://matplotlib.org/)"))
+  
+  import matplotlib
+  import matplotlib.pylab as plt
+  from mpl_toolkits.axes_grid1 import host_subplot
+  from matplotlib.ticker import MultipleLocator
+  from matplotlib.font_manager import FontProperties
+  from matplotlib import rcParams
+  
+  rcParams['xtick.major.pad'] = 12 
+  
+  if len(allData.keys()) == 0:
+    raise(PE.PyAValError("Input dictionary is empty", \
+          where="transitVisibilityPlot", \
+          solution=["Use `transitTimes` to generate input dictionary",
+                    "Did you forget to supply observer's location?", \
+                    "If you used `transitTime`, you might need to change the call argument (e.g., times)"]))
+  
+  # Check whether all relevant data have been specified
+  reqK = ["Obs jd", "Obs coord", "Star ra", "Star dec", "Obs cal", "Planet name"]
+  if markTransit:
+    reqK.append("Transit jd")
+  missingK = []
+  for k in reqK:
+    if not k in allData[1].keys():
+      missingK.append(k)
+  if len(missingK) > 0:
+    raise(PE.PyAValError("The following keys are missing in the input dictionary: " + ', '.join(missingK), \
+                         where="transitVisibilityPlot", \
+                         solution="Did you specify observer's location in `transitTimes`?"))
+  
+  fig = plt.figure(figsize=(15,10))
+  fig.subplots_adjust(left=0.07, right=0.8, bottom=0.15, top=0.88)
+  ax = host_subplot(111)
+
+  font0 = FontProperties()
+  font1 = font0.copy()
+  font0.set_family('sans-serif')
+  font0.set_weight('light')
+  font1.set_family('sans-serif')
+  font1.set_weight('medium')
+
+  for n in allData.keys():
+    # JD array
+    jdbinsize = 1.0/24./10.
+    jds = np.arange(allData[n]["Obs jd"][0], allData[n]["Obs jd"][2], jdbinsize)
+    # Get JD floating point
+    jdsub = jds - np.floor(jds[0])
+    # Get alt/az of object
+    altaz = eq2hor.eq2hor(jds, np.ones(jds.size)*allData[n]["Star ra"], np.ones(jds.size)*allData[n]["Star dec"], \
+                        lon=allData[n]["Obs coord"][0], lat=allData[n]["Obs coord"][1], \
+                        alt=allData[n]["Obs coord"][2])
+    # Get alt/az of Sun
+    sunpos_altaz = eq2hor.eq2hor(jds, np.ones(jds.size)*allData[n]["Sun ra"], np.ones(jds.size)*allData[n]["Sun dec"], \
+                                lon=allData[n]["Obs coord"][0], lat=allData[n]["Obs coord"][1], \
+                                alt=allData[n]["Obs coord"][2])
+    
+    # Define plot label
+    plabel = "[%02d]  %02d.%02d.%4d" % (n, allData[n]["Obs cal"][0][2], \
+                                        allData[n]["Obs cal"][0][1], allData[n]["Obs cal"][0][0])
+    
+    # Find periods of: day, twilight, and night
+    day = np.where( sunpos_altaz[0] >= 0. )[0]
+    twi = np.where( np.logical_and(sunpos_altaz[0] > -18., sunpos_altaz[0] < 0.) )[0]
+    night = np.where( sunpos_altaz[0] <= -18. )[0]
+    
+    if (len(day) == 0) and (len(twi) == 0) and (len(night) == 0):
+      print
+      print "transitVisibilityPlot - no points to draw for date %2d.%2d.%4d" \
+            % (allData[n]["Obs cal"][0][2], allData[n]["Obs cal"][0][1], allData[n]["Obs cal"][0][0])
+      print "Skip transit and continue with next"
+      print
+      continue
+
+    mpos = moonpos(jds)
+    mpha = moonphase(jds)
+    mpos_altaz = eq2hor.eq2hor(jds, mpos[0], mpos[1], lon=allData[n]["Obs coord"][0], \
+                               lat=allData[n]["Obs coord"][1], alt=allData[n]["Obs coord"][2])
+    moonind = np.where( mpos_altaz[0] > 0. )[0]
+
+    if showMoonDist:
+      mdist = getAngDist(mpos[0], mpos[1], np.ones(jds.size)*allData[n]["Star ra"], \
+                         np.ones(jds.size)*allData[n]["Star dec"])
+      bindist = int((2.0/24.)/jdbinsize)
+      firstbin = np.random.randint(0,bindist)
+      for mp in range(0, int(len(jds)/bindist)):
+        bind = firstbin+float(mp)*bindist
+        ax.text(jdsub[bind], altaz[0][bind]-1., str(int(mdist[bind]))+r"$^\circ$", ha="center", va="top", \
+                fontsize=8, stretch='ultra-condensed', fontproperties=font0, alpha=1.)
+
+    if markTransit:
+      # Mark points within transit. These may differ from that pertaining to the
+      # observation if an extra offset was given to provide off-transit time.
+      transit_only_ind = np.where( np.logical_and(jds >= allData[n]["Transit jd"][0], \
+                                                  jds <= allData[n]["Transit jd"][2]) )[0]
+      ax.plot( jdsub[transit_only_ind], altaz[0][transit_only_ind], 'g', linewidth=6, alpha=.3)
+
+    if len(twi) > 1:
+      # There are points in twilight
+      linebreak = np.where( (jdsub[twi][1:]-jdsub[twi][:-1]) > 2.0*jdbinsize)[0]
+      if len(linebreak) > 0:
+        plotrjd = np.insert(jdsub[twi], linebreak+1, np.nan)
+        plotdat = np.insert(altaz[0][twi], linebreak+1, np.nan)
+        ax.plot( plotrjd, plotdat, "-", color='#BEBEBE', linewidth=1.5)
+      else:
+        ax.plot( jdsub[twi], altaz[0][twi], "-", color='#BEBEBE', linewidth=1.5)
+
+    ax.plot( jdsub[night], altaz[0][night], 'k', linewidth=1.5, label=plabel)
+    ax.plot( jdsub[day], altaz[0][day], color='#FDB813', linewidth=1.5)
+    
+    altmax = np.argmax(altaz[0])
+    ax.text( jdsub[altmax], altaz[0][altmax], str(n), color="b", fontsize=14, \
+             fontproperties=font1, va="bottom", ha="center")
+
+    if n == 29:
+      ax.text( 1.1, 1.0-float(n)*0.04, "too many transits", ha="left", va="top", transform=ax.transAxes, \
+              fontsize=10, fontproperties=font0, color="r")      
+    else:
+      ax.text( 1.1, 1.0-float(n)*0.04, plabel, ha="left", va="top", transform=ax.transAxes, \
+              fontsize=12, fontproperties=font0, color="b")
+
+  ax.text( 1.1, 1.03, "Start of observation", ha="left", va="top", transform=ax.transAxes, \
+          fontsize=12, fontproperties=font0, color="b")
+  ax.text( 1.1, 1.0, "[No.]  Date", ha="left", va="top", transform=ax.transAxes, \
+          fontsize=12, fontproperties=font0, color="b")
+  
+  axrange = ax.get_xlim()
+  ax.set_xlabel("UT [hours]")
+  
+  if axrange[1]-axrange[0] <= 1.0:
+    jdhours = np.arange(0,3,1.0/24.)
+    utchours = (np.arange(0,72,dtype=int)+12)%24
+  else:
+    jdhours = np.arange(0,3,1.0/12.)
+    utchours = (np.arange(0,72, 2, dtype=int)+12)%24
+  ax.set_xticks(jdhours)
+  ax.set_xlim(axrange)
+  ax.set_xticklabels(utchours, fontsize=18)  
+  
+  # Make ax2 responsible for "top" axis and "right" axis
+  ax2 = ax.twin()
+  # Set upper x ticks
+  ax2.set_xticks(jdhours)
+  ax2.set_xticklabels(utchours, fontsize=18)
+  ax2.set_xlabel("UT [hours]")
+
+  # Horizon angle for airmass
+  airmass_ang = np.arange(5.,90.,5.)
+  geo_airmass = airmass.airmassPP(90.-airmass_ang) 
+  ax2.set_yticks(airmass_ang)
+  airmassformat = []
+  for t in range(geo_airmass.size):
+    airmassformat.append("%2.2f" % geo_airmass[t])
+  ax2.set_yticklabels(airmassformat, rotation=90)
+  ax2.set_ylabel("Relative airmass", labelpad=32)
+  ax2.tick_params(axis="y", pad=10, labelsize=10)
+  plt.text(1.015,-0.04, "Plane-parallel", transform=ax.transAxes, ha='left', \
+           va='top', fontsize=10, rotation=90)
+
+  ax22 = ax.twin()
+  ax22.set_xticklabels([])  
+  ax22.set_frame_on(True)
+  ax22.patch.set_visible(False)
+  ax22.yaxis.set_ticks_position('right')
+  ax22.yaxis.set_label_position('right')
+  ax22.spines['right'].set_position(('outward', 25))
+  ax22.spines['right'].set_color('k')
+  ax22.spines['right'].set_visible(True)
+  airmass2 = np.array(map(lambda ang: airmass.airmassSpherical(90. - ang, allData[n]["Obs coord"][2]), \
+                          airmass_ang))
+  ax22.set_yticks(airmass_ang)
+  airmassformat = []
+  for t in range(airmass2.size): airmassformat.append("%2.2f" % airmass2[t])
+  ax22.set_yticklabels(airmassformat, rotation=90)
+  ax22.tick_params(axis="y", pad=10, labelsize=10)
+  plt.text(1.045,-0.04, "Spherical+Alt", transform=ax.transAxes, ha='left', va='top', \
+           fontsize=10, rotation=90)
+
+  ax3 = ax.twiny()
+  ax3.set_frame_on(True)
+  ax3.patch.set_visible(False)
+  ax3.xaxis.set_ticks_position('bottom')
+  ax3.xaxis.set_label_position('bottom')
+  ax3.spines['bottom'].set_position(('outward', 50))
+  ax3.spines['bottom'].set_color('k')
+  ax3.spines['bottom'].set_visible(True)
+
+  ltime, ldiff = localtime.localTime(utchours, np.repeat(allData[n]["Obs coord"][0], len(utchours)))
+  jdltime = jdhours - ldiff/24.
+  ax3.set_xticks(jdltime)
+  ax3.set_xticklabels(utchours)
+  ax3.set_xlim([axrange[0],axrange[1]])
+  ax3.set_xlabel("Local time [hours]")
+
+  ax.yaxis.set_major_locator(MultipleLocator(15))
+  ax.yaxis.set_minor_locator(MultipleLocator(5))
+  yticks = ax.get_yticks()
+  ytickformat = []
+  for t in range(yticks.size): ytickformat.append(str(int(yticks[t]))+r"$^\circ$")
+  ax.set_yticklabels(ytickformat, fontsize=20)
+  ax.set_ylabel("Altitude", fontsize=18)
+  yticksminor = ax.get_yticks(minor=True)
+  ymind = np.where( yticksminor % 15. != 0. )[0]
+  yticksminor = yticksminor[ymind]
+  ax.set_yticks(yticksminor, minor=True)
+  m_ytickformat = []
+  for t in range(yticksminor.size): m_ytickformat.append(str(int(yticksminor[t]))+r"$^\circ$")
+  ax.set_yticklabels(m_ytickformat, minor=True)
+  
+  ax.yaxis.grid(color='gray', linestyle='dashed')
+  ax.yaxis.grid(color='gray', which="minor", linestyle='dotted')
+  ax2.xaxis.grid(color='gray', linestyle='dotted')
+
+  plt.text(0.5,0.95,"Transit visibility of "+allData[n]["Planet name"], \
+           transform=fig.transFigure, ha='center', va='bottom', fontsize=20)
+
+  if plotLegend:
+    line1 = matplotlib.lines.Line2D((0,0),(1,1), color='#FDB813', linestyle="-", linewidth=2)
+    line2 = matplotlib.lines.Line2D((0,0),(1,1), color='#BEBEBE', linestyle="-", linewidth=2)
+    line3 = matplotlib.lines.Line2D((0,0),(1,1), color='k', linestyle="-", linewidth=2)
+    line4 = matplotlib.lines.Line2D((0,0),(1,1), color='g', linestyle="-", linewidth=6, alpha=.3)
+
+    if markTransit:
+      lgd2 = plt.legend((line1,line2,line3, line4),("day","twilight","night","transit",), \
+                        bbox_to_anchor=(0.88, 0.15), loc=2, borderaxespad=0.,prop={'size':12}, fancybox=True)
+    else:
+      lgd2 = plt.legend((line1,line2,line3),("day","twilight","night",), \
+                        bbox_to_anchor=(0.88, 0.13), loc=2, borderaxespad=0.,prop={'size':12}, fancybox=True)
+    lgd2.get_frame().set_alpha(.5)
+
+  targetco = r"Target coordinates: (%8.4f$^\circ$, %8.4f$^\circ$)" % \
+            (allData[n]["Star ra"], allData[n]["Star dec"])
+  obsco = "Obs coord.: (%8.4f$^\circ$, %8.4f$^\circ$, %4d m)" % \
+          (allData[n]["Obs coord"][0], allData[n]["Obs coord"][1], allData[n]["Obs coord"][2])
+  plt.text(0.01,0.97, targetco, transform=fig.transFigure, ha='left', va='center', fontsize=10)
+  plt.text(0.01,0.95, obsco, transform=fig.transFigure, ha='left', va='center', fontsize=10)
+  
+  if print2file:
+    outfile = "transVis-"+allData[n]["Planet name"].replace(" ", "")+".png"
+    plt.savefig(outfile, format="png", dpi=300)
+  else:
+    plt.show()
