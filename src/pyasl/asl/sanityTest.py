@@ -1270,3 +1270,36 @@ class SanityOfAirmass(unittest.TestCase):
       ampp = pyasl.airmassPP(za)
       amsp = pyasl.airmassSpherical(za, 0.0)
       self.assertAlmostEqual(ampp/amsp, 1.0, delta=0.01)
+
+
+class SanityOfTransitTimes(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_example(self):
+    """
+      Checking example of transitTimes
+    """
+    from PyAstronomy import pyasl
+    import datetime as dt
+    
+    # Get the data for WASP-7 from NEXA data base
+    nexa = pyasl.NasaExoplanetArchive()
+    dat = nexa.selectByPlanetName("Wasp-7 b")
+    
+    # Convert July 14th, 2018, 10pm to a Julian date
+    d = dt.datetime(2018, 7, 14, 22)
+    jd = pyasl.jdcnv(d)
+    
+    # Calculate transit data for transits between July 14th and
+    # July 24th, 2018.
+    dat = pyasl.transitTimes(jd, jd+10.0, dat, nexaInput=True, \
+                             observatory="eso", obsOffset=1./24.)
+    # Plot the result
+#    pyasl.transitVisibilityPlot(dat, markTransit=True)
+  
+
