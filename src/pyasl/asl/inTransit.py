@@ -59,7 +59,7 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False):
   if (period <= 0.0) or (halfDuration <= 0.0):
     raise(PE.PyAValError("Both period and half-duration must be larger 0.", \
                          where="isInTransit"))
-  absPhase = np.abs((np.array(time) - T0)/period)
+  absPhase = np.array(np.abs((np.array(time) - T0)/period), ndmin=1)
   absPhase -= np.floor(absPhase)
   dPhase = halfDuration/period
   isIn = np.logical_or(absPhase <= dPhase, absPhase >= (1.-dPhase))
