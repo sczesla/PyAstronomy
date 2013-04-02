@@ -7,6 +7,8 @@ From 0.5.0 to 0.6.0
   funcFit             *New functionality*
                         - GUI tool for model exploration
                         - Tutorial on TraceAnalysis
+  modelSuite          *New functionality*
+                        - Hydrogen Lyman-alpha line profile
   pyasl               *New routines*
                         - Signal to Noise Ratio (SNR) estimator
                         - Outlier detection
