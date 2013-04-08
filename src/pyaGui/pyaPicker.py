@@ -76,6 +76,9 @@ class Picker:
     self.lb.grid(row=0,rowspan=6, column=0, columnspan=1)
     self.lb.bind("<<ListboxSelect>>", self._lbSelect)
     
+    self.copyButton = tk.Button(self.pointFrame, text="Open List", command=self._showList)
+    self.copyButton.grid(row=8, sticky='w')
+    
     self.removeButton = tk.Button(master=self.pointFrame, text="Remove", \
                                   command=self._removeButtonClicked)
     self.removeButton.grid_configure(row=7, sticky="w")
@@ -97,6 +100,24 @@ class Picker:
 
     self.quitButton = tk.Button(master=self.pointFrame, text='Quit', command=_quit)
     self.quitButton.grid_configure(row=9, sticky="e", pady=30)
+    
+  def _showList(self):
+      """
+        Creates a new window containing a copy and paste aware list with the 
+        points.
+      """
+      def _quitWin():
+          win.destroy()
+      win = tk.Tk()
+      text =  tk.Text(master=win)
+      text.pack()
+      for p in self.pointList:
+        text.insert(tk.END, p.asStr()+"\n")
+      quit = tk.Button(master=win, text='Quit', command=_quitWin)
+      quit.pack()
+      win.wm_title("Copy Window")
+
+    
 
   def _plotPointAs(self, state, point=None, lbString=None):
     """
