@@ -44,6 +44,7 @@ Useful algorithms
    aslDoc/pyasl_wvlconv.rst
    aslDoc/pyaslAitoff.rst
    aslDoc/coorTimeDate.rst
+   aslDoc/decimalYear.rst
    aslDoc/baryvel.rst
    aslDoc/folding.rst
    aslDoc/keplerOrbit.rst
