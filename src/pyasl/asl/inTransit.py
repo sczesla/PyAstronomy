@@ -111,7 +111,7 @@ def transitDuration(sma, rp, rs, inc, period):
   """
   c = PC.PyAConstants()
   # Calculate the impact parameter
-  impact = (sma*c.AU)/(rs*c.RSun) * np.cos(inc/180.*np.pi)
+  impact = (sma*c.AU) * np.cos(inc/180.*np.pi)
   # Calculate the geometric transit duration
   dur = (period/np.pi) * \
         np.arcsin(np.sqrt((rs*c.RSun + rp*c.RJ)**2 - impact**2) / (sma*c.AU))
