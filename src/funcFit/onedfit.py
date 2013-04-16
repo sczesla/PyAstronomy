@@ -510,6 +510,10 @@ class _OndeDFitParBase:
     return self.pars.getRestrictions()
   getRestrictions.__doc__ = Params.getRestrictions.__doc__
   
+  def delRestriction(self, parName):
+    return self.pars.delRestriction(parName)
+  delRestriction.__doc__ = Params.delRestriction.__doc__
+  
   def availableParameters(self):
     return self.pars.availableParameters()
   availableParameters.__doc__ = Params.availableParameters.__doc__
@@ -1463,15 +1467,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       ppr = []
       for par in pars:
         ppr.append(self[par])
-      if not quiet:
-        print "Result from last iteration:"
-        print "  ", ppr
       try:
         ppr.append(self._extractFctVal(self.fitResult))
       except Exception as e:
         PE.warn(PE.PyAValError("The call to the `extractFctVal` function failed. Using full output." + \
                                "\n  Original message: " + str(e)))
         ppr.append(self.fitResult)
+      if not quiet:
+        print "Result from last iteration:"
+        print "  ", ppr
       ppr.append(index)
       result.append(ppr)
     # Restore old state of object

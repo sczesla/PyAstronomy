@@ -421,6 +421,20 @@ class Params:
       self.isRestricted[name] = [(v[0] is not None),(v[1] is not None)]
       self.restrictions[name] = v
 
+  def delRestriction(self, parName):
+    """
+      Delete restriction
+      
+      Parameters
+      ----------
+      parName : string
+          Name of restricted parameter
+    """
+    self.__checkForParam(parName)
+    self.isRestricted[parName] = [False, False]
+    self.restrictions[parName] = [None, None]
+    
+
   def getRestrictions(self):
     """
       Get all restrictions.
