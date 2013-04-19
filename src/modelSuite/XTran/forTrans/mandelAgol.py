@@ -83,10 +83,11 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
     self._calcZList(time - self["T0"])
 
     # Use occultquad Fortran library to compute flux decrease
-    result = occultquad.occultquad(self._zlist[self._intrans],self["linLimb"],self["quadLimb"], \
-                                   self["p"],len(self._intrans))
     df = numpy.zeros(len(time))
-    df[self._intrans] = (1.0 - result[0])
+    if len(self._intrans) > 0:
+      result = occultquad.occultquad(self._zlist[self._intrans],self["linLimb"],self["quadLimb"], \
+                                     self["p"],len(self._intrans))
+      df[self._intrans] = (1.0 - result[0])
     
     self.lightcurve = (1.-df)*1./(1.+self["b"]) + self["b"]/(1.0+self["b"])
     
