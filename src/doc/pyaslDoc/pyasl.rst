@@ -54,6 +54,7 @@ Useful algorithms
    aslDoc/planetPhase.rst
    aslDoc/dopplerShift.rst
    aslDoc/rotBroad.rst
+   aslDoc/broad.rst
    aslDoc/fluxConversion.rst
    aslDoc/svd.rst
    aslDoc/unredDoc.rst

@@ -1323,3 +1323,70 @@ class SanityOfDecimalYear(unittest.TestCase):
     d = dt.datetime(1998,7,2,12,30,59)
     
     print "Decimal representation: ", pyasl.decimalYear(d)
+
+
+class SanityOfBroad(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_example(self):
+    """
+      Checking sanity of 'instrBroadGaussFast' example.
+    """
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    import numpy as np
+    
+    # Set up an input spectrum
+    x = np.linspace(5000.0,5100.0,1000)
+    y = np.ones(x.size)
+    
+    # Introduce some delta-peaked lines
+    y[165] = 0.7
+    y[187] = 0.3
+    y[505] = 0.1
+    y[610] = 0.1
+    y[615] = 0.7
+    
+    # Apply Gaussian instrumental broadening, setting the resolution to 10000.
+    r, fwhm = pyasl.instrBroadGaussFast(x, y, 10000,
+                                        edgeHandling="firstlast", fullout=True)
+    
+    print "FWHM used for the Gaussian kernel: ", fwhm, " A"
+    
+    # Plot the output
+    plt.plot(x,r, 'r--p')
+    plt.plot(x,y, 'b-')
+#    plt.show()
+
+  def sanity_tests(self):
+    """
+      Checking sanity of 'instrBroadGaussFast'
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    # Set up an input spectrum
+    x = np.linspace(5000.0,5100.0,1000)
+    y = np.zeros(x.size)
+    
+    # Introduce some delta-peaked lines
+    y[165] = 0.7
+    y[187] = 0.3
+    y[505] = 0.1
+    y[610] = 0.1
+    y[615] = 0.7
+
+    # Apply Gaussian instrumental broadening.
+    resolution = 12700.
+    r, fwhm = pyasl.instrBroadGaussFast(x, y, resolution, edgeHandling=None, fullout=True)
+    
+    self.assertAlmostEqual(fwhm, np.mean(x)/resolution, 6, "FWHM does not match")
+    
+    s1 = y.sum()
+    s2 = r.sum()
+    self.assertAlmostEqual(s1, s2, 6, "EW in spectrum did change")
