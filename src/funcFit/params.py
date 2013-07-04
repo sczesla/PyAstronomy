@@ -280,6 +280,14 @@ class Params:
     """
     names = self.__toList(name)
     for n in names:
+      # Check whether the parameter is a dependent variable in
+      # a relation
+      for pn, rels in self.relations.iteritems():
+        for rel in rels:
+          if rel[0] == n:
+            raise(PE.PyAParameterConflict("You tried to free the parameter '" + n + \
+                                          "', which is a dependent variable in a relation.", \
+                                          solution="Use 'untie' first to remove the relation."))
       self.__checkForParam(n)
       self.isFree[n] = True
 
