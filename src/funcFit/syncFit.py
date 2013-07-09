@@ -186,8 +186,8 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     self.pars.setFreeParams(self.fitResult[0])
     self.updateModel()    
 
-  def fitMCMC(self, data, X0, Lims, Steps, yerr=None, pymcPars={}, pyy=None, \
-              potentials=[], dbfile="mcmcSample.tmp", dbArgs={}, adaptiveMetropolis=False,
+  def fitMCMC(self, data, X0, Lims, Steps, yerr=None, pymcPars=None, pyy=None, \
+              potentials=None, dbfile="mcmcSample.tmp", dbArgs=None, adaptiveMetropolis=False,
               **sampleArgs):
     """
       Carry out MCMC fit/error estimation.
@@ -245,6 +245,13 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     global _pymcImport
     if not _pymcImport:
       raise(PE.PyARequiredImport("pymc package could not be imported.", solution="Install pymc (see http://code.google.com/p/pymc/"))
+    # Assign mutable default parameters
+    if pymcPars is None:
+      pymcPars = {}
+    if dbArgs is None:
+      dbArgs = {}
+    if potentials is None:
+      potentials = []
     self.data = data
     self.yerr = yerr
     # Build up "concatenated" y-axis and yerr axis

@@ -1072,8 +1072,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     else:
       self.x = copy.copy(x)
 
-  def fitMCMC(self, x, y, X0, Lims, Steps, yerr=None, pymcPars={}, pyy=None, \
-              potentials=[], dbfile="mcmcSample.tmp", quiet=False, dbArgs={}, \
+  def fitMCMC(self, x, y, X0, Lims, Steps, yerr=None, pymcPars=None, pyy=None, \
+              potentials=None, dbfile="mcmcSample.tmp", quiet=False, dbArgs=None, \
               adaptiveMetropolis=False, **sampleArgs):
     """
       Carry out MCMC fit/error estimation.
@@ -1151,6 +1151,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     global _pymcImport
     if not _pymcImport:
       raise(PE.PyARequiredImport("pymc package could not be imported.", solution="Install pymc (see http://code.google.com/p/pymc/"))
+    # Assign mutable default parameters
+    if pymcPars is None:
+      pymcPars = {}
+    if dbArgs is None:
+      dbArgs = {}
+    if potentials is None:
+      potentials = []
     # Assign attributes and check x, y, and yerr.
     self._checkAndAssignXYYERR(x, y, yerr)
     # Copy the pymcPars and dbArgs dictionaries (prevents error on multiple sampler calls)
