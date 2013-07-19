@@ -182,7 +182,7 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
   
   def sanity_example_binningx0dt(self):
     """
-      Checking `binningx0dt` example.
+      Checking `binningx0dt` example 1.
     """
     import numpy as np
     import matplotlib.pylab as plt
@@ -222,6 +222,41 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
     plt.errorbar(r3[::,0], r3[::,1], yerr=r3[::,2], fmt='gp--')
 #    plt.show()
 
+  def sanity_example_binningx0dt_example2(self):
+    """
+      Checking `binningx0dt` example 2.
+    """
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy.pyasl import binningx0dt
+    
+    # Generate some data
+    x = np.arange(-100,999)
+    # Create some holes in the data
+    x = np.delete(x, range(340,490))
+    x = np.delete(x, range(670,685))
+    x = np.delete(x, range(771,779))
+    y = np.sin(x/100.)
+    y += np.random.normal(0,0.1,len(x))
+    
+    
+    # Bin using bin width of 27 and starting at minimum x-value.
+    # Use beginning of bin as starting value.
+    r1, dt1 = binningx0dt(x, y, dt=27, x0=min(x), useBinCenter=True)
+    
+    # As previously, but use the mean x-value in the bins to produce the
+    # rebinned time axis.
+    r2, dt2 = binningx0dt(x, y, dt=27, x0=min(x), useMeanX=True)
+    
+    print "Median shift between the time axes: ", np.median(r1[::,0] - r2[::,0])
+    print " -> Time bins are not aligned due to 'forced' positioning of"
+    print "    the first axis."
+    
+    # Plot the output
+    plt.plot(x,y, 'b.-')
+    plt.errorbar(r1[::,0], r1[::,1], yerr=r1[::,2], fmt='kp--')
+    plt.errorbar(r2[::,0], r2[::,1], yerr=r2[::,2], fmt='rp--')
+#    plt.show()
 
 class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
   

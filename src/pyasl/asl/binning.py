@@ -4,7 +4,7 @@ import numpy as np
     
 
 def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, removeEmpty=True, \
-                removeNoError=False, useBinCenter=True):
+                removeNoError=False, useBinCenter=True, useMeanX=False):
   """
     A simple binning algorithm.
     
@@ -57,6 +57,10 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
         If True (default), the time axis will refer to the
         center of the bins. Otherwise the numbers refer to
         the start of the bins.
+    useMeanX : boolean, optional
+        If True, the binned x-values refer to the mean x-value
+        of all points in that bin.
+        Therefore, the new time axis does not have to be equidistant.
     
     Returns
     -------
@@ -115,6 +119,9 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     indi = np.where(inWhichBin == b)[0]
     result[b, 3] = len(indi)
     result[b, 1] = np.mean(y[indi])
+    if useMeanX:
+      # Overwrite the time axis using the mean x-value
+      result[b, 0] = np.mean(x[indi])
     if yerr is None:
       # No errors on data points are given
       if len(indi) > 1:
