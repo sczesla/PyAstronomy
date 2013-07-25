@@ -41,7 +41,7 @@ def planck(T, lam=None, nu=None):
     from PyAstronomy import constants
     c = constants.PyAConstants(unitSystem="SI")
   else:
-    raise(PE.PyARequiredImport("You need to install 'quantities' to use this function.\n 'qunatities' can be obtained from 'http://pypi.python.org/pypi/quantities'."))
+    raise(PE.PyARequiredImport("You need to install 'quantities' to use this function.\n 'quantities' can be obtained from 'http://pypi.python.org/pypi/quantities'."))
     return None
   if (lam is not None) and (nu is not None):
     raise(PE.PyAParameterConflict("Specify either 'lam' OR 'nu', but not both."))
