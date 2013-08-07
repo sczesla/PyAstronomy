@@ -122,3 +122,37 @@ Example
     plt.plot(x[indi], np.polyval(y[i], x[indi]), 'b.')
     plt.plot(x[indi], der, 'r--')
     plt.show()
+
+    
+Matrix (2d) output
+-------------------
+
+.. autofunction:: matrix2doutput
+
+Example
+~~~~~~~~
+
+::
+
+  from PyAstronomy import pyaC as PC
+  import numpy as np
+  
+  m = np.zeros((4,3))
+  colNames = ["first", "second", "third"]
+  rowNames = ["1", "2", "3", "4"]
+  
+  for j in range(4):
+    for i in range(3):
+      m[j,i] = (i+1) * 10**(j+1) * np.sin(i*j)
+  
+  PC.matrix2doutput(m, colNames=colNames, rowNames=rowNames)
+  print
+  PC.matrix2doutput(m, rowNames=rowNames)
+  print
+  PC.matrix2doutput(m, colsep=" ")
+  print
+  PC.matrix2doutput(m, oformat="% 12.5f", colNames=colNames, rowNames=rowNames)
+  print
+  PC.matrix2doutput(m, oformat=["% 12.5f", "% 6.3f", "% e"], colNames=colNames)
+
+::
