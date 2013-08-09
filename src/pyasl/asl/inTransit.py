@@ -2,7 +2,6 @@
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from astroTimeLegacy import helio_jd, daycnv
-from PyAstronomy import constants as PC
 import observatory as pyaobs
 import eq2hor
 import sunpos
@@ -109,6 +108,8 @@ def transitDuration(sma, rp, rs, inc, period):
         The duration of the transit (same units as
         `period`).
   """
+  from PyAstronomy import constants as PC
+  
   c = PC.PyAConstants()
   # Calculate the impact parameter
   impact = (sma*c.AU) * np.cos(inc/180.*np.pi)
