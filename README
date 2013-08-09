@@ -36,10 +36,13 @@ Installation
 Documentation and further information
 -------------------------------------
  
-  For the documentation and installation instructions please
-  visit the following link:
+  View the latest documentation on "Read the Docs":
+    
+    https://pyastronomy.readthedocs.org/en/latest/
   
-  http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/index.html
+  Visit the documentation of the latest release:
+  
+    http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/index.html
 
 Licensing
 ---------
