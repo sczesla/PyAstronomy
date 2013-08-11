@@ -9,6 +9,7 @@ from nameIdentBase import ModelNameIdentBase
 from anneal import PyAAnneal
 from PyAstronomy import pyaC 
 from time import time as timestamp
+from fufDS import FufDS
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport
 if _pymcImport:
@@ -67,6 +68,12 @@ class MiniFunc:
       self.odf.pars.setFreeParams(P)
       # Update self.model to hold the evaluated function.
       self.odf.updateModel()
+      # Assign y and yerr attributed. This is a not-so-beautiful
+      # way of not breaking the API and having the funcFit data
+      # storage object.
+      self.odf.y = self.odf._fufDS.y
+      self.odf.yerr = self.odf._fufDS.yerr
+      
       val = f(self.odf, P)
       # Assign penalty
       val += self.odf.pars.getPenalty(penaltyFact=self.odf.penaltyFactor)[0]
@@ -637,9 +644,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.rightCompo = None
     self.penaltyFactor = 1e20
     self.model = None
-    self.x = None
-    self.y = None
-    self.yerr = None
+    self._fufDS = None
     self.fitResult = None
     # Determines whether steppar can be used
     self._stepparEnabled = False
@@ -870,11 +875,19 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     result.evaluate = instancemethod(powEval, result, OneDFit)
     return result
   
+  def __sqrDiff(self):
+    @MiniFunc(self)
+    def miniSqrDiff(odf, P):
+      # Calculate squared difference
+      chi = numpy.sum((self._fufDS.y - self.model)**2)
+      return chi
+    return miniSqrDiff   
+  
   def __chiSqr(self):
     @MiniFunc(self)
     def miniChiSqr(odf, P):
       # Calculate chi^2 and apply penalty if boundaries are violated.
-      chi = numpy.sum(((self.y - self.model)/self.yerr)**2)
+      chi = numpy.sum(((self._fufDS.y - self.model)/self._fufDS.yerr)**2)
       return chi
     return miniChiSqr
 
@@ -882,7 +895,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     @MiniFunc(self)
     def miniCash79(odf, P):
       # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
-      c = -2.0 * numpy.sum(self.y*numpy.log(self.model) - self.model)
+      c = -2.0 * numpy.sum(self._fufDS.y * numpy.log(self.model) - self.model)
       return c
     return miniCash79
 
@@ -917,8 +930,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       calling `evaluate` using the `x` attribute, which
       is, e.g., assigned on call to a fit method.
     """
-    if self.x is None: return
-    self.model = self.evaluate(self.x)
+    if self._fufDS is None: return
+    self.model = self.evaluate(self._fufDS.x)
 
   def setPenaltyFactor(self, penalFac):
     """
@@ -1034,43 +1047,41 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     
     return lines
 
-  def _checkAndAssignXYYERR(self, x, y, yerr):
+  def setObjectiveFunction(self, miniFunc="chisqr"):
     """
-      Checks the correctness of x, y, and yerr.
+      Define the objective function.
       
-      Copies the given values to attributes `x`, `y`,
-      and `yerr`.
-      
-      Throws an exception if anything is inconsistent.
+      This function sets the `miniFunc` attribute, which is used
+      to calculate the quantity to be minimized.
       
       Parameters
       ----------
-      x : any type
-          Tells `evaluate` how to build up the model.
-      y : array
-          The "observations"
-      yerr : array or None
-          The error of the observations. Needs to have
-          the same size and dimension as `y` if specified. 
+      miniFunc : str {chisqr, cash79, sqrdiff} or callable
+          The objective function. If "chisqr", chi-square will be
+          minimzed. If "cash 79", the Cash statistics 
+          (Cash 1979, ApJ 228, 939, Eq. 5) will be used.
+          If "sqrdiff" is specified, 
+          Otherwise, a user-defined function is assumed.
     """
-    if not isinstance(y, numpy.ndarray):
-      raise(PE.PyAValError("`y` must be a numpy.ndarray. Current type is '" + str(type(y) + "'.", \
-            solution="Make `y` a numpy array.")))
-    self.y = y.copy()
-    if yerr is not None:
-      if not isinstance(yerr, numpy.ndarray):
-        raise(PE.PyAValError("`yerr` must be a numpy.ndarray. Current type is '" + str(type(y) + "'.", \
-              solution="Make `yerr` a numpy array.")))
-        if y.shape != yerr.shape:
-          raise(PE.PyAValError("`y` and `yerr` must have the same shape.", \
-                solution="Check and adapt shapes of arrays."))
-      self.yerr = yerr.copy()
+    # Determine function to be minimized
+    if miniFunc == "chisqr":
+      self.miniFunc = self.__chiSqr()
+      return
+    elif miniFunc == "cash79":
+      self.miniFunc = self.__cash79()
+      return
+    elif miniFunc == "sqrdiff":
+      self.miniFunc = self.__sqrDiff()
+      return
     else:
-      self.yerr = None
-    if isinstance(x, numpy.ndarray):
-      self.x = x.copy()
-    else:
-      self.x = copy.copy(x)
+      if not hasattr(miniFunc, '__call__'):
+        raise(PE.PyAValError("`miniFunc` is neither None, a valid string, or a function.",
+                             where="OneDFit::fit",
+                             solution="Use, e.g., 'chisqr' or another valid choice from the documentation."))
+      
+      # A function has been specified
+      self.miniFunc = miniFunc
+      return
 
   def fitMCMC(self, x, y, X0, Lims, Steps, yerr=None, pymcPars=None, pyy=None, \
               potentials=None, dbfile="mcmcSample.tmp", quiet=False, dbArgs=None, \
@@ -1159,7 +1170,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if potentials is None:
       potentials = []
     # Assign attributes and check x, y, and yerr.
-    self._checkAndAssignXYYERR(x, y, yerr)
+    self._fufDS = FufDS(x, y, yerr)
     # Copy the pymcPars and dbArgs dictionaries (prevents error on multiple sampler calls)
     pymcPars = pymcPars.copy()
     dbArgs = dbArgs.copy()
@@ -1202,10 +1213,10 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if pyy is None:
       if yerr is None:
         if not quiet: print "Assuming Poisson distribution for 'y'. Use 'pyy' parameter to change this!"
-        pyy = pymc.Poisson("y", mu=modelDet, value=self.y, observed=True)
+        pyy = pymc.Poisson("y", mu=modelDet, value=self._fufDS.y, observed=True)
       else:
         if not quiet: print "Assuming Gaussian distribution for 'y'. Use 'pyy' parameter to change this!"
-        pyy = pymc.Normal("y", mu=modelDet, tau=1.0/self.yerr**2, value=self.y, observed=True)
+        pyy = pymc.Normal("y", mu=modelDet, tau=1.0/self._fufDS.yerr**2, value=self._fufDS.y, observed=True)
 
     # Add data to the Model
     Model = [pyy]
@@ -1301,10 +1312,12 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           statistics, which will be minimized.
     """
     # Assign attributes and check x, y, and yerr.
-    self._checkAndAssignXYYERR(x, y, yerr)
-    # Use uniform errors if None are specified
-    if self.yerr is None:
-      self.yerr = numpy.ones(self.y.shape)
+    if (x is not None) and (y is not None):
+      # This is a not-so-beautiful way to allow
+      # calls from within without redefining the
+      # data object. This way, the API can remain
+      # unchanged.
+      self._fufDS = FufDS(x, y, yerr)
     # Choose minimization algorithm
     if minAlgo is None:
       # If not specified use default.
@@ -1316,16 +1329,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     else:
       self.minAlgo = minAlgo
     # Determine function to be minimized
-    if (miniFunc is None) or (miniFunc == "chisqr"):
-      self.miniFunc = self.__chiSqr()
-    elif miniFunc == "cash79":
-      self.miniFunc = self.__cash79()
-    else:
-      if not hasattr(miniFunc, '__call__'):
-        raise(PE.PyAValError("`miniFunc` is neither None, a valid string, or a function.",
-                             where="OneDFit::fit",
-                             solution="Use, e.g., 'chisqr' or another valid choice from the documentation."))
-      self.miniFunc = miniFunc
+    if (miniFunc is None) and (yerr is not None):
+      miniFunc = "chisqr"
+    elif (miniFunc is None) and (yerr is None):
+      miniFunc = "sqrdiff"
+    self.setObjectiveFunction(miniFunc)
     # Assign initial guess if necessary
     if X0 is not None:
       self.pars.setFreeParams(X0)
@@ -1468,7 +1476,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       for i, p in enumerate(pars):
         self[p] = rs[i][index[i]]
       # Fit using previous setting
-      self.fit(self.x, self.y, yerr=self.yerr, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
+      self.fit(None, None, yerr=None, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
                *self.fminPars, **self.fminArgs)
       # Build up result
       ppr = []
@@ -1583,7 +1591,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     x0 = parmin
     y0 = cvalmin
     self[par] = parmin - scale
-    self.fit(self.x, self.y, yerr=self.yerr, minAlgo=self.minAlgo, miniFunc=self.miniFunc)
+    self.fit(None, None, yerr=None, minAlgo=self.minAlgo, miniFunc=self.miniFunc)
     x1 = self[par]
     y1 = self.__extractFunctionValue(self.fitResult)
     while True:
@@ -1612,7 +1620,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           newguess = hardLimit[1]
           atLimit = True
       self[par] = newguess
-      self.fit(self.x, self.y, yerr=self.yerr, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
+      self.fit(None, None, yerr=None, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
                *self.fminPars, **self.fminArgs)
       # Update guess
       x0 = x1
@@ -1631,7 +1639,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     x0 = parmin
     y0 = cvalmin
     self[par] = parmin + scale
-    self.fit(self.x, self.y, yerr=self.yerr, minAlgo=self.minAlgo, miniFunc=self.miniFunc)
+    self.fit(None, None, yerr=None, minAlgo=self.minAlgo, miniFunc=self.miniFunc)
     x1 = self[par]
     y1 = self.__extractFunctionValue(self.fitResult)
     while True:
@@ -1656,7 +1664,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           newguess = hardLimit[1]
           atLimit = True
       self[par] = newguess
-      self.fit(self.x, self.y, yerr=self.yerr, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
+      self.fit(None, None, yerr=None, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
                *self.fminPars, **self.fminArgs)
       x0 = x1
       y0 = y1

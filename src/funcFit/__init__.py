@@ -33,6 +33,7 @@ from anneal import *
 from syncFit import SyncFitContainer
 from coordinateGrid import *
 from circle2d import *
+from extFitter import NelderMead
 
 if ic.check["scipy"]:
   from voigt1d import *
