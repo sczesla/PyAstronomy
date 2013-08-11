@@ -5,16 +5,45 @@ class NelderMead:
   """
     Downhill-Simplex algorithm for minimization.
     
+    This implementation is based on the publication:
     Nelder and Mead, The Computer Journal 7, 308-313, 1965 (NM 1965)
+    
+    :Halting criterion:
+    The default stop criterion is the one used by NM 1965. In
+    particular, the value
+    
+    .. math:: \\sqrt{\\sum (\\bar{y}-y_i) / n}
+    
+    is calculated. If it falls below the limit defined by the
+    attribute `nmCritLim`, the iteration stops.
+   
+    
+    Attributes
+    ----------
+    alpha, beta, gamma : float
+        The reflection-, expansion-, and contraction-coefficients.
+        The default values (after NM 1965) are 1.0, 0.5, and 2.0.
+        These coefficients control the modification of the simplex.
+    initialStepWidthFac : float
+        This factor determines how the initial simplex is calculated.
+        The first simplex point is the starting value, the others are
+        constructed by adding a fraction defined by this factor to
+        the starting value. The default is 0.05.
+    nmCritLim : float
+        Critical value for the NM 1965 stopping criterion. The
+        default is 1e-8.
+    _maxIter : int
+        The maximum number of iterations. The default is 10000.
+        
   """
   
   def __init__(self):
     # Best guesses after NM 1965
-    self._alpha, self._beta, self._gamma = (1.0, 0.5, 2.0)
+    self.alpha, self.beta, self.gamma = (1.0, 0.5, 2.0)
     # Step-width factor for initial simplex (if not specified otherwise)
-    self._initialStepWidthFac = 0.05
+    self.initialStepWidthFac = 0.05
     # Critical limit for the NM 1965 stopping criterion
-    self._nmCritLim = 1e-8
+    self.nmCritLim = 1e-8
     # Stopping criterion
     self._stopCrit = self._stopNM1965
     # Maximum number of iterations
@@ -22,6 +51,7 @@ class NelderMead:
   
   def _initSimplex(self, m, initDelta):
     """
+      Define the initial simplex.
     """
     # The simplex: n+1 points in n-dimensional space
     self._simplex = np.zeros( (self._n+1, self._n) )
@@ -40,7 +70,7 @@ class NelderMead:
                          "to an appropriate simplex.", \
                           solution="Specify an initial step via the `initDelta` parameter.\n" + \
                           "The size of the step should reflect the 'scale' of the problem.")
-        self._simplex[i+1, i] += self._simplex[0,i] * self._initialStepWidthFac
+        self._simplex[i+1, i] += self._simplex[0,i] * self.initialStepWidthFac
       self._yi[i+1] = m.miniFunc(self._simplex[i+1,::])
     
   def _step(self, m):
@@ -53,11 +83,11 @@ class NelderMead:
     # Barycenter (excluding the worst point)
     pb = (np.sum(self._simplex, 0) - self._simplex[h,::]) / self._n
     # New suggestion
-    ps = (1. + self._alpha) * pb - self._alpha*self._simplex[h,::]
+    ps = (1. + self.alpha) * pb - self.alpha*self._simplex[h,::]
     ys = m.miniFunc(ps)
     if ys < self._yi[l]:
       # In this case, calculate pss
-      pss = self._gamma*ps + (1. - self._gamma) * pb
+      pss = self.gamma*ps + (1. - self.gamma) * pb
       yss = m.miniFunc(pss)
       if yss < self._yi[l]:
         # Replace by pss
@@ -76,7 +106,7 @@ class NelderMead:
       return
     else:
       # There is a new maximum
-      pssb = self._beta*self._simplex[h,::] + (1.0 - self._beta)*pb
+      pssb = self.beta*self._simplex[h,::] + (1.0 - self.beta)*pb
       yssb = m.miniFunc(pssb)
       if yssb > self._yi[h]:
         # Contract
@@ -102,7 +132,7 @@ class NelderMead:
           True, if the stopping criterion has been reached.
     """
     ym = np.mean(self._yi)
-    return (np.sqrt(np.sum((self._yi-ym)**2))/self._n) < self._nmCritLim
+    return (np.sqrt(np.sum((self._yi-ym)**2))/self._n) < self.nmCritLim
   
   def fit(self, m, ds, objf="chisqr", initDelta=None):
     # Number of free parameters
