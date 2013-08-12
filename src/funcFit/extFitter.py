@@ -32,8 +32,6 @@ class NelderMead:
     nmCritLim : float
         Critical value for the NM 1965 stopping criterion. The
         default is 1e-8.
-    _maxIter : int
-        The maximum number of iterations. The default is 10000.
         
   """
   
@@ -46,12 +44,18 @@ class NelderMead:
     self.nmCritLim = 1e-8
     # Stopping criterion
     self._stopCrit = self._stopNM1965
-    # Maximum number of iterations
-    self._maxIter = 10000
   
   def _initSimplex(self, m, initDelta):
     """
       Define the initial simplex.
+      
+      Parameters
+      ----------
+      m : Instance of OneDFit
+          The model.
+      initDelta : dictionary
+          Maps parameter name to the initial step width
+          for the simplex.
     """
     # The simplex: n+1 points in n-dimensional space
     self._simplex = np.zeros( (self._n+1, self._n) )
@@ -66,10 +70,10 @@ class NelderMead:
         self._simplex[i+1, i] += initDelta[p]
       else:
         if self._simplex[0,i] == 0.0:
-          PE.PyAValError("The start value of the parameter '" + p + "' is 0.0. This will lead" + \
-                         "to an appropriate simplex.", \
+          raise(PE.PyAValError("The start value of the parameter '" + p + "' is 0.0. This will lead" + \
+                         " to an appropriate simplex.", \
                           solution="Specify an initial step via the `initDelta` parameter.\n" + \
-                          "The size of the step should reflect the 'scale' of the problem.")
+                          "The size of the step should reflect the 'scale' of the problem."))
         self._simplex[i+1, i] += self._simplex[0,i] * self.initialStepWidthFac
       self._yi[i+1] = m.miniFunc(self._simplex[i+1,::])
     
@@ -134,7 +138,44 @@ class NelderMead:
     ym = np.mean(self._yi)
     return (np.sqrt(np.sum((self._yi-ym)**2))/self._n) < self.nmCritLim
   
-  def fit(self, m, ds, objf="chisqr", initDelta=None):
+  def fit(self, m, ds, objf="chisqr", initDelta=None, maxIter=1e4, callback=None):
+    """
+      Carry out the model fit.
+      
+      After the iteration, the `iterCount` attribute contains the
+      number of iterations. The `maxIterReached` attribute flag is
+      False, if the maximum number of iterations has not been reached
+      and True otherwise. 
+      
+      Parameters
+      ----------
+      m : Instance of OneDFit
+          The model to be fitted.
+      ds : Instance of FufDS
+          The data.
+      objf : string
+          The objective function to be used. Possible
+          choices are "chisqr" (default), "sqrdiff", and
+          "cash79".
+      initDelta : dictionary, optional
+          A dictionary mapping parameter names to the
+          initial step width. This can be very useful, if
+          the starting values are zero or very small. The
+          here defined step will be added to the starting
+          value to construct the simplex.
+      maxIter : int, optional
+          The maximum number of iterations. The default is
+          10000.
+      callback : callable, optional
+          If not None, "callback" will be called with the
+          three parameters: number of iteration (int), current
+          best parameter set (array), and current simplex (array).
+      
+      Returns
+      -------
+      Best-fit values : dictionary
+          Maps parameter name to the best-fit value.
+    """
     # Number of free parameters
     self._n = m.numberOfFreeParams()
     # Set objective function
@@ -145,11 +186,16 @@ class NelderMead:
     self._fpns = m.freeParamNames()
     # Initial simplex
     self._initSimplex(m, initDelta)
+    # MaxIter flag
+    self.maxIterReached = False
     
     self.iterCount = 0
-    while (not self._stopCrit()) and (self.iterCount < self._maxIter):
-      self._step(m)
+    while (not self._stopCrit()) and (self.iterCount < maxIter):
       self.iterCount += 1
+      self._step(m)
+      if callback is not None:
+        l = np.argmin(self._yi)
+        callback(self.iterCount, self._simplex[l,::], self._simplex)
     
     # Find the optimum parameter set
     l = np.argmin(self._yi)
@@ -157,6 +203,14 @@ class NelderMead:
     # Evaluate model so that model attribute holds the best match
     m.evaluate(ds.x)
     
-    if self.iterCount == self._maxIter:
-      print "Maxiter reached"
+    if self.iterCount == maxIter:
+      self.maxIterReached = True
+      PE.warn(PE.PyAAlgorithmFailure("The maximum number of iterations has been reached.\n" + \
+                                     "The fit may be inappropriate.", \
+                                     where="NelderMead", \
+                                     solution=["Increase number of iterations.", \
+                                               "Change starting values.", \
+                                               "Change algorithm parameters (e.g., alpha, beta, gamma)."]))
+    # Return a dictionary with the best-bit parameters
+    return dict(zip(self._fpns, self._simplex[l,::]))
     

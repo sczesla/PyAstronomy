@@ -80,3 +80,14 @@ class PyADownloadError(PyaErrTemplate):
       A download could not successfully be carried out.
     """
     PyaErrTemplate.__init__(self, what, "PyA download error", **keys)
+
+
+class PyAAlgorithmFailure(PyaErrTemplate):
+  
+  def __init__(self, what, **keys):
+    """
+      When to be raised?
+      
+      Whenever an algorithm fails in accomplishing its purpose.
+    """
+    PyaErrTemplate.__init__(self, what, "PyA algorithm failure", **keys)
