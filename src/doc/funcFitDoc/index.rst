@@ -32,7 +32,7 @@ External fitters
 .. toctree::
     :maxdepth: 2
 
-    nelderMead.rst
+    extFitters.rst
 
 Technical documentation
 --------------------------

@@ -6,8 +6,8 @@ Nelder-Mead downhill simplex
    :members:
    :private-members:
 
-Example
---------
+Example: Application of the NelderMead class
+----------------------------------------------
 
 ::
 
