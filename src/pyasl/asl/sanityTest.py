@@ -1425,3 +1425,79 @@ class SanityOfBroad(unittest.TestCase):
     s1 = y.sum()
     s2 = r.sum()
     self.assertAlmostEqual(s1, s2, 6, "EW in spectrum did change")
+
+
+class SanityOfCrosscor(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_ShiftedGaussian(self):
+    """
+      Checking the shift of a single Gaussian.
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    # Create the template
+    tw = np.linspace(5000,5010,1000)
+    tf = np.exp(-(tw-5004.0)**2/(2.*0.1**2))
+    
+    # Create data, which are not that well sampled
+    dw = np.linspace(5000,5010,200)
+    df = np.exp(-(dw-5004.0)**2/(2.*0.1**2))
+    
+    rv1, cc1 = pyasl.crosscorrRV(dw, df, tw, tf, -30., 30., 60./100., skipedge=20, mode="doppler")
+    rv2, cc2 = pyasl.crosscorrRV(dw, df, tw, tf, -30., 30., 60./100., skipedge=20, mode="lin")
+    
+    m1 = np.argmax(cc1)
+    m2 = np.argmax(cc2)
+    
+    self.assertAlmostEqual(rv1[m1], rv2[m2], delta=1e-10)
+    
+    accu = 60./100.
+    for dwl in np.linspace(-0.2,0.2,20):
+      # Create the template
+      tw = np.linspace(5000,5010,1000)
+      tf = np.exp(-(tw-5004.0)**2/(2.*0.1**2))
+    
+      # Create data, which are not that well sampled
+      dw = np.linspace(5000,5010,200)
+      df = np.exp(-(dw-(5004.0+dwl))**2/(2.*0.1**2))
+      
+      rv1, cc1 = pyasl.crosscorrRV(dw, df, tw, tf, -30., 30., 60./100., skipedge=20, mode="doppler")
+      rv2, cc2 = pyasl.crosscorrRV(dw, df, tw, tf, -30., 30., 60./100., skipedge=20, mode="lin")
+      
+      m1 = np.argmax(cc1)
+      m2 = np.argmax(cc2)
+      
+      rv = dwl/np.mean(tw) * 299792.458
+      
+      self.assertAlmostEqual(rv1[m1], rv2[m2], delta=accu)
+      self.assertAlmostEqual(rv1[m1], rv, delta=accu)
+      self.assertAlmostEqual(rv2[m1], rv, delta=accu)
+
+  def sanity_randomDIstribution(self):
+    """
+      Checking the shift with random numbers.
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    # Create the template
+    tw = np.linspace(10000,10010,100)
+    tf = np.random.normal(0.0, 1.0, len(tw))
+    
+    dw = tw
+    df = np.roll(tf, 2)
+    
+    rv1, cc1 = pyasl.crosscorrRV(dw, df, tw, tf, -30., 30., 60./1000., skipedge=20, mode="doppler")
+    
+    m1 = np.argmax(cc1)
+    rv = (tw[2] - tw[0])/np.mean(tw) * 299792.458
+    
+    accu = 60./1000.
+    self.assertAlmostEqual(rv1[m1], rv, delta=accu)

@@ -75,6 +75,7 @@ Useful algorithms
    aslDoc/twilight.rst
    aslDoc/angularDistance.rst
    aslDoc/airmass.rst
+   aslDoc/crosscorr.rst
 
 Transit routines
 ~~~~~~~~~~~~~~~~~
