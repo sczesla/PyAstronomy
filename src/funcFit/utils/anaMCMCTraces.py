@@ -8,6 +8,7 @@ from scipy.stats import spearmanr, pearsonr
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.funcFit.utils import ic
 import itertools
+from PyAstronomy import pyaC as PC
 
 class TraceAnalysis:
   """
@@ -499,9 +500,9 @@ class TraceAnalysis:
           k+=1
 
 
-  def correlationMatrix(self, toScreen=True, method="pearson", parList=None):
+  def correlationMatrix(self, toScreen=True, method="pearson", parList=None, covariance=False):
     """
-      Calculates the correlation matrix.
+      Calculates the correlation or covariance matrix.
       
       Parameters
       ----------
@@ -513,18 +514,20 @@ class TraceAnalysis:
           If True, the result will be printed to stdout
       method : string, {"pearson", "spearman"}
           The correlation coefficient to be used.
+      covariance : boolean, optional
+          If True, the covariance will be returned instead
+          of the correlation. The default is False.
       
       Returns
       -------
       Parlist : list
           Parameter names in the order used in the calculation.
-      Correlation matrix : array,
+      Correlation matrix : 2d array
           The correlation matrix
-      lines :
+      lines : list of strings
           Formatted version of the correlation matrix in the form
           of a list of strings.
     """
-    lines = []
     if parList is None:
       parList = self.availableParameters()
     corFunc = None
@@ -535,29 +538,25 @@ class TraceAnalysis:
             solution="Change method argument e.g. to 'pearson'."))
     for p in parList:
       self._parmCheck(p)
+    if covariance:
+      # The covariance is requested. In this case, the
+      # correlation coefficient has to be multiplied by the
+      # standard deviation(s).
+      stds = {}
+      for p in parList:
+        stds[p] = self.std(p)
+    # Calculate the matrix
     n = len(parList)
     matrix = numpy.zeros( (n, n) )
     for i in xrange(n):
       for j in xrange(n):
         matrix[i, j] = corFunc(parList[i], parList[j])[0]
+        if covariance:
+          matrix[i, j] *= (stds[parList[i]] * stds[parList[j]])
+
     # Format the output
-    maxlen = 0
-    for p in parList:
-      maxlen = max(maxlen, len(p))
-    line = " " * maxlen
-    for p in parList:
-      line += ("  %"+str(maxlen)+"s") % p
-    lines.append(line + "\n")
-    for i in xrange(n):
-      line = ("%"+str(maxlen)+"s") % parList[i]
-      for j in xrange(n):
-        line += ("  %"+str(maxlen)+"s") %  ("% 5.3f" % matrix[i, j])
-      lines.append(line + "\n")
-    
-    if toScreen:
-      for l in lines:
-        print l,
-        
+    lines = PC.matrix2doutput(matrix, colNames=parList, rowNames=parList, toScreen=toScreen)
+ 
     return parList, matrix, lines
     
 
