@@ -27,7 +27,7 @@ class SimIOF(file):
     self.origin = origin
     file.__init__(self, *args, **kwargs)
     if self.mode == 'w':
-      self.write("# File cerated by " + str(origin) + "\n")
+      self.write("# File created by " + str(origin) + "\n")
       self.write("# Date: " + str(datetime.datetime.now()).split('.')[0] + "\n")
       self.write("#\n")
     elif self.mode == 'r':
