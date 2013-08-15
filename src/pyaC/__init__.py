@@ -9,3 +9,4 @@ from fuzzyMatch import fuzzyMatch
 from conversions import radtodeg, degtorad
 from numericalDerivatives import diffCFD
 from output import matrix2doutput
+from simiof import SimIOF

@@ -155,4 +155,35 @@ Example
   print
   PC.matrix2doutput(m, oformat=["% 12.5f", "% 6.3f", "% e"], colNames=colNames)
 
+
+Simple Input-Output file
+-------------------------
+
+.. autoclass:: SimIOF
+   :members:
+
 ::
+
+  from PyAstronomy import pyaC as PC
+  import numpy as np
+  
+  f = PC.SimIOF("origin", "test.tmp", 'w')
+  
+  a = 5.6
+  b = 8.7
+  c = 5
+  
+  f.addProp("a", a, fmt="% 4.4e")
+  f.addProp(["b", "c"], [b,c])
+  
+  for x in range(10):
+    f.write(str(x) + "\n")
+  
+  f.close()
+  
+  g = PC.SimIOF("origin", "test.tmp", 'r')
+  
+  # See the properties assigned
+  print g.args
+  # Use loadtxt to load the data
+  print np.loadtxt(g)

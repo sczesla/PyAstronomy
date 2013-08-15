@@ -1,4 +1,5 @@
 import unittest
+import os
 
 class SanityOfPyasl(unittest.TestCase):
   
@@ -6,7 +7,8 @@ class SanityOfPyasl(unittest.TestCase):
     pass
   
   def tearDown(self):
-    pass
+    if os.path.isfile("test.tmp"):
+      os.remove("test.tmp")
   
   def sanity_invertIndexSelectionExample(self):
     """
@@ -160,3 +162,31 @@ class SanityOfPyasl(unittest.TestCase):
     PC.matrix2doutput(m, oformat="% 12.5f", colNames=colNames, rowNames=rowNames)
     print
     PC.matrix2doutput(m, oformat=["% 12.5f", "% 6.3f", "% e"], colNames=colNames)
+
+  def sanity_SimIOF_Example(self):
+    """
+      Checking example for simple input/output file.
+    """
+    from PyAstronomy import pyaC as PC
+    import numpy as np
+    
+    f = PC.SimIOF("origin", "test.tmp", 'w')
+    
+    a = 5.6
+    b = 8.7
+    c = 5
+    
+    f.addProp("a", a, fmt="% 4.4e")
+    f.addProp(["b", "c"], [b,c])
+    
+    for x in range(10):
+      f.write(str(x) + "\n")
+    
+    f.close()
+    
+    g = PC.SimIOF("origin", "test.tmp", 'r')
+    
+    # See the properties assigned
+    print g.args
+    # Use loadtxt to load the data
+    print np.loadtxt(g)
