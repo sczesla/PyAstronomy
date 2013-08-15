@@ -6,4 +6,14 @@ From 0.6.0 to 0.7.0
   ==================  =============================================
   pyaC                *New functionality*
                         - Formatted output of 2d matrices
+                        - Numerical derivatives (diffCFD)
+  pyasl               *New functionality*
+                        - Cross-correlation algorithm (crosscorrRV)
+                        - Finding extreme point by parabolic fit
+                          (quadExtreme)
+                        - Calculate decimal year (decimalYear)
+                        - Gaussian instrumental broadening
+                          (instrBroadGaussFast)
+  funcFit             *New functionality*
+                        - Various bug fixes.
   ==================  =============================================
