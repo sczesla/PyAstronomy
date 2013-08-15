@@ -4,6 +4,7 @@ import matplotlib.pylab as mpl
 from numpy import mean, median, std
 import numpy
 import re
+import os
 from scipy.stats import spearmanr, pearsonr
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.funcFit.utils import ic
@@ -70,6 +71,8 @@ class TraceAnalysis:
 
   def __init__(self, resource, db="pickle"):
     if isinstance(resource, basestring):
+      if not os.path.isfile(resource):
+        raise(PE.PyAFileError(resource, "ne"))
       self.file = resource
       if not (re.match(".*\.hdf5", resource) is None):
         db = "hdf5"

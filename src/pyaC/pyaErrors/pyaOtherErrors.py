@@ -80,3 +80,26 @@ class PyADownloadError(PyaErrTemplate):
       A download could not successfully be carried out.
     """
     PyaErrTemplate.__init__(self, what, "PyA download error", **keys)
+
+
+class PyAFileError(PyaErrTemplate):
+  
+  def __init__(self, fn, mode, **keys):
+    """
+      When to be raised?
+      
+      Whenever a file-related error is detected.
+
+      Parameters
+      ----------
+      fn : string
+          Name of the file in question.
+      mode : string, {no, ne}
+          - "no": File could not be opened.
+          - "ne": File does not exist 
+    """
+    if mode == "no":
+      what = "File '" + str(fn) + "' could not be opened."
+    elif mode == "ne":
+      what = "File '" + str(fn) + "' does not exist."
+    PyaErrTemplate.__init__(self, what, "PyA file error", **keys)
