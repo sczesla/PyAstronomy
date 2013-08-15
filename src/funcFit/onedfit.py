@@ -1248,10 +1248,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     
     # Setting values to ``best fit values'' (lowest deviance)
     mindex = numpy.argmin(self.MCMC.trace("deviance")[:])
+    if not quiet:
+      print "Searching for lowest-deviance solution."
+      print "  Index of lowest-deviance solution: ", mindex
     for par in pymcPars.iterkeys():
       # Weird way of accessing element with index "mindex";
       # prevents slicing/indexing problem in pymc-Trace
       self[par] = (self.MCMC.trace(par)[mindex:mindex+1])[0]
+      if not quiet:
+        print "  Parameter: ", par, ", value: ", self[par]
     self.updateModel() 
     self.MCMC.db.close()
     
