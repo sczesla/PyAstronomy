@@ -4,6 +4,9 @@ Cross-correlation
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: crosscorrRV
 
+.. seealso:: An algorithm for finding the extreme points by
+             parabolic approximation (:py:func:`quadExtreme`).
+
 Example: Cross-correlation with a Gaussian
 -------------------------------------------
 
