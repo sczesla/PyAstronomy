@@ -9,11 +9,12 @@ class FufDS:
     Parameters
     ----------
     x : array
-        Specify the data.
+        Specify the abscissa.
     y : array
         Specify the data.
     yerr : array, optional
-        The error of the data. 
+        The error of the data.
+  
   """
   
   def __init__(self, x, y, yerr=None):
