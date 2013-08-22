@@ -6,4 +6,6 @@ From 0.6.0 to 0.7.0
   ==================  =============================================
   pyaC                *New functionality*
                         - Formatted output of 2d matrices
+  funcFit             *New functionality*
+                        - Introduced external fitters
   ==================  =============================================
