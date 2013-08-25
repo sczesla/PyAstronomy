@@ -103,3 +103,15 @@ class PyAFileError(PyaErrTemplate):
     elif mode == "ne":
       what = "File '" + str(fn) + "' does not exist."
     PyaErrTemplate.__init__(self, what, "PyA file error", **keys)
+
+
+class PyAAlgorithmFailure(PyaErrTemplate):
+  
+  def __init__(self, what, **keys):
+    """
+      When to be raised?
+      
+      Whenever an algorithm fails in accomplishing its purpose.
+    """
+    PyaErrTemplate.__init__(self, what, "PyA algorithm failure", **keys)
+

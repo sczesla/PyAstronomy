@@ -14,6 +14,49 @@ if _pymcImport:
   import pymc
 
 
+class MiniFuncSync:
+  """
+    This decorator can be applied to use
+    self-defined objective functions.
+    
+    Applied to an objective function, it adds the functionality
+    needed to evaluate the model given a certain parameter vector,
+    so that the user does only have to take care
+    about the quantity to be minimized.
+    
+    Parameters
+    ----------
+    odf : fitting object
+        The fitting object that is supposed to use the self-defined
+        objective function.
+  """
+  
+  def __init__(self, odf):
+    """
+      Parameter:
+        - `odf` - An instance of a fitting objects such as for example *GaussFit1d*.
+    """
+    # Save a REFERENCE to the fitting object
+    self.odf = odf
+  
+  def __call__(self, f):
+    """
+      Parameter:
+       - `f` - The user-defined objective function.
+    """
+    def miniFunc(P):
+      # Update the parameter values in the 'Params' class instance.
+      self.odf.pars.setFreeParams(P)
+      # Update self.model to hold the evaluated function.
+      self.odf.updateModel()
+      
+      val = f(self.odf, P)
+      # Assign penalty
+      val += self.odf.pars.getPenalty(penaltyFact=self.odf.penaltyFactor)[0]
+      return val
+    return miniFunc
+
+
 class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
   
   def addComponent(self, newCompo):
@@ -78,7 +121,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       self.evaluate(self.data[c][0], component=c)
   
   def __chiSqr(self):
-    @MiniFunc(self)
+    @MiniFuncSync(self)
     def miniChiSqr(odf, P):
       # Calculate chi^2 and apply penalty if boundaries are violated.
       chi = 0.0
@@ -86,6 +129,16 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
         chi += numpy.sum(((self.data[k][1] - self.models[k])/self.yerr[k])**2)
       return chi
     return miniChiSqr
+  
+  def __sqrdiff(self):
+    @MiniFuncSync(self)
+    def minisqr(odf, P):
+      # Calculate squared difference
+      sqr = 0.0
+      for k in self._compos.iterkeys():
+        sqr += numpy.sum((self.data[k][1] - self.models[k])**2)
+      return sqr
+    return minisqr
   
   def treatAsEqual(self, parameter):
     """
@@ -155,10 +208,6 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     self.data = data
     if yerr is not None:
       self.yerr = yerr
-    else:
-      self.yerr = {}
-      for k in self._compos.iterkeys():
-        self.yerr[k] = numpy.ones(len(self.data[k][0]))
     # Choose minimization algorithm
     if minAlgo is None:
       # If not specified use default.
@@ -171,7 +220,10 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       self.minAlgo = minAlgo
     # Determine function to be minimized
     if miniFunc is None:
-      self.miniFunc = self.__chiSqr()
+        if yerr is None:
+          self.miniFunc = self.__sqrdiff()
+        else:
+          self.miniFunc = self.__chiSqr()
     else:
       self.miniFunc = miniFunc
     # Assign initial guess if necessary
@@ -367,24 +419,29 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
   
   def __init__(self):
     """
-      This class can be used in the case that two related models defined on different axes
-      are to be fitted simultaneously.
+      Simultaneous model fitting.
       
       As an example, take a simultaneous measurement of a photometric planetary transit and
       the Rossiter-McLaughlin effect. Surely, both should be described by a subset of common
-      parameters like size of the planet and large semi-major axis, but the models/measurements
+      parameters like the size of the planet and the large semi-major axis, but the
+      models/measurements
       refer to quite different regimes: brightness and radial-velocity shift. This class
       can be used to carry out a fit of both simultaneously. 
       
-      :Class properties:
-        - `_compos` - A dictionary of the form {component-number:model-component}. The \
-                      component number identifies every model component.
-        - `models` - A dictionary of the form {component-number:model}; saves the evaluated \
-                     model for every model component. This property is updated on a call \
-                     to *updateModel*.
-        - `pars` - Instance of the *Params* class to manage the model parameters.
-        - `penaltyFactor` - float, Factor used to scale the penalty imposed if parameter \
-                            restrictions are violated.  
+      Attributes
+      ----------
+      pars : Instance of Params
+          Manages the model parameters.
+      models : dictionary
+          A dictionary of the form component-number model; saves the evaluated
+          models.
+      penaltyFactor : float
+          Factor used to scale the penalty imposed if parameter
+          restrictions are violated.
+      _compos : dictionary
+          A dictionary of the form component-number model-component. The
+          component number uniquely identifies every model component.
+    
     """
     self._compos = {}
     self.models = {}

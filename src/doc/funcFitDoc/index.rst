@@ -26,6 +26,14 @@ package. The most important aspects are demonstrated by example.
     tutorial2.rst
     traceAnalysisTutorial.rst
 
+External fitters
+---------------------
+
+.. toctree::
+    :maxdepth: 2
+
+    extFitters.rst
+
 Technical documentation
 --------------------------
 
