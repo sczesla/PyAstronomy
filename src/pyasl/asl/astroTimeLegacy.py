@@ -1086,6 +1086,11 @@ def juldate(date):
   """
     Convert from calendar to Reduced Julian Date
   
+    This function returns the *reduced* Julian date, which
+    is obtained by subtracting 2400000 from the Julian date.
+    To convert the output into Modified Julian Date (MJD),
+    another 0.5 days have to be subtracted.
+  
     Parameters
     ----------
     date : DateTime object
@@ -1094,7 +1099,7 @@ def juldate(date):
     Returns
     -------
     RJD : float
-        The reduced Julian date.
+        The **reduced** Julian date.
   
     Notes
     -----
