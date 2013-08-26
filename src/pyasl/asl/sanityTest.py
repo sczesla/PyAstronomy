@@ -1330,13 +1330,50 @@ class SanityOfTransitTimes(unittest.TestCase):
     d = dt.datetime(2018, 7, 14, 22)
     jd = pyasl.jdcnv(d)
     
-    # Calculate transit data for transits between July 14th and
-    # July 24th, 2018.
-    dat = pyasl.transitTimes(jd, jd+10.0, dat, nexaInput=True, \
-                             observatory="eso", obsOffset=1./24.)
+    # Calculate transit data for transits within 100 days starting
+    # form July 14th, 2018.
+    dat = pyasl.transitTimes(jd, jd+100., dat, nexaInput=True, \
+                             observatory="esoparanal", obsOffset=1./24., \
+                             minAltitude=10.0)
     # Plot the result
 #    pyasl.transitVisibilityPlot(dat, markTransit=True)
   
+  def sanity_ETD_compare(self):
+    """
+      Check transit of Wasp-7 on Oct. 03, 2018, with ETD result.
+    """
+    from PyAstronomy import pyasl
+    import datetime as dt
+    
+    # Get the data for WASP-7 from NEXA data base
+    nexa = pyasl.NasaExoplanetArchive()
+    dat = nexa.selectByPlanetName("Wasp-7 b")
+    
+    # Convert July 14th, 2018, 10pm to a Julian date
+    d = dt.datetime(2018, 7, 14, 22)
+    jd = pyasl.jdcnv(d)
+    
+    # Calculate transit data for transits within 100 days starting
+    # form July 14th, 2018.
+    dat = pyasl.transitTimes(jd, jd+100., dat, nexaInput=True, \
+                             observatory="esoparanal", obsOffset=0.0, \
+                             minAltitude=10.0)
+    
+    # Choose first transit
+    d = dat[2]
+    print d
+    mt = d["Obs cal"][1]
+    self.assertEqual(mt[0], 2018, "Year does not match")
+    self.assertEqual(mt[1], 10, "Month does not match")
+    self.assertEqual(mt[2], 3, "Day does not match")
+    self.assertAlmostEqual(mt[3], 3.+53./60., delta=5./60., msg="Hour does not match")
+    self.assertAlmostEqual(d["Star alt"][0], 67., msg="Stellar altitude does not match", delta=2.0)
+    self.assertAlmostEqual(d["Star alt"][1], 47., msg="Stellar altitude does not match", delta=2.0)
+    self.assertAlmostEqual(d["Star alt"][2], 27., msg="Stellar altitude does not match", delta=2.0)
+    # Transit duration is specified in Nexa (therefore, 15 min uncertainty here)
+    self.assertAlmostEqual((d["Transit jd"][2] - d["Transit jd"][0])*24.0, \
+                           3.567 , delta=15./60., msg = "Duration does not match")
+
 
 class SanityOfDecimalYear(unittest.TestCase):
   
