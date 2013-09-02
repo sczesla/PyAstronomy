@@ -36,6 +36,7 @@ class FFModelPlotFit:
     self.withResiduals = withResiduals
     self.modelLine = None
     self.residualLine = None
+    self.dataPlot = False
   
   def _setUpAxes(self, f):
     """
@@ -65,17 +66,25 @@ class FFModelPlotFit:
     if self.a is None:
       self._setUpAxes(f)
       firstCall = True
+    
+    # Calculate the model
     model = odf.evaluate(self.x)
-    if self.yerr is None:
-      if self.modelLine is not None:
-        # Remove the last model
-        self.a.lines.pop(-1)
-      # Plot new model
-      self.modelLine = self.a.plot(self.x, self.y, 'bp')
-      self.a.plot(self.x, self.y, ms='',ls='-',color='b',alpha=0.2)
-    else:
-      self.a.errorbar(self.x, self.y, yerr=self.yerr, fmt='b.')
-    self.a.plot(self.x, model, 'r--')
+    
+    if not self.dataPlot:
+      # Plot the data
+      self.dataPlot = True
+      if self.yerr is None:
+        self.a.plot(self.x, self.y, 'bp')
+        self.a.plot(self.x, self.y, ms='',ls='-',color='b',alpha=0.2)
+      else:
+        self.a.errorbar(self.x, self.y, yerr=self.yerr, fmt='b.')
+    
+    if self.modelLine is not None:
+      # Remove the last model to show the latest one
+      self.a.lines.pop(-1)
+    # Plot the model
+    self.modelLine = self.a.plot(self.x, model, 'r--')
+    
     if self.withResiduals:
       if self.residualLine is not None:
         self.ar.lines.pop(-1)
