@@ -222,6 +222,10 @@ class ValueSetSummary(tk.Toplevel):
     self.showText = tk.Text(self.showFrame)
     self.showText.config(background='white')
     self.showText.grid(row=1,column=0,columnspan=2) #.pack(expand=True)
+    
+    self.helpLabel = tk.Label(self.showFrame, text="You may use the above code for pasting...")
+    self.helpLabel.grid(row=2, column=0, columnspan=2)
+    
     self.showFrame.pack()
     
     self.protocol("WM_DELETE_WINDOW", self._windowClosed)
