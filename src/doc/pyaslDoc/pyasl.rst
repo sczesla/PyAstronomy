@@ -99,3 +99,4 @@ Resource based helpers
    resBasedDoc/baraffe98tracks.rst
    resBasedDoc/nasaExoplanetArchive.rst
    resBasedDoc/exoplanetEU.rst
+   resBasedDoc/exoplanetsOrg.rst
