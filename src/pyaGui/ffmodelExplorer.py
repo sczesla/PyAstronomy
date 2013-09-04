@@ -262,6 +262,13 @@ class ValueSetSummary(tk.Toplevel):
 class FFModelExplorerList:
   """
     Adapt model interactively.
+
+    Parameters
+    ----------
+    odf : Instance of OneDFit
+        The model to be adapted.
+    plotter : Instance of FFModelPlotFit or custom
+        Class instance managing the actual plotting.
   """
   
   def __init__(self, odf, plotter):
@@ -577,6 +584,13 @@ class FFModelExplorerList:
 class FFModelExplorerDropDownMenu:
   """
     Adapt model interactively.
+
+    Parameters
+    ----------
+    odf : Instance of OneDFit
+        The model to be adapted.
+    plotter : Instance of FFModelPlotFit or custom
+        Class instance managing the actual plotting.
   """
   
   def __init__(self, odf, plotter):
@@ -833,3 +847,31 @@ class FFModelExplorerDropDownMenu:
     
 # Set the standard for FFModelExplorer    
 FFModelExplorer = FFModelExplorerList
+
+def ffmodelExplorer(odf, plotter, version="list"):
+  """
+    Instantiate the model explorer.
+    
+    Parameters
+    ----------
+    odf : Instance of OneDFit
+        The model to be adapted.
+    plotter : Instance of FFModelPlotFit or custom
+        Class instance managing the actual plotting.
+    
+    Returns
+    -------
+    ffmod : Model explorer
+        Depending on the `version`, an instance of
+        `FFModelExplorerList` or `FFModelExplorerDropDown`.
+  """
+  if version == "list":
+    ffmod = FFModelExplorerList(odf, plotter)
+    return ffmod
+  elif version == "dropdown":
+    ffmod = FFModelExplorerDropDownMenu(odf, plotter)
+    return ffmod
+  else:
+    raise(PE.PyAValError("Unknown version: '" + str(version) + "'", \
+                         where="ffmodelExplorer", \
+                         solution="Choose between 'list' and 'dropdown'."))

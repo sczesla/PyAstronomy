@@ -6,6 +6,13 @@ to manipulate and plot `funcFit` models interactively.
 Individual model parameters can be selected, and their values can
 be manipulated via the *mouse wheel* or changed directly.
 
+There are two versions of the model explorer, which mainly
+differ in the way individual parameters to be adapted are
+selected. In particular, there is a version based on a drop-down
+menu (`FFModelExplorerDropDownMenu`) and one based on a
+list view (`FFModelExplorerList` or simply `FFModelExplorer`),
+which is the default.
+
 See the following example to explore its possibilities.
 
 Example---Manipulating a Gaussian
@@ -39,18 +46,19 @@ This example demonstrates the basic usage of the model explorer.
   # needs the x and y values. Optionally, you can specify
   # errors via `yerr`. Depending on the setting for
   # "withResiduals", the residuals will be shown or not.
-  mp = pyaGui.FFModelPlotFit(x, y, yerr=yerr, withResiduals=False)
+  mp = pyaGui.FFModelPlotFit(x, y, yerr=yerr, withResiduals=True)
   
-  # Create an instance of the FFModelExplorer class, which
+  # Use the function ffmodelExplorer (note the lowercase letters)
+  # to create an instance of the FFModelExplorer class, which
   # needs to be given the model (gg in this case) and
   # the plotter (and fitter), which we created above.
-  g = pyaGui.FFModelExplorer(gg, mp)
+  # 
+  # The 'version' flag specifies whether a "list" view
+  # or a "dropdown" menu is used to specify the currently
+  # adapted parameter.
+  g = pyaGui.ffmodelExplorer(gg, mp, version="list")
   g.show()
 
-
-.. note:: Plotting and fitting is not done by the class `FFModelPlotFit`, which
-          provides the basic capabilities to handle one-dimensional models.
-          In more general cases, custom classes can be used. 
 
 
 Example---Providing a custom class for plotting and fitting
@@ -164,7 +172,10 @@ Implementation
 ----------------
 
 .. currentmodule:: PyAstronomy.pyaGui
-.. autoclass:: FFModelExplorer
+.. autoclass:: FFModelExplorerList
+   :members:
+
+.. autoclass:: FFModelExplorerDropDownMenu
    :members:
 
 .. autoclass:: FFModelPlotFit
