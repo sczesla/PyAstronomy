@@ -77,6 +77,7 @@ Useful algorithms
    aslDoc/airmass.rst
    aslDoc/crosscorr.rst
    aslDoc/quadextreme.rst
+   aslDoc/readFitsSpec.rst
 
 Transit routines
 ~~~~~~~~~~~~~~~~~
