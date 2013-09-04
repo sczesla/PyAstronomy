@@ -188,9 +188,10 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
       return None
     if verbose:
       print "{0:12s}  {1:35s}  {2:5s}".format("Column", "Description", "Unit")
-      print "-"*56
+      print "-"*63
       for v in self._columns.itervalues():
         print "{0:12s}  {1:35s}  {2:5s}".format(*v)
+      print "-"*63
     
     return map(lambda x:self._columns[x][0], range(len(self._columns)))
     
@@ -212,7 +213,6 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
           A dictionary with a key for every data column holding
           the associated value from the data table.
     """
-    print self.data.pl_name 
     r = pyaC.fuzzyMatch(planetName, self.data.pl_name, caseSensitive=caseSensitive, raises=True)
     result = {}
     for c in self._columns.itervalues():
