@@ -9,11 +9,16 @@ class PolyFit1d(OneDFit):
     *Fit parameters*:
       - cn - Here n is a number indicating degree
              (e.g., c0 + c1*x + c2*x**2 ...)
+    
+    If `xoff` is specified, the polynomial will be
+    evaluated at the points `x-xoff`. This can be
+    useful to suppress correlation.
   """
   
-  def __init__(self, degree):
+  def __init__(self, degree, xoff=0.0):
     coeffs = []
     self.degree = degree
+    self.xoff = xoff
     for i in xrange(degree+1):
       coeffs.append("c"+str(i))
     OneDFit.__init__(self, coeffs)
@@ -43,7 +48,7 @@ class PolyFit1d(OneDFit):
       x : array
           Specifies the points at which to evaluate the model.
     """
-    return self.asNPPoly()(x)
+    return self.asNPPoly()(x-self.xoff)
 
 
 class ConstantFit1d(OneDFit):
