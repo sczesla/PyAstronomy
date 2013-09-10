@@ -124,7 +124,8 @@ package_data = {"PyAstronomy":["setup.cfg"],
                 "PyAstronomy.modelSuite.XTran.palTrans":["ellint/makefile_template", "ellint/ell.cpp"], \
                 "PyAstronomy.modelSuite.XTran.forTrans":["*.f", "*.pyf"], \
                 "PyAstronomy.pyasl.asl":["testPro/*.pro", "*.cfg"], \
-                "PyAstronomy.constants":["*.dat"]
+                "PyAstronomy.constants":["*.dat"], \
+                "PyAstronomy.pyaC":["*.dat"]
                 }
 
 extOccultnl = Extension('PyAstronomy.modelSuite.XTran.forTrans.occultnl',
