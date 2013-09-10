@@ -116,7 +116,8 @@ packages = ['PyAstronomy', \
             'PyAstronomy.pyaC', \
             'PyAstronomy.pyaC.pyaErrors', \
             'PyAstronomy.pyaC.pyaPermanent', \
-            'PyAstronomy.constants']
+            'PyAstronomy.constants', \
+            'PyAstronomy.pyaGui']
 
 # "doc/*/*.rst", "doc/*/*.png"],
 package_data = {"PyAstronomy":["setup.cfg"],
