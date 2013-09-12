@@ -126,7 +126,7 @@ class SVD:
     w1 = 1.0/self.w
     indi = np.where(self.w < wlimit)[0]
     w1[indi] = 0.0
-    b = self.v * np.diag(w1) * self.u.T * np.matrix(flux[validIndi]).T
+    b = np.dot(self.v, np.dot(np.diag(w1), np.dot(self.u.T, np.matrix(flux[validIndi]).T)))
     if not asarray:
       return b
     else:
