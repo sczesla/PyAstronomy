@@ -28,9 +28,9 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
         The number of degrees of freedom of model 2.
         Should be lower than `dof1`.
     compute_ratio_of_variance : boolean, optional
-        Determines which how the F-statistics is computed.
-        If False, the "ANOVA F-test in regression analysis
-        of nested nonlinear models" is applied (default).
+        Determines how the F-statistics is computed.
+        If False (default), the "ANOVA F-test in regression analysis
+        of nested nonlinear models" is applied.
         If True, "Fisher's classical test for the equality
         of two variances" is used.
    
@@ -47,17 +47,14 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
     Notes
     -----
 
-    The most commonly used statistical method for estimating the parameters
-    of interest is the method of least squares. The parameters of a chosen
-    model are estimated such that the predictions from the model and the
-    observed data are in the best possible agreement as measured by the
-    least squares criterion, i.e., the minimization of the sum of squared
-    differences between the model and the observed data points.
+    The "method of least squares" is widely used in parameter estimation.
+    Much of its appeal lies in its simplicity: Minimizing the sum of squared
+    differences between the model and the data.
 
     The backbone of least squares is the classical multiple regression
     analysis using linear models to relate several independent variables to
-    a variable. However, most physical models are nonlinear in the parameters.
-    This is the realm of nonlinear least squares regression methods.
+    a dependent variable. However, many physical models are nonlinear;
+    this is the realm of nonlinear least squares regression methods.
     
     The aim of model fitting is to explain as much of the variation in the
     dependent variable as possible from information contained in the
@@ -68,13 +65,13 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
     **ANOVA F-test in regression analysis for nested nonlinear models**
     
     The sum of squares for any hypothesis can be determined from the
-    difference between the residual sums of squares (:math:`RSS`) of two models. The
-    current model, in the context of which the null hypothesis is to be
-    tested, is called the "full model". The second model is obtained from
-    the full model by imposing additional constraints on the full model,
-    thereby lowering the number of parameters ("reduced model")
+    difference between the residual sums of squares (:math:`RSS`) of two models: The
+    so-called "full" model, in the context of which the null hypothesis is to be
+    tested, and the "reduced" model, which is derived from
+    the full model by imposing additional constraints specified by the null hypothesis;
+    setting one parameter to zero is a common example.
     The reduced model is a special case of the full model and, hence, its
-    residual sum of squares must always be at least as large as the residual
+    residual sum of squares must not be lower than the residual
     sum of squares for the full model.
     
     Accounting for :math:`k` independent constraints on the full model and :math:`N` data
@@ -82,35 +79,34 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
     
     .. math:: Q = RSS(reduced) - RSS(full)
     
-    which has :math:`k` degrees of freedom. Typically, :math:`k` corresponds to the
-    difference between the number of parameters (or equivalently, the difference
-    between the degrees of freedoms) of two vying models, that were used
-    to fit the data.
+    which has :math:`k` degrees of freedom. Here, :math:`k` corresponds to the
+    difference in the number of parameters---or equivalently, the difference
+    in the degrees of freedoms---between the full and reduced model.
     The :math:`F`-test of the null hypothesis can
     then be computed as
     
     .. math:: \\hat{F} = (Q/k) / s^2
     
     where :math:`s^2` is an unbiased estimate of :math:`\\sigma^2`, e.g., derived from the
-    full model. In the case of error-weighted data the :math:`F` statistic reads
+    full model. In the case of error-weighted data, the :math:`F` statistic reads
     
     .. math:: \\hat{F} = \\frac{(\chi^2_{reduced}-\chi^2_{full})/(\\nu_{reduced}-\\nu_{full})}{\chi^2_{full}/\\nu_{full}}
     
-    where the :math:`\\nu` are the numbers of degrees of freedom, :math:`N-p-1`,
-    for a model with :math:`p` parameters and an additional constant.
+    where :math:`\\nu` denotes the number of degrees of freedom, which may be calculated as
+    :math:`N-p-1` given a model with :math:`p` parameters and an additional constant.
     The expectation value of :math:`F` is :math:`1`, thus, if :math:`\\hat{F}=1` 
     there is no significant difference
     between the RSS of both models. If, however, :math:`F` deviates from :math:`1`, we can compute
-    the probability for :math:`F` to equal or exceed the obtained value  :math:`\\hat{F}` by
+    the probability for :math:`F` to equal or exceed the obtained value :math:`\\hat{F}` by
     
     .. math:: Prob(F\\geq \\hat{F}) = CDF(F( \\nu_{reduced}-\\nu_{full}, \\nu_{full} ))
     
     For details on the principles of the formalism,
-    see Sect. 4.5.4 in Rawlings' "Applied Regression Analysis"
+    see Sect. 4.5.4 in Rawlings' "Applied Regression Analysis".
     
-    In case of nonlinear models, the distribution of the least-squares
-    estimates of the parameters only approximately follows the normal distribution.
-    In this case, the :math:`F` statistic (in this case called "Wald statistic") also
+    In case of nonlinear models, the distribution of the least-square
+    parameter estimates only approximately follows the normal distribution.
+    Then, the :math:`F` statistic (in this case called "Wald statistic") also
     holds approximately.
     The validity of the method depends on how well the model is represented
     by a linear approximation in the parameters ("parameter effects curvature").
