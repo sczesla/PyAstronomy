@@ -25,6 +25,8 @@ What is it?
                 the Lomb-Scargle and the Generalized Lomb-Scargle
                 periodogram
 
+    pyaGUI:     A collection of GUI tools for interactive work.
+
 Installation
 ------------
 
