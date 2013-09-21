@@ -13,20 +13,16 @@ _systems = ["SI", "cgs"]
 _unitSystem = "cgs"
 inventory = {}
 
-from itc import PyAConstants
+from itc import PyAConstants, _displaySummary
+
+
 
 def summary():
   """
     Print a summary of available constants to screen.
   """
-  maxlen = 0
-  for k in inventory.iterkeys():
-    maxlen = max(maxlen, len(k))
-  maxlen = max(maxlen, len("Symbol"))
-  print ("%" + str(maxlen) + "s | Description") % "Symbol"
-  print "-" * maxlen + "-|-" + '-' * 20
-  for k in sorted(inventory.keys()):
-    print (("%" + str(maxlen) + "s | ") % k) + inventory[k]["descr"]
+  _displaySummary(sys.modules[__name__])
+
     
 def constantDetails(const):
   """

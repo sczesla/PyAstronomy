@@ -10,6 +10,47 @@ _ic = _ImportCheck(["quantities"], ["quantities"])
 
 import quantities as _pq
 
+
+def _displaySummary(scope):
+  """
+    Display unit system and constants.
+    
+    Parameters
+    ----------
+    scope : module or class
+        The scope from which to get the data to
+        be displayed.
+  """
+  print "Current unit system: ", getattr(scope, "getSystem")()
+  print
+  
+  cmod = scope
+  inventory = getattr(scope, "inventory")
+    
+  maxlenSym = 0
+  maxlenDescr = 0
+  maxlenVal = 0
+  for k in inventory.iterkeys():
+    maxlenSym = max(maxlenSym, len(k))
+    maxlenDescr = max(maxlenDescr, len(inventory[k]["descr"]))
+    maxlenVal = max(maxlenVal, len("%10.5e %s" % (getattr(cmod, "f_"+k).magnitude, getattr(cmod, "f_"+k).dimensionality)))
+  maxlenSym = max(maxlenSym, len("Symbol"))
+  maxlenDescr = max(maxlenDescr, len("Description"))
+  maxlenVal = max(maxlenVal, len("Value"))
+  
+  totlen = maxlenSym + maxlenDescr + maxlenVal + 6
+  
+  print ("%" + str(maxlenSym) + "s | %" + str(maxlenDescr) + "s | %" + \
+         str(maxlenVal) + "s") % ("Symbol", "Description", "Value")
+  print "-" * maxlenSym + "---" + '-' * maxlenDescr + "---" + '-' * maxlenVal
+
+  for k in sorted(inventory.keys()):
+    print (("%" + str(maxlenSym) + "s | ") % k) + \
+          ("%" + str(maxlenDescr) + "s") % inventory[k]["descr"] + " | " + \
+          "%10.5e %s" % (getattr(cmod, "f_"+k).magnitude, getattr(cmod, "f_"+k).dimensionality)
+  print "-" * totlen
+
+
 class PyAConstants:
   """
     Class scope for constants.
@@ -39,14 +80,7 @@ class PyAConstants:
     """
       Print a summary of available constants to screen.
     """
-    maxlen = 0
-    for k in self.inventory.iterkeys():
-      maxlen = max(maxlen, len(k))
-    maxlen = max(maxlen, len("Symbol"))
-    print ("%" + str(maxlen) + "s | Description") % "Symbol"
-    print "-" * maxlen + "-|-" + '-' * 20
-    for k in sorted(self.inventory.keys()):
-      print (("%" + str(maxlen) + "s | ") % k) + self.inventory[k]["descr"]
+    _displaySummary(self)
 
   def setSystem(self, system):
     """
