@@ -1,4 +1,4 @@
-Some statistical tests
+F-test
 ======================
 
 .. currentmodule:: PyAstronomy.pyasl

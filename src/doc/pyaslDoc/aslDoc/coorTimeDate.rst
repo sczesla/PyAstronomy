@@ -1,5 +1,5 @@
-Coordinates, time, and date
-===============================
+Julian/calendar date and heliocentric correction
+===================================================================
 
 Below you find the documentation of the following routines:
 
