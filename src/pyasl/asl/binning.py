@@ -18,7 +18,7 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     points divided by the square root of their number. If `yerr` has
     been specified, error propagation is used to determine the error.
     
-    The behavior of the time axis can be controlled via the
+    The behavior of the x-axis can be controlled via the
     `useBinCenter` flag.
     
     Values which cannot be determined will be indicated by NaN.
@@ -64,11 +64,13 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     
     Returns
     -------
-    Binned LC : array
-        An array with four columns: 1) The binned time axis,
-        2) The binned data, 3) Error of binned data, 4) The
-        number of input data points used to create the bin, e.g.
-        the new x-values are LC[::,0].
+    Binned data set : array
+        An array with four columns: 1) The new x-axis,
+        2) The binned data (the mean value of the data points located
+        in the individual bins), 3) Error of binned data, 4) The
+        number of input data points used to create the bin.
+        For instance, the new x-values can be accessed
+        using result[::,0].
     dt : float
         The width of the bins.
   """
