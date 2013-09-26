@@ -15,6 +15,7 @@ From 0.6.0 to 0.7.0
                         - Gaussian instrumental broadening
                           (instrBroadGaussFast)
                         - Reading spectrum from fits file
+                        - Distance module to distance conversion
   funcFit             *New functionality*
                         - Various bug fixes.
                         - Introduced external fitters

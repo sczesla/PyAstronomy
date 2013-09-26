@@ -796,6 +796,29 @@ class SanityOfMagnitudes(unittest.TestCase, SaniBase):
     print "Absolute bolometric magnitude of the Sun: ", absMagSun
     print "  Absolute luminosity [erg/s]: ", pyasl.absMagToPower(absMagSun)
 
+  def sanity_absModuleToDistExample(self):
+    """
+      Sanity of distance module example.
+    """
+    from PyAstronomy import pyasl
+
+    # Apparent magnitude
+    appMag = 11.37
+    # Absolute (bolometric) magnitude of Sun
+    absMagSun = 4.75
+    
+    print "Distance of a sun-like star with apparent bolometric ",
+    print "brightness of 11.37 mag: %5.2f pc" % (pyasl.absModuleToDist(appMag, absMagSun))
+
+  def sanity_absModuleToDist(self):
+    """
+      Sanity checks for absModuleToDist.
+    """
+    from PyAstronomy import pyasl
+    x = pyasl.absModuleToDist(5.37, 5.37)
+    self.assertAlmostEqual(x, 10., delta=1e-7)
+    x = pyasl.absModuleToDist(5.37+5., 5.37)
+    self.assertAlmostEqual(x, 100., delta=1e-7)
 
 class SanityOfSunpos(unittest.TestCase, SaniBase):
   
@@ -1611,3 +1634,4 @@ class SanityOfQuadExtreme(unittest.TestCase):
     # Overplot the model (shifted, because xb is shifted)
     plt.plot(newx+x[mi], model, 'r--')
 #    plt.show()
+

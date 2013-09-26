@@ -25,3 +25,24 @@ def absMagToPower(am, absMagSun=4.75, absLumSun=3.846e33):
   """  
   power = 10.0**((am-absMagSun)/(-2.5)) * absLumSun
   return power
+
+
+def absModuleToDist(magApp, magAbs):
+  """
+    Convert apparent and absolute magnitude into distance.
+    
+    Parameters
+    ----------
+    magApp : float
+        Apparent magnitude of object.
+    magAbs : float
+        Absolute magnitude of object.
+    
+    Returns
+    -------
+    Distance : float
+        The distance resulting from the difference in
+        apparent and absolute magnitude [pc].
+  """
+  d = 10.0**(-(magAbs - magApp)/5.0 + 1.0)
+  return d
