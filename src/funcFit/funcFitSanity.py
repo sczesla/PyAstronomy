@@ -36,3 +36,66 @@ class FuncFitSanity(unittest.TestCase):
         gff.thaw(s); gff.thaw([s,s])
         gff.freeze(s); gff.freeze([s,s])
         gff.setRestriction({s:[None, 10.]})
+
+        
+class MultiVoigtSanity(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def oneVsMulti_sanity(self):
+    """
+      Checking MultiVoigt1d vs. Voigt1d
+    """
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    
+    v1 = fuf.Voigt1d()
+    vm = fuf.MultiVoigt1d(3)
+    
+    x = np.linspace(-10.,10.,200)
+    
+    ps = {"lin":0.0067, "off":-12.753, "A":9.0, "ad":2.17, "al":1.78, "mu":-0.771}
+    
+    v1.assignValues(ps)
+    
+    vm["lin"] = v1["lin"]
+    vm["off"] = v1["off"]
+    
+    for i in range(1, 4):
+      num = str(i)
+      for p in ["ad", "al", "mu"]: 
+        vm[p+num] = v1[p]
+      vm["A"+num] = v1["A"]/3.0
+    
+    self.assertAlmostEqual(np.max(np.abs(vm.evaluate(x) - v1.evaluate(x))), 0.0, delta=1e-12, \
+                           msg="MultiVoigt and Voigt1d deviate with 'amplitude separation'.")
+    
+    
+    v1 = fuf.Voigt1d()
+    vm = fuf.MultiVoigt1d(3)
+    
+    x = np.linspace(-10.,10.,200)
+    
+    ps = {"lin":0.0067, "off":-12.753, "A":9.0, "ad":2.17, "al":1.78, "mu":-0.771}
+    
+    v1.assignValues(ps)
+    
+    vm["lin"] = v1["lin"]
+    vm["off"] = v1["off"]
+    
+    for i in range(1, 4):
+      num = str(i)
+      for p in ["ad", "al", "mu"]: 
+        vm[p+num] = v1[p]
+      if i == 1:
+        vm["A"+num] = v1["A"]
+        
+    self.assertAlmostEqual(np.max(np.abs(vm.evaluate(x) - v1.evaluate(x))), 0.0, delta=1e-12, \
+                           msg="MultiVoigt and Voigt1d deviate with one nonvanishing profile in multiVoigt.")
+      
+    
+    

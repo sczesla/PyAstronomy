@@ -92,3 +92,81 @@ class Voigt1d(OneDFit):
       fd = 2.35482 * self['ad']
       return 0.5346*fl + numpy.sqrt(0.2166*(fl**2.) + fd**2.)  
 
+
+
+class MultiVoigt1d(OneDFit):
+  """
+    Multicomponent Voigt with a single linear continuum component.
+    
+    The parameters are the same as for *Voigt1d*,
+    except that all are extended by a number specifying the
+    component to which they belong. Therefore, they read, e.g.,
+    `A1`, `mu2`, and so on; only `off` and `lin`
+    remain unnumbered.
+
+    Parameters
+    ----------
+    n : int
+        The number of Voigt components.
+  """
+  
+  def __init__(self, n):
+    # Number of components
+    self.n = n
+    # Building parameter list
+    params = ["off", "lin"]
+    for i in range(n):
+      p = str(i+1)
+      params.extend(["A"+p, "mu"+p, "al"+p, "ad"+p])
+    OneDFit.__init__(self, params)
+    self.setRootName("MultiVoigt")
+    # Use Voigt1d for evaluation
+    self._v1d = Voigt1d()
+    self._v1d["off"] = 0.0
+    self._v1d["lin"] = 0.0
+  
+  def evaluate(self, x):
+    """
+      Evaluates the model for current parameter values.
+      
+      Parameters
+      ----------
+      x : array
+          Specifies the points at which to evaluate the model.
+    """
+    # Assign 'continuum'
+    y = self["off"] + self["lin"]*x
+    # Add Voigt lines
+    for i in xrange(self.n):
+      p = str(i+1)
+      self._v1d.assignValues({"A":self["A"+p], "al":self["al"+p], "ad":self["ad"+p], "mu":self["mu"+p]})
+      y += self._v1d.evaluate(x)
+    return y
+  
+  def evalComponent(self, x, p):
+    """
+      Evaluate the model considering only a single component.
+      
+      Parameters
+      ----------
+      x : array
+          The abscissa.
+      p : int
+          Component number (starts with one).
+      
+      Returns
+      -------
+      Single component model : array
+          The model considering a single component. Note that the
+          linear continuum is included.
+    """
+    if p > 0 and p <= self.n:
+      p = str(p)
+      y = self["off"] + self["lin"] * x
+      self._v1d.assignValues({"A":self["A"+p], "al":self["al"+p], "ad":self["ad"+p], "mu":self["mu"+p]})
+      y += self._v1d.evaluate(x)
+      return y
+    else:
+      raise(PE.PyAValError("No such component (no. "+str(p)+")", where="MultiVoigt1d::evalComponent", \
+            solution="Use value between 1 and "+str(self.n)))
+

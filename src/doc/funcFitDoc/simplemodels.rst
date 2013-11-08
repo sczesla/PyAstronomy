@@ -9,6 +9,7 @@ Several often needed models are shipped with funcFit.
   - Multicomponent Gaussian (class :py:class:`MultiGauss1d`)
   - Cauchy-Lorentz profile (class :py:class:`CauchyLorentz1d`)
   - Voigt profile (class :py:class:`Voigt1d`)
+  - Multicomponent Voigt (class :py:class:`MultiVoigt1d`)
   - Sine wave (class :py:class:`SinusFit1d`)
   - Exponential decay (class :py:class:`ExpDecayFit1d`)
   - Polynomial of degree *n* (class :py:class:`PolyFit1d`)
@@ -38,6 +39,14 @@ Cauchy-Lorentz with linear continuum
 Voigt with linear continuum
 ---------------------------------------------
 .. autoclass:: Voigt1d
+
+.. _MultiVoigt1d
+
+Multicomponent Voigt profile with linear continuum
+---------------------------------------------------
+
+.. autoclass:: MultiVoigt1d
+   :members:
 
 Sine fit
 ---------------------------------------------
