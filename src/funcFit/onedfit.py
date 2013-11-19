@@ -68,9 +68,10 @@ class MiniFunc:
       self.odf.pars.setFreeParams(P)
       # Update self.model to hold the evaluated function.
       self.odf.updateModel()
-      # Assign y and yerr attributed. This is a not-so-beautiful
+      # Assign x, y, and yerr attributes. This is a not-so-beautiful
       # way of not breaking the API and having the funcFit data
       # storage object.
+      self.odf.x = self.odf._fufDS.x
       self.odf.y = self.odf._fufDS.y
       self.odf.yerr = self.odf._fufDS.yerr
       
