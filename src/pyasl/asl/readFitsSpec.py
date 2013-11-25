@@ -3,7 +3,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import _ic
 import os
 
-def read1dFitsSpec(fn, hdu=0, fullout=False):
+def read1dFitsSpec(fn, hdu=0, fullout=False, CRPIX1=None):
   """
     Read a simple 1d spectrum from fits file.
     
@@ -24,6 +24,8 @@ def read1dFitsSpec(fn, hdu=0, fullout=False):
         If True, the header keywords used to construct
         the wavelength axis will be returned. The default
         is False.
+    CRPIX1 : int, optional
+        Can be used to circumvent missing CRPIX1 entry.
     
     Returns
     -------
@@ -64,8 +66,10 @@ def read1dFitsSpec(fn, hdu=0, fullout=False):
                          where="read1dFitsSpec", \
                          solution="Check file and HDU."))
 
-  hkeys = {"CRVAL1":None, "CRPIX1":None, "CDELT1":None}
+  hkeys = {"CRVAL1":None, "CRPIX1":CRPIX1, "CDELT1":None}
   for k in hkeys.keys():
+    if hkeys[k] is not None:
+      continue
     if not k in hl[hdu].header:
       raise(PE.PyAValError("Header does not contain required keyword '" + str(k) + "'", \
                          where="read1dFitsSpec", \
