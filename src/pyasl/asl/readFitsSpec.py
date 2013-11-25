@@ -40,8 +40,8 @@ def read1dFitsSpec(fn, hdu=0, fullout=False):
       from PyAstronomy import pyasl
       wvl, flx = pyasl.read1dFitsSpec("mySpectrum.fits")
   """
-  if not _ic.check["pyfits"]:
-    raise(PE.PyARequiredImport("Could not import module 'pyfits'.", \
+  if (not _ic.check["pyfits"]) and (not _ic.check["astropy.io.fits"]):
+    raise(PE.PyARequiredImport("Could neither import module 'pyfits' and 'astropy.io.fits'.", \
                                where="read1dFitsSpec", \
                                solution="Install pyfits: http://www.stsci.edu/institute/software_hardware/pyfits"))
   
@@ -50,7 +50,12 @@ def read1dFitsSpec(fn, hdu=0, fullout=False):
                           where="read1dFitsSpec", \
                           solution="Check file name."))
   
-  import pyfits
+  if _ic.check["pyfits"]:
+    import pyfits
+  else:
+    import astropy.io.fits as pyfits
+  
+  
   hl = pyfits.open(fn)
   
   naxis = hl[hdu].header["NAXIS"]
