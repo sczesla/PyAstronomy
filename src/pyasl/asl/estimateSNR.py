@@ -95,19 +95,19 @@ def estimateSNR(x, y, xlen, deg=1, controlPlot=False, xlenMode="dataPoints"):
               solution=["Install matplotlib.", "Change `controlPlot` to False."]))
       if i == 1:
         # This is the first call
-        plt.subplot(3,1,1)
+        ax1 = plt.subplot(3,1,1)
         plt.title("Data (blue) and model (red)")
-        plt.subplot(3,1,2)
+        ax2 = plt.subplot(3,1,2, sharex=ax1)
         plt.title("Residuals")
-        plt.subplot(3,1,3)
+        ax3 = plt.subplot(3,1,3, sharex=ax1)
         plt.title("SNR")
       # Create plot
       plt.subplot(3,1,1)
       plt.plot(x[indi], y[indi], 'b.')
       plt.plot(x[indi], model, 'r-')
-      plt.subplot(3,1,2)
+      plt.subplot(3,1,2, sharex=ax1)
       plt.plot(x[indi], residuals, 'g.')
-      plt.subplot(3,1,3)
+      plt.subplot(3,1,3, sharex=ax1)
       plt.plot(np.mean(x[indi]), snrs[-1], 'bp')
   
   if controlPlot:
