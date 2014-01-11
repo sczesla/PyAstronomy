@@ -20,7 +20,7 @@ class MarkleyKESolver:
     """
       Solve Eq. 20
     """
-    return ( 3.*pi2 + 1.6*pi*(pi-abs(M))/(1.+e) )/(pi2 - 6.)
+    return ( 3.*self.pi2 + 1.6*pi*(pi-abs(M))/(1.+e) )/(self.pi2 - 6.)
   
   def _d(self, alpha, e):
     """
