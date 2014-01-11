@@ -308,13 +308,13 @@ class KeplerEllipse(object):
     r = self.radius(t, E=E)
     f = arctan( sqrt((1.+self.e)/(1.-self.e)) * tan(E/2.) ) * 2.0
     wf = self._w + f
-	cos_Omega = cos(self._Omega)
-	sin_Omega = sin(self._Omega)
-	cos_i = cos(self._i)
-	sin_i = sin(self._i)
+    cos_Omega = cos(self._Omega)
+    sin_Omega = sin(self._Omega)
+    cos_i = cos(self._i)
+    sin_i = sin(self._i)
     if not hasattr(wf, "__iter__"):
-	  cos_wf = cos(wf)
-	  sin_wf = sin(wf)
+      cos_wf = cos(wf)
+      sin_wf = sin(wf)
       xyz = numpy.array([cos_Omega*cos_wf - sin_Omega*sin_wf*cos_i,
                          sin_Omega*cos_wf + cos_Omega*sin_wf*cos_i,
                          sin_wf*sin_i
@@ -323,11 +323,11 @@ class KeplerEllipse(object):
       # Assume it is an array
       xyz = numpy.zeros( (len(t), 3) )
       for i in xrange(len(t)):
-	  	cos_wf = cos(wf[i])
-	  	sin_wf = sin(wf[i])
-        xyz[i,::] = numpy.array([cos_Omega*cos_wf - sin_Omega*sin_wf*cos_i),
-                         sin_Omega*cos_wf + cos_Omega*sin_wf*cos_i),
-                         sin_wf*sin_i)
+        cos_wf = cos(wf[i])
+        sin_wf = sin(wf[i])
+        xyz[i,::] = numpy.array([cos_Omega*cos_wf - sin_Omega*sin_wf*cos_i,
+                         sin_Omega*cos_wf + cos_Omega*sin_wf*cos_i,
+                         sin_wf*sin_i
                          ]) * r[i]
     if not getTA:
       return xyz
@@ -353,12 +353,12 @@ class KeplerEllipse(object):
           semi-major axis divided by that of the period.
     """
     # From AE ROY "Orbital motion" p. 102
-	cos_Omega = cos(self._Omega)
-	sin_Omega = sin(self._Omega)
-	cos_i = cos(self._i)
-	sin_i = sin(self._i)
-	cos_w = cos(self._w)
-	sin_w = sin(self._w)
+    cos_Omega = cos(self._Omega)
+    sin_Omega = sin(self._Omega)
+    cos_i = cos(self._i)
+    sin_i = sin(self._i)
+    cos_w = cos(self._w)
+    sin_w = sin(self._w)
 
     E = self._getEccentricAnomaly(t)
     l1 = cos_Omega*cos_w - sin_Omega*sin_w*cos_i
@@ -371,8 +371,8 @@ class KeplerEllipse(object):
     r = self.radius(t, E)
     nar = self._n * self.a / r
     if not hasattr(t, "__iter__"):
-	  bcos_E = b*cos(E)
-	  asin_E = self.a*sin(E)
+      bcos_E = b*cos(E)
+      asin_E = self.a*sin(E)
       vel = nar * numpy.array([l2*bcos_E - l1*asin_E,
                                m2*bcos_E - m1*asin_E,
                                n2*bcos_E - n1*asin_E])
@@ -380,8 +380,8 @@ class KeplerEllipse(object):
       # Assume it is an array
       vel = numpy.zeros( (len(t), 3) )
       for i in xrange(len(t)):
-		bcos_E = b*cos(E[i])
-		asin_E = self.a*sin(E[i])
+        bcos_E = b*cos(E[i])
+        asin_E = self.a*sin(E[i])
         vel[i,::] = nar[i] * numpy.array([l2*bcos_E - l1*asin_E,
                                           m2*bcos_E - m1*asin_E,
                                           n2*bcos_E - n1*asin_E])
