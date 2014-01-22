@@ -94,6 +94,9 @@ class ExoplanetEU(pp.PyAUpdateCycle):
           key = k
         if len(v) == 0:
           v = None
+        # Accept only expected fields 
+        if not key in self.data.dtype.names:
+          continue
         self.data[key][i] = v
 
   def availableColumns(self):
@@ -181,11 +184,11 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     self._columns[29] = ["stTeff", "Stellar effective temperature", "K", np.float]
     # Identify exoplanet.eu csv column names with internal column names
     self._ident = {"name":"plName", "mass":"plMass", "radius":"plRadius", \
-                   "axis":"sma", "angular_distance":"angDistance", "publication_status":"pubStatus", \
-                   "detection_type":"detType", "star.name":"stName", "star.magnitude_v":"mag_v", \
-                   "star.magnitude_i":"mag_i", "star.magnitude_j":"mag_j", "star.magnitude_h":"mag_h", \
-                   "star.magnitude_k":"mag_k", "star.distance":"dist", "star.metallicity":"mh", \
-                   "star.mass":"stMass", "star.radius":"stRadius", "star.spec_type":"SpT", \
-                   "star.age":"stAge", "star.teff":"stTeff"}
+                   "semi_major_axis":"sma", "angular_distance":"angDistance", "publication_status":"pubStatus", \
+                   "detection_type":"detType", "star_name":"stName", "mag_v":"mag_v", \
+                   "mag_i":"mag_i", "mag_j":"mag_j", "mag_h":"mag_h", \
+                   "mag_k":"mag_k", "star_distance":"dist", "star_metallicity":"mh", \
+                   "star_mass":"stMass", "star_radius":"stRadius", "star_sp_type":"SpT", \
+                   "star_age":"stAge", "star_teff":"stTeff"}
     
     self._readData()
