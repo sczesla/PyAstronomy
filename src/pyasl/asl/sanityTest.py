@@ -10,6 +10,7 @@ from dopplerShift import dopplerShift
 from fluxConversion import flux2photons, photons2flux
 from rotBroad import rotBroad, fastRotBroad
 from cardinalPoint import getCardinalPoint
+from posAngle import positionAngle
 
 class SanityOfPyasl(unittest.TestCase, SaniBase):
   
@@ -1635,3 +1636,38 @@ class SanityOfQuadExtreme(unittest.TestCase):
     plt.plot(newx+x[mi], model, 'r--')
 #    plt.show()
 
+
+class SanityOfPositionAngle(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_Example(self):
+    """
+      Checking position angle example
+    """
+    from PyAstronomy import pyasl
+    
+    # Position of Mizar: 200.98141867 +54.92535197
+    # Position of Alcor: 201.30640764 +54.98795966
+    
+    # Calculate position angle
+    r = pyasl.positionAngle(200.98141867, +54.92535197, 201.30640764,+54.98795966)
+    
+    print "Position angle of Alcor (from Mizar): %4.2f deg" % r
+  
+  def sanity_positionAngle(self):
+    """
+      Checking sanity of positionAngle
+    """
+    # Check North
+    self.assertEqual(positionAngle(10.0, 10.0, 10.0, 11.0), 0.0)
+    # Check South
+    self.assertEqual(positionAngle(10.0, 10.0, 10.0, 9.0), 180.0)
+    # Check East
+    self.assertEqual(positionAngle(10.0, 0.0, 10.1, 0.0), 90.0)
+    # Check West
+    self.assertEqual(positionAngle(10.0, 0.0, 9.9, 0.0), 270.0)

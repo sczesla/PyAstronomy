@@ -82,6 +82,7 @@ Coordinates, time, and observation tools
    aslDoc/cardinalPoint.rst
    aslDoc/twilight.rst
    aslDoc/angularDistance.rst
+   aslDoc/posAngle.rst
    aslDoc/airmass.rst
    aslDoc/observatory.rst
 

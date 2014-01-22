@@ -323,7 +323,23 @@ pro test_baryvel
   close, fw
 end
 
+
+pro test_posangle
+  openw, fw, 'posangle.test', /get_lun, WIDTH=1000
+  for i=0, 1000 do begin
+    ra1 = 360.0d0 * randomu(seed,/double) /15.0d0
+    de1 = 180.0d0 * randomu(seed,/double) - 90.0d0
+    ra2 = 360.0d0 * randomu(seed,/double) /15.0d0
+    de2 = 180.0d0 * randomu(seed,/double) - 90.0d0
+    posang, 1, ra1, de1, ra2, de2, a
+    printf, fw, ra1, de1, ra2, de2, a, FORMAT="(F30.15,F30.15,F30.15,F30.15, F30.15)"
+  endfor
+  close, fw
+end
+
+
 pro create_test_data
+ ; note that co_refract has to be compiled first...
  TEST_BPRECESS
  TEST_PREMAT
  TEST_PRECESS
@@ -343,4 +359,5 @@ pro create_test_data
  test_hadec2altaz
  test_moonpos
  test_mphase
+ test_posangle
 end

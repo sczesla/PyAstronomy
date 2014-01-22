@@ -10,6 +10,7 @@ import eq2hor
 import sunpos
 import moonpos
 import moonphase
+import posAngle
 
 class AstroTimeLegacyTest(unittest.TestCase):
 
@@ -381,6 +382,16 @@ class IDLTests(unittest.TestCase):
         self.assertAlmostEqual(abs(f), 0.0 , delta=self.p)
         continue
       self.assertAlmostEqual(f/dat[i,1], 1.0, delta=self.p)
+
+  def test_posangle(self):
+    """
+      Testing positionAngle (posAng) routine
+    """
+    dat = self.getData("posangle.test")[1]
+    for i in xrange(len(dat[::,0])):
+      # Using *15.0 because decimal hours have been specified for IDL...
+      f = posAngle.positionAngle(dat[i,0]*15.0, dat[i,1], dat[i,2]*15.0, dat[i,3], positive=False)
+      self.assertAlmostEqual(dat[i,4], f, delta=1e-9, msg="Position angle does not match.")
 
 if __name__ == "__main__":
   suite = unittest.TestLoader().loadTestsFromTestCase(AstroTimeLegacyTest)
