@@ -181,7 +181,7 @@ class Params:
       No return value.
     """
     if not self.hasParam(name):
-      raise(PE.PyAValError("No such parameter: "+name+".\n  Available parameters: "+', '.join(self.parameters().keys()) , where="Params::__checkForParam"))
+      raise(PE.PyAValError("No such parameter: \""+name+"\".\n  Available parameters: "+', '.join(self.parameters().keys()) , where="Params::__checkForParam"))
   
   def hasParam(self, name):
     """
