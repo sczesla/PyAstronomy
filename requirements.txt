@@ -2,4 +2,5 @@ numpy>=1.5
 matplotlib>=1.0
 quantities==0.10.1
 numpydoc>=0.4
+scipy==0.13.3
 pymc==2.3
