@@ -3,11 +3,14 @@ Contact us
 
 We appreciate your opinion.
 
-Currently, we have not set up any
-fancy contact interface nor public repository.
-Please send comments, remarks, bug reports, wishes,
-and coarse insults via email to:
+If you intend to send us any comments, remarks, bug reports, wishes,
+or coarse insults, you can do so using PyAstronomy's project page on
 
-*stefan.czesla@hs.uni-hamburg.de*
+  `github <https://github.com/sczesla/PyAstronomy>`_
 
-We will try our best to answer appropriately.
+or simply send us an e-mail to 
+
+  *stefan.czesla@hs.uni-hamburg.de*
+
+In any case,
+we will try our best to answer appropriately.
