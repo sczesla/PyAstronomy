@@ -5,3 +5,4 @@ Members of the PyA group
  * Sebastian Schröter
  * Christian P. Schneider
  * Klaus F. Huber
+ * Fabian Pfeifer
