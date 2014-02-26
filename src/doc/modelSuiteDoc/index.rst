@@ -19,3 +19,4 @@ Contents:
     lineListGaussModelDoc.rst
     astroVoigt.rst
     LyAProfile.rst
+    rotBroadProfile.rst

@@ -12,3 +12,4 @@ from keplerEllipseModel import KeplerEllipseModel
 from lineListGaussModel import *
 from voigtAstro import VoigtAstroP
 from LyAProfile import LyaTransmission
+from rotBroadProfile import RotBroadProfile
