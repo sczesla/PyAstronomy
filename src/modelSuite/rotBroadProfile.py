@@ -11,6 +11,7 @@ class RotBroadProfile(fuf.OneDFit):
       - `A`     - Area under the profile (negative for absorption)
       - `off`   - An offset applied to the profile
       - `lin`   - Gradient of a linear term to adjust the 'continuum'
+      - `mu`    - Center of the profile (same units as `xmax`)
 
     The profile is given by:
     
@@ -33,7 +34,7 @@ class RotBroadProfile(fuf.OneDFit):
   """
 
   def __init__(self):
-    fuf.OneDFit.__init__(self, ["off", "lin", "xmax", "eps", "A"], rootName="RTB")
+    fuf.OneDFit.__init__(self, ["off", "lin", "xmax", "eps", "A", "mu"], rootName="RTB")
     self["A"] = 1.0
     self["xmax"] = 1.0
   
@@ -49,10 +50,10 @@ class RotBroadProfile(fuf.OneDFit):
     c1 = 2.0*(1.0-self["eps"])/denom
     c2 = (np.pi*self["eps"]/2.0) / denom
     
-    indi = np.where(self["xmax"] - np.abs(v) > 0.0)[0]
+    indi = np.where(self["xmax"] - np.abs(v-self["mu"]) > 0.0)[0]
     y = np.zeros(v.size)
     
-    vv = (v[indi]/self["xmax"])**2
+    vv = ((v[indi]-self["mu"])/self["xmax"])**2
     y[indi] += (c1 * np.sqrt(1.0 - vv) + c2 * (1.0 - vv))
     y[indi] *= self["A"]
     
