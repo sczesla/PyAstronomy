@@ -74,6 +74,8 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     dt : float
         The width of the bins.
   """
+  if len(x) != len(y):
+    raise(PE.PyAValError("x and y need to have the same length."))
   if ((not dt is None) + (not nbins is None) + (not reduceBy is None)) != 1:
     raise(PE.PyAParameterConflict("Specify one of `dt`, `nbins`, or `reduceBy`."))
   if ((not x0 is None) + (not reduceBy is None)) != 1:
