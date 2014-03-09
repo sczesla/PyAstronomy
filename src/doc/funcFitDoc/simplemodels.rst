@@ -15,6 +15,7 @@ Several often needed models are shipped with funcFit.
   - Polynomial of degree *n* (class :py:class:`PolyFit1d`)
   - Constant (class :py:class:`ConstantFit1d`)
   - 2d Gaussian (class :py:class:`GaussFit2d`)
+  - Multicomponent 2d Gaussian (class :py:class:`MultiGauss2d`)
 
 The use of these models is demonstrated in the tutorial.
 
@@ -68,6 +69,9 @@ Two-dimensional Gaussian
 ---------------------------------------------
 .. autoclass:: GaussFit2d
 
+Multicomponent two-dimensional Gaussian
+---------------------------------------------
+.. autoclass:: MultiGauss2d
 
 Demonstration models
 =====================
