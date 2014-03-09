@@ -1261,3 +1261,27 @@ class ExampleSanity(unittest.TestCase):
     # Plot correlations
     ta.plotCorr(parsList=["mu", "ad", "al"])
 #    ta.show()
+
+  def sanity_MCMCautoParameters(self):
+    """
+      Checking sanity of MCMCautoParameters
+    """
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    x = np.linspace(0,30,1000)
+    gauss = fuf.GaussFit1d()
+    gauss["A"] = 1
+    gauss["mu"] = 23.
+    gauss["sig"] = 0.5
+    yerr = np.random.normal(0., 0.05, len(x))
+    y = gauss.evaluate(x) + yerr
+    # This step is not necessary if <picky>=False in MCMCautoParameters.
+    gauss.thaw(["A","mu","sig"])
+    X0, lims, steps = gauss.MCMCautoParameters({"A":[0,10],"mu":3, "sig":[0.1,1.0]})
+    gauss.fitMCMC(x, y, X0, lims, steps, yerr=yerr, iter=1000)
+    
+#     plt.plot(x, y, 'k+')
+#     plt.plot(x, gauss.evaluate(x), 'r--')
+#     plt.show()

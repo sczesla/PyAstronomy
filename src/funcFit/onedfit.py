@@ -160,7 +160,7 @@ class _PyMCSampler:
                            solution="Use another database (e.g., pickle or hdf5).")))
     return dbArgs     
 
-  def MCMCautoParameters(self, ranges, picky=True, stepsize=1e-2):
+  def MCMCautoParameters(self, ranges, picky=True, stepsize=1e-2, setRestrictionsFromPriors=False):
     """
       Convenience function to generate parameters for MCMC fit.
       
@@ -199,6 +199,9 @@ class _PyMCSampler:
         If True (default), the list of free parameters has to match exactly
         the list of parameters specified in `ranges`. If False, the list
         of free parameters will be adapted to those given in `ranges`.
+      setRestrictionsFromPriors : boolean, optional 
+        Default: False. If True, parameter restrictions are applied according to
+        the ranges of the uniform priors.
           
       Returns
       -------
@@ -235,6 +238,7 @@ class _PyMCSampler:
         plt.show()
         
     """
+        
     X0 = {}
     steps = {}
     lims = {}
@@ -277,6 +281,9 @@ class _PyMCSampler:
       else:
         lims[p] = [X0[p]-ranges[p]/2., X0[p]+ranges[p]/2.]
       steps[p] = (max(lims[p]) - min(lims[p])) * stepsize 
+      if setRestrictionsFromPriors:
+        self.setRestriction({p:lims[p]})  
+          
     return X0, lims, steps    
   
   def autoFitMCMC(self, x, y, ranges, picky=True, stepsize=1e-3, yerr=None, \
@@ -949,6 +956,39 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       directly.
     """
     self.penaltyFactor = penalFac
+
+  def rootName(self):
+    """
+      Returns (hopefully) useful name of the model
+      
+      Returns
+      -------
+      string containing the name.
+    """
+    rootNums = {}
+    rootNoComp = {}
+    for c in self._compoWalk():
+      if c._isComposed():
+          continue
+      # It is a noncomposed component
+      if not c.naming.getRoot() in rootNums:
+          rootNums[c.naming.getRoot()] = [c.naming.getComponentCounter()]
+      else:
+          rootNums[c.naming.getRoot()].append(c.naming.getComponentCounter())
+      rootNoComp[(c.naming.getRoot(), c.naming.getComponentCounter())] = c
+          
+      # Walk through all root and counter to provide output
+      for root in sorted(rootNums.keys()):
+          for counter in sorted(rootNums[root]):
+              c = rootNoComp[(root, counter)]
+              cono = ""
+              if root == "":
+                cono += "unnamed"
+              else:
+                cono += root
+              if counter != 0:
+                cono += " (No. " + str(counter) +")"
+      return cono
 
   def parameterSummary(self, toScreen=True, prefix=""):
     """
