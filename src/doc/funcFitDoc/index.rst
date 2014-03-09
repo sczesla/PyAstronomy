@@ -26,6 +26,14 @@ package. The most important aspects are demonstrated by example.
     tutorial2.rst
     traceAnalysisTutorial.rst
 
+Basic models
+----------------
+
+.. toctree::
+    :maxdepth: 2
+
+    simplemodels.rst
+
 External fitters
 ---------------------
 
@@ -34,11 +42,8 @@ External fitters
 
     extFitters.rst
 
-Technical documentation
---------------------------
-
-A more comprehensive (and technical) documentation of individual classes
-and concepts can be found below:
+Parameters and further functionality
+-------------------------------------
 
 .. toctree::
     :maxdepth: 2
@@ -46,7 +51,6 @@ and concepts can be found below:
     params.rst
     onedfit.rst
     modelRebin.rst
-    simplemodels.rst
     syncFit.rst
     traceAnalysis.rst
     coordinateGrid.rst
