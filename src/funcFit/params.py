@@ -3,6 +3,7 @@ import re
 from PyAstronomy.pyaC import pyaErrors as PE
 import pickle
 import os
+import uuid
 
 
 def equal(dependsOn):
@@ -108,6 +109,8 @@ class Params:
     result.isRestricted = self.isRestricted.copy(); result.isRestricted.update(right.isRestricted)
     result.restrictions = self.restrictions.copy(); result.restrictions.update(right.restrictions)
     result.relations = self.relations.copy(); result.relations.update(right.relations)
+    result.conditionalRestrictions = self.conditionalRestrictions.copy()
+    result.conditionalRestrictions.update(right.conditionalRestrictions)
     result.assignValue(self.parameters())
     result.assignValue(right.parameters())
     return result
@@ -147,6 +150,13 @@ class Params:
           if relat[2][i] == old:
             relat[2][i] = new
         self.relations[p][k] = relat
+    # Loop over conditional restrictions and replace occurrences of the old names
+    for name, v in self.conditionalRestrictions.iteritems():
+      for i, p in enumerate(v[0]):
+        # Loop over input-parameter names and replace if necessary
+        if p == old:
+          # Needs to be replaced
+          self.conditionalRestrictions[name][0][i] = new
   
   def __init__(self, paramNames):
     i = 0
@@ -157,6 +167,7 @@ class Params:
     self.isRestricted = {}
     self.restrictions = {}
     self.relations = {}
+    self.conditionalRestrictions = {}
     for n in paramNames:
       self.__params[n] = 0.0
       self.isFree[n] = False
@@ -166,6 +177,95 @@ class Params:
       self.isRestricted[n] = [False, False]
       self.restrictions[n] = [None, None]
       self.relations[n] = []
+  
+  def addConditionalRestriction(self, pars, func):
+    """
+      Define a conditional restriction.
+      
+      Conditional restrictions can be used to modify the
+      behavior in a more complex manner. For instance,
+      penalties can be added to the objective function
+      depending on the relation of one or more parameters.
+      
+      The given function is evaluated in each iteration
+      and its return value (a float) is added to the
+      objective function (e.g., chi square).
+      
+      Parameters
+      ----------
+      pars : list of strings
+          The names of the parameters the given function
+          needs as input.
+      func : callable object
+          This callable object must take the specified
+          parameters (in that exact order) as input. It
+          must return a float, which is added to the
+          value of the objective function.
+      
+      Returns
+      -------
+      identifier : string
+          A unique ID used to refer to the conditional
+          restriction.
+    """
+    for p in pars:
+      self.__checkForParam(p)
+    name = uuid.uuid4()
+    self.conditionalRestrictions[name] = (pars[:], func)
+    return name
+  
+  def removeConditionalRestriction(self, id):
+    """
+      Remove an existing conditional constraint.
+      
+      Parameters
+      ----------
+      id : string
+          The identifier used to refer to the conditional
+          constraint (returned by `addConditionalRestriction`).
+    """
+    if not id in self.conditionalRestrictions:
+      raise(PE.PyAValError("No conditional restriction with ID '" + str(id)))
+    del self.conditionalRestrictions[id]
+  
+  def applyConditionalRestrictions(self, fullout=False):
+    """
+      Apply all conditional restrictions.
+      
+      Parameters
+      ----------
+      fullout : boolean, optional
+          If True, a dictionary holding the values
+          of the individual restrictions is returned.
+          The IDs are used as dictionary keys. The
+          default is False.
+      
+      Returns
+      -------
+      Modification : float
+          The summed value of the existing conditional restrictions.
+      Individual values : dictionary, optional
+          The contributions of the individual conditional
+          restrictions.
+    """
+    result = 0.0
+    if fullout:
+      fo = {}
+    for name, v in self.conditionalRestrictions.iteritems():
+      vs = ()
+      for p in v[0]:
+        vs += (self[p],)
+      val = v[1](*vs)
+      if val is None:
+        raise(PE.PyAValError("Conditional restriction with ID '" + str(name) + "' returned None.", \
+                             solution="Did you forget to return 0.0, in case the condition is not fulfilled?"))
+      if fullout:
+        fo[name] = val
+      result += val
+    if fullout:
+      return result, fo
+    else:
+      return result
   
   def __toList(self, x):
     """

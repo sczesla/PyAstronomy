@@ -78,6 +78,8 @@ class MiniFunc:
       val = f(self.odf, P)
       # Assign penalty
       val += self.odf.pars.getPenalty(penaltyFact=self.odf.penaltyFactor)[0]
+      # Apply consitional restrictions
+      val += self.odf.pars.applyConditionalRestrictions()
       return val
     return miniFunc
 
@@ -544,6 +546,16 @@ class _OndeDFitParBase:
   def restoreState(self, resource):
     self.pars.restoreState(resource)
   restoreState.__doc__ = Params.restoreState.__doc__
+
+  def addConditionalRestriction(self, *args):
+    return self.pars.addConditionalRestriction(*args)
+  addConditionalRestriction.__doc__ = Params.addConditionalRestriction.__doc__
+
+  def removeConditionalRestriction(self, *args):
+    return self.pars.addConditionalRestriction(*args)
+  removeConditionalRestriction.__doc__ = Params.removeConditionalRestriction.__doc__
+  
+  
 
 
 class OneDFit(_OndeDFitParBase, _PyMCSampler):
