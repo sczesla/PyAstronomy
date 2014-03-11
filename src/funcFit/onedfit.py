@@ -552,10 +552,12 @@ class _OndeDFitParBase:
   addConditionalRestriction.__doc__ = Params.addConditionalRestriction.__doc__
 
   def removeConditionalRestriction(self, *args):
-    return self.pars.addConditionalRestriction(*args)
+    return self.pars.removeConditionalRestriction(*args)
   removeConditionalRestriction.__doc__ = Params.removeConditionalRestriction.__doc__
   
-  
+  def showConditionalRestrictions(self, **kwargs):
+    return self.pars.showConditionalRestrictions(**kwargs)
+  showConditionalRestrictions.__doc__ = Params.showConditionalRestrictions.__doc__
 
 
 class OneDFit(_OndeDFitParBase, _PyMCSampler):

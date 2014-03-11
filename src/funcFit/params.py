@@ -62,6 +62,20 @@ class Params:
         variables "know" about the relation, because if their value
         changes, the value of the dependent
         variable (in this case `a`) has to be updated.
+    conditionalRestrictions : dict
+        A dictionary holding the `conditional restrictions', i.e.,
+        complex restrictions, which may, e.g., depend in the values
+        of other parameters. The dictionary key is a unique ID
+        generated, when a conditional restriction is added. For each
+        key, the dictionary holds a tuple of which the first entry
+        is a list holding the names of the parameters on which the
+        conditional restrictions depends and the second is a
+        callable, which is called with the values of those parameters
+        specified in the first entry. The callable must return a
+        float that specifies the penalty (or reward) depending on
+        the given parameter values. Because conditional restrictions
+        are referred to using a unique ID, their name (i.e., ID) does
+        not change if models are combined.
     
     Notes
     -----
@@ -227,6 +241,36 @@ class Params:
     if not id in self.conditionalRestrictions:
       raise(PE.PyAValError("No conditional restriction with ID '" + str(id)))
     del self.conditionalRestrictions[id]
+  
+  def showConditionalRestrictions(self, toScreen=True):
+    """
+      Show conditional restrictions.
+      
+      Parameters
+      ----------
+      toScreen : boolean, optional
+          If True (default), the output is written to stdout.
+      
+      Returns
+      -------
+      Output : list of strings
+          The output as a list of strings.
+    """
+    ll = []
+    nc = 80
+    ll.append("-" * nc)
+    ll.append("    Conditional restrictions")
+    ll.append("-" * nc)
+    for name, v in self.conditionalRestrictions.iteritems():
+      s = "ID: " + str(name) + ", parameters: "
+      s += ', '.join(v[0])
+      ll.append(s)
+    ll.append("-" * nc)
+    if toScreen:
+      for l in ll:
+        print l
+    return ll
+      
   
   def applyConditionalRestrictions(self, fullout=False):
     """

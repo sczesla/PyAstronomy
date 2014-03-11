@@ -463,6 +463,88 @@ remain unique. A component identifier is simply an appendix to the variable name
 model behaves exactly like the individual ones. It should also be noted that model characteristics such as relations, restrictions, etc.,
 are preserved in the combined model.
 
+
+Applying conditional restrictions
+--------------------------------------
+
+Via `conditional restrictions` complex penalty (or reward) functions can be
+defined, which keep the fit out or force into a specific subspace of the
+parameter space. Conditional restrictions are self-defined callables such
+as function, which take a number of parameters and return a float, which
+specifies the penalty. The latter is added to the objective function.
+
+Conditional restrictions are referred to by a unique ID, which is generated
+as soon as it is added to the model. Note that this ID does not change, when
+models are combined.    
+
+::
+
+  import numpy as np
+  import matplotlib.pylab as plt
+  from PyAstronomy import funcFit as fuf
+  
+  # Get fitting object for a Gaussian ...
+  g = fuf.GaussFit1d()
+  # .. and define the parameters
+  g["A"] = 0.97
+  g["mu"] = 0.1
+  g["sig"] = 0.06
+  
+  # Generate some "data" with noise included
+  x = np.linspace(-1.0,1.0,200)
+  y = g.evaluate(x) + np.random.normal(0.0, 0.1, len(x))
+  yerr = np.ones(len(x)) * 0.1
+  
+  
+  def myRestriction(A, sig):
+    """
+      A conditional restriction.
+      
+      Returns
+      -------
+      Penalty : float
+          A large value if condition is violated
+          and zero otherwise.
+    """
+    if A > 10.0*sig:
+      return np.abs(A-10.0*sig + 1.0)*1e20
+    return 0.0
+  
+    
+  # Add the conditional restriction to the model and save
+  # the unique ID, which can be used to refer to that
+  # restriction.
+  uid = g.addConditionalRestriction(["A", "sig"], myRestriction)
+  print "Conditional restriction has been assigned the ID: ", uid
+  print
+  
+  # Now see whether the restriction is really in place
+  g.showConditionalRestrictions()
+  
+  # Define free parameters ...
+  g.thaw(["A", "mu", "sig"])
+  # ... and fit the model (restriction included)
+  g.fit(x, y, yerr=yerr)
+  
+  # Save the resulting best-fit model
+  restrictedModel = g.model.copy()
+  
+  # Remove the conditional restriction and re-fit
+  g.removeConditionalRestriction(uid)
+  g.fit(x, y, yerr=yerr)
+  
+  # Save new model
+  unrestrictedModel = g.model.copy()
+  
+  # Plot the result
+  plt.errorbar(x, y, yerr=yerr, fmt='b.')
+  plt.plot(x, restrictedModel, 'r--', label="Restricted")
+  plt.plot(x, unrestrictedModel, 'g--', label="Unresctricted")
+  plt.legend()
+  plt.show()
+
+
+
 Minimize the Cash statistic
 ----------------------------
 
