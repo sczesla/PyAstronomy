@@ -14,11 +14,13 @@ class MarkleyKESolver:
     Markley (Markley 1995, CeMDA, 63, 101).
   """
   
+  pi2 = pi**2
+
   def _alpha(self, e, M):
     """
       Solve Eq. 20
     """
-    return ( 3.*pi**2 + 1.6*pi*(pi-abs(M))/(1.+e) )/(pi**2 - 6.)
+    return ( 3.*self.pi2 + 1.6*pi*(pi-abs(M))/(1.+e) )/(self.pi2 - 6.)
   
   def _d(self, alpha, e):
     """
@@ -306,18 +308,26 @@ class KeplerEllipse(object):
     r = self.radius(t, E=E)
     f = arctan( sqrt((1.+self.e)/(1.-self.e)) * tan(E/2.) ) * 2.0
     wf = self._w + f
+    cos_Omega = cos(self._Omega)
+    sin_Omega = sin(self._Omega)
+    cos_i = cos(self._i)
+    sin_i = sin(self._i)
     if not hasattr(wf, "__iter__"):
-      xyz = numpy.array([cos(self._Omega)*cos(wf) - sin(self._Omega)*sin(wf)*cos(self._i),
-                         sin(self._Omega)*cos(wf) + cos(self._Omega)*sin(wf)*cos(self._i),
-                         sin(wf)*sin(self._i)
+      cos_wf = cos(wf)
+      sin_wf = sin(wf)
+      xyz = numpy.array([cos_Omega*cos_wf - sin_Omega*sin_wf*cos_i,
+                         sin_Omega*cos_wf + cos_Omega*sin_wf*cos_i,
+                         sin_wf*sin_i
                          ]) * r
     else:
       # Assume it is an array
       xyz = numpy.zeros( (len(t), 3) )
       for i in xrange(len(t)):
-        xyz[i,::] = numpy.array([cos(self._Omega)*cos(wf[i]) - sin(self._Omega)*sin(wf[i])*cos(self._i),
-                         sin(self._Omega)*cos(wf[i]) + cos(self._Omega)*sin(wf[i])*cos(self._i),
-                         sin(wf[i])*sin(self._i)
+        cos_wf = cos(wf[i])
+        sin_wf = sin(wf[i])
+        xyz[i,::] = numpy.array([cos_Omega*cos_wf - sin_Omega*sin_wf*cos_i,
+                         sin_Omega*cos_wf + cos_Omega*sin_wf*cos_i,
+                         sin_wf*sin_i
                          ]) * r[i]
     if not getTA:
       return xyz
@@ -343,27 +353,38 @@ class KeplerEllipse(object):
           semi-major axis divided by that of the period.
     """
     # From AE ROY "Orbital motion" p. 102
+    cos_Omega = cos(self._Omega)
+    sin_Omega = sin(self._Omega)
+    cos_i = cos(self._i)
+    sin_i = sin(self._i)
+    cos_w = cos(self._w)
+    sin_w = sin(self._w)
+
     E = self._getEccentricAnomaly(t)
-    l1 = cos(self._Omega)*cos(self._w) - sin(self._Omega)*sin(self._w)*cos(self._i)
-    l2 = -cos(self._Omega)*sin(self._w) - sin(self._Omega)*cos(self._w)*cos(self._i)
-    m1 = sin(self._Omega)*cos(self._w) + cos(self._Omega)*sin(self._w)*cos(self._i)
-    m2 = -sin(self._Omega)*sin(self._w) + cos(self._Omega)*cos(self._w)*cos(self._i)
-    n1 = sin(self._w)*sin(self._i)
-    n2 = cos(self._w)*sin(self._i)
+    l1 = cos_Omega*cos_w - sin_Omega*sin_w*cos_i
+    l2 = -cos_Omega*sin_w - sin_Omega*cos_w*cos_i
+    m1 = sin_Omega*cos_w + cos_Omega*sin_w*cos_i
+    m2 = -sin_Omega*sin_w + cos_Omega*cos_w*cos_i
+    n1 = sin_w*sin_i
+    n2 = cos_w*sin_i
     b = self.a * sqrt(1. - self.e**2)
     r = self.radius(t, E)
     nar = self._n * self.a / r
     if not hasattr(t, "__iter__"):
-      vel = nar * numpy.array([b*l2*cos(E) - self.a*l1*sin(E),
-                               b*m2*cos(E) - self.a*m1*sin(E),
-                               b*n2*cos(E) - self.a*n1*sin(E)])
+      bcos_E = b*cos(E)
+      asin_E = self.a*sin(E)
+      vel = nar * numpy.array([l2*bcos_E - l1*asin_E,
+                               m2*bcos_E - m1*asin_E,
+                               n2*bcos_E - n1*asin_E])
     else:
       # Assume it is an array
       vel = numpy.zeros( (len(t), 3) )
       for i in xrange(len(t)):
-        vel[i,::] = nar[i] * numpy.array([b*l2*cos(E[i]) - self.a*l1*sin(E[i]),
-                               b*m2*cos(E[i]) - self.a*m1*sin(E[i]),
-                               b*n2*cos(E[i]) - self.a*n1*sin(E[i])])
+        bcos_E = b*cos(E[i])
+        asin_E = self.a*sin(E[i])
+        vel[i,::] = nar[i] * numpy.array([l2*bcos_E - l1*asin_E,
+                                          m2*bcos_E - m1*asin_E,
+                                          n2*bcos_E - n1*asin_E])
     return vel
   
   def xyzPeriastron(self):
