@@ -1671,3 +1671,60 @@ class SanityOfPositionAngle(unittest.TestCase):
     self.assertEqual(positionAngle(10.0, 0.0, 10.1, 0.0), 90.0)
     # Check West
     self.assertEqual(positionAngle(10.0, 0.0, 9.9, 0.0), 270.0)
+
+
+class SanityOfSMW_RHK(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_ExampleConversion(self):
+    """
+      Check the S-index -> RHK conversion example
+    """
+    from PyAstronomy import pyasl
+
+    ss = pyasl.SMW_RHK()
+    
+    bv = 0.8
+    teff = 5100.0
+    s = 0.4
+    
+    print "Convert S-index to RHK assuming a giant"
+    ss.SMWtoRHK(s, teff, bv, lc="g", verbose=True)
+    
+    print
+    print
+    print "Convert S-index to RHK assuming a main-sequence star"
+    ss.SMWtoRHK(s, teff, bv, lc="ms", verbose=True)
+    
+  def sanity_ExampleShowCCF(self):
+    """
+      Check example showing the Ccf conversion factor.
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    ss = pyasl.SMW_RHK()
+    
+    bv = np.arange(0.4,0.9,0.05)
+    ccfn = bv * 0.0
+    ccfr = bv * 0.0
+    ccfrg = bv * 0.0
+    
+    for i in xrange(len(bv)):
+      ccfn[i] = ss.log10ccfNoyes(bv[i])
+      ccfr[i] = ss.log10ccfRutten(bv[i])
+      ccfrg[i] = ss.log10ccfRutten(bv[i], lc="g")
+    
+#     plt.plot(bv, ccfn, 'b.-', label="Noyes")
+#     plt.plot(bv, ccfr, 'r.-', label="Rutten (ms)")
+#     plt.plot(bv, ccfrg, 'g.-', label="Rutten (g)")
+#     plt.xlabel("B - V [mag]")
+#     plt.ylabel("Ccf")
+#     plt.legend()
+#     plt.show()
