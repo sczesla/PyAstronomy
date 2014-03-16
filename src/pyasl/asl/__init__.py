@@ -41,3 +41,4 @@ from crosscorr import *
 from quadextreme import *
 from readFitsSpec import *
 from posAngle import *
+from sindex import *

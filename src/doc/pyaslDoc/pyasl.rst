@@ -29,6 +29,7 @@ Uncategorized algorithms
    
    aslDoc/keplerOrbit.rst
    aslDoc/magnitudes.rst
+   aslDoc/sindex.rst
 
 
 General data analysis
