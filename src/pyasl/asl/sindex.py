@@ -64,7 +64,8 @@ class SMW_RHK:
                 
                 where the factor 1.34e-4 is a combination of the conversion from
                 arbitrary to physical units, 1e-14, and the Stefan-Boltzmann
-                constant, in particular 1.34e-4 = 7.6e5*1e-14/5.67e-5.
+                constant, in particular 1.34e-4 = 7.6e5*1e-14/5.67e-5. The Ccf factor
+                is, however, calculated according to Rutten 1984.
       
       The relations and coefficients used here are taken from the
       following publications (and references therein):
