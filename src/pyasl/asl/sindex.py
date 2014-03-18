@@ -36,8 +36,11 @@ class SMW_RHK:
       starting with Middelkoop 1982.
       Their factor was also used by Noyes et al. 1984---in particular in their
       appendix a, where is appears implicitly. Later, the value of the conversion
-      factor by Oranje 1983 and Rutten 1984, who estimate that it is
-      about 70% larger than previously proposed.
+      factor has been revised by several authors, e.g., Oranje 1983 and Rutten 1984,
+      who estimated a value about 70% larger than previously proposed. Hall et al.
+      2007 derive a value 40% larger than that of Middelkoop 1982 and provide
+      a thorough discussion on the differences between the individual approaches
+      and results given in the literature.
       
       Finally, the RHK index thus derived still covers a photospheric
       contribution, which is always present and not related to the
@@ -46,6 +49,10 @@ class SMW_RHK:
       has to be subtracted. For active stars, the photospheric correction
       is usually quite irrelevant. For inactive, quiet stars, it can,
       however, be important.
+      
+      The issue of the Mount-Wilson S-index conversion has been revisited
+      by Mittag et al. 2013, who provide an alternative conversion procedure
+      and revised photospheric corrections for various luminosity classes. 
       
       .. note:: In the default configuration, the conversion of the S-index
                 into RHK is identical to the relation stated by Noyes et al. 1984
@@ -65,12 +72,14 @@ class SMW_RHK:
         - Oranje 1983, A&A 124, 43
         - Noyes et al. 1984, A&A 279, 763
         - Rutten 1984, A&A 130, 353
+        - Hall et al. 2007, AJ 133, 862
+        - Mittag et al. 2013, A&A 549, 117
       
       Parameters
       ----------
       ccfs : string, {rutten, noyes}, optional
           Source of the conversion factor between S-index and RHK.
-      afc : string, {rutten, oranje, middelkoop}, optional
+      afc : string, {rutten, oranje, middelkoop, hall}, optional
           Source of conversion factor between "arbitrary units"
           and physical units of surface flux.
       rphot : string, {noyes}
@@ -95,7 +104,7 @@ class SMW_RHK:
     
     self._afc = afc
     # The conversion factor from "arbitrary units" to physical units.
-    self._absCal = {"rutten":1.29e6, "oranje":1.21e6, "middelkoop": 7.6e5}
+    self._absCal = {"rutten":1.29e6, "oranje":1.21e6, "middelkoop": 7.6e5, "hall":1.07e6}
     if not self._afc in self._absCal:
       raise(PE.PyAValError("No such source for the conversion from arbitrary to physical units: " + str(self._afc), \
                            solution="Use either of: " + ', '.join(self._absCal.keys()) ))
