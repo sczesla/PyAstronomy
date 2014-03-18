@@ -37,6 +37,13 @@ class FuncFitSanity(unittest.TestCase):
         gff.freeze(s); gff.freeze([s,s])
         gff.setRestriction({s:[None, 10.]})
 
+  def description_sanity(self):
+    """
+      Check sanity of 'description'
+    """
+    gf = fuf.GaussFit1d()
+    gff = gf + gf
+    self.assertEqual(gff.description(), "Gaussian(No. 1) + Gaussian(No. 2)", "Wrong description: " + gff.description())
         
 class MultiVoigtSanity(unittest.TestCase):
   

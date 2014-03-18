@@ -875,26 +875,36 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
   def __add__(self, right):
     result = self.__combineFittingObjects(right)
     result.evaluate = instancemethod(addEval, result, OneDFit)
+    # Save the 'operator' relating left and right component
+    result._operator = '+'
     return result
 
   def __sub__(self, right):
     result = self.__combineFittingObjects(right)
     result.evaluate = instancemethod(subEval, result, OneDFit)
+    # Save the 'operator' relating left and right component
+    result._operator = '-'
     return result
   
   def __mul__(self, right):
     result = self.__combineFittingObjects(right)
     result.evaluate = instancemethod(mulEval, result, OneDFit)
+    # Save the 'operator' relating left and right component
+    result._operator = '*'    
     return result
 
   def __div__(self, right):
     result = self.__combineFittingObjects(right)
     result.evaluate = instancemethod(divEval, result, OneDFit)
+    # Save the 'operator' relating left and right component
+    result._operator = '/'    
     return result
 
   def __pow__(self, right):
     result = self.__combineFittingObjects(right)
     result.evaluate = instancemethod(powEval, result, OneDFit)
+    # Save the 'operator' relating left and right component
+    result._operator = '**'
     return result
   
   def __sqrDiff(self):
@@ -971,39 +981,33 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     """
     self.penaltyFactor = penalFac
 
-  def rootName(self):
+  def description(self, parenthesis=False):
     """
-      Returns (hopefully) useful name of the model
-      
-      Returns
-      -------
-      string containing the name.
+    Returns a description of the model based on the names of the individual components.
+    
+    Parameters
+    ----------
+    parenthesis : boolean, optional
+        If True, the entire expression/description will be enclosed in
+        parenthesis. The default is False.
+    
+    Returns
+    -------
+    Description : string
+        Description of the model.
     """
-    rootNums = {}
-    rootNoComp = {}
-    for c in self._compoWalk():
-      if c._isComposed():
-          continue
-      # It is a noncomposed component
-      if not c.naming.getRoot() in rootNums:
-          rootNums[c.naming.getRoot()] = [c.naming.getComponentCounter()]
+    c = self
+    if c._isComposed():
+      if parenthesis:
+        return "(" + c.leftCompo.description(True) + " " + c._operator + " " + c.rightCompo.description(True) + ")"
       else:
-          rootNums[c.naming.getRoot()].append(c.naming.getComponentCounter())
-      rootNoComp[(c.naming.getRoot(), c.naming.getComponentCounter())] = c
-          
-      # Walk through all root and counter to provide output
-      for root in sorted(rootNums.keys()):
-          for counter in sorted(rootNums[root]):
-              c = rootNoComp[(root, counter)]
-              cono = ""
-              if root == "":
-                cono += "unnamed"
-              else:
-                cono += root
-              if counter != 0:
-                cono += " (No. " + str(counter) +")"
-      return cono
-
+        return c.leftCompo.description(True) + " " + c._operator + " " + c.rightCompo.description(True)
+    else: 
+      if c.naming.getComponentCounter()>0:
+        return c.naming.getRoot()+"(No. "+str(c.naming.getComponentCounter())+")"
+      else:  
+        return c.naming.getRoot()
+      
   def parameterSummary(self, toScreen=True, prefix=""):
     """
       Writes a summary of the parameters in text form.

@@ -252,6 +252,12 @@ class ExampleSanity(unittest.TestCase):
     # Our actual model is the sum of both Gaussians
     twoG = gf1 + gf2
     
+    # Show a description of the model depending on the
+    # names of the individual components
+    print
+    print "Description of the model: ", twoG.description()
+    print
+    
     # Note that now the parameter names changed!
     # Each parameter is now named using the "property"
     # (e.g., 'A' or 'sig') as the first part, the component
