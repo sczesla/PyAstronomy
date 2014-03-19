@@ -127,3 +127,12 @@ errSI   = 0
 unitSI  = kg
 unitcgs = g
 source  = http://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+
+[ProtonMass]
+descr   = Mass of a proton
+symbol  = mp
+valueSI = 1.672621777e-27
+errSI   = 0.000000074e-27
+unitSI  = kg
+unitcgs = g
+source  = NIST, CODATA (http://physics.nist.gov/cgi-bin/cuu/Value?mp|search_for=proton+mass)
