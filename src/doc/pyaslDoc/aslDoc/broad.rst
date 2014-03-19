@@ -1,7 +1,8 @@
-Instrumental broadening
-===========================
+Instrumental (Gaussian kernel) broadening
+===========================================
 
 .. currentmodule:: PyAstronomy.pyasl
+.. autofunction:: broadGaussFast
 .. autofunction:: instrBroadGaussFast
 
 Example of usage

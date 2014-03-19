@@ -6,6 +6,7 @@ From 0.7.0 to 0.8.0
   ==================  =============================================
   pyasl               *New functionality*
                         - S-index into RHK conversion
+                        - Convolution with Gaussian (broadGaussFast)
   funcFit             *New functionality*
                         - Model description
   ==================  =============================================

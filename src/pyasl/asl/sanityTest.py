@@ -1487,6 +1487,36 @@ class SanityOfBroad(unittest.TestCase):
     s2 = r.sum()
     self.assertAlmostEqual(s1, s2, 6, "EW in spectrum did change")
 
+  def sanity_convolutionGaussian(self):
+    """
+      Check the sanity of broadGaussFast (properties of result in case of two Gaussians)
+    """
+    import numpy as np
+    from PyAstronomy import pyasl
+    from PyAstronomy import funcFit as fuf
+    
+    x = np.arange(-8.0, 8.0, 0.001)
+    gf = fuf.GaussFit1d()
+    gf["A"] = 0.8
+    gf["sig"] = 0.471
+    y = gf.evaluate(x)
+    
+    y2 = pyasl.broadGaussFast(x, y, 1.5-gf["sig"], edgeHandling="firstlast")
+    
+    print np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2)
+    print np.sqrt(np.sum( x**2*y)/np.sum(y))
+    print np.sqrt(np.sum( x**2*y2)/np.sum(y2))
+    print np.sum(y), np.sum(y2)
+    
+    mean2 = np.mean(x*y2)/np.sum(y2)
+    self.assertAlmostEqual(mean2, 0.0, delta=1e-9, \
+                           msg="Barycenter of convoluted Gaussian (" + str(mean2) + ") deviates from 0.0.")
+    std2 = np.sqrt(np.sum( x**2*y2)/np.sum(y2))
+    std2_nom = np.sqrt(gf["sig"]**2 + (1.5-gf["sig"])**2)
+    self.assertAlmostEqual(std2, std2_nom, delta=1e-5, \
+                           msg="Std of convoluted Gaussian (" + str(std2) +") deviates from nominal value.")
+    self.assertAlmostEqual(np.sum(y), np.sum(y2), delta=1e-4,
+                           msg="Normalization of convoluted Gaussian (" + str(np.sum(y2)) +") is incorrect.")
 
 class SanityOfCrosscor(unittest.TestCase):
   
