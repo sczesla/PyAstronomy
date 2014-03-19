@@ -1518,6 +1518,19 @@ class SanityOfBroad(unittest.TestCase):
     self.assertAlmostEqual(np.sum(y), np.sum(y2), delta=1e-4,
                            msg="Normalization of convoluted Gaussian (" + str(np.sum(y2)) +") is incorrect.")
 
+  def sanity_thermalBroadening(self):
+    """
+      Check sanity of thermal broadening width.
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    fwhm = pyasl.thermalBroadeningWidth(4200.0, 7500.)
+    sig = pyasl.thermalBroadeningWidth(4200.0, 7500., fwhm=False)
+    self.assertAlmostEqual(fwhm, 0.26, delta=1e-2, \
+                           msg="FWHM of thermal broadening (" + str(fwhm) + ") is incorrect")
+    self.assertAlmostEqual(fwhm, sig*2*np.sqrt(2.*np.log(2.0)), delta=1e-9, \
+                           msg="FWHM and std differ.")
+
 class SanityOfCrosscor(unittest.TestCase):
   
   def setUp(self):

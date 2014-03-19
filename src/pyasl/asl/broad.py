@@ -113,4 +113,51 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False)
     return (result, fwhm)
   
 
-  
+def thermalBroadeningWidth(lam0, T, m=None, fwhm=True):
+  """
+    Calculate the width for thermal broadening.
+    
+    Thermal motion of particles causes a Doppler
+    broadening of the line profile. The resulting
+    line profile is Gaussian with FWHM given by
+    
+    .. math::
+    
+        fwhm = \\lambda_0\\sqrt{\\frac{8k_B T\\ln(2)}{m c^2}}
+    
+    See, e.g.,
+    http://hyperphysics.phy-astr.gsu.edu/hbase/atomic/broaden.html
+    
+    Parameters
+    ----------
+    lam0 : float
+        Wavelength at which to calculate the width.
+    T : float
+        Temperature [K].
+    m : float, optional
+        Mass of the particles. If not specified,
+        the proton mass is assumed.
+    fwhm : boolean, optional
+        If True (default), the FWHM of the Gaussian
+        broadening kernel will be returned. Otherwise,
+        the standard deviation is returned.
+    
+    Returns
+    -------
+    Width : float
+        The width of the Gaussian broadening kernel.
+        By default, the FWHM is returned. To obtain
+        the standard deviation, set the `fwhm` flag to
+        False.
+  """
+  from PyAstronomy import constants as PC
+  pc = PC.PyAConstants()
+  pc.setSystem("SI")
+  if m is None:
+    # Use proton mass if not specified otherwise
+    m = pc.mp
+  result = lam0 * np.sqrt(8.0*pc.k*T*np.log(2.0)/(m*(pc.c)**2))
+  if not fwhm:
+    return result/(2.0*np.sqrt(2.0*np.log(2.0)))
+  else:
+    return result

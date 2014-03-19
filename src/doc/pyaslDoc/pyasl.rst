@@ -58,12 +58,12 @@ Spectral routines
    aslDoc/planck.rst
    aslDoc/crosscorr.rst
    aslDoc/dopplerShift.rst
-   aslDoc/rotBroad.rst
-   aslDoc/broad.rst
+   aslDoc/broadening.rst
    aslDoc/unredDoc.rst
    aslDoc/lineWidth.rst
    aslDoc/fluxConversion.rst
    aslDoc/readFitsSpec.rst
+
 
 Coordinates, time, and observation tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
