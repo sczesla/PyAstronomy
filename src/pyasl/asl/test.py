@@ -5,7 +5,7 @@ import os
 import astroTimeLegacy as at
 import aitoffLegacy
 import unittest
-from baryvel import baryvel
+from baryvel import baryvel, helcorr
 import eq2hor
 import sunpos
 import moonpos
@@ -378,10 +378,8 @@ class IDLTests(unittest.TestCase):
     dat = self.getData("mphase.test")[1]
     for i in xrange(len(dat[::,0])):
       f = moonphase.moonphase(dat[i,0])
-      if abs(dat[i,1]) < self.p:
-        self.assertAlmostEqual(abs(f), 0.0 , delta=self.p)
-        continue
-      self.assertAlmostEqual(f/dat[i,1], 1.0, delta=self.p)
+      self.assertAlmostEqual(f, dat[i,1], delta=1e-5, msg="Lunar phase does not match." )
+      self.assertAlmostEqual(f/dat[i,1], 1.0, delta=1e-5, msg="Lunar phase (relative) does not match")
 
   def test_posangle(self):
     """
@@ -392,6 +390,20 @@ class IDLTests(unittest.TestCase):
       # Using *15.0 because decimal hours have been specified for IDL...
       f = posAngle.positionAngle(dat[i,0]*15.0, dat[i,1], dat[i,2]*15.0, dat[i,3], positive=False)
       self.assertAlmostEqual(dat[i,4], f, delta=1e-9, msg="Position angle does not match.")
+
+  def test_helcorr(self):
+    """
+      Testing helcorr function for barycentric correction
+    """
+    dat = self.getData("helcorr.test")[1]
+    import matplotlib.pylab as plt
+    for i in xrange(len(dat[::,0])):
+      # Using *15.0 because decimal hours have been specified for IDL...
+      # The minus accounts for the east-west change
+      corr, hjd = helcorr(-dat[i,0], dat[i,1], dat[i,2], dat[i,3]*15.0, dat[i,4], dat[i,5])
+      self.assertAlmostEqual(dat[i,6], corr, delta=1e-5, msg="Barycentric correction does not match.")
+      self.assertAlmostEqual(dat[i,7], hjd, delta=1e-5, msg="HJD does not match.")
+    plt.show()
 
 if __name__ == "__main__":
   suite = unittest.TestLoader().loadTestsFromTestCase(AstroTimeLegacyTest)

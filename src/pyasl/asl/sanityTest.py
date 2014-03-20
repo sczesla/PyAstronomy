@@ -552,6 +552,33 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
     from PyAstronomy import pyasl
     vh, vb = pyasl.baryCorr(2449398.5000000000, 297.69488, 8.8676389, deq=2000)
     self.assertAlmostEqual(vb, 10.583091, delta=1e-5)
+  
+  def sanity_helcorrExample(self):
+    """
+      Checking sanity of helcorr example.
+    """
+    from PyAstronomy import pyasl
+  
+    # Coordinates of European Southern Observatory
+    # (Coordinates of UT1)
+    longitude = 289.5967661
+    latitude = -24.62586583
+    altitude = 2635.43
+    
+    # Coordinates of HD 12345 (J2000)
+    ra2000 = 030.20313477
+    dec2000 = -12.87498346
+    
+    # (Mid-)Time of observation
+    jd = 2450528.2335
+    
+    # Calculate barycentric correction (debug=True show
+    # various intermediate results)
+    corr, hjd = pyasl.helcorr(longitude, latitude, altitude, \
+                ra2000, dec2000, jd, debug=True)
+    
+    print "Barycentric correction [km/s]: ", corr
+    print "Heliocentric Julian day: ", hjd
     
     
 

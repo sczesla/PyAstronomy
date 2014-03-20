@@ -338,6 +338,27 @@ pro test_posangle
 end
 
 
+pro test_helcorr
+; pro helcorr,obs_long,obs_lat,obs_alt,ra2000,dec2000,jd $
+;            ,corr,hjd,DEBUG=debug
+  openw, fw, 'helcorr.test', /get_lun, WIDTH=1000
+  corr = 0.0d0
+  hjd = 0.0d0
+  for i=0, 1000 do begin
+    obs_long = 720.0d0 * randomu(seed,/double) - 360.0d0
+    obs_lat = 180.0d0 * randomu(seed,/double) - 90.0d0
+    obs_alt = 8000.0d0 * randomu(seed,/double)
+    ; Convert into hours!
+    ra2000 = 360.0d0 * randomu(seed,/double) / 15.0d0
+    dec2000 = 180.0d0 * randomu(seed,/double) - 90.0d0
+    jd = 2444240.0d0 + randomu(seed,/double) * (100.0d0*365.0d0)
+    helcorr, obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, corr, hjd
+    printf, fw, obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, corr, hjd, FORMAT="(F30.15,F30.15,F30.15,F30.15,F30.15,F30.15,F30.15,F30.15)"
+  endfor
+  close, fw
+end
+
+
 pro create_test_data
  ; note that co_refract has to be compiled first...
  TEST_BPRECESS
@@ -360,4 +381,5 @@ pro create_test_data
  test_moonpos
  test_mphase
  test_posangle
+ test_helcorr
 end

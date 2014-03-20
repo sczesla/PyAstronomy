@@ -1,5 +1,5 @@
 import numpy as np
-from astroTimeLegacy import premat
+from astroTimeLegacy import premat, daycnv, precess, helio_jd
 from idlMod import idlMod
 
 def baryvel(dje, deq):
@@ -376,3 +376,164 @@ def baryCorr(jd, ra, dec, deq=0.0):
         vh[1]*np.cos(derad)*np.sin(rarad) + vh[2]*np.sin(derad) 
   
   return vhp, vbp
+
+
+def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
+  """
+    Calculate barycentric velocity correction.
+    
+    This function calculates the motion of an observer in
+    the direction of a star. In contract to :py:func:`baryvel`
+    and :py:func:`baryCorr`, the rotation of the Earth is
+    taken into account.
+    
+    .. note:: This function was ported from the REDUCE IDL package.
+              See Piskunov & Valenti 2002, A&A 385, 1095 for a detailed
+              description of the package and/or visit
+              http://www.astro.uu.se/~piskunov/RESEARCH/REDUCE/
+    
+    .. warning:: Contrary to the original implementation the longitude
+                 increases toward the East and the right ascension is
+                 given in degrees instead of hours.
+    
+    Parameters
+    ----------
+    obs_long : float
+        Longitude of observatory (degrees, **eastern** direction is positive)
+    obs_lat : float
+        Latitude of observatory [deg]
+    obs_alt : float
+        Altitude of observatory [m]
+    ra2000 : float
+        Right ascension of object for epoch 2000.0 [deg]
+    dec2000 : float
+        Declination of object for epoch 2000.0 [deg]
+    jd : float
+        Julian date for the middle of exposure
+    
+    Returns
+    -------
+    Barycentric correction : float
+        The barycentric correction accounting for the rotation
+        of the Earth, the rotation of the Earth's center around
+        the Earth-Moon barycenter, and the motion of the Earth-Moon 
+        barycenter around the center of the Sun [km/s].
+    HJD : float
+        Heliocentric Julian date for middle of exposure.
+
+    Notes
+    -----
+
+    :IDL REDUCE - Documentation:
+
+
+    Calculates heliocentric Julian date, barycentric and heliocentric radial
+    velocity corrections from:
+    
+    INPUT:
+    <OBSLON> Longitude of observatory (degrees, western direction is positive)
+    <OBSLAT> Latitude of observatory (degrees)
+    <OBSALT> Altitude of observatory (meters)
+    <RA2000> Right ascension of object for epoch 2000.0 (hours)
+    <DE2000> Declination of object for epoch 2000.0 (degrees)
+    <JD> Julian date for the middle of exposure
+    [DEBUG=] set keyword to get additional results for debugging
+    
+    OUTPUT:
+    <CORRECTION> barycentric correction - correction for rotation of earth,
+       rotation of earth center about the earth-moon barycenter, earth-moon 
+       barycenter about the center of the Sun.
+    <HJD> Heliocentric Julian date for middle of exposure
+    
+    Algorithms used are taken from the IRAF task noao.astutils.rvcorrect
+    and some procedures of the IDL Astrolib are used as well.
+    Accuracy is about 0.5 seconds in time and about 1 m/s in velocity.
+    
+    History:
+    written by Peter Mittermayer, Nov 8,2003
+    2005-January-13   Kudryavtsev   Made more accurate calculation of the sidereal time.
+                                    Conformity with MIDAS compute/barycorr is checked.
+    2005-June-20      Kochukhov Included precession of RA2000 and DEC2000 to current epoch
+
+"""
+  from PyAstronomy.pyaC import degtorad
+
+  # This reverts the original longitude convention. After this,
+  # East longitudes are positive
+  obs_long = -obs_long
+
+  # Covert JD to Gregorian calendar date
+  xjd = 2400000. + jd
+  
+  year, month, day, ut = tuple(daycnv(xjd))
+
+  # Current epoch
+  epoch = year + month/12. + day/365.
+
+  # Precess ra2000 and dec2000 to current epoch, resulting ra is in degrees
+  ra = ra2000
+  dec = dec2000
+  ra, dec = precess(ra, dec, 2000.0, epoch)  
+
+  # Calculate heliocentric julian date
+  hjd = helio_jd(jd, ra, dec)
+
+  # DIURNAL VELOCITY (see IRAF task noao.astutil.rvcorrect)
+  # convert geodetic latitude into geocentric latitude to correct
+  # for rotation of earth
+  dlat = -(11.*60.+32.743)*np.sin(2.0*degtorad(obs_lat)) \
+         +1.1633*np.sin(4.0*degtorad(obs_lat)) - 0.0026*np.sin(6.0*degtorad(obs_lat))
+  lat = obs_lat + dlat/3600.0
+
+  # Calculate distance of observer from earth center
+  r = 6378160.0 * (0.998327073+0.001676438*np.cos(2.0*degtorad(lat)) \
+     -0.00000351 * np.cos(4.0*degtorad(lat)) + 0.000000008*np.cos(6.0*degtorad(lat))) \
+     + obs_alt
+
+  # Calculate rotational velocity (perpendicular to the radius vector) in km/s
+  # 23.934469591229 is the sidereal day in hours for 1986
+  v = 2.*np.pi * (r/1000.) / (23.934469591229*3600.)
+
+  # Calculating local mean sidereal time (see astronomical almanach)
+  tu = (jd-51545.0)/36525.0
+  gmst = 6.697374558 + ut + \
+        (236.555367908*(jd-51545.0) + 0.093104*tu**2 - 6.2e-6*tu**3)/3600.0
+  lmst = idlMod(gmst-obs_long/15, 24)
+
+  # Projection of rotational velocity along the line of sight
+  vdiurnal = v*np.cos(degtorad(lat))*np.cos(degtorad(dec))*np.sin(degtorad(ra-lmst*15))
+
+  # BARICENTRIC and HELIOCENTRIC VELOCITIES
+  vh, vb = baryvel(xjd,0)
+
+  # Project to line of sight
+  vbar = vb[0]*np.cos(degtorad(dec))*np.cos(degtorad(ra)) + vb[1]*np.cos(degtorad(dec))*np.sin(degtorad(ra)) + \
+         vb[2]*np.sin(degtorad(dec))
+  vhel = vh[0]*np.cos(degtorad(dec))*np.cos(degtorad(ra)) + vh[1]*np.cos(degtorad(dec))*np.sin(degtorad(ra)) + \
+         vh[2]*np.sin(degtorad(dec))
+  
+  # Use barycentric velocity for correction
+  corr = (vdiurnal + vbar) 
+
+  if debug:
+    print ''
+    print '----- HELCORR.PRO - DEBUG INFO - START ----'
+    print '(obs_long (East positive),obs_lat,obs_alt) Observatory coordinates [deg,m]: ', -obs_long, obs_lat, obs_alt
+    print '(ra,dec) Object coordinates (for epoch 2000.0) [deg]: ', ra,dec
+    print '(ut) Universal time (middle of exposure) [hrs]: ', ut
+    print '(jd) Julian date (middle of exposure) (JD-2400000): ', jd
+    print '(hjd) Heliocentric Julian date (middle of exposure) (HJD-2400000): ', hjd
+    print '(gmst) Greenwich mean sidereal time [hrs]: ', idlMod(gmst, 24)
+    print '(lmst) Local mean sidereal time [hrs]: ', lmst
+    print '(dlat) Latitude correction [deg]: ', dlat
+    print '(lat) Geocentric latitude of observer [deg]: ', lat
+    print '(r) Distance of observer from center of earth [m]: ', r
+    print '(v) Rotational velocity of earth at the position of the observer [km/s]: ', v
+    print '(vdiurnal) Projected earth rotation and earth-moon revolution [km/s]: ', vdiurnal
+    print '(vbar) Barycentric velocity [km/s]: ', vbar
+    print '(vhel) Heliocentric velocity [km/s]: ', vhel
+    print '(corr) Vdiurnal+vbar [km/s]: ', corr
+    print '----- HELCORR.PRO - DEBUG INFO - END -----'
+    print ''
+  
+  return corr, hjd
