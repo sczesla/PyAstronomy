@@ -2,7 +2,7 @@
 import datetime
 import numpy
 from numpy import sin, cos, tan, sqrt, arcsin
-
+from PyAstronomy.pyaC import pyaErrors as PE
 
 
 def daycnv(xjd):
@@ -840,7 +840,7 @@ def helio_jd(date, ra, dec, B1950 = False, TIME_DIFF = False):
     Parameters
     ----------
     date : float
-        Julian date
+        (Reduced) Julian date (2.4e6 subtracted)
     ra, dec : float
         Right ascension and declination in degrees
     B1950 : boolean
@@ -924,6 +924,11 @@ def helio_jd(date, ra, dec, B1950 = False, TIME_DIFF = False):
   """
 
   # Because XYZ uses default B1950 coordinates, we'll convert everything to B1950
+
+  if date > 2.4e6:
+    PE.warn(PE.PyAValError("The given Julian Date ( " + str(date) + ") is exceedingly large far a reduced JD.",
+                           solution="Did you forget to subtract 2.4e6?",
+                           where="helio_jd"))
 
   if not B1950:
     bpresult = bprecess(ra,dec)
