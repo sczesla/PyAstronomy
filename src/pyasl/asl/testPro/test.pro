@@ -352,7 +352,8 @@ pro test_helcorr
     ra2000 = 360.0d0 * randomu(seed,/double) / 15.0d0
     dec2000 = 180.0d0 * randomu(seed,/double) - 90.0d0
     jd = 2444240.0d0 + randomu(seed,/double) * (100.0d0*365.0d0)
-    helcorr, obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, corr, hjd
+    rjd = jd - 2.4d6
+    helcorr, obs_long, obs_lat, obs_alt, ra2000, dec2000, rjd, corr, hjd
     printf, fw, obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, corr, hjd, FORMAT="(F30.15,F30.15,F30.15,F30.15,F30.15,F30.15,F30.15,F30.15)"
   endfor
   close, fw

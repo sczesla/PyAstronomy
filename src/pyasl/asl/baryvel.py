@@ -1,6 +1,7 @@
 import numpy as np
 from astroTimeLegacy import premat, daycnv, precess, helio_jd
 from idlMod import idlMod
+from PyAstronomy.pyaC import pyaErrors as PE
 
 def baryvel(dje, deq):
   """
@@ -394,7 +395,8 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
     
     .. warning:: Contrary to the original implementation the longitude
                  increases toward the East and the right ascension is
-                 given in degrees instead of hours.
+                 given in degrees instead of hours. The JD is given as is,
+                 in particular, nothing needs to be subtracted.
     
     Parameters
     ----------
@@ -409,7 +411,7 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
     dec2000 : float
         Declination of object for epoch 2000.0 [deg]
     jd : float
-        Julian date for the middle of exposure
+        Julian date for the middle of exposure.
     
     Returns
     -------
@@ -462,8 +464,11 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
   # East longitudes are positive
   obs_long = -obs_long
 
+  if jd < 2.4e6:
+    PE.warn(PE.PyAValError("The given Julian Date (" + str(jd) + ") is exceedingly small. Did you subtract 2.4e6?"))
+
   # Covert JD to Gregorian calendar date
-  xjd = 2400000. + jd
+  xjd = jd
   
   year, month, day, ut = tuple(daycnv(xjd))
 
@@ -476,7 +481,8 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
   ra, dec = precess(ra, dec, 2000.0, epoch)  
 
   # Calculate heliocentric julian date
-  hjd = helio_jd(jd, ra, dec)
+  rjd = jd-2.4e6
+  hjd = helio_jd(rjd, ra, dec) + 2.4e6
 
   # DIURNAL VELOCITY (see IRAF task noao.astutil.rvcorrect)
   # convert geodetic latitude into geocentric latitude to correct
@@ -495,9 +501,9 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
   v = 2.*np.pi * (r/1000.) / (23.934469591229*3600.)
 
   # Calculating local mean sidereal time (see astronomical almanach)
-  tu = (jd-51545.0)/36525.0
+  tu = (rjd-51545.0)/36525.0
   gmst = 6.697374558 + ut + \
-        (236.555367908*(jd-51545.0) + 0.093104*tu**2 - 6.2e-6*tu**3)/3600.0
+        (236.555367908*(rjd-51545.0) + 0.093104*tu**2 - 6.2e-6*tu**3)/3600.0
   lmst = idlMod(gmst-obs_long/15, 24)
 
   # Projection of rotational velocity along the line of sight
@@ -521,8 +527,8 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
     print '(obs_long (East positive),obs_lat,obs_alt) Observatory coordinates [deg,m]: ', -obs_long, obs_lat, obs_alt
     print '(ra,dec) Object coordinates (for epoch 2000.0) [deg]: ', ra,dec
     print '(ut) Universal time (middle of exposure) [hrs]: ', ut
-    print '(jd) Julian date (middle of exposure) (JD-2400000): ', jd
-    print '(hjd) Heliocentric Julian date (middle of exposure) (HJD-2400000): ', hjd
+    print '(jd) Julian date (middle of exposure) (JD): ', jd
+    print '(hjd) Heliocentric Julian date (middle of exposure) (HJD): ', hjd
     print '(gmst) Greenwich mean sidereal time [hrs]: ', idlMod(gmst, 24)
     print '(lmst) Local mean sidereal time [hrs]: ', lmst
     print '(dlat) Latitude correction [deg]: ', dlat

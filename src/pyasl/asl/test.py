@@ -396,14 +396,18 @@ class IDLTests(unittest.TestCase):
       Testing helcorr function for barycentric correction
     """
     dat = self.getData("helcorr.test")[1]
-    import matplotlib.pylab as plt
+#    import matplotlib.pylab as plt
+#    diffs = []
     for i in xrange(len(dat[::,0])):
       # Using *15.0 because decimal hours have been specified for IDL...
       # The minus accounts for the east-west change
       corr, hjd = helcorr(-dat[i,0], dat[i,1], dat[i,2], dat[i,3]*15.0, dat[i,4], dat[i,5])
+#      print corr, dat[i,6], corr-dat[i,6]
+#      diffs.append(corr-dat[i,6])
       self.assertAlmostEqual(dat[i,6], corr, delta=1e-5, msg="Barycentric correction does not match.")
-      self.assertAlmostEqual(dat[i,7], hjd, delta=1e-5, msg="HJD does not match.")
-    plt.show()
+      self.assertAlmostEqual(dat[i,7]+2.4e6, hjd, delta=1e-5, msg="HJD does not match.")
+#    plt.hist(diffs)
+#    plt.show()
 
 if __name__ == "__main__":
   suite = unittest.TestLoader().loadTestsFromTestCase(AstroTimeLegacyTest)
