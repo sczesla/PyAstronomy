@@ -20,8 +20,7 @@ class KuruczMT:
     Attributes
     ----------
     teffs : array
-        Available effective temperatures [K] in
-        ascending order.
+        Available effective temperatures [K] in ascending order.
     loggs : array
         Available loggs in ascending order [cgs].
     models : dictionary
@@ -30,6 +29,7 @@ class KuruczMT:
         model.
     met : float
         The logarithmic metallicity of the model grid.
+    
   """
   
   def _extractModelProperties(self, model):

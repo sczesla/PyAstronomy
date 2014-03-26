@@ -116,6 +116,7 @@ Resource based helpers
    resBasedDoc/nasaExoplanetArchive.rst
    resBasedDoc/exoplanetEU.rst
    resBasedDoc/exoplanetsOrg.rst
+   resBasedDoc/kuruczModels.rst
 
    
 License note
