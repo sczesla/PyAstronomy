@@ -4,3 +4,4 @@ ic = ImportCheck(["Tkinter", "matplotlib"], required=["Tkinter", "matplotlib"])
 
 from pyaPicker import Picker
 from ffmodelExplorer import FFModelExplorer, FFModelExplorerList, FFModelExplorerDropDownMenu, FFModelPlotFit, ffmodelExplorer
+from continuumFinder import ContiInteractive
