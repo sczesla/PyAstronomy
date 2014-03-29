@@ -59,7 +59,7 @@ class KuruczMT:
       fn : string
           Name of the Kurucz model-grid file. 
     """
-    lines = gzip.open(fn, 'rU').readlines()
+    lines = gzip.open(fn, 'r').readlines()
     if len(lines) == 1:
       lines = lines[0].split("\r")
     models = []
