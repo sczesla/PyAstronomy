@@ -2,6 +2,7 @@ import numpy as np
 import scipy.interpolate as sci
 import matplotlib.pylab as plt
 import matplotlib
+from PyAstronomy.pyaC import pyaErrors as PE
 
 
 class ContiInteractive:
@@ -40,11 +41,14 @@ class ContiInteractive:
         Model continuum derived from some other source. A two-dimensional
         array with the first column denoting the model wavelength and the
         second column the model flux.
+    alwaysMC : boolean, optional
+        If True, the model is always shown along with the data.
+        Default is False.
     splineKind : string, {cubic, linear}, optional
         The type of spline to be used; can be changed via the GUI.
   """
   
-  def __init__(self, splineKind="cubic", modelConti=None):
+  def __init__(self, splineKind="cubic", modelConti=None, alwaysMC=False):
     # splinekind is either "cubic" or "linear" (GUI controlled)
     self.splineKind = splineKind
     # Point list contains the entries specifying the user defined points.
@@ -62,6 +66,12 @@ class ContiInteractive:
     self.middleButtonCon = None
     # The model continuum
     self.modelConti = modelConti
+    # Always show model continuum?
+    self.alwaysMC = alwaysMC
+    # Saves instance of the line used to plot comparison model 
+    self.modelMC = None
+    if self.alwaysMC and (modelConti is None):
+      raise(PE.PyAParameterConflict("If alwaysMC is set True, modelConti must be provided, too."))
     
     # Inactive Button Color
     self.ibc = [0.7,0.7,0.7]
@@ -138,6 +148,16 @@ class ContiInteractive:
       if model is not None:
         self.ax.plot(self.w, self.getModel(), 'r--')
         self.cmodel = self.ax.lines[-1]
+    # Plot the comparison model
+    if self.alwaysMC:
+      if not self.modelMC is None:
+        for i in xrange(len(self.ax.lines)):
+          if self.ax.lines[i] is self.modelMC:
+            self.ax.lines.pop(i)
+            self.modelMC = None
+          break
+      self.ax.plot(self.modelConti[::,0], self.modelConti[::,1], 'g--')
+      self.modelMC = self.ax.lines[-1]
   
   def __keyEvent(self, event):
     """
