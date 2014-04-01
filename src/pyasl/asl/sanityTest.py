@@ -1835,3 +1835,52 @@ class SanityOfKuruczModel(unittest.TestCase):
     # Use simple access method to obtain a model.
     # The input is: Teff, logg, and log10(metallicity)
     model = pyasl.getKuruczModel(4250, 4.5, 0.1)
+
+
+class SanityOfAtomicNo(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_Example(self):
+    """
+      Check example of atomic number (AtomicNo)
+    """
+    from PyAstronomy import pyasl
+
+    an = pyasl.AtomicNo()
+    
+    # Show table with all atomic numbers, elemental
+    # symbols, and the names of the elements
+    an.showAll()
+    
+    print an.getElSymbol(26)
+    
+    print an.getAtomicNo("He")
+    
+    print an.getElementName(25)
+    
+  def sanity_AtomicNo(self):
+    """
+      Check a number of associations
+    """    
+    from PyAstronomy import pyasl
+
+    an = pyasl.AtomicNo()
+    
+    
+    self.assertEqual("Fe", an.getElSymbol(26))
+    self.assertEqual("Ca", an.getElSymbol(20))
+    self.assertEqual("H", an.getElSymbol(1))
+    
+    
+    self.assertEqual(an.getAtomicNo("He"), 2)
+    self.assertEqual(an.getAtomicNo("O"), 8)
+    
+    self.assertEqual(an.getElementName(3), "Lithium")
+    
+    print an.getElementName(25)
+    

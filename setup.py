@@ -123,7 +123,7 @@ packages = ['PyAstronomy', \
 package_data = {"PyAstronomy":["setup.cfg"],
                 "PyAstronomy.modelSuite.XTran.palTrans":["ellint/makefile_template", "ellint/ell.cpp"], \
                 "PyAstronomy.modelSuite.XTran.forTrans":["*.f", "*.pyf"], \
-                "PyAstronomy.pyasl.asl":["testPro/*.pro", "*.cfg"], \
+                "PyAstronomy.pyasl.asl":["testPro/*.pro", "*.cfg", "*.dat"], \
                 "PyAstronomy.constants":["*.dat"], \
                 "PyAstronomy.pyaC":["*.dat"]
                 }

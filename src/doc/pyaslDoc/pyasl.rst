@@ -30,6 +30,7 @@ Uncategorized algorithms
    aslDoc/keplerOrbit.rst
    aslDoc/magnitudes.rst
    aslDoc/sindex.rst
+   aslDoc/atomicNo.rst
 
 
 General data analysis
