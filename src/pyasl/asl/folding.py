@@ -1,6 +1,6 @@
 import numpy
 
-def foldAt(time, period, T0=0.0):
+def foldAt(time, period, T0=0.0, getEpoch=False):
   """
     Fold time series at a particular period.
     
@@ -15,11 +15,22 @@ def foldAt(time, period, T0=0.0):
         The period to fold at (same time units is period.)
     T0 : float
         Time reference point
+    getEpoch : boolean, optional
+        If True, an array holding the epoch for every point
+        in time will be returned; the default is False.
+        Note that the first epoch is 0.
   
     Returns
     -------
     Phases : array
         The (unsorted) phase array pertaining to the input time axis.
+    Epoch : array, optional
+        An array holding the epoch for every given point in time.
+        The counting starts at zero. Only returned if `getEpoch`
+        is True.
   """
-  phase = (time - T0)/period - numpy.floor( (time - T0)/period )
+  epoch = numpy.floor( (time - T0)/period )
+  phase = (time - T0)/period - epoch
+  if getEpoch:
+    return phase, epoch
   return phase

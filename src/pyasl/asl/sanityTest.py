@@ -314,7 +314,7 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
   
   def sanity_foldAtExample(self):
     """
-      Checking `flotAt` example.
+      Checking `foldAt` example.
     """
     from PyAstronomy.pyasl import foldAt
     import matplotlib.pylab as plt
@@ -341,6 +341,18 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
     plt.plot(phases, flux, 'bp')
     # plt.show()
 
+  def sanity_foldAtEpoch(self):
+    """
+      Checking epoch calculation of `foldAt`
+    """
+    from PyAstronomy.pyasl import foldAt
+    import numpy as np
+    time = np.array([-1.5, -0.5, 0.5, 1.5, 9.5])
+    p, e = foldAt(time, 1.0, T0=0.0, getEpoch=True)
+    self.assertFalse(np.any(np.abs(p - 0.5) > 1e-5), msg="Bad phase")
+    pe = np.array([-2.,-1.,0.0, 1.0, 9.0])
+    self.assertFalse(np.any(np.abs(pe - e) > 1e-5), msg="Bad epoch")
+    
 
 class SanityOfDopplerShift(unittest.TestCase, SaniBase):
   
