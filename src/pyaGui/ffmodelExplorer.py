@@ -493,7 +493,7 @@ class FFModelExplorerList:
     """
     """
     self.plotter.fit(self.odf)
-    self._parameterValueChanged()
+    self._parameterValueChanged(mode="all")
 
   def _modModeChangedAdd(self, *args):
       self.modProps[self.selectedPar.get()]["modValAdd"] = self.modEntryTextAdd.get()
@@ -531,17 +531,31 @@ class FFModelExplorerList:
       self.radioAdd.select()
     print  
     
-  def _parameterValueChanged(self):
+  def _parameterValueChanged(self, mode="selected"):
     """
       Called when the value of the current parameter is changed.
+      
+      Parameters
+      ----------
+      mode : string, optional, {selected, all}
+          If 'selected' is specified, only the label of the
+          currently selected parameter will be updated. If 'all'
+          is chosen, all labels will be updated.
     """
-    # Update value in label and plot new model
-    newText = "% g" % (self.odf[self.selectedPar.get()])
-    #self.valLabel.config(text=newText)
-    #print self.selectedPar.get()
-    #print "selected Par: ",self.selectedPar.get()," value: ",self.odf[self.selectedPar.get()]
-    self.singleParameterVar[self.selectedPar.get()].set(newText)
+    if mode == "selected":
+      # Update label value for currently selected parameter
+      newText = "% g" % (self.odf[self.selectedPar.get()])
+      self.singleParameterVar[self.selectedPar.get()].set(newText)
+    elif mode == "all":
+      # Update label values of all parameters
+      for p in self.odf.parameters().keys():
+        newText = "% g" % (self.odf[p])
+        self.singleParameterVar[p].set(newText)
+    else:
+      raise(PE.PyAValError("Unknown mode: " + str(mode), \
+                           where="FFModelExplorerList::_parameterValueChanged"))
 
+    # Plot new model
     self.plotter.plot(self.f, self.odf)
     self.f.canvas.draw()
 
