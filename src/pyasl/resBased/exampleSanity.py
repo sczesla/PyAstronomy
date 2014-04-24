@@ -126,3 +126,43 @@ class SanityOfNasaExoplanetsOrg(unittest.TestCase):
     print
     for k, v in d.items():
       print "%12s  %12s" % (k,str(v))
+      
+class SanityOfFIP(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def sanity_example(self):
+    """
+      Checking example of FIP.
+    """
+    from PyAstronomy import pyasl
+  
+    fip = pyasl.FirstIonizationPot()
+    
+    print "First ionization energy of Li = %4.2e +/- %4.2e eV" % fip.getFIP(3)
+    print "First ionization energy of Protactinium = %4.2e +/- %4.2e eV" % fip.getFIP(91)
+    
+    # And the same using elemental symbols
+    print
+    print "First ionization energy of Li = %4.2e +/- %4.2e eV" % fip.getFIP("Li")
+    print "First ionization energy of Protactinium = %4.2e +/- %4.2e eV" % fip.getFIP("Pa")
+    
+    # Plot the first ionization energy as a function of atomic number
+#    pyasl.plotFIP()
+
+  def sanity_FIP(self):
+    """
+      Checking sanity of FIP.
+    """
+    from PyAstronomy import pyasl
+  
+    fip = pyasl.FirstIonizationPot()
+    self.assertAlmostEqual(10.451260, fip.getFIP(53)[0], 6, msg="FIP for iodine does not match (an).")
+    self.assertAlmostEqual(10.451260, fip.getFIP("I")[0], 6, msg="FIP for iodine does not match (sym).")
+    
+    self.assertAlmostEqual(25e-6, fip.getFIP(53)[1], 6, msg="FIP for iodine does not match (an).")
+    self.assertAlmostEqual(25e-6, fip.getFIP("I")[1], 6, msg="FIP for iodine does not match (sym).")

@@ -118,6 +118,7 @@ Resource based helpers
    resBasedDoc/exoplanetEU.rst
    resBasedDoc/exoplanetsOrg.rst
    resBasedDoc/kuruczModels.rst
+   resBasedDoc/fip.rst
 
    
 License note

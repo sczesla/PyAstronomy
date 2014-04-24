@@ -3,3 +3,4 @@ from nasaExoplanetArchive import *
 from exoplanetEU import *
 from exoplanetsOrg import *
 from kuruczModels import *
+from fip import *
