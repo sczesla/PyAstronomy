@@ -2,7 +2,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyaC import invertIndexSelection
 import numpy as np
 
-def intep(x, y, xinter, boundsError=True):
+def intep(x, y, xinter, boundsError=True, fillValue=None):
   """
     The INTEP interpolation algorithm
     
@@ -32,7 +32,13 @@ def intep(x, y, xinter, boundsError=True):
         limits are simply replaced with the closest
         valid value available, which might not be a
         good approximation. Set this flag to False
-        suppress the exception. 
+        suppress the exception.
+    fillValue : float, optional
+        If given (i.e., not None), this value will be
+        used to represent values outside of the given
+        bounds. Note that `boundsError` must be set
+        False for this to have an effect. For instance,
+        use np.NaN.
     
     Returns
     -------
@@ -51,9 +57,17 @@ def intep(x, y, xinter, boundsError=True):
   result = np.zeros(len(xinter))
   # Treat extrapolation points
   ilow = np.where(xinter < min(x))[0]
-  result[ilow] = y[0]
+  if fillValue is None:
+    # Use first point beyond limit
+    result[ilow] = y[0]
+  else:
+    result[ilow] = fillValue
   iup = np.where(xinter > max(x))[0]
-  result[iup] = y[-1]
+  if fillValue is None:
+    # Use last point beyond limit
+    result[iup] = y[-1]
+  else:
+    result[iup] = fillValue
   
   noepo = invertIndexSelection(xinter, np.concatenate((ilow, iup)))
   
