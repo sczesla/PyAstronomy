@@ -3,6 +3,7 @@ import scipy.interpolate as sci
 import matplotlib.pylab as plt
 import matplotlib
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy import pyasl
 
 
 class ContiInteractive:
@@ -46,9 +47,14 @@ class ContiInteractive:
         Default is False.
     splineKind : string, {cubic, linear}, optional
         The type of spline to be used; can be changed via the GUI.
+    useINTEP : boolean, optional
+        If True, cubic interpolation will be replaced by INTEP interpolation.
   """
   
-  def __init__(self, splineKind="cubic", modelConti=None, alwaysMC=False):
+  def __init__(self, splineKind="cubic", modelConti=None, alwaysMC=False, useINTEP=False):
+    self.useINTEP = useINTEP
+    if self.useINTEP:
+      splineKind = "intep"
     # splinekind is either "cubic" or "linear" (GUI controlled)
     self.splineKind = splineKind
     # Point list contains the entries specifying the user defined points.
@@ -102,12 +108,14 @@ class ContiInteractive:
     """
     if self.splineKind == "cubic":
       if len(self.pointList) < 4: return None
-    if self.splineKind == "linear":
+    if (self.splineKind == "linear") or (self.splineKind == "intep"):
       if len(self.pointList) < 2: return None
     self.__sortPointList()
     x = []; y = []
     for p in self.pointList:
       x.append(p[0]); y.append(p[1])
+    if self.splineKind == "intep":
+      return pyasl.intep(np.array(x), np.array(y), self.w, boundsError=False, fillValue=np.NaN)
     ip = sci.interp1d(x, y, kind=self.splineKind, bounds_error=False)
     return ip(self.w)
     
@@ -226,7 +234,10 @@ class ContiInteractive:
       The cubic button click event handler. Change splineKind and button
       color.
     """
-    self.splineKind = "cubic"
+    if not self.useINTEP:
+      self.splineKind = "cubic"
+    else:
+      self.splineKind = "intep"
     # Change button color
     self.buttonCubic.color = self.abc
     self.buttonLinear.color = self.ibc
@@ -304,11 +315,18 @@ class ContiInteractive:
     # Linear and cubic
     axButtonCubic = self.fig.add_axes([0.1, 0.0375, 0.1, 0.05])
     axButtonLinear = self.fig.add_axes([0.22, 0.0375, 0.1, 0.05])
-    if self.splineKind == "cubic":
-      self.buttonCubic = matplotlib.widgets.Button(axButtonCubic, "cubic", color=self.abc)
+    
+    # CubicButton text
+    cubt = "cubic"
+    if self.useINTEP:
+      # Replace of INTEP
+      cubt = "INTEP"
+    
+    if (self.splineKind == "cubic") or (self.splineKind == "intep"):
+      self.buttonCubic = matplotlib.widgets.Button(axButtonCubic, cubt, color=self.abc)
       self.buttonLinear = matplotlib.widgets.Button(axButtonLinear, "linear", color=self.ibc)
     else:
-      self.buttonCubic = matplotlib.widgets.Button(axButtonCubic, "cubic", color=self.ibc)
+      self.buttonCubic = matplotlib.widgets.Button(axButtonCubic, cubt, color=self.ibc)
       self.buttonLinear = matplotlib.widgets.Button(axButtonLinear, "linear", color=self.abc)
     self.buttonCubic.on_clicked(self.__cubicClicked)
     self.buttonLinear.on_clicked(self.__linearClicked)
