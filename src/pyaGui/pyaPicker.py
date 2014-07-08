@@ -21,6 +21,12 @@ class Point():
   
   def asStr(self):
     """
+      String representation of the point.
+      
+      Returns
+      -------
+      Point : string
+          String representation of the point coordinates.
     """
     return "%g, %g" % (self.xdata, self.ydata)
 
@@ -58,33 +64,33 @@ class Picker:
     self.pointList = []
 
     self.root = tk.Tk()
-    # Make the widgets expand/shrink as window size changes
-    self.root.columnconfigure(0, weight=1)
-    self.root.rowconfigure(0, weight=1)
     
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
-    self.plotFrame.grid(column=0, columnspan=7, row=0, rowspan=10, sticky="nsew")
+    self.plotFrame.pack(fill=tk.BOTH, side=tk.LEFT)
     self.canvas = FigureCanvasTkAgg(self.f, master=self.plotFrame)
     
     # A frame containing the box with selected points
     # and control buttons
     self.pointFrame = tk.Frame(self.root)
-    self.pointFrame.grid(column=7, columnspan=3, row=0, rowspan=10)
+    self.pointFrame.pack(side=tk.LEFT, fill=tk.BOTH)
+    
+    self.listLabel = tk.Label(self.pointFrame, text="Selected points")
+    self.listLabel.pack(side=tk.TOP)
     
     self.lb = tk.Listbox(self.pointFrame, height=15)
-    self.lb.grid(row=0,rowspan=6, column=0, columnspan=1)
+    self.lb.pack(side=tk.TOP)
     self.lb.bind("<<ListboxSelect>>", self._lbSelect)
     
     self.copyButton = tk.Button(self.pointFrame, text="Open List", command=self._showList)
-    self.copyButton.grid(row=8, sticky='w')
+    self.copyButton.pack(side=tk.TOP, fill=tk.X)
     
     self.removeButton = tk.Button(master=self.pointFrame, text="Remove", \
                                   command=self._removeButtonClicked)
-    self.removeButton.grid_configure(row=7, sticky="w")
+    self.removeButton.pack(side=tk.TOP, fill=tk.X)
 
     # a tk.DrawingArea
-    self.canvas.get_tk_widget().grid(column=0, columnspan=7, row=0, rowspan=10)
+    self.canvas.get_tk_widget().pack()
     self.cid = self.f.canvas.mpl_connect('button_press_event', self._mouseButtonClicked)
     
     self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.plotFrame)
@@ -99,12 +105,11 @@ class Picker:
       self.root.destroy()
 
     self.quitButton = tk.Button(master=self.pointFrame, text='Quit', command=_quit)
-    self.quitButton.grid_configure(row=9, sticky="e", pady=30)
+    self.quitButton.pack(side=tk.BOTTOM, fill=tk.X)
     
   def _showList(self):
       """
-        Creates a new window containing a copy and paste aware list with the 
-        points.
+        Creates a new window containing a copy-and-paste aware list of the points.
       """
       def _quitWin():
           win.destroy()
