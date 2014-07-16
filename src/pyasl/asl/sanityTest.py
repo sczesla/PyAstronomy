@@ -1674,6 +1674,31 @@ class SanityOfQuadExtreme(unittest.TestCase):
         p, indi = pyasl.quadExtreme(x, y, mode=mode, dp=(3,7))
         self.assertAlmostEqual(p - delta, 0.0, delta=1e-14)
 
+  def sanity_quadextremeFullPoint(self):
+    """
+      Checking quadExtreme: find max and min of parabola (ordinate values included).
+    """
+    import numpy as np
+    from PyAstronomy import pyasl
+    
+    x = np.arange(100.0)
+    
+    sign = {"min":+1, "max":-1}
+    
+    for mode in ["min", "max"]:
+    
+      for delta in np.arange(30,70,np.pi/2.):
+        c = (np.random.random() - 0.5) * 500.0
+        y = sign[mode] * (x-delta)**2 + c
+        p, indi = pyasl.quadExtreme(x, y, mode=mode, fullPoint=True)
+        self.assertAlmostEqual(p[0] - delta, 0.0, delta=1e-8)
+        self.assertAlmostEqual(p[1], c, delta=1e-8)
+        p, indi = pyasl.quadExtreme(x, y, mode=mode, dp=(3,7), fullPoint=True)
+        self.assertAlmostEqual(p[0] - delta, 0.0, delta=1e-8)
+        self.assertAlmostEqual(p[1], c, delta=1e-8)
+
+
+
   def sanity_quadextremeExample(self):
     """
       Checking example for quadExtreme.

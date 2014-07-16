@@ -1,14 +1,14 @@
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 
-def quadExtreme(x, y, mode="max", dp=(1,1), exInd=None, fullOutput=False):
+def quadExtreme(x, y, mode="max", dp=(1,1), exInd=None, fullOutput=False, fullPoint=False):
   """
     Find the extreme (minimum or maximum) by means of a parabolic fit.
     
-    This function searches the maximum (or minimum) in the given
-    ordinate values, fit a second-order polynomial to the
-    surroundings of that point, and, finally, determine the
-    thus approximated extreme point. 
+    This function searches for the maximum (or minimum) in the given
+    ordinate values, fits a second-order polynomial to the
+    surroundings of that point, and, finally, determines the
+    thus approximated abscissa value of the extreme point. 
     
     Parameters
     ----------
@@ -29,11 +29,17 @@ def quadExtreme(x, y, mode="max", dp=(1,1), exInd=None, fullOutput=False):
     fullOutput : boolean, optional
         If True, the output will also cover the points used in
         the fitting and the resulting polynomial.
+    fullPoint : boolean, optional
+        If True, the return value `epos` will be a tuple holding
+        the abscissa and ordinate values of the extreme point.
+        The default is False.
     
     Returns
     -------
-    epos : float
-        Position of the extreme point.
+    epos : float or tuple
+        Position of the extreme point. If `fullPoint` is True,
+        a tuple with the abscissa and ordinate values of the
+        extreme point.
     mi : int
         The index of the extreme point (maximum or minimum).
     xb : array, optional
@@ -85,6 +91,9 @@ def quadExtreme(x, y, mode="max", dp=(1,1), exInd=None, fullOutput=False):
   epos = -p[1]/(2.0 * p[0])
   # Shift back the location
   epos += xm
+  
+  if fullPoint:
+    epos = (epos, -p[1]**2/(4.0*p[0]) + p[2])
   
   if not fullOutput:
     return epos, mi
