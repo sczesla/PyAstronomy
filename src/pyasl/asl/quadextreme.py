@@ -84,8 +84,8 @@ def quadExtreme(x, y, mode="max", dp=(1,1), exInd=None, fullOutput=False, fullPo
   # Check whether curvature agrees with mode
   signs = {"max":-1, "min":+1}
   if np.sign(p[0]) != signs[mode]:
-    PE.warn(PE.PyAValError("The curvature of the fit does not fit the requested mode of '" + str(mode) + "'.", \
-                           solution="Did you choose the right mode?"))
+    PE.warn(PE.PyAValError("The curvature of the fit does not match the requested mode of '" + str(mode) + "'.", \
+                           solution="Did you choose the right mode (min/max)?"))
   
   # Location of the extreme
   epos = -p[1]/(2.0 * p[0])
