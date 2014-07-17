@@ -67,7 +67,7 @@ class Picker:
     
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
-    self.plotFrame.pack(fill=tk.BOTH, side=tk.LEFT)
+    self.plotFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
     self.canvas = FigureCanvasTkAgg(self.f, master=self.plotFrame)
     
     # A frame containing the box with selected points
