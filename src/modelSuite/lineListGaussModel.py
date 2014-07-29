@@ -11,7 +11,7 @@ class LLGauss(fuf.OneDFit):
     
     This class provides a simple spectral model based on a number
     of Gaussian lines, whose strength may be fitted individually.
-    Note that the EW of the lines is given not only by:
+    Note that the EW of the lines is given by:
     `A{n}`*`lineScale`, where `A{n}` is the area of the n-th
     Gaussian. The `scale` parameter does not influence the
     EW of the Gaussians.
