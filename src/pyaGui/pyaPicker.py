@@ -140,9 +140,9 @@ class Picker:
     if (point is None) == (lbString is None):
       raise(PE.PyAValError("Either `point` or `lbString` have to be specified."))
     if point is not None:
-      pli, lli = self._seachPoint(point.lbIdent)
+      pli, lli = self._searchPoint(point.lbIdent)
     else:
-      pli, lli = self._seachPoint(lbString)
+      pli, lli = self._searchPoint(lbString)
     # Remove 'old' point from plot
     self.a.lines.pop(lli)
     if state == "active":
@@ -153,7 +153,7 @@ class Picker:
     self.a.plot([self.pointList[pli].xdata], [self.pointList[pli].ydata], style)
     self.pointList[pli].mplLine = self.a.lines[-1]
       
-  def _seachPoint(self, lbString):
+  def _searchPoint(self, lbString):
     """
       Search point specified by listbox string. 
       
@@ -226,7 +226,7 @@ class Picker:
     if len(sel) == 0: return
     # Find indices for the point 
     el = self.lb.get(int(sel[0]))
-    pli, lli = self._seachPoint(el)
+    pli, lli = self._searchPoint(el)
     # Remove it
     self.a.lines.pop(lli)
     self.pointList.pop(pli)
