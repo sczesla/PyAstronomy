@@ -518,12 +518,15 @@ class ContinuumInteractive:
                           at the given x-values.
             - splineKind : A string specifying the selected
                            spline option.
+            - normalizedData : An array holding the normalized
+                               data.
     """
     result = {}
     result["points"] = []
     for p in self.pointList:
       result["points"].append((p.xdata, p.ydata))
     result["continuum"] = self._currentSpline.copy()
+    result["normalizedData"] = self._y / result["continuum"]
     result["splineKind"] = self._currentSplineKind
     return result
 
@@ -541,6 +544,8 @@ class ContinuumInteractive:
                           at the given x-values.
             - splineKind : A string specifying the selected
                            spline option.
+            - normalizedData : An array holding the normalized
+                               data.
     """
     self.root.wm_title(self.windowTitle)
     self.canvas.show()
