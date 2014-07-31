@@ -4,10 +4,10 @@ import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from PyAstronomy.pyaC import pyaErrors as PE
-
+import numpy
 import Tkinter as tk
 import tkMessageBox
-
+import platform
 
 class FFModelPlotFit:
   """
@@ -37,7 +37,10 @@ class FFModelPlotFit:
     self.modelLine = None
     self.residualLine = None
     self.dataPlot = False
-  
+    self.fitLims = None # range for fit
+    self.fitIdx = None # indices for fit
+    self.chi2 = None
+    
   def _setUpAxes(self, f):
     """
       Create axes for plotting
@@ -81,9 +84,12 @@ class FFModelPlotFit:
     
     if self.modelLine is not None:
       # Remove the last model to show the latest one
-      self.a.lines.pop(-1)
+      self.modelLine[0].remove()
     # Plot the model
     self.modelLine = self.a.plot(self.x, model, 'r--')
+    
+    # Derive chi2 value    
+    self.chi2 = self.get_chi2(odf)
     
     if self.withResiduals:
       if self.residualLine is not None:
@@ -94,8 +100,28 @@ class FFModelPlotFit:
       self.residualLine = self.ar.plot(self.x, res, 'bp')
     if firstCall:
       self.a.autoscale(False)
+  
+  def get_chi2(self, odf, lims = None):
+    """
+      Calculate current chi2 value
+    """
+    if lims:
+        self.fitLims = lims
 
-  def fit(self, odf):
+    r = 0.0
+    model = odf.evaluate(self.x)
+    if self.fitLims:
+        #print "Using lims: ",self.fitLims
+        self.fitIdx = numpy.where(numpy.logical_and(self.x >= self.fitLims[0], self.x <= self.fitLims[1]))[0]
+    else:
+        self.fitIdx = numpy.arange(len(self.x))
+    if self.yerr is not None:
+        r = numpy.sum((self.y[self.fitIdx]-model[self.fitIdx])**2 / self.yerr[self.fitIdx]**2)
+    else:
+        r = numpy.sum((self.y[self.fitIdx]-model[self.fitIdx])**2)
+    return r
+
+  def fit(self, odf, lims = None, verbose=1):
     """
       Fit the model.
       
@@ -104,8 +130,28 @@ class FFModelPlotFit:
       odf : funcFit model class
           The model to be fitted.
     """
-    odf.fit(self.x, self.y, yerr=self.yerr)
-
+    
+    if lims:
+        if False: # if old fit ranges -> use old indices... lims == self.fitLims and self.fitIdx:
+            odf.fit(self.x[self.fitIdx], self.y[self.fitIdx], yerr=self.yerr[self.fitIdx])
+        else:
+            self.fitLims = lims
+            self.fitIdx = numpy.where(numpy.logical_and(self.x >= self.fitLims[0], self.x <= self.fitLims[1]))[0]
+	    if verbose>1:
+	      print "fit index: ",self.fitIdx
+	      print "         x ",self.x[self.fitIdx]
+	      print "         y ", self.y[self.fitIdx]
+	      if self.yerr: print "    yerr ",self.yerr[self.fitIdx]
+	      print "     model ",odf.evaluate(self.x[self.fitIdx])
+            if self.yerr  is not None:
+	       odf.fit(self.x[self.fitIdx], self.y[self.fitIdx], yerr=self.yerr[self.fitIdx])
+	    else:
+	       odf.fit(self.x[self.fitIdx], self.y[self.fitIdx])
+    else:
+        if self.yerr is not None:
+	    odf.fit(self.x, self.y, yerr=self.yerr)
+        else:
+	    odf.fit(self.x, self.y)
 
 class SetToDialog(tk.Toplevel):
   
@@ -283,6 +329,10 @@ class FFModelExplorerList:
     # Save reference to the plotter
     self.plotter = plotter
     
+    self.leftMask = None
+    self.rightMask = None
+    self.activeLine = None
+
     self.root = tk.Tk()
     self.root.wm_title("PyA Model Explorer")
     # Make the widgets expand/shrink as window size changes
@@ -290,9 +340,12 @@ class FFModelExplorerList:
     self.root.rowconfigure(0, weight=1)
     
     # Bind the mouse wheel
-    self.root.bind("<Button-4>", self._mouseWheel)
-    self.root.bind("<Button-5>", self._mouseWheel)
-        
+    if platform.system() == "Linux":
+        self.root.bind("<Button-4>", self._mouseWheel)
+        self.root.bind("<Button-5>", self._mouseWheel)    
+    elif platform.system() == "Darwin":
+        self.root.bind("<MouseWheel>", self._onWheel) # for OS X
+
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
     self.plotFrame.grid(column=0, columnspan=7, row=0, rowspan=10, sticky="nsew")
@@ -377,6 +430,18 @@ class FFModelExplorerList:
     # Set of the menu to select the current parameter
     self.selectedPar.set(ps[0])
     
+    
+    # Chi2 frame:
+    self.chi2Frame = tk.Frame(self.controlFrame, height=1, bd=1)#, relief=tk.SUNKEN)
+    self.chi2value = tk.DoubleVar()
+    self.chi2value.set(self.plotter.chi2)
+    self.chi2Label = tk.Label(self.chi2Frame,text="Chi2: ")
+    self.chi2Entry = tk.Entry(self.chi2Frame, textvariable=self.chi2value, width=9, bd=2)
+    self.chi2Label.pack(side=tk.LEFT)
+    self.chi2Entry.pack(side=tk.RIGHT)
+    self.chi2Frame.grid(row=3, column=0, columnspan=3, pady=10, padx=1)
+  
+    
     # Frame to bundle mouse-wheel inputs
     self.mouseWheelFrame = tk.Frame(self.controlFrame, height=2, bd=1, relief=tk.SUNKEN)
     self.mwmLabel = tk.Label(self.mouseWheelFrame, text="Mouse wheel manipulation")
@@ -405,29 +470,43 @@ class FFModelExplorerList:
     self.modEntryTextAdd.set(self.modProps[self.selectedPar.get()]["modValAdd"])
     self.modEntryTextAdd.trace("w", self._modModeChangedAdd)
     self.modEntryTextMul.trace("w", self._modModeChangedMul)
-
     # Show the frame
-    self.mouseWheelFrame.grid(row=3, column=0, columnspan=3, pady=10)
+    self.mouseWheelFrame.grid(row=4, column=0, columnspan=3, pady=10)
+    
     
     # React to change in modify Modus
     self.modModus.trace('w', self._modModusChanged)
     # React to a change in the active parameter
     self.selectedPar.trace("w", self._activeParameterChanged)
     
-    # Show the fit button
-    self.fitButton = tk.Button(self.controlFrame, text="Fit", command=self._fitClicked)
-    self.fitButton.grid(row=5, column=0, columnspan=3)
+    # Fit button and fit ranges
+    self.fitRangeFrame = tk.Frame(self.controlFrame, height=1, bd=1, relief=tk.SUNKEN)
+    self.fit_lo = tk.DoubleVar()
+    self.fit_hi = tk.DoubleVar()
+    self.fit_lo.set(min(plotter.x))
+    self.fit_hi.set(max(plotter.x))
+    self.fitRangeLoLim = tk.Entry(self.fitRangeFrame, textvariable=self.fit_lo, width=9, bd=2)
+    self.fitRangeHiLim = tk.Entry(self.fitRangeFrame, textvariable=self.fit_hi, width=9, bd=2)
+    self.fitRangeLabel = tk.Label(self.fitRangeFrame,text="Fit range:")
+    self.fitRangeLabel.pack(side=tk.LEFT)
+    self.fitRangeLoLim.pack(side=tk.LEFT)
+    self.fitRangeHiLim.pack(side=tk.LEFT)    
+    self.fitButton = tk.Button(self.fitRangeFrame, text="Fit", command=self._fitClicked)
+    self.fitButton.pack(side=tk.RIGHT)
+    self.fitRangeFrame.grid(row=6, column=0, columnspan=3, pady=10, padx=1)
+    self.numberClicked=0
+    #self.modModus.trace('w', self._modModusChanged)
+    #self.modModus.trace('w', self._modModusChanged)
     
     self.parSumButton = tk.Button(self.controlFrame, text="Parameter summary", command=self._parameterSummaryClicked)
-    self.parSumButton.grid(row=6)
+    self.parSumButton.grid(row=7)
         
     self.valSetButton = tk.Button(self.controlFrame, text="Value set code", command=self._valueSetClicked)
-    self.valSetButton.grid(row=6, column=2)
+    self.valSetButton.grid(row=7, column=2)
      
     # a tk.DrawingArea
     self.canvas.get_tk_widget().grid(column=0, columnspan=7, row=0, rowspan=10)
     self.cid = self.f.canvas.mpl_connect('button_press_event', self._mouseButtonClicked)
-    
     self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.plotFrame)
     self.toolbar.update()
     self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -447,9 +526,53 @@ class FFModelExplorerList:
     
     # Whether or not parameter summary exists
     self.root.parSumWin = None
+    
+    if platform.system() == "Darwin":
+        self.root.bind("<MouseWheel>", self._onWheel) # for OS X
 
+   
   def _parameterActivated(self, *args):
       print args
+
+  def _mouseButtonClicked(self, event):
+    #print "mouse Button Clicked: ",event
+    if event.button != 2: return
+    # Check whether click occurred on plot axes.
+    if event.inaxes is not self.plotter.a: 
+      #print "not in axis"
+      #print event.inaxes, self.plotter.a
+      return
+    else: 
+      #print event.xdata, event.ydata
+      if self.numberClicked == 0:
+          self.fit_lo.set(event.xdata)
+          self.numberClicked=1
+      else:
+          self.fit_hi.set(event.xdata)
+          self.numberClicked=0
+      self.plotter.plot(self.f, self.odf)
+      
+      if self.leftMask:
+          self.plotter.a.collections.remove(self.leftMask)
+      if self.rightMask:    
+          self.plotter.a.collections.remove(self.rightMask)
+      if self.activeLine:
+          self.activeLine[0].remove()
+      y0, y1 = self.f.gca().get_ylim()
+      y0, y1 = y0*10, y1*10
+      if y0 > 0: y0 = 0
+      if y1 < 0: y1 = 0.
+      self.leftMask = self.plotter.a.fill_between([min(self.plotter.x),self.fit_lo.get()],[y0,y0],y2=[y1,y1],alpha=0.2)
+      self.rightMask = self.plotter.a.fill_between([self.fit_hi.get(), max(self.plotter.x)],[y0,y0],y2=[y1,y1],alpha=0.2)
+      if self.numberClicked == 0:
+          self.activeLine = self.plotter.a.plot([self.fit_lo.get(),self.fit_lo.get()],[y0,y1],color='k',ls='--')
+      if self.numberClicked == 1:
+          self.activeLine = self.plotter.a.plot([self.fit_hi.get(),self.fit_hi.get()],[y0,y1],color='k',ls='--')    
+      #self._parameterValueChanged()
+      self.plotter.chi2 = self.plotter.get_chi2(self.odf, lims=[self.fit_lo.get(), self.fit_hi.get()])
+      self.chi2value.set(self.plotter.chi2)
+      #print self.chi2value.get(), self.fit_lo.get(), self.fit_hi.get()
+      self.f.canvas.draw()    
 
   def _parameterSummaryClicked(self, *args):
     """
@@ -492,8 +615,8 @@ class FFModelExplorerList:
   def _fitClicked(self):
     """
     """
-    self.plotter.fit(self.odf)
-    self._parameterValueChanged(mode="all")
+    self.plotter.fit(self.odf, lims=[self.fit_lo.get(), self.fit_hi.get()])
+    self._parameterValueChanged(allFree = True)
 
   def _modModeChangedAdd(self, *args):
       self.modProps[self.selectedPar.get()]["modValAdd"] = self.modEntryTextAdd.get()
@@ -529,35 +652,49 @@ class FFModelExplorerList:
       self.radioMultipli.select()
     else:
       self.radioAdd.select()
-    print  
+    #print  
     
-  def _parameterValueChanged(self, mode="selected"):
+  def _parameterValueChanged(self, allFree=False):
     """
       Called when the value of the current parameter is changed.
-      
-      Parameters
-      ----------
-      mode : string, optional, {selected, all}
-          If 'selected' is specified, only the label of the
-          currently selected parameter will be updated. If 'all'
-          is chosen, all labels will be updated.
     """
-    if mode == "selected":
-      # Update label value for currently selected parameter
+    # Update value in label and plot new model
+    if not allFree:
       newText = "% g" % (self.odf[self.selectedPar.get()])
+      #self.valLabel.config(text=newText)
+      #print self.selectedPar.get()
+      #print "selected Par: ",self.selectedPar.get()," value: ",self.odf[self.selectedPar.get()]
       self.singleParameterVar[self.selectedPar.get()].set(newText)
-    elif mode == "all":
-      # Update label values of all parameters
-      for p in self.odf.parameters().keys():
-        newText = "% g" % (self.odf[p])
-        self.singleParameterVar[p].set(newText)
     else:
-      raise(PE.PyAValError("Unknown mode: " + str(mode), \
-                           where="FFModelExplorerList::_parameterValueChanged"))
+      for p in self.odf.freeParamNames():
+	newText = "% g" % (self.odf[p])
+	self.singleParameterVar[p].set(newText)
 
-    # Plot new model
     self.plotter.plot(self.f, self.odf)
+    #print self.plotter.chi2
+    self.chi2value.set(self.plotter.chi2)
     self.f.canvas.draw()
+
+  def _onWheel(self, event):
+    val = self.odf[self.selectedPar.get()]
+    pname = self.selectedPar.get()
+    try:
+      if self.modModus.get() == "add":
+        mf = float(self.modEntryTextAdd.get())
+      elif self.modModus.get() == "mul":
+        mf = float(self.modEntryTextMul.get())
+    except ValueError:
+      tkMessageBox.showwarning("Invalid float", "Cannot convert " + self.modEntry.get() + " to float." + \
+                               " Make it a valid value to proceed.")
+      return
+    if self.modModus.get() == "mul":
+        if event.delta>0:
+          self.odf[pname] = val * mf
+	else:
+	  self.odf[pname] = val / mf
+    else:
+        self.odf[pname] = val + mf * event.delta/2.
+    self._parameterValueChanged()
 
   def _mouseWheel(self, event):
     """
@@ -565,6 +702,7 @@ class FFModelExplorerList:
     """
     # event.num == 4 -> up
     # event.num == 5 -> down
+    #print "mouse wheel  ",event
     val = self.odf[self.selectedPar.get()]
     pname = self.selectedPar.get()
     try:
@@ -587,9 +725,6 @@ class FFModelExplorerList:
       else:
         self.odf[pname] = val - mf
     self._parameterValueChanged()
-
-  def _mouseButtonClicked(self, even):
-    pass
 
   def show(self):
     """
@@ -618,17 +753,21 @@ class FFModelExplorerDropDownMenu:
     self.odf = odf
     # Save reference to the plotter
     self.plotter = plotter
-    
+        
     self.root = tk.Tk()
     self.root.wm_title("PyA Model Explorer")
     # Make the widgets expand/shrink as window size changes
     self.root.columnconfigure(0, weight=1)
     self.root.rowconfigure(0, weight=1)
-    
+   
+    def _onWheel(event):
+       print event
+
     # Bind the mouse wheel
     self.root.bind("<Button-4>", self._mouseWheel)
     self.root.bind("<Button-5>", self._mouseWheel)
-        
+    self.root.bind("<MouseWheel>", _onWheel) # for OS X
+
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
     self.plotFrame.grid(column=0, columnspan=7, row=0, rowspan=10, sticky="nsew")
@@ -817,10 +956,6 @@ class FFModelExplorerDropDownMenu:
     # Update value in label and plot new model
     newText = "Value:  % g" % (self.odf[self.selectedPar.get()])
     self.valLabel.config(text=newText)
-    #print dir(self.plotter.a)
-    #print self.plotter.a
-    #x, y = self.plotter.a.get_xlim(), self.plotter.a.get_ylim()
-    #print x,y
     self.plotter.plot(self.f, self.odf)
     self.f.canvas.draw()
 
@@ -830,6 +965,7 @@ class FFModelExplorerDropDownMenu:
     """
     # event.num == 4 -> up
     # event.num == 5 -> down
+    #print "mouse wheel", event
     val = self.odf[self.selectedPar.get()]
     pname = self.selectedPar.get()
     try:
@@ -862,6 +998,7 @@ class FFModelExplorerDropDownMenu:
     """
     self.canvas.show()
     tk.mainloop()
+    
     
 # Set the standard for FFModelExplorer    
 FFModelExplorer = FFModelExplorerList
