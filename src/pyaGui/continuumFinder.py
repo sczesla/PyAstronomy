@@ -37,6 +37,7 @@ class ContinuumInteractive:
           - astyle: Style used to plot 'active' points (default 'ro')
           - istyle: Style used to plot 'inactive' points (default 'yp')
           - splineLineStyle: Style used to plot the continuum estimate (default 'r--')
+          - normPlotRefLine: If True (default), a reference line is printed in the normalization window 
           - normLineStyle: Style used to plot the normalized data (default 'b.--')
           - normRefLineStyle: Style used to plot the reference line for the normalization (default 'k--')
           - sortPointListX: Determines whether point list is sorted in ascending order (default: True)
@@ -67,6 +68,7 @@ class ContinuumInteractive:
                 "istyle":"yp",
                 "splineLineStyle":"r--",
                 "normLineStyle":"b.--",
+                "normPlotRefLine":True,
                 "normRefLineStyle":"k--",
                 "sortPointListX":True,
                 "windowTitle":"PyA Continuum Interactive"}
@@ -219,8 +221,9 @@ class ContinuumInteractive:
     if not self._normaLineRef is None:
       self.norma.lines.pop(self.norma.lines.index(self._normaLineRef))
     else:
-      # First plot
-      self.norma.plot([self._x[0], self._x[-1]], [1.0, 1.0], self.config["normRefLineStyle"])
+      # First plot, add the reference line if requested
+      if self.config["normPlotRefLine"]:
+        self.norma.plot([self._x[0], self._x[-1]], [1.0, 1.0], self.config["normRefLineStyle"])
       
     self.norma.plot(self._x, normFlux, self.config["normLineStyle"])
     self._normaLineRef = self.norma.lines[-1]
@@ -236,7 +239,8 @@ class ContinuumInteractive:
     
     def _quitWin():
       self._normalizedDataShown = False
-      self.norma.cla()
+      if not self._normaLineRef is None:
+        self.norma.lines.pop(self.norma.lines.index(self._normaLineRef))
       self._normaLineRef = None
       win.destroy()
     
@@ -490,6 +494,15 @@ class ContinuumInteractive:
       matplotlib's `plot` method.
     """
     self.a.plot(*args, **kwargs)
+
+  def plotNorm(self, *args, **kwargs):
+    """
+      Plot on normalization window.
+      
+      Accepts all arguments and keywords also accepted by
+      matplotlib's `plot` method.
+    """
+    self.norma.plot(*args, **kwargs)
 
   def _getState(self):
     """
