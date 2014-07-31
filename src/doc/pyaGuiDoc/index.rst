@@ -6,3 +6,5 @@ PyA GUI
    
    pyapicker.rst
    modelExplorer.rst
+   continuumFinder.rst
+   
