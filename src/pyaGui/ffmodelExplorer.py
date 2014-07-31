@@ -348,13 +348,13 @@ class FFModelExplorerList:
 
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
-    self.plotFrame.grid(column=0, columnspan=7, row=0, rowspan=10, sticky="nsew")
+    self.plotFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
     self.canvas = FigureCanvasTkAgg(self.f, master=self.plotFrame)
     
     # A frame containing the box with selected points
     # and control buttons
     self.controlFrame = tk.Frame(self.root)
-    self.controlFrame.grid(column=7, columnspan=3, row=0, rowspan=10, sticky="nsew")
+    self.controlFrame.pack(side=tk.RIGHT, expand=False, fill=tk.BOTH)
     self.selectedPar = tk.StringVar(self.controlFrame)
 
     # Get parameters of model
@@ -425,25 +425,25 @@ class FFModelExplorerList:
       y4 = tk.Radiobutton(x, text="Frozen", value=False,variable=self.singleParameterFree[k], command=frozenChanged(k))
       y3.pack(side=tk.RIGHT)
       y4.pack(side=tk.RIGHT)
-    self.parameterFrame.grid(row=2, column=0, columnspan=3)
-    
+      self.parameterFrame.pack(fill=tk.X, expand=False)
+      
     # Set of the menu to select the current parameter
     self.selectedPar.set(ps[0])
     
     
     # Chi2 frame:
-    self.chi2Frame = tk.Frame(self.controlFrame, height=1, bd=1)#, relief=tk.SUNKEN)
+    self.chi2Frame = tk.Frame(self.controlFrame, borderwidth=10)#, relief=tk.SUNKEN)
     self.chi2value = tk.DoubleVar()
     self.chi2value.set(self.plotter.chi2)
     self.chi2Label = tk.Label(self.chi2Frame,text="Chi2: ")
-    self.chi2Entry = tk.Entry(self.chi2Frame, textvariable=self.chi2value, width=9, bd=2)
+    self.chi2Entry = tk.Entry(self.chi2Frame, textvariable=self.chi2value, bd=2)
     self.chi2Label.pack(side=tk.LEFT)
     self.chi2Entry.pack(side=tk.RIGHT)
-    self.chi2Frame.grid(row=3, column=0, columnspan=3, pady=10, padx=1)
+    self.chi2Frame.pack()
   
     
     # Frame to bundle mouse-wheel inputs
-    self.mouseWheelFrame = tk.Frame(self.controlFrame, height=2, bd=1, relief=tk.SUNKEN)
+    self.mouseWheelFrame = tk.Frame(self.controlFrame, height=2, bd=3, relief=tk.SUNKEN)
     self.mwmLabel = tk.Label(self.mouseWheelFrame, text="Mouse wheel manipulation")
     self.mwmLabel.pack()
     # Modify by multiplication or addition (modModus)
@@ -471,7 +471,8 @@ class FFModelExplorerList:
     self.modEntryTextAdd.trace("w", self._modModeChangedAdd)
     self.modEntryTextMul.trace("w", self._modModeChangedMul)
     # Show the frame
-    self.mouseWheelFrame.grid(row=4, column=0, columnspan=3, pady=10)
+#     self.mouseWheelFrame.grid(row=4, column=0, columnspan=3, pady=10)
+    self.mouseWheelFrame.pack()
     
     
     # React to change in modify Modus
@@ -479,33 +480,41 @@ class FFModelExplorerList:
     # React to a change in the active parameter
     self.selectedPar.trace("w", self._activeParameterChanged)
     
+    dummyLabel = tk.Label(self.controlFrame)
+    dummyLabel.pack()
+    
     # Fit button and fit ranges
-    self.fitRangeFrame = tk.Frame(self.controlFrame, height=1, bd=1, relief=tk.SUNKEN)
+    self.fitRangeFrame = tk.Frame(self.controlFrame, bd=3, relief=tk.SUNKEN)
     self.fit_lo = tk.DoubleVar()
     self.fit_hi = tk.DoubleVar()
     self.fit_lo.set(min(plotter.x))
     self.fit_hi.set(max(plotter.x))
     self.fitRangeLoLim = tk.Entry(self.fitRangeFrame, textvariable=self.fit_lo, width=9, bd=2)
     self.fitRangeHiLim = tk.Entry(self.fitRangeFrame, textvariable=self.fit_hi, width=9, bd=2)
-    self.fitRangeLabel = tk.Label(self.fitRangeFrame,text="Fit range:")
-    self.fitRangeLabel.pack(side=tk.LEFT)
-    self.fitRangeLoLim.pack(side=tk.LEFT)
-    self.fitRangeHiLim.pack(side=tk.LEFT)    
+    self.fitRangeLabel = tk.Label(self.fitRangeFrame, text="Fit range:")
     self.fitButton = tk.Button(self.fitRangeFrame, text="Fit", command=self._fitClicked)
-    self.fitButton.pack(side=tk.RIGHT)
-    self.fitRangeFrame.grid(row=6, column=0, columnspan=3, pady=10, padx=1)
+    self.fitButton.pack(side=tk.BOTTOM, fill=tk.X)
+    self.fitRangeLabel.pack(side=tk.LEFT, fill=tk.X)
+    self.fitRangeLoLim.pack(side=tk.RIGHT)
+    self.fitRangeHiLim.pack(side=tk.RIGHT)    
+    self.fitRangeFrame.pack(fill=tk.X)
     self.numberClicked=0
     #self.modModus.trace('w', self._modModusChanged)
     #self.modModus.trace('w', self._modModusChanged)
     
+    dummyLabel = tk.Label(self.controlFrame)
+    dummyLabel.pack()
+    
     self.parSumButton = tk.Button(self.controlFrame, text="Parameter summary", command=self._parameterSummaryClicked)
-    self.parSumButton.grid(row=7)
+    self.parSumButton.pack(fill=tk.X)
         
     self.valSetButton = tk.Button(self.controlFrame, text="Value set code", command=self._valueSetClicked)
-    self.valSetButton.grid(row=7, column=2)
+#     self.valSetButton.grid(row=7, column=2)
+    self.valSetButton.pack(fill=tk.X)
      
     # a tk.DrawingArea
-    self.canvas.get_tk_widget().grid(column=0, columnspan=7, row=0, rowspan=10)
+#     self.canvas.get_tk_widget().grid(column=0, columnspan=7, row=0, rowspan=10)
+    self.canvas.get_tk_widget().pack()
     self.cid = self.f.canvas.mpl_connect('button_press_event', self._mouseButtonClicked)
     self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.plotFrame)
     self.toolbar.update()
@@ -519,7 +528,7 @@ class FFModelExplorerList:
       self.root.destroy()
 
     self.quitButton = tk.Button(master=self.controlFrame, text='Quit', command=_quit)
-    self.quitButton.grid_configure(row=9, column=2, sticky="se")
+    self.quitButton.pack(side=tk.BOTTOM)
     
     # Plot the model for the first time
     self._parameterValueChanged()
@@ -734,6 +743,7 @@ class FFModelExplorerList:
     tk.mainloop()
 
 
+
 class FFModelExplorerDropDownMenu:
   """
     Adapt model interactively.
@@ -757,8 +767,8 @@ class FFModelExplorerDropDownMenu:
     self.root = tk.Tk()
     self.root.wm_title("PyA Model Explorer")
     # Make the widgets expand/shrink as window size changes
-    self.root.columnconfigure(0, weight=1)
-    self.root.rowconfigure(0, weight=1)
+#     self.root.columnconfigure(0, weight=1)
+#     self.root.rowconfigure(0, weight=1)
    
     def _onWheel(event):
        print event
@@ -770,13 +780,15 @@ class FFModelExplorerDropDownMenu:
 
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
-    self.plotFrame.grid(column=0, columnspan=7, row=0, rowspan=10, sticky="nsew")
+#     self.plotFrame.grid(column=0, columnspan=7, row=0, rowspan=10, sticky="nsew")
+    self.plotFrame.pack(master=self.root, side=tk.LEFT, fill=tk.BOTH, expand=True)
     self.canvas = FigureCanvasTkAgg(self.f, master=self.plotFrame)
     
     # A frame containing the box with selected points
     # and control buttons
     self.controlFrame = tk.Frame(self.root)
-    self.controlFrame.grid(column=7, columnspan=3, row=0, rowspan=10, sticky="nsew")
+#     self.controlFrame.grid(column=7, columnspan=3, row=0, rowspan=10, sticky="nsew")
+    self.controlFrame.pack(master=self.root, fill=tk.BOTH, expand=True)
     
     # Get parameters of model
     ps = self.odf.parameters().keys()
@@ -795,13 +807,15 @@ class FFModelExplorerDropDownMenu:
     self.setToButton = tk.Button(self.valueFrame, text="Set to value", command=self._setToClicked)
     self.valLabel.pack()
     self.setToButton.pack()
-    self.valueFrame.grid(row=1, column=0, columnspan=3)
+#     self.valueFrame.grid(row=1, column=0, columnspan=3)
+    self.valueFrame.pack()
     
     # Set of the menu to select the current parameter
     self.selectedPar = tk.StringVar(self.controlFrame)
     self.selectedPar.set(ps[0])
     self.pselect = tk.OptionMenu(self.controlFrame, self.selectedPar, *ps)
-    self.pselect.grid(row=0,rowspan=1, column=0, columnspan=3, sticky="ew", pady=10)
+#     self.pselect.grid(row=0,rowspan=1, column=0, columnspan=3, sticky="ew", pady=10)
+    self.pselect.pack()
     
     # Frame to bundle mouse-wheel inputs
     self.mouseWheelFrame = tk.Frame(self.controlFrame, height=2, bd=1, relief=tk.SUNKEN)
