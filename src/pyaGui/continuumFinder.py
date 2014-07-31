@@ -86,6 +86,10 @@ class ContinuumInteractive:
     self.removeButton = tk.Button(master=self.pointFrame, text="Remove", \
                                   command=self._removeButtonClicked)
     self.removeButton.pack(side=tk.TOP, fill=tk.X)
+    
+    self.clearButton = tk.Button(master=self.pointFrame, text="Clear all", \
+                                 command=self._clearAll)
+    self.clearButton.pack(side=tk.TOP, fill=tk.X)
 
     # Says whether the normalized spectrum is currently shown 
     self._normalizedDataShown = False
@@ -127,6 +131,51 @@ class ContinuumInteractive:
 
     self.quitButton = tk.Button(master=self.pointFrame, text='Quit', command=_quit)
     self.quitButton.pack(side=tk.BOTTOM, fill=tk.X)
+
+    self.saveLoadFrame = tk.Frame(self.pointFrame)
+    self.saveLoadFrame.pack(side=tk.BOTTOM, fill=tk.X)
+    self.saveButton = tk.Button(master=self.saveLoadFrame, text="Save", command=self._saveToFile)
+    self.saveButton.pack(side=tk.LEFT, fill=tk.X, expand=True)
+    self.loadButton = tk.Button(master=self.saveLoadFrame, text="Load", command=self._loadFromFile)
+    self.loadButton.pack(side=tk.RIGHT, fill=tk.X, expand=True)
+
+
+  def _saveToFile(self):
+    """
+      Save state to a pickle file.
+    """
+    import pickle
+    import tkFileDialog
+    fn = tkFileDialog.asksaveasfilename(defaultextension=".pickle", title="Save as pickle file", \
+                                        filetypes=[("pickle files", "*.pickle")])
+    pickle.dump(self._getState(), open(fn, 'w'))
+
+  def _loadFromFile(self):
+    """
+      Load state from a pickle file.
+    """
+    import pickle
+    import tkFileDialog
+    fn = tkFileDialog.askopenfilename(defaultextension=".pickle", title="Load from pickle file", \
+                                      filetypes=[("pickle files", "*.pickle")])
+    state = pickle.load(open(fn))
+    
+    class Event:
+      def __init__(self, xd, yd, inax):
+        self.button = 2
+        self.inaxes = inax
+        self.xdata = xd
+        self.ydata = yd
+    
+    for p in state["points"]:
+      e = Event(p[0], p[1], self.a)
+      self._mouseButtonClicked(e)
+    
+    self.splineSelectBox.select_clear(0, len(self.splineOptions))
+    selected = self.splineOptions.index(state["splineKind"])
+    self.splineSelectBox.select_set(selected)
+    self._splineSelected(None)
+
   
   def _updateNormalizationPlot(self):
     """
@@ -175,8 +224,6 @@ class ContinuumInteractive:
     
     self._normalizedDataShown = True
     self._updateNormalizationPlot()
-
-
   
   def _pointListToArray(self):
     """
@@ -383,6 +430,16 @@ class ContinuumInteractive:
     self._updateSplineLine()
     self._updateView()
 
+  def _clearAll(self):
+    """
+      Remove all previously selected points.
+    """
+    np = self.lb.size()
+    for _ in xrange(np):
+      self.lb.select_clear(0, self.lb.size())
+      self.lb.select_set(0)
+      self._removeButtonClicked()
+
   def _updateView(self):
     """
       Redraw MPL canvas
@@ -398,13 +455,36 @@ class ContinuumInteractive:
     """
     self.a.plot(*args, **kwargs)
 
+  def _getState(self):
+    """
+      Collect current state in a dictionary.
+      
+      Returns
+      -------
+      State : dictionary
+          The following keys are defined:
+            - points: A list of two-float tuples holding the
+                      x,y location of the selected points.
+            - continuum : Array holding the continuum estimate
+                          at the given x-values.
+            - splineKind : A string specifying the selected
+                           spline option.
+    """
+    result = {}
+    result["points"] = []
+    for p in self.pointList:
+      result["points"].append((p.xdata, p.ydata))
+    result["continuum"] = self._currentSpline.copy()
+    result["splineKind"] = self._currentSplineKind
+    return result
+
   def findContinuum(self):
     """
       Interactively find the continuum estimate.
 
       Returns
       -------
-      Continuum : dictionary
+      State : dictionary
           The following keys are defined:
             - points: A list of two-float tuples holding the
                       x,y location of the selected points.
@@ -416,13 +496,6 @@ class ContinuumInteractive:
     self.root.wm_title(self.windowTitle)
     self.canvas.show()
     tk.mainloop()
-    # Prepare return value
-    result = {}
-    result["points"] = []
-    for p in self.pointList:
-      result["points"].append((p.xdata, p.ydata))
-    result["continuum"] = self._currentSpline.copy()
-    result["splineKind"] = self._currentSplineKind
-    return result
+    return self._getState()
     
 
