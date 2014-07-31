@@ -6,7 +6,8 @@ from PyA_Version import PyA_Version
 import mock
  
 MOCK_MODULES = ['scipy', 'scipy.stats', 'scipy.special', 'scipy.optimize', 'scipy.interpolate', 'pymc', 'matplotlib', \
-                'matplotlib.pylab', '_tkinter']
+                'matplotlib.pylab', '_tkinter', 'Tkinter', 'matplotlib.backends', 'matplotlib.backends.backend_tkagg', \
+                'matplotlib.figure']
 for mod_name in MOCK_MODULES:
   sys.modules[mod_name] = mock.Mock()
 
