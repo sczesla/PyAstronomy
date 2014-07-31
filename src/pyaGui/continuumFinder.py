@@ -153,6 +153,8 @@ class ContinuumInteractive:
     self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def _quit():
+      if self._normalizedDataShown:
+        self._quitWin()
       # stops main loop
       self.root.quit()
       # this is necessary on Windows to prevent
@@ -229,6 +231,13 @@ class ContinuumInteractive:
     self._normaLineRef = self.norma.lines[-1]
     self.normCanvas.draw()
     
+  def _quitWin(self):
+    self._normalizedDataShown = False
+    if not self._normaLineRef is None:
+      self.norma.lines.pop(self.norma.lines.index(self._normaLineRef))
+    self._normaLineRef = None
+    self._normwin.destroy()
+  
   def _showNorm(self):
     """
       Shows normalized data in a separate window.
@@ -237,19 +246,12 @@ class ContinuumInteractive:
     if self._normalizedDataShown:
       return
     
-    def _quitWin():
-      self._normalizedDataShown = False
-      if not self._normaLineRef is None:
-        self.norma.lines.pop(self.norma.lines.index(self._normaLineRef))
-      self._normaLineRef = None
-      win.destroy()
-    
-    win = tk.Tk()
-    win.wm_title("Normalized spectrum")
-    win.protocol("WM_DELETE_WINDOW", _quitWin)
+    self._normwin = tk.Tk()
+    self._normwin.wm_title("Normalized spectrum")
+    self._normwin.protocol("WM_DELETE_WINDOW", self._quitWin)
       
     # A frame containing the mpl plot
-    self.normFrame = tk.Frame(master=win)
+    self.normFrame = tk.Frame(master=self._normwin)
     self.normFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
     self.normCanvas = FigureCanvasTkAgg(self.normf, master=self.normFrame)
 
@@ -259,7 +261,7 @@ class ContinuumInteractive:
     self.normToolbar.update()
     self.normCanvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
       
-    closeButton = tk.Button(master=win, text='Close', command=_quitWin)
+    closeButton = tk.Button(master=self._normwin, text='Close', command=self._quitWin)
     closeButton.pack(side=tk.BOTTOM)
     
     self._normalizedDataShown = True
