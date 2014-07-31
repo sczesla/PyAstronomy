@@ -1,445 +1,428 @@
 import numpy as np
 import scipy.interpolate as sci
-import matplotlib.pylab as plt
+
 import matplotlib
+matplotlib.use('TkAgg')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
+
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyasl
+from bisect import bisect
+
+import Tkinter as tk
+
+from pyaPicker import Point
 
 
-class ContiInteractive:
+class ContinuumInteractive:
   """
-    Define the continuum estimate manually and interactively.
+    GUI for interactive point selection.
     
-    Given wavelength and flux arrays, this tool allows to define individual
-    continuum points between which either linear or spline
-    interpolation is used to specify the continuum model.
-    
-    The main method of this class is called "searchConti". On call, it shows
-    a GUI window with the spectrum. You can use the middle button of the
-    mouse to *add points* defining the continuum. Once you have defined a
-    sufficient number of points, the window will also show the obtained
-    continuum estimate.
-    
-    To *remove points*, use the "remove" button. Again, clicking
-    the middle button of the mouse will remove the closest point; use the "add"
-    button to change the behavior again. Note that you can also use the "r"
-    and "a" keys to switch between the removing and adding point modes.
-    
-    Additionally, there are two buttons
-    entitled "cubic" and "linear", which determine whether spline or
-    linear interpolation is used to calculate the continuum.
-    
-    Once you have obtained a reasonable estimate, you can check the result
-    using the "Normalize" button. After clicking it, another window opens,
-    which shows the normalized spectrum.
-    
-    If you are satisfied with the continuum estimate, hit the OK button to
-    close the GUI window.
-    
-    Parameters
+    Attributes
     ----------
-    modelConti : 2d-array
-        Model continuum derived from some other source. A two-dimensional
-        array with the first column denoting the model wavelength and the
-        second column the model flux.
-    alwaysMC : boolean, optional
-        If True, the model is always shown along with the data.
-        Default is False.
-    splineKind : string, {cubic, linear}, optional
-        The type of spline to be used; can be changed via the GUI.
-    useINTEP : boolean, optional
-        If True, cubic interpolation will be replaced by INTEP interpolation.
+    f : mpl Figure
+        A Figure instance from matplotlib.
+    a : mpl axis
+        An Axis instance from matplotlib
+    pointList : list of points
+        A list containing the selected points in the form
+        of `Point` instances.
+    astyle : string
+        Mpl style for plotting used for "active" point.
+        Default is "ro".
+    istyle : string
+        Mpl style for plotting used for "inactive" point.
+        Default is "yp".
   """
   
-  def __init__(self, splineKind="cubic", modelConti=None, alwaysMC=False, useINTEP=False):
-    self.useINTEP = useINTEP
-    if self.useINTEP:
-      splineKind = "intep"
-    # splinekind is either "cubic" or "linear" (GUI controlled)
-    self.splineKind = splineKind
-    # Point list contains the entries specifying the user defined points.
-    # An entry looks as follows:
-    #   [xdata, ydata, True/False, 2DLine instance]
-    # The third entry whether a point has already been put on the canvas
-    # and the forth is the line instance, which represents that point in
-    # the figure (needed to be able to remove it).
+  def __init__(self, x, y, config=None):
+    
+    if config is None:
+      config = {"specPlotStyle":"b.--", 
+                "astyle":"ro",
+                "istyle":"yp",
+                "splineLineStyle":"r--",
+                "normLineStyle":"b.--",
+                "normRefLineStyle":"k--",
+                "sortPointListX":True,
+                "windowTitle":"PyA Continuum Interactive"}
+    self.config = config
+    
+    self.windowTitle = config["windowTitle"]
+    self.f = Figure()
+    self.a = self.f.add_subplot(111)
+    
+    # Save the data (spectrum)
+    self._x = x.copy()
+    self._y = y.copy()
+    self.a.plot(x, y, config["specPlotStyle"])
+    
+    # Active and Inactive plot style for points
+    self.astyle = config["astyle"]
+    self.istyle = config["istyle"]
+    
     self.pointList = []
-    # The current mode ("add" points or "remove" points)
-    self.mode = "add"
-    # Continuum model
-    self.cmodel = None
-    # Connection of middle mouse button
-    self.middleButtonCon = None
-    # The model continuum
-    self.modelConti = modelConti
-    # Always show model continuum?
-    self.alwaysMC = alwaysMC
-    # Saves instance of the line used to plot comparison model 
-    self.modelMC = None
-    if self.alwaysMC and (modelConti is None):
-      raise(PE.PyAParameterConflict("If alwaysMC is set True, modelConti must be provided, too."))
+
+    self.root = tk.Tk()
     
-    # Inactive Button Color
-    self.ibc = [0.7,0.7,0.7]
-    # Active Button Color
-    self.abc = [0.1,0.1,0.99]
+    # A frame containing the mpl plot
+    self.plotFrame = tk.Frame()
+    self.plotFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+    self.canvas = FigureCanvasTkAgg(self.f, master=self.plotFrame)
+    
+    # A frame containing the box with selected points
+    # and control buttons
+    self.pointFrame = tk.Frame(self.root)
+    self.pointFrame.pack(side=tk.LEFT, fill=tk.BOTH)
+    
+    self.listLabel = tk.Label(self.pointFrame, text="Selected points")
+    self.listLabel.pack(side=tk.TOP)
+    
+    self.lb = tk.Listbox(self.pointFrame, height=15, selectmode=tk.SINGLE)
+    self.lb.pack(side=tk.TOP)
+    self.lb.bind("<<ListboxSelect>>", self._lbSelect)
+    
+    self.removeButton = tk.Button(master=self.pointFrame, text="Remove", \
+                                  command=self._removeButtonClicked)
+    self.removeButton.pack(side=tk.TOP, fill=tk.X)
+
+    # Says whether the normalized spectrum is currently shown 
+    self._normalizedDataShown = False
+    # The dummy label only holds some space
+    self.dummyLabel1 = tk.Label(self.pointFrame, text="")
+    self.dummyLabel1.pack(side=tk.TOP)
+    self.splineBoxLabel = tk.Label(self.pointFrame, text="Spline kind")
+    self.splineBoxLabel.pack(side=tk.TOP)
+    # Define spline selection
+    self.splineOptions = ["Linear", "Quadratic", "INTEP"]
+    self.splineFuncs = [self._evalLinearSpline, self._evalQudraticSpline, self._evalIntepSpline]
+    self.splineSelectBox = tk.Listbox(self.pointFrame, height=len(self.splineOptions), selectmode=tk.SINGLE, \
+                                      exportselection=False)
+    for item in self.splineOptions:
+      self.splineSelectBox.insert(tk.END, item)
+    self.splineSelectBox.pack(side=tk.TOP)
+    self.splineSelectBox.bind("<<ListboxSelect>>", self._splineSelected)
+    self.splineSelectBox.select_set(0)
+    self._splineSelected(None)
+
+    self.normButton = tk.Button(master=self.pointFrame, text="Normalize", \
+                                  command=self._showNorm)
+    self.normButton.pack(side=tk.TOP, fill=tk.X)
+
+    # a tk.DrawingArea
+    self.canvas.get_tk_widget().pack()
+    self.cid = self.f.canvas.mpl_connect('button_press_event', self._mouseButtonClicked)
+    
+    self.toolbar = NavigationToolbar2TkAgg(self.canvas, self.plotFrame)
+    self.toolbar.update()
+    self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+    def _quit():
+      # stops main loop
+      self.root.quit()
+      # this is necessary on Windows to prevent
+      # Fatal Python Error: PyEval_RestoreThread: NULL tstate
+      self.root.destroy()
+
+    self.quitButton = tk.Button(master=self.pointFrame, text='Quit', command=_quit)
+    self.quitButton.pack(side=tk.BOTTOM, fill=tk.X)
   
-  def __comparePoints(self, a, b):
+  def _updateNormalizationPlot(self):
     """
-      Compare two points from the point list according to xadata position.
-      Used to sort the point list.
+      Replot the normalized spectrum.
     """
-    if a[0] < b[0]: return -1
-    if a[0] == b[0]: return 0
-    return 1
+    if not self._normalizedDataShown:
+      return
     
-  def getModel(self):
+    normFlux = self._y / self._currentSpline
+    self.norma.cla()
+    self.norma.plot(self._x, normFlux, self.config["normLineStyle"])
+    self.norma.plot([self._x[0], self._x[-1]], [1.0, 1.0], self.config["normRefLineStyle"])
+    self.normCanvas.draw()
+    
+  def _showNorm(self):
     """
-      Get the currently defined continuum model.
+      Shows normalized data in a separate window.
+    """
+    
+    if self._normalizedDataShown:
+      return
+    
+    def _quitWin():
+      self._normalizedDataShown = False
+      win.destroy()
+    
+    win = tk.Tk()
+    win.wm_title("Normalized spectrum")
+    
+    self.normf = Figure()
+    self.norma = self.normf.add_subplot(111)
       
-      Either linear or spline interpolation is used to connect the
-      individual points.
+    # A frame containing the mpl plot
+    self.normFrame = tk.Frame(master=win)
+    self.normFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+    self.normCanvas = FigureCanvasTkAgg(self.normf, master=self.normFrame)
+
+    # a tk.DrawingArea
+    self.normCanvas.get_tk_widget().pack()
+    self.normToolbar = NavigationToolbar2TkAgg(self.normCanvas, self.normFrame)
+    self.normToolbar.update()
+    self.normCanvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+      
+    closeButton = tk.Button(master=win, text='Close', command=_quitWin)
+    closeButton.pack(side=tk.BOTTOM)
+    
+    self._normalizedDataShown = True
+    self._updateNormalizationPlot()
+
+
+  
+  def _pointListToArray(self):
+    """
+      Convert pointList data values into x,y arrays
       
       Returns
       -------
-      Continuum : array
-          The continuum model (note that it
-          contains `Nan' values where no continuum is defined).
+      x, y : array
+          The x/y-data for the selected points. 
     """
-    if self.splineKind == "cubic":
-      if len(self.pointList) < 4: return None
-    if (self.splineKind == "linear") or (self.splineKind == "intep"):
-      if len(self.pointList) < 2: return None
-    self.__sortPointList()
-    x = []; y = []
-    for p in self.pointList:
-      x.append(p[0]); y.append(p[1])
-    if self.splineKind == "intep":
-      return pyasl.intep(np.array(x), np.array(y), self.w, boundsError=False, fillValue=np.NaN)
-    ip = sci.interp1d(x, y, kind=self.splineKind, bounds_error=False)
-    return ip(self.w)
-    
-  def __sortPointList(self):
-    self.pointList.sort(self.__comparePoints)
+    x, y = np.zeros(len(self.pointList)), np.zeros(len(self.pointList))
+    for i, p in enumerate(self.pointList):
+      x[i], y[i] = p.xdata, p.ydata
+    indi = np.argsort(x)
+    return x[indi], y[indi] 
   
-  def __plot(self):
+  def _evalLinearSpline(self):
     """
-      Put points and continuum model into the figure. To do so, the old
-      continuum model has to be removed.
+      Evaluates linear spline.
+      
+      Returns
+      -------
+      Spline : array
+          The continuum estimate.
     """
-    self.__sortPointList()
-    # Plot the points (if not already in the figure).
-    for i in xrange(len(self.pointList)):
-      if not self.pointList[i][2]:
-        # Show only those points, which are not too far off the
-        # visible axis
-        range = self.w.max() - self.w.min()
-        if (self.pointList[i][0] < self.w.min()-0.1*range) or \
-           (self.pointList[i][0] > self.w.max()+0.1*range): continue 
-        self.ax.plot([self.pointList[i][0]], [self.pointList[i][1]], 'rp')[0]
-        self.pointList[i][2] = True
-        self.pointList[i][3] = self.ax.lines[-1]
-    
-    # Plot the model onto the canvas and remove the old one
-    # if necessary.
-    model = self.getModel()
-    if self.cmodel is None:
-      if model is not None:
-        self.ax.plot(self.w, self.getModel(), 'r--')
-        self.cmodel = self.ax.lines[-1]
-    else:
-      for i in xrange(len(self.ax.lines)):
-        if self.ax.lines[i] is self.cmodel:
-          self.ax.lines.pop(i)
-          self.cmodel = None
-          break
-      if model is not None:
-        self.ax.plot(self.w, self.getModel(), 'r--')
-        self.cmodel = self.ax.lines[-1]
-    # Plot the comparison model
-    if self.alwaysMC:
-      if not self.modelMC is None:
-        for i in xrange(len(self.ax.lines)):
-          if self.ax.lines[i] is self.modelMC:
-            self.ax.lines.pop(i)
-            self.modelMC = None
-          break
-      self.ax.plot(self.modelConti[::,0], self.modelConti[::,1], 'g--')
-      self.modelMC = self.ax.lines[-1]
+    x, y = self._pointListToArray()
+    if len(x) < 2:
+      return self._x * np.nan
+    f = sci.interp1d(x, y, bounds_error=False, fill_value=np.nan)
+    return f(self._x)
   
-  def __keyEvent(self, event):
+  def _evalQudraticSpline(self):
     """
-      The key ``a'' can be used to change mode to add points, while ``r''
-      will start the remove point mode.
+      Evaluates quadratic spline.
+      
+      Returns
+      -------
+      Spline : array
+          The continuum estimate.
     """
-    if event.key == "a":
-      self.mode = "add"
-    elif event.key == "r":
-      self.mode = "remove"
-    self.__setConnections()
-  
-  def __addPoint(self, event):
-    """
-      Add a point to the list and replot.
-    """
-    # Accept only middle button.
-    if event.button != 2: return
-    if (event.xdata is None) or (event.ydata is None):
-      return
-    self.pointList.append([event.xdata, event.ydata, False, None])
-    self.__plot()
-    self.fig.canvas.draw()
-  
-  def __removePoint(self, event):
-    """
-      Remove a point from the list and replot.
-    """
-    if len(self.pointList) == 0: return
-    # Check whether click occurred on plot axes.
-    if event.inaxes is not self.ax: return
-    # Accept only middle button
-    if event.button != 2: return
-    # Find the index of the point closest to the click.
-    dist = []
-    for p in self.pointList:
-      dist.append(np.sqrt((p[0]-event.xdata)**2 + (p[1]-event.ydata)**2))
-    dist = np.array(dist)
-    indmin = np.argmin(dist)
-    # Remove that point and redraw.
-    for i in xrange(len(self.ax.lines)):
-      if self.ax.lines[i] is self.pointList[indmin][3]:
-        self.ax.lines.pop(i)
-        self.pointList.pop(indmin)
-        break
-    self.__plot()
-    self.fig.canvas.draw()
+    x, y = self._pointListToArray()
+    if len(x) < 3:
+      return self._x * np.nan
+    f = sci.interp1d(x, y, bounds_error=False, fill_value=np.nan, kind="quadratic")
+    return f(self._x)
     
-  
-  def __setConnections(self):
+  def _evalIntepSpline(self):
     """
-      Depending on the mode (add or remove) change meaning of the middle
-      mouse button.
+      Evaluates INTEP spline.
+      
+      Returns
+      -------
+      Spline : array
+          The continuum estimate.
     """
-    if self.mode == "add":
-      if self.middleButtonCon is not None:
-        self.fig.canvas.mpl_disconnect(self.middleButtonCon)
-      self.middleButtonCon = self.fig.canvas.mpl_connect("button_press_event", self.__addPoint)
-    if self.mode == "remove":
-      if self.middleButtonCon is not None:
-        self.fig.canvas.mpl_disconnect(self.middleButtonCon)
-      self.middleButtonCon = self.fig.canvas.mpl_connect("button_press_event", self.__removePoint)
-  
-  def __cubicClicked(self, event):
-    """
-      The cubic button click event handler. Change splineKind and button
-      color.
-    """
-    if not self.useINTEP:
-      self.splineKind = "cubic"
-    else:
-      self.splineKind = "intep"
-    # Change button color
-    self.buttonCubic.color = self.abc
-    self.buttonLinear.color = self.ibc
-    # Plot (note that _motio calls are needed to change
-    # the color immediately on click).
-    self.__plot()
-    self.buttonCubic._motion(event)
-    self.buttonLinear._motion(event)
-    self.fig.canvas.draw()
-
-  def __linearClicked(self, event):
-    self.splineKind = "linear"
-    # Change button color
-    self.buttonCubic.color = self.ibc
-    self.buttonLinear.color = self.abc
-    # Plot (note that _motio calls are needed to change
-    # the color immediately on click).
-    self.__plot()
-    self.buttonCubic._motion(event)
-    self.buttonLinear._motion(event)
-    self.fig.canvas.draw()
-
-  def __addClicked(self, event):
-    """
-      Change mode to adding points.
-    """
-    self.mode = "add"
-    # Plot (note that _motio calls are needed to change
-    # the color immediately on click).
-    self.buttonAdd.color = self.abc
-    self.buttonRem.color = self.ibc
-    self.buttonAdd._motion(event)
-    self.buttonRem._motion(event)
-    self.__setConnections()
-
-  def __remClicked(self, event):
-    """
-      Change mode to remove points.
-    """
-    self.mode = "remove"
-    # Plot (note that _motio calls are needed to change
-    # the color immediately on click).
-    self.buttonAdd.color = self.ibc
-    self.buttonRem.color = self.abc
-    self.buttonAdd._motion(event)
-    self.buttonRem._motion(event)
-    self.__setConnections()
-
-  def __normClicked(self, event):
-    """
-      Normalization button was clicked. Open a second figure and show
-      the normalized spectrum to check the result.
-    """
-    fign = plt.figure(facecolor="white")
-    ax = fign.add_subplot(111, title="Check normalization")
-    model = self.getModel()
-    nflux = self.f / model
-    nnone = np.where(np.isnan(model) == False)[0]
-    ax.plot(self.w[nnone], nflux[nnone],  'b-')
-    ax.plot([self.w[nnone].min(), self.w[nnone].max()], [1,1], 'r--')
-    if self.modelConti is not None:
-      indi = np.where(np.logical_and( \
-             self.modelConti[::,0] > self.w[nnone].min(),\
-             self.modelConti[::,0] < self.w[nnone].max()))[0]
-      ax.plot(self.modelConti[indi,0], self.modelConti[indi,1], 'g--')
-    fign.show()
-
-  def __okClicked(self, event):
-    plt.close()
-
-  def __defineButtons(self):
-    """
-      Put buttons on the canvas and assign meaning.
-    """
-    # Linear and cubic
-    axButtonCubic = self.fig.add_axes([0.1, 0.0375, 0.1, 0.05])
-    axButtonLinear = self.fig.add_axes([0.22, 0.0375, 0.1, 0.05])
+    x, y = self._pointListToArray()
+    if len(x) < 2:
+      return self._x * np.nan
+    return pyasl.intep(x, y, self._x, boundsError=False, fillValue=np.nan)
     
-    # CubicButton text
-    cubt = "cubic"
-    if self.useINTEP:
-      # Replace of INTEP
-      cubt = "INTEP"
-    
-    if (self.splineKind == "cubic") or (self.splineKind == "intep"):
-      self.buttonCubic = matplotlib.widgets.Button(axButtonCubic, cubt, color=self.abc)
-      self.buttonLinear = matplotlib.widgets.Button(axButtonLinear, "linear", color=self.ibc)
-    else:
-      self.buttonCubic = matplotlib.widgets.Button(axButtonCubic, cubt, color=self.ibc)
-      self.buttonLinear = matplotlib.widgets.Button(axButtonLinear, "linear", color=self.abc)
-    self.buttonCubic.on_clicked(self.__cubicClicked)
-    self.buttonLinear.on_clicked(self.__linearClicked)
-    
-    # Add and remove
-    axButtonAdd = self.fig.add_axes([0.36, 0.0375, 0.1, 0.05])
-    axButtonRem = self.fig.add_axes([0.48, 0.0375, 0.1, 0.05])
-    self.buttonAdd = matplotlib.widgets.Button(axButtonAdd, "add", color=self.abc)
-    self.buttonRem = matplotlib.widgets.Button(axButtonRem, "rem", color=self.ibc)  
-    self.buttonAdd.on_clicked(self.__addClicked)
-    self.buttonRem.on_clicked(self.__remClicked)
-    
-    # Normalize
-    axbuttonNorm = self.fig.add_axes([0.65, 0.0375, 0.15, 0.05])
-    self.buttonNorm = matplotlib.widgets.Button(axbuttonNorm, "Normalize")
-    self.buttonNorm.on_clicked(self.__normClicked)
-    
-    # OK
-    axButtonOK = self.fig.add_axes([0.83, 0.0375, 0.07, 0.05])
-    self.buttonOK = matplotlib.widgets.Button(axButtonOK, "OK")
-    self.buttonOK.on_clicked(self.__okClicked)
-
-  def __cleanPointListAfterFigureClose(self):
+  def _splineSelected(self, event):
     """
-      If the figure is closed, the plot flag and the line reference entries \
-      in the pointList loose their meaning and have to be reset. In this way, \
-      the points are again available, when the plot is created (searchConti \
-      called) the next time.
+      Called when the spline selection box is clicked.
     """
-    for i in xrange(len(self.pointList)):
-      self.pointList[i][2] = False
-      self.pointList[i][3] = None
-
-  def calc(self, w, f, points=[], region=1., interpol = 'cubic'):
-      """
-        Non-interactive method to determine the continuum by estimating the 
-        continuum level at the given points.
-        
-        Parameters
-        ----------
-          w : array 
-               The wavelength array
-          f : array
-               The flux array
-          points : array or list
-               The wavelength points where the continuum will be estimated
-          region : float or array
-               Wavelength range around the given points for continuum estimate
-          interpol : string
-               Defines the interpolation scheme, must be either 'linear' or 'cubic'                        
-      """
-      self.w = w.copy()
-      self.f = f.copy()
-      self.pointList = []
-      self.splineKind = interpol
-      if type(region) in [type(0.1),type(1)]:
-          region = np.ones(len(points))*region
-      for i in range(len(points)):
-          gindex = np.where(abs(self.w-points[i]) < region[i]/2.)[0]
-          y = np.median(self.f[gindex])
-          self.pointList.append([points[i], y, False, None])   
-      m =  self.getModel()
-      return m
-  
-  def searchConti(self, w, f, figTitle="", compare=None):
+    selected = int(self.splineSelectBox.curselection()[0])
+    self._evalSpline = self.splineFuncs[selected]
+    self._evalSpline()
+    self._updateSplineLine()
+    self._updateView()
+    # Save the name of the current spline selection
+    self._currentSplineKind = self.splineOptions[selected]
+    
+  def _plotPointAs(self, state, point=None, lbString=None):
     """
-      Find the continuum estimate manually and interactively.
+      Plot a point in active/inactive color
       
       Parameters
       ----------
-      w : array
-          The wavelength array
-      f : array
-          The flux array
-      figTitle : string, optional
-          Defines the title of the figure.
-      compare : array
-          An array with two columns: wvl and flux, which will
-          be plotted along the data for comparison in the
-          window used to define the continuum.
+      state : string, {"active", "inactive"}
+          Which color to use
+      point : Point, optional
+          The point information as an instance of the Point class.
+      lbString : string
+          The point identifier used in the listbox.
+    """
+    if (point is None) == (lbString is None):
+      raise(PE.PyAValError("Either `point` or `lbString` have to be specified."))
+    if point is not None:
+      pli, lli = self._searchPoint(point.lbIdent)
+    else:
+      pli, lli = self._searchPoint(lbString)
+    # Remove 'old' point from plot
+    self.a.lines.pop(lli)
+    if state == "active":
+      style = self.astyle
+    elif state == "inactive":
+      style = self.istyle
+    # Add new point in specified color
+    self.a.plot([self.pointList[pli].xdata], [self.pointList[pli].ydata], style)
+    self.pointList[pli].mplLine = self.a.lines[-1]
+      
+  def _searchPoint(self, lbString):
+    """
+      Search point specified by listbox string. 
+      
+      Parameters
+      ----------
+      lbString : string
+          The string used as identifier in the listbox.
       
       Returns
       -------
-      Continuum : array
-          The continuum model evaluated at the input wavelength
-          points.
+      Point list index : int
+          The index of the point in the `pointlist`.
+      Line index : int
+          The index of the corresponding line in the
+          lines list attribute of the axis instance. 
     """
+    for ip, p in enumerate(self.pointList):
+      if p.lbIdent == lbString: break
+    for i, l in enumerate(self.a.lines):
+      if l is p.mplLine:
+        break
+    return ip, i
     
-    # Create a figure
-    self.fig = plt.figure(facecolor="white")
-    # Handle key pressed events
-    self.fig.canvas.mpl_connect("key_press_event", self.__keyEvent)
-    self.ax = self.fig.add_subplot(111)
-    # Leave a little room for buttons
-    self.fig.subplots_adjust(bottom=0.15)
+  def _lbSelect(self, event):
+    """
+      React on change of point-listbox selection.
+      
+      This function determines the selected item
+      and plots the point in "active" style.
+    """
+    # Get 'old' active item (changed afterward)
+    oa = self.lb.get(tk.ACTIVE)
+    # Get active item (string)
+    ai = self.lb.get(int(self.lb.curselection()[0]))
+    self._plotPointAs("inactive", lbString=oa)
+    self._plotPointAs("active", lbString=ai)
+    # Update view
+    self._updateView()
+    
+  def _updateSplineLine(self):
+    """
+      Draws a new line representing the spline.
+    """
+    if not hasattr(self, "_splineLineRef"):
+      self._splineLineRef = None
+    if not self._splineLineRef is None:
+      # Remove old line
+      self.a.lines.pop(self.a.lines.index(self._splineLineRef))
+    self._currentSpline = self._evalSpline()
+    self.a.plot(self._x, self._currentSpline, self.config["splineLineStyle"])
+    self._splineLineRef = self.a.lines[-1]
+    if self._normalizedDataShown:
+      self._updateNormalizationPlot()
+    
+  def _mouseButtonClicked(self, event):
+    """
+      Called on click of mouse button.
+      
+      If the middle button has been clicked, a
+      point is added to the selection.
+    """
+    # Accept only middle button
+    if event.button != 2: return
+    # Check whether click occurred on plot axes.
+    if event.inaxes is not self.a: return
+    
+    p = Point(event)
+    self.a.plot([p.xdata], [p.ydata], self.istyle)
+    p.mplLine = self.a.lines[-1]
+    
+    index = tk.END
+    if self.config["sortPointListX"]:
+      # Insert point into the list at appropriate position
+      # to keep x-values sorted
+      x, y = self._pointListToArray()
+      index = bisect(x, p.xdata)
+    
+    # Insert the point's content into the list box
+    self.lb.insert(index, p.asStr())
+    # Save the "list box identifier"
+    p.lbIdent = p.asStr()
+    # Save the point
+    self.pointList.append(p)
+    
+    self._updateSplineLine()
+    self._updateView()
 
-    # Put the buttons into the figure
-    self.__defineButtons()
-    
-    self.ax.set_title(figTitle)
-    self.w = w.copy()
-    self.f = f.copy()
-    
-    self.ax.plot(self.w, self.f, 'b--')
-    if compare is not None:
-      self.ax.plot(compare[::,0], compare[::,1], 'g--')
-    
-    self.__plot()
-    self.__setConnections()
+  def _removeButtonClicked(self):
+    """
+      Remove a point.
+    """
+    # Check whether anything was selected
+    sel = self.lb.curselection()
+    if len(sel) == 0: return
+    # Find indices for the point 
+    el = self.lb.get(int(sel[0]))
+    pli, lli = self._searchPoint(el)
+    # Remove it
+    self.a.lines.pop(lli)
+    self.pointList.pop(pli)
+    self.lb.delete(sel[0])
+    self._updateSplineLine()
+    self._updateView()
 
-    plt.show()
-    self.__cleanPointListAfterFigureClose()
-    return self.getModel()
-  
-  def __call__(self, w, f, **kwargs):
-    return self.searchConti(w, f, "Manual continuum approximation", **kwargs)
+  def _updateView(self):
+    """
+      Redraw MPL canvas
+    """
+    self.f.canvas.draw()
+
+  def plot(self, *args, **kwargs):
+    """
+      Plot on interactive canvas.
+      
+      Accepts all arguments and keywords also accepted by
+      matplotlib's `plot` method.
+    """
+    self.a.plot(*args, **kwargs)
+
+  def findContinuum(self):
+    """
+      Interactively find the continuum estimate.
+
+      Returns
+      -------
+      Continuum : dictionary
+          The following keys are defined:
+            - points: A list of two-float tuples holding the
+                      x,y location of the selected points.
+            - continuum : Array holding the continuum estimate
+                          at the given x-values.
+            - splineKind : A string specifying the selected
+                           spline option.
+    """
+    self.root.wm_title(self.windowTitle)
+    self.canvas.show()
+    tk.mainloop()
+    # Prepare return value
+    result = {}
+    result["points"] = []
+    for p in self.pointList:
+      result["points"].append((p.xdata, p.ydata))
+    result["continuum"] = self._currentSpline.copy()
+    result["splineKind"] = self._currentSplineKind
+    return result
+    
+
