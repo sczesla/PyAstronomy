@@ -19,6 +19,29 @@ class ContinuumInteractive:
   """
     GUI for interactive point selection.
     
+    The `ContinuumInteractive` class provides a tool to normalize data
+    interactively. The data are plotted and a number of points are defined
+    using the mouse, which are connected by a spline to define a
+    continuum estimate.
+    
+    Points are *selected* using the *middle button* of the mouse on the
+    plot window. 
+    
+    Parameters
+    ----------
+    x, y : array
+        The data to be normalized.
+    config : dictionary, optional
+        Information used for configuration:
+          - specPlotStyle: Style used to plot the data (default 'b.--')
+          - astyle: Style used to plot 'active' points (default 'ro')
+          - istyle: Style used to plot 'inactive' points (default 'yp')
+          - splineLineStyle: Style used to plot the continuum estimate (default 'r--')
+          - normLineStyle: Style used to plot the normalized data (default 'b.--')
+          - normRefLineStyle: Style used to plot the reference line for the normalization (default 'k--')
+          - sortPointListX: Determines whether point list is sorted in ascending order (default: True)
+          - windowTitle: Title of the window
+    
     Attributes
     ----------
     f : mpl Figure
@@ -52,6 +75,11 @@ class ContinuumInteractive:
     self.windowTitle = config["windowTitle"]
     self.f = Figure()
     self.a = self.f.add_subplot(111)
+    
+    # The normalized plot figure
+    self.normf = Figure()
+    self.norma = self.normf.add_subplot(111)
+    self._normaLineRef = None
     
     # Save the data (spectrum)
     self._x = x.copy()
@@ -126,7 +154,7 @@ class ContinuumInteractive:
       # stops main loop
       self.root.quit()
       # this is necessary on Windows to prevent
-      # Fatal Python Error: PyEval_RestoreThread: NULL tstate
+      # Fatal Python Error: PyEval_RestoreThread: NULL state
       self.root.destroy()
 
     self.quitButton = tk.Button(master=self.pointFrame, text='Quit', command=_quit)
@@ -138,6 +166,8 @@ class ContinuumInteractive:
     self.saveButton.pack(side=tk.LEFT, fill=tk.X, expand=True)
     self.loadButton = tk.Button(master=self.saveLoadFrame, text="Load", command=self._loadFromFile)
     self.loadButton.pack(side=tk.RIGHT, fill=tk.X, expand=True)
+    
+    self.root.protocol("WM_DELETE_WINDOW", _quit)
 
 
   def _saveToFile(self):
@@ -185,9 +215,15 @@ class ContinuumInteractive:
       return
     
     normFlux = self._y / self._currentSpline
-    self.norma.cla()
+    
+    if not self._normaLineRef is None:
+      self.norma.lines.pop(self.norma.lines.index(self._normaLineRef))
+    else:
+      # First plot
+      self.norma.plot([self._x[0], self._x[-1]], [1.0, 1.0], self.config["normRefLineStyle"])
+      
     self.norma.plot(self._x, normFlux, self.config["normLineStyle"])
-    self.norma.plot([self._x[0], self._x[-1]], [1.0, 1.0], self.config["normRefLineStyle"])
+    self._normaLineRef = self.norma.lines[-1]
     self.normCanvas.draw()
     
   def _showNorm(self):
@@ -200,13 +236,13 @@ class ContinuumInteractive:
     
     def _quitWin():
       self._normalizedDataShown = False
+      self.norma.cla()
+      self._normaLineRef = None
       win.destroy()
     
     win = tk.Tk()
     win.wm_title("Normalized spectrum")
-    
-    self.normf = Figure()
-    self.norma = self.normf.add_subplot(111)
+    win.protocol("WM_DELETE_WINDOW", _quitWin)
       
     # A frame containing the mpl plot
     self.normFrame = tk.Frame(master=win)
