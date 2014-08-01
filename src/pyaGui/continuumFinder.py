@@ -174,15 +174,28 @@ class ContinuumInteractive:
     self.root.protocol("WM_DELETE_WINDOW", _quit)
 
 
-  def _saveToFile(self):
+  def _saveToFile(self, fn=None):
     """
       Save state to a pickle file.
     """
     import pickle
-    import tkFileDialog
-    fn = tkFileDialog.asksaveasfilename(defaultextension=".pickle", title="Save as pickle file", \
-                                        filetypes=[("pickle files", "*.pickle")])
+    if fn is None:
+      # Request a filename
+      import tkFileDialog
+      fn = tkFileDialog.asksaveasfilename(defaultextension=".pickle", title="Save as pickle file", \
+                                          filetypes=[("pickle files", "*.pickle")])
     pickle.dump(self._getState(), open(fn, 'w'))
+
+  def saveStateToPickleFile(self, fn):
+    """
+      Save the state (point selection etc.) to pickle file.
+      
+      Parameters
+      ----------
+      fn : string
+          The filename.
+    """
+    self._saveToFile(fn=fn)
 
   def _loadFromFile(self):
     """
