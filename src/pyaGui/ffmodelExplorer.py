@@ -381,6 +381,7 @@ class FFModelExplorerList:
                 self.odf.thaw(k)
             else:
                 self.odf.freeze(k)
+            self._updateDof()     
         return change
     
     # define what happens when a value is set to the entered parameter (closures)
@@ -435,10 +436,18 @@ class FFModelExplorerList:
     self.chi2Frame = tk.Frame(self.controlFrame, borderwidth=10)#, relief=tk.SUNKEN)
     self.chi2value = tk.DoubleVar()
     self.chi2value.set(self.plotter.chi2)
+    self.dofValue = tk.IntVar()
+    #self.dofValue.set(len(self.plotter.fitIdx))
+    #self.dofValue.set(100)
+    self.dofValue.set(len(self.plotter.x) - len(self.odf.freeParameters())-1)
     self.chi2Label = tk.Label(self.chi2Frame,text="Chi2: ")
-    self.chi2Entry = tk.Entry(self.chi2Frame, textvariable=self.chi2value, bd=2)
+    self.dofLabel = tk.Label(self.chi2Frame,text="dof: ")
+    self.chi2Entry = tk.Entry(self.chi2Frame, textvariable=self.chi2value, bd=2, width=10)
+    self.dofEntry = tk.Entry(self.chi2Frame, textvariable=self.dofValue, bd=2, width=10)
     self.chi2Label.pack(side=tk.LEFT)
-    self.chi2Entry.pack(side=tk.RIGHT)
+    self.chi2Entry.pack(side=tk.LEFT)
+    self.dofLabel.pack(side=tk.LEFT)
+    self.dofEntry.pack(side=tk.LEFT)
     self.chi2Frame.pack()
   
     
@@ -495,9 +504,12 @@ class FFModelExplorerList:
     self.fitButton = tk.Button(self.fitRangeFrame, text="Fit", command=self._fitClicked)
     self.fitButton.pack(side=tk.BOTTOM, fill=tk.X)
     self.fitRangeLabel.pack(side=tk.LEFT, fill=tk.X)
-    self.fitRangeLoLim.pack(side=tk.RIGHT)
     self.fitRangeHiLim.pack(side=tk.RIGHT)    
+    self.fitRangeLoLim.pack(side=tk.RIGHT)
     self.fitRangeFrame.pack(fill=tk.X)
+    #self.fitRangeLoLim.bind('<Return>', self._fitRangeChanged())
+    self.fit_lo.trace("w", self._fitRangeChanged)
+    self.fit_hi.trace("w", self._fitRangeChanged)
     self.numberClicked=0
     #self.modModus.trace('w', self._modModusChanged)
     #self.modModus.trace('w', self._modModusChanged)
@@ -505,12 +517,15 @@ class FFModelExplorerList:
     dummyLabel = tk.Label(self.controlFrame)
     dummyLabel.pack()
     
-    self.parSumButton = tk.Button(self.controlFrame, text="Parameter summary", command=self._parameterSummaryClicked)
-    self.parSumButton.pack(fill=tk.X)
+    self.showFrame = tk.Frame(self.controlFrame, bd=3)#, relief=tk.SUNKEN)
+    self.showFrame.pack(side=tk.TOP)
+    
+    self.parSumButton = tk.Button(self.showFrame, text="Parameter summary", command=self._parameterSummaryClicked)
+    self.parSumButton.pack(side=tk.LEFT)
         
-    self.valSetButton = tk.Button(self.controlFrame, text="Value set code", command=self._valueSetClicked)
+    self.valSetButton = tk.Button(self.showFrame, text="Value set code", command=self._valueSetClicked)
 #     self.valSetButton.grid(row=7, column=2)
-    self.valSetButton.pack(fill=tk.X)
+    self.valSetButton.pack(side=tk.RIGHT)
      
     # a tk.DrawingArea
 #     self.canvas.get_tk_widget().grid(column=0, columnspan=7, row=0, rowspan=10)
@@ -553,13 +568,23 @@ class FFModelExplorerList:
       return
     else: 
       #print event.xdata, event.ydata
+      xrng = self.plotter.a.get_xlim()
+      #print 
+      digits = int(numpy.log10(1./((xrng[1] - xrng[0])/1000.))+2)
+      #print digits
       if self.numberClicked == 0:
-          self.fit_lo.set(event.xdata)
+          self.fit_lo.set(round(event.xdata,digits))
           self.numberClicked=1
       else:
-          self.fit_hi.set(event.xdata)
+          self.fit_hi.set(round(event.xdata, digits))
           self.numberClicked=0
       self.plotter.plot(self.f, self.odf)
+      
+      self._fitRangeChanged()
+
+  def _fitRangeChanged(self, *args):
+      #print "fitRangeChanged", args
+      #print self.fit_lo.get(), self.fit_hi.get()
       
       if self.leftMask:
           self.plotter.a.collections.remove(self.leftMask)
@@ -567,22 +592,31 @@ class FFModelExplorerList:
           self.plotter.a.collections.remove(self.rightMask)
       if self.activeLine:
           self.activeLine[0].remove()
-      y0, y1 = self.f.gca().get_ylim()
-      y0, y1 = y0*10, y1*10
-      if y0 > 0: y0 = 0
-      if y1 < 0: y1 = 0.
-      self.leftMask = self.plotter.a.fill_between([min(self.plotter.x),self.fit_lo.get()],[y0,y0],y2=[y1,y1],alpha=0.2)
-      self.rightMask = self.plotter.a.fill_between([self.fit_hi.get(), max(self.plotter.x)],[y0,y0],y2=[y1,y1],alpha=0.2)
-      if self.numberClicked == 0:
-          self.activeLine = self.plotter.a.plot([self.fit_lo.get(),self.fit_lo.get()],[y0,y1],color='k',ls='--')
-      if self.numberClicked == 1:
-          self.activeLine = self.plotter.a.plot([self.fit_hi.get(),self.fit_hi.get()],[y0,y1],color='k',ls='--')    
+      try:
+        y0, y1 = self.plotter.a.get_ylim()
+        y0, y1 = y0*10, y1*10
+        if y0 > 0: y0 = 0
+        if y1 < 0: y1 = 0.
+        self.leftMask = self.plotter.a.fill_between([min(self.plotter.x),self.fit_lo.get()],[y0,y0],y2=[y1,y1],alpha=0.2)
+        self.rightMask = self.plotter.a.fill_between([self.fit_hi.get(), max(self.plotter.x)],[y0,y0],y2=[y1,y1],alpha=0.2)
+      except:
+          pass
       #self._parameterValueChanged()
       self.plotter.chi2 = self.plotter.get_chi2(self.odf, lims=[self.fit_lo.get(), self.fit_hi.get()])
-      self.chi2value.set(self.plotter.chi2)
+      self._updateChi2()
+      self._updateDof()
       #print self.chi2value.get(), self.fit_lo.get(), self.fit_hi.get()
       self.f.canvas.draw()    
 
+  def _updateDof(self):
+      self.dofValue.set(len(self.plotter.fitIdx)- len(self.odf.freeParameters())-1)
+      
+  def _updateChi2(self):
+      if self.plotter.chi2 > 1e-3 and self.plotter.chi2 < 1e4:
+          self.chi2value.set("%8.3f" % self.plotter.chi2)
+      else:
+          self.chi2value.set("%8.3e" % self.plotter.chi2)
+  
   def _parameterSummaryClicked(self, *args):
     """
     """
@@ -611,6 +645,7 @@ class FFModelExplorerList:
       self.odf.thaw(self.selectedPar.get())
     else:
       self.odf.freeze(self.selectedPar.get())
+    self._updateDof()
 
   def _setToClicked(self):
     """
@@ -681,7 +716,7 @@ class FFModelExplorerList:
 
     self.plotter.plot(self.f, self.odf)
     #print self.plotter.chi2
-    self.chi2value.set(self.plotter.chi2)
+    self._updateChi2()
     self.f.canvas.draw()
 
   def _onWheel(self, event):
