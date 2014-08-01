@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.interpolate as sci
+import gzip
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -41,6 +42,7 @@ class ContinuumInteractive:
           - normLineStyle: Style used to plot the normalized data (default 'b.--')
           - normRefLineStyle: Style used to plot the reference line for the normalization (default 'k--')
           - sortPointListX: Determines whether point list is sorted in ascending order (default: True)
+          - usegzip: If True (default), gzip is used to open and save files.
           - windowTitle: Title of the window
     
     Attributes
@@ -71,6 +73,7 @@ class ContinuumInteractive:
                 "normPlotRefLine":True,
                 "normRefLineStyle":"k--",
                 "sortPointListX":True,
+                "usegzip":True,
                 "windowTitle":"PyA Continuum Interactive"}
     self.config = config
     
@@ -174,17 +177,47 @@ class ContinuumInteractive:
     self.root.protocol("WM_DELETE_WINDOW", _quit)
 
 
+  def _fileOpenMethod(self):
+    """
+      Get method for opening file.
+      
+      Determines whether gzip is used for file opening or not.
+      
+      Returns
+      -------
+      open : callable
+          Method to open file.
+    """
+    if self.config["usegzip"]:
+      return gzip.open
+    return open
+
+  def _pickleFileExtension(self):
+    """
+      Get default extension for pickle files.
+      
+      Returns
+      -------
+      Extension : string
+          The default file extension.
+    """
+    if self.config["usegzip"]:
+      return ".pickle.gz"
+    else:
+      return ".pickle"
+
   def _saveToFile(self, fn=None):
     """
       Save state to a pickle file.
     """
     import pickle
+    pfe = self._pickleFileExtension()
     if fn is None:
       # Request a filename
       import tkFileDialog
-      fn = tkFileDialog.asksaveasfilename(defaultextension=".pickle", title="Save as pickle file", \
-                                          filetypes=[("pickle files", "*.pickle")])
-    pickle.dump(self._getState(), open(fn, 'w'))
+      fn = tkFileDialog.asksaveasfilename(defaultextension=pfe, title="Save as pickle file", \
+                                          filetypes=[("pickle files", "*"+pfe)])
+    pickle.dump(self._getState(), self._fileOpenMethod()(fn, 'w'))
 
   def saveStateToPickleFile(self, fn):
     """
@@ -203,9 +236,10 @@ class ContinuumInteractive:
     """
     import pickle
     import tkFileDialog
-    fn = tkFileDialog.askopenfilename(defaultextension=".pickle", title="Load from pickle file", \
-                                      filetypes=[("pickle files", "*.pickle")])
-    state = pickle.load(open(fn))
+    pfe = self._pickleFileExtension()
+    fn = tkFileDialog.askopenfilename(defaultextension=pfe, title="Load from pickle file", \
+                                      filetypes=[("pickle files", "*"+pfe)])
+    state = pickle.load(self._fileOpenMethod()(fn))
     
     class Event:
       def __init__(self, xd, yd, inax):
