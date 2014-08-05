@@ -115,3 +115,13 @@ class PyAAlgorithmFailure(PyaErrTemplate):
     """
     PyaErrTemplate.__init__(self, what, "PyA algorithm failure", **keys)
 
+
+class PyADeprecationError(PyaErrTemplate):
+  
+  def __init__(self, what, **keys):
+    """
+      When to be raised?
+      
+      Whenever a deprecated part of code is called.
+    """
+    PyaErrTemplate.__init__(self, what, "PyA deprecation note", **keys)
