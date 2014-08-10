@@ -11,6 +11,7 @@ from fluxConversion import flux2photons, photons2flux
 from rotBroad import rotBroad, fastRotBroad
 from cardinalPoint import getCardinalPoint
 from posAngle import positionAngle
+from coordinates import hmsToDeg, degToHMS, degToDMS, dmsToDeg, coordsSexaToDeg, coordsDegToSexa
 
 class SanityOfPyasl(unittest.TestCase, SaniBase):
   
@@ -111,6 +112,68 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     p = ks.precisionTest()
     self.assertLess(p, 1e-14)
 
+  def sanity_degToSexaCoordConversion(self):
+    """
+      Checking degrees-sexagesimal coordinate conversion.
+    """
+    # From SIMBAD
+    hd1s = "00 05 08.83239 +67 50 24.0135"
+    hd1d = (1.28680161, +67.84000375) 
+    hd123456s = "14 08 24.78626 -26 20 56.6438"
+    hd123456d = (212.10327608, -26.34906773)
+    
+    hdhmss = [(0.0, 5., 08.83239), (14., 8., 24.78626)]
+    hddmss = [(67., 50., 24.0135), (-26., 20., 56.6438)]
+    
+    hdss = [hd1s, hd123456s]
+    hdds = [hd1d, hd123456d]
+    
+    for i, hds in enumerate(hdss):
+      d = hmsToDeg(*hdhmss[i])
+      self.assertAlmostEqual(d, hdds[i][0], delta=1e-7, msg="hmsToDeg: Incorrect conversion")
+      hms = degToHMS(d)
+      for j in range(3):
+        self.assertAlmostEqual(hms[j], hdhmss[i][j], delta=1e-5, msg="degToHMS: Incorrect conversion")
+      
+      d = dmsToDeg(*hddmss[i])
+      self.assertAlmostEqual(d, hdds[i][1], delta=1e-7, msg="dmsToDeg: Incorrect conversion")
+      dms = degToDMS(d)
+      for j in range(3):
+        self.assertAlmostEqual(dms[j], hddmss[i][j], delta=1e-5, msg="degToDMS: Incorrect conversion")
+      
+      r, d, hms, dms = coordsSexaToDeg(hdss[i], fullOut=True)
+      self.assertAlmostEqual(r, hdds[i][0], delta=1e-7, msg="coordsSexaToDeg: ra incorrect")
+      self.assertAlmostEqual(d, hdds[i][1], delta=1e-7, msg="coordsSexaToDeg: dec incorrect")
+      for j in range(3):
+        self.assertAlmostEqual(hms[j], hdhmss[i][j], delta=1e-5, msg="degToHMS: Incorrect conversion")
+      for j in range(3):
+        self.assertAlmostEqual(dms[j], hddmss[i][j], delta=1e-5, msg="degToDMS: Incorrect conversion")
+      
+      rat, dect = coordsDegToSexa(r, d, asString=False)
+      print rat, dect, r, d
+      for j in range(3):
+        self.assertAlmostEqual(rat[j], hdhmss[i][j], delta=1e-5, msg="degToHMS: Incorrect conversion")
+      for j in range(3):
+        self.assertAlmostEqual(dect[j], hddmss[i][j], delta=1e-5, msg="degToDMS: Incorrect conversion")      
+      
+  def sanity_degToSexaCoordConversionExample(self):
+    """
+      Checking example of sexagesimal-decimal conversion
+    """
+    from PyAstronomy import pyasl
+    
+    # Coordinates of HD 1 from SIMBAD
+    hd1 = "00 05 08.83239 +67 50 24.0135"
+    
+    print "Coordinates of HD 1 (SIMBAD): ", hd1
+    
+    # Obtain decimal representation
+    ra, dec = pyasl.coordsSexaToDeg(hd1)
+    print "Coordinates of HD 1 [deg]: %010.6f  %+09.6f" % (ra, dec)
+    
+    # Convert back into sexagesimal representation
+    sexa = pyasl.coordsDegToSexa(ra, dec)
+    print "Coordinates of HD 1 [sexa]: ", sexa
 
 class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
   

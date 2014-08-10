@@ -87,6 +87,7 @@ Coordinates, time, and observation tools
    aslDoc/posAngle.rst
    aslDoc/airmass.rst
    aslDoc/observatory.rst
+   aslDoc/coordinates.rst
 
 Transit and planet routines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

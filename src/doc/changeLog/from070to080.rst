@@ -10,6 +10,8 @@ From 0.7.0 to 0.8.0
                         - Conversion between atomic number and
                           elemental symbol
                         - First ionization energies
+                        - Conversion between decimal and
+                          sexagesimal coordinates
   funcFit             *New functionality*
                         - Model description
   pyaGui              *New functionality*

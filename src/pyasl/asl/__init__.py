@@ -43,3 +43,4 @@ from readFitsSpec import *
 from posAngle import *
 from sindex import *
 from atomicNo import *
+from coordinates import *
