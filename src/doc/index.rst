@@ -22,18 +22,22 @@ PyAstronomy's sub-packages
 
 .. toctree::
    :maxdepth: 1
+
+   Astrolib --- Routines for low-level data analysis and other small-scale applications <pyaslDoc/pyasl.rst>   
+   PyaGUI --- GUI-based tools for the work with data <pyaGuiDoc/index.rst>
+   Constants --- Numerical values for physical constants <constantsDoc/index.rst>
+   Timing --- Tools for timing analysis such as Lomb-Scargle periodograms <pyTimingDoc/index.rst>
    
-   pyaGuiDoc/index.rst
+Model fitting
+~~~~~~~~~~~~~~~~
    
-   pyaslDoc/pyasl.rst
+.. toctree::
+   :maxdepth: 1
    
-   constantsDoc/index.rst
-   
-   funcFitDoc/index.rst
-   
-   modelSuiteDoc/index.rst
-   
-   pyTimingDoc/index.rst
+   funcFit --- A convenient fitting interface <funcFitDoc/index.rst>
+   Model suite --- A collection of ready-to-use models for funcFit <modelSuiteDoc/index.rst>
+
+
 
 PyAstronomy core
 -------------------
