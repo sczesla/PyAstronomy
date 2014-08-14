@@ -14,6 +14,7 @@ About PyAstronomy
    PyAGroup.rst
    license.rst
    changeLog/index.rst
+   pyaCDoc/acknowledgement.rst
    pyaCDoc/cont.rst
 
 PyAstronomy's sub-packages
