@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from PyAstronomy.pyaC import pyaErrors as PE
 
 class Pizzolato2003:
@@ -70,6 +71,13 @@ class Pizzolato2003:
                            )
     return row[0]
   
+  def _checkPr(self, pr):
+    """
+      Check whether rotation period is valid.
+    """
+    if pr <= 0.0:
+      raise(PE.PyAValError("Rotation period must be >= 0. Given value: " + str(pr)))
+  
   def log10lxbv(self, bv, pr):
     """
       Estimate log10(Lx)
@@ -88,6 +96,7 @@ class Pizzolato2003:
       Error log10(Lx) : float
           Uncertainty
     """
+    self._checkPr(pr)
     row = self._findRow(self._tab4, bv, "B-V")
     return self._calcVal(self._tab4, row, 3, 7, pr)
   
@@ -109,6 +118,7 @@ class Pizzolato2003:
       Error log10(Lx/Lbol) : float
           Uncertainty
     """
+    self._checkPr(pr)
     row = self._findRow(self._tab4, bv, "B-V")
     return self._calcVal(self._tab4, row, 5, 9, pr)
   
@@ -130,6 +140,7 @@ class Pizzolato2003:
       Error log10(Lx) : float
           Uncertainty
     """
+    self._checkPr(pr)
     row = self._findRow(self._tab3, m, "Mass")
     return self._calcVal(self._tab3, row, 3, 7, pr)
   
@@ -151,6 +162,7 @@ class Pizzolato2003:
       Error log10(Lx/Lbol) : float
           Uncertainty
     """
+    self._checkPr(pr)
     row = self._findRow(self._tab3, m, "Mass")
     return self._calcVal(self._tab3, row, 5, 9, pr)
   
@@ -170,6 +182,6 @@ class Pizzolato2003:
       at saturation. The coefficients can be found in Tables 3 and 4
       of Pizzolato et al. 2003.
     """
-    self._readData("pizzolato2003tables.dat")
+    self._readData(os.path.join(os.path.dirname(__file__), "pizzolato2003tables.dat"))
   
   

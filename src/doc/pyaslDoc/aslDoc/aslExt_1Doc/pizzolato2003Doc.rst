@@ -5,8 +5,8 @@ X-ray luminosity / rotation period relations
 .. autoclass:: Pizzolato2003
    :members:
 
-Example: Plot Lx as a function of rotation period
---------------------------------------------------
+Example: Plot Lx and Lx/Lbol as a function of rotation period
+--------------------------------------------------------------
 
 ::
 
