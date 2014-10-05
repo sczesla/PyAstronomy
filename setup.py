@@ -104,6 +104,7 @@ packages = ['PyAstronomy', \
             'PyAstronomy.funcFit.utils', \
             'PyAstronomy.pyasl', \
             'PyAstronomy.pyasl.asl', \
+            'PyAstronomy.pyasl.asl.aslExt_1', \
             'PyAstronomy.pyasl.resBased', \
             'PyAstronomy.pyasl.phoenixUtils', \
             'PyAstronomy.modelSuite', \
@@ -125,6 +126,7 @@ package_data = {"PyAstronomy":["setup.cfg"],
                 "PyAstronomy.modelSuite.XTran.forTrans":["*.f", "*.pyf"], \
                 "PyAstronomy.pyasl.asl":["testPro/*.pro", "*.cfg", "*.dat"], \
                 "PyAstronomy.pyasl.resBased":["*.dat"], \
+                "PyAstronomy.pyasl.asl.aslExt_1":["*.dat"], \
                 "PyAstronomy.constants":["*.dat"], \
                 "PyAstronomy.pyaC":["*.dat"]
                 }
