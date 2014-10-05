@@ -31,6 +31,7 @@ Uncategorized algorithms
    aslDoc/magnitudes.rst
    aslDoc/sindex.rst
    aslDoc/atomicNo.rst
+   aslDoc/aslExt_1Doc/pizzolato2003Doc.rst
 
 
 General data analysis
@@ -120,6 +121,7 @@ Resource based helpers
    resBasedDoc/exoplanetsOrg.rst
    resBasedDoc/kuruczModels.rst
    resBasedDoc/fip.rst
+   
 
    
 License note

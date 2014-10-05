@@ -1,0 +1,39 @@
+# Table 3 (Pizzolato et al. 2003)
+# Column 7: Upper mass limit changed from 0.78 to 0.79 to achieve consistency
+# 1,2) Mass range
+# 3) Number of stars
+# 4,5) log(Lx_sat), error
+# 6,7) log(Lx/Lbol_sat), error
+# 8,9) P_sat for Lx, error
+# 10,11) P_sat for Lx/Lbol, error
+# 12,13) log(tau_e), error
+1.10  1.29  34  30.0  0.5   -3.9  0.5   2.3 1.8   2.2 1.8   0.9 0.4
+1.03  1.10  34  30.3  0.3   -3.2  0.3   1.5 1.6   1.4 1.6   1.1 0.3
+0.98  1.03  34  30.1  0.3   -3.2  0.3   2.0 1.6   2.2 1.6   1.2 0.3
+0.93  0.98  34  30.1  0.4   -3.1  0.4   1.9 1.6   2.1 1.6   1.3 0.3
+0.87  0.93  34  29.8  0.3   -3.1  0.3   3.0 1.5   3.0 1.5   1.4 0.2
+0.79  0.87  34  29.5  0.2   -3.2  0.2   3.1 1.5   3.3 1.5   1.5 0.2
+0.63  0.79  34  29.3  0.2   -3.1  0.2   3.5 1.5   3.3 1.5   1.5 0.2
+# 0.22  0.60  21  28.2  0.2   -3.3  0.2    >10.8      >13.1     >2.0
+
+
+# Table 4
+# Column 1: Changed upper B-V limit from 0.60 to 0.61
+# Column 2: Changed upper B-V limit from 0.71 to 0.72
+# Column 5: Changed upper B-V limit from 1.06 to 1.07
+# Column 6: Changed upper B-V limit from 1.35 to 1.36
+# 1,2) B-V range
+# 3) Number of stars
+# 4,5) log(Lx_sat), error
+# 6,7) log(Lx/Lbol_sat), error
+# 8,9) P_sat for Lx, error
+# 10,11) P_sat for Lx/Lbol, error
+# 12,13) log(tau_e), error
+0.50  0.61  34  30.1  0.4   -3.6  0.4   1.8 1.6   1.6 1.6   1.0 0.3
+0.61  0.72  34  30.3  0.4   -3.1  0.4   1.6 1.7   1.3 1.7   1.1 0.3
+0.72  0.84  34  30.2  0.3   -3.1  0.3   1.8 1.5   1.7 1.5   1.2 0.2
+0.84  0.91  34  29.9  0.3   -3.2  0.3   2.6 1.5   2.4 1.5   1.3 0.2
+0.91  1.07  34  29.9  0.3   -3.0  0.3   2.8 1.5   2.4 1.5   1.4 0.2
+1.07  1.36  34  29.4  0.2   -3.2  0.2   4.1 1.5   3.5 1.5   1.5 0.2
+1.36  1.54  34  29.2  0.3   -3.2  0.2   4.0 1.5   3.7 1.5   1.5 0.2
+# 1.55  1.90  21  28.3  0.2   -3.3  0.2     >9.7      >23.9     >2.3    
