@@ -1221,6 +1221,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     global _pymcImport
     if not _pymcImport:
       raise(PE.PyARequiredImport("pymc package could not be imported.", solution="Install pymc (see http://code.google.com/p/pymc/"))
+    if (pymc.__version__).startswith('3'):
+      raise(PE.PyARequiredImport("pymc is available in version '" + str(pymc.__version__) + "'. " +
+                                 "Please note that funcFit does not yet support pymc3, which is a " +
+                                 "complete rewrite of pymc2.",
+                                 solution="Please install pymc in version 2.3."))
     # Assign mutable default parameters
     if pymcPars is None:
       pymcPars = {}
