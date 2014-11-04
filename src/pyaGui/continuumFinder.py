@@ -64,18 +64,22 @@ class ContinuumInteractive:
   
   def __init__(self, x, y, config=None):
     
-    if config is None:
-      config = {"specPlotStyle":"b.--", 
-                "astyle":"ro",
-                "istyle":"yp",
-                "splineLineStyle":"r--",
-                "normLineStyle":"b.--",
-                "normPlotRefLine":True,
-                "normRefLineStyle":"k--",
-                "sortPointListX":True,
-                "usegzip":True,
-                "windowTitle":"PyA Continuum Interactive"}
-    self.config = config
+    dconfig = {"specPlotStyle":"b.--", 
+              "astyle":"ro",
+              "istyle":"yp",
+              "splineLineStyle":"r--",
+              "normLineStyle":"b.--",
+              "normPlotRefLine":True,
+              "normRefLineStyle":"k--",
+              "sortPointListX":True,
+              "usegzip":True,
+              "windowTitle":"PyA Continuum Interactive"}
+    if config is not None:
+      for k in dconfig.keys():
+        if k in config:
+          dconfig[k] = config[k]
+
+    self.config = dconfig
     
     self.windowTitle = config["windowTitle"]
     self.f = Figure()
