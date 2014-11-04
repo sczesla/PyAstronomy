@@ -81,7 +81,7 @@ class ContinuumInteractive:
 
     self.config = dconfig
     
-    self.windowTitle = config["windowTitle"]
+    self.windowTitle = dconfig["windowTitle"]
     self.f = Figure()
     self.a = self.f.add_subplot(111)
     
@@ -93,11 +93,11 @@ class ContinuumInteractive:
     # Save the data (spectrum)
     self._x = x.copy()
     self._y = y.copy()
-    self.a.plot(x, y, config["specPlotStyle"])
+    self.a.plot(x, y, dconfig["specPlotStyle"])
     
     # Active and Inactive plot style for points
-    self.astyle = config["astyle"]
-    self.istyle = config["istyle"]
+    self.astyle = dconfig["astyle"]
+    self.istyle = dconfig["istyle"]
     
     self.pointList = []
 
