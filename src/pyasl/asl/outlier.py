@@ -1,4 +1,5 @@
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy import pyaC
 import numpy as np
 from PyAstronomy.pyaC import ImportCheck
 
@@ -135,3 +136,79 @@ def pointDistGESD(x, maxOLs, alpha=0.05):
       oll.append(r[1][i]+1)
   return len(oll), oll
   
+  
+def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False):
+  """
+    Simple outlier detection based on residuals.
+    
+    This algorithm fits a polynomial of the specified degree
+    to the data, subtracts it to find the residuals, determines the
+    standard deviations of the residuals, and, finally,
+    identifies all points with residuals further than the
+    specified number of standard deviations from the fit.
+    
+    Parameters
+    ----------
+    x, y : arrays
+        The abscissa and ordinate of the data.
+    deg : int, optional
+        The degree of the polynomial to be fitted.
+        The default is 0, i.e., a constant.
+    stdlim : float, optional
+        The number of standard deviations acceptable
+        for points not categorized as outliers.
+    controlPlot : boolean, optional
+        If True, a control plot will be generated
+        showing the location of outliers (default is
+        False).
+    fullOutput : boolean, optional
+        If True, the fitted polynomial and the resulting
+        model will be returned.
+    
+    Returns
+    -------
+    indiin : array
+        The indices of the points *not* being categorized
+        as outliers.
+    indiout : array
+        Indices of the oulier points.
+    p : array, optional
+        Coefficients of the fitted polynomial (only returned if
+        `fullOutput` is True).
+    model : array, optional
+        The polynomial model (only returned if
+        `fullOutput` is True).
+  """
+  if len(x) < deg + 1:
+    raise(PE.PyAValError("Only " + str(len(x)) + " points given to fit a polynomial of degree " + str(deg) + ".", \
+                         solution="Use more points and/or change degree of polynomial.", \
+                         where="polyResOutlier"))
+  if len(x) != len(y):
+    raise(PE.PyAValError("x and y need to have the same length.", \
+                         solution="Check the lengths of the input arrays.", \
+                         where="polyResOutlier"))
+  if deg < 0:
+    raise(PE.PyAValError("Polynomial degree must be > 0.",
+                         where="polyResOutlier"))
+  
+  p = np.polyfit(x, y, deg)
+  model = np.polyval(p, x)
+  residuals = y - model
+  
+  std = np.std(residuals)
+  # Find points too far off
+  indi = np.where(np.abs(residuals) >= stdlim*std)[0]
+  indiin = pyaC.invertIndexSelection(residuals, indi)
+  if controlPlot:
+    # Produce control plot
+    import matplotlib.pylab as plt
+    plt.title("polyResOutlier control plot (red: potential outliers, green: polynomial model)")
+    plt.plot(x, y, 'b.')
+    s = np.argsort(x)
+    plt.plot(x[s], model[s], 'g--')
+    plt.plot(x[indi], y[indi], 'rp')
+    plt.show()
+  
+  if fullOutput:
+    return indiin, indi, p, model
+  return indiin, indi

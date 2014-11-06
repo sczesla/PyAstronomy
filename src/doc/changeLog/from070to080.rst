@@ -12,6 +12,8 @@ From 0.7.0 to 0.8.0
                         - First ionization energies
                         - Conversion between decimal and
                           sexagesimal coordinates
+                        - Outlier detection based on polynomial
+                          fit
   funcFit             *New functionality*
                         - Model description
   pyaGui              *New functionality*

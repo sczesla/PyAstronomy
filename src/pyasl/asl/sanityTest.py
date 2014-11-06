@@ -880,6 +880,40 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
       plt.plot(r[1][i], x[r[1][i]], 'rp')
 #    plt.show()
 
+  def sanity_polyResOutlierExample(self):
+    """
+      Sanity of polyResOutlier example
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    # Generate some "data"
+    x = np.arange(100)
+    y = np.random.normal(x*0.067, 1.0, len(x))
+    
+    # Introduce an outliers
+    y[14] = -5.0
+    y[67] = +9.8
+    
+    # Find outliers based on a linear (deg = 1) fit.
+    # Assign outlier status to all points deviating by
+    # more than 3.0 standard deviations from the fit,
+    # and show a control plot.
+    iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=False)
+    
+    # What about the outliers
+    print "Number of outliers: ", len(iout)
+    print "Indices of outliers: ", iout
+    
+    # Remove outliers
+    xnew, ynew = x[iin], y[iin]
+    
+    # Plot result (outlier in red)
+    plt.plot(x, y, 'r.')
+    plt.plot(xnew, ynew, 'bp')
+#     plt.show()
+
 
 class SanityOfMagnitudes(unittest.TestCase, SaniBase):
   

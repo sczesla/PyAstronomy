@@ -147,3 +147,23 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     indi = np.where(np.invert(np.isnan(result[::,2])))[0]
     result = result[indi,::]
   return result, dt
+
+
+def binByGrouping(x, y, grp, yerr=None):
+  """
+  """
+  # Determine the number of bins (+1 for trailing bin)
+  nb = len(x) / grp + 1
+  result = np.zeros((nb, 5))
+  for si in xrange(nb, 0, grp):
+    # Which bins are to be grouped here
+    indi = range(si, min(si+grp, len(x)))
+    # Center of bin
+    result[i,0] = (x[indi[0]] + x[indi[-1]])/2.0
+    # Width of bin
+    result[i,1] = (x[indi[-1]] - x[indi[0]])/2.0
+    # Mean of y-values
+    result[i,2] = np.mean(y[indi])
+    # Std of y-values
+    result[i,2] = np.std(y[indi])
+  
