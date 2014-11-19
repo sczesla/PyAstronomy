@@ -2018,3 +2018,32 @@ class SanityOfAtomicNo(unittest.TestCase):
     
     print an.getElementName(25)
     
+
+class SanityOfFitsSpec(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    import os
+    os.remove("test1.fits")
+    os.remove("test2.fits")
+  
+  def sanity_write1dFitsSpecExample(self):
+    """
+      Sanity of write1dFitsSpec example
+    """
+    import numpy as np
+    from PyAstronomy import pyasl
+    
+    # Generate a "spectrum"
+    wvl = np.arange(5000., 5010., 0.01)
+    flux = np.random.normal(1.0, 0.01, wvl.size)
+    
+    # Write spectrum providing wavelength array
+    pyasl.write1dFitsSpec("test1.fits", flux, wvl=wvl, clobber=True)
+    
+    # Write spectrum specifying wavelength-related header keywords
+    # manually
+    wp = {"CRVAL1":5000., "CDELT1":0.01, "CRPIX1":1}
+    pyasl.write1dFitsSpec("test2.fits", flux, waveParams=wp, clobber=True)
