@@ -45,7 +45,7 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0):
     skipedge : int, optional
         If larger zero, the specified number of bins will be
         skipped from the begin and end of the observation. This
-        may be useful of the template does not provide sufficient
+        may be useful if the template does not provide sufficient
         coverage of the observation.
     
     Returns
