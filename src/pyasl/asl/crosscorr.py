@@ -2,7 +2,7 @@ import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import _ic
 
-def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0):
+def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edgeTapering=None):
   """
     Cross-correlate a spectrum with a template.
     
@@ -47,6 +47,16 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0):
         skipped from the begin and end of the observation. This
         may be useful if the template does not provide sufficient
         coverage of the observation.
+    edgeTapering : float or tuple of two floats
+        If not None, the method will "taper off" the edges of the
+        observed spectrum by multiplying with a sine function. If a float number
+        is specified, this will define the width (in wavelength units)
+        to be used for tapering on both sides. If different tapering
+        widths shall be used, a tuple with two (positive) numbers
+        must be given, specifying the width to be used on the low- and
+        high wavelength end. If a nonzero 'skipedge' is given, it
+        will be applied first. Edge tapering can help to avoid
+        edge effects (see, e.g., Gullberg and Lindegren 2002, A&A 390).
     
     Returns
     -------
@@ -68,6 +78,24 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0):
   w, f = w.copy(), f.copy()
   if skipedge > 0:
     w, f = w[skipedge:-skipedge], f[skipedge:-skipedge]
+  
+  if edgeTapering is not None:
+    # Smooth the edges using a sine
+    if isinstance(edgeTapering, float):
+      edgeTapering = [edgeTapering, edgeTapering]
+    if len(edgeTapering) != 2:
+      raise(PE.PyAValError("'edgeTapering' must be a float or a list of two floats.", \
+                           where="crosscorrRV"))
+    if edgeTapering[0] < 0.0 or edgeTapering[1] < 0.0:
+      raise(PE.PyAValError("'edgeTapering' must be (a) number(s) >= 0.0.", \
+                           where="crosscorrRV"))
+    # Carry out edge tapering (left edge)
+    indi = np.where(w < w[0]+edgeTapering[0])[0]
+    f[indi] *= np.sin((w[indi] - w[0])/edgeTapering[0]*np.pi/2.0)
+    # Carry out edge tapering (right edge)
+    indi = np.where(w > (w[-1]-edgeTapering[1]))[0]
+    f[indi] *= np.sin((w[indi] - w[indi[0]])/edgeTapering[1]*np.pi/2.0 + np.pi/2.0)
+  
   # Speed of light in km/s
   c = 299792.458
   # Check order of rvmin and rvmax
