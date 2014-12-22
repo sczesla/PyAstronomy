@@ -1,10 +1,23 @@
 Wavelength conversion (air and vacuum)
 ========================================
 
-PyA offers the function to transform the wavelength axis:
+PyA provides tools to convert wavelengths from air into vacuum conditions and vice versa:
 
- * :py:func:`airtovac <PyAstronomy.pyasl.airtovac>`
- * :py:func:`vactoair <PyAstronomy.pyasl.vactoair>`
+ * :py:func:`airtovac2 <PyAstronomy.pyasl.airtovac2>`
+ * :py:func:`vactoair2 <PyAstronomy.pyasl.vactoair2>`
+
+These functions allow to use the conversions specified by:
+  - Edlen 1953, J. Opt. Soc. Am 43 no. 5
+  - Peck and Reeder 1972, J. Opt. Soc. 62 no. 8
+  - Ciddor 1996, Applied Optics 35 no. 9
+
+.. warning::
+   The function `airtovac` and `vactoair` are based on the formula by Edlen 1953.
+   It seems that air wavelengths (or wavenumbers) are used, where vacuum wavenumbers
+   should be used.
+
+   * :py:func:`airtovac <PyAstronomy.pyasl.airtovac>`
+   * :py:func:`vactoair <PyAstronomy.pyasl.vactoair>`
 
 Moreover, you can use:
 
@@ -13,38 +26,98 @@ Moreover, you can use:
 to convert from vacuum into air conditions or vice versa, but
 retain the input wavelength axis.
 
-`airtovac` and `vactoair`
----------------------------
-
-Both functions have been ported from IDL's astrolib.
-
-.. currentmodule:: PyAstronomy.pyasl
-.. autofunction:: airtovac
-.. autofunction:: vactoair
-
+Usage examples for `airtovac2` and `vactoair2`
+----------------------------------------------------
 
 Example: From air to vacuum and back
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+  from PyAstronomy import pyasl
+  import numpy as np
+  
+  # Define wavelength array
+  wvl = np.arange(10) + 5000.0
+  print "Input wavelengths: ", wvl
+  
+  # Convert wavelength in air to wavelength
+  # in vacuum. By default, the conversion
+  # specified by Ciddor 1996 are used.
+  wvlVac = pyasl.airtovac2(wvl)
+  print "Wavelength in vacuum: ", wvlVac
+  
+  # Convert wavelength from vacuum to air
+  wvlAir = pyasl.vactoair2(wvlVac)
+  print "Wavelength in air: ", wvlAir
+
+
+Example: Compare Edlen and Ciddor conversions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
   from PyAstronomy import pyasl
   import numpy
+  import matplotlib.pylab as plt
+  
+  # Compare the Edlen and Ciddor conversions
+  wvl = numpy.arange(3000, 10000, 1.0)
+  wvlVacCiddor = pyasl.airtovac2(wvl, mode="ciddor")
+  wvlVacEdlen = pyasl.airtovac2(wvl, mode="edlen53")
+  
+  plt.subplot(2,1,1)
+  plt.title("Difference in air wavelength (Ciddor-Edlen)")
+  plt.ylabel("dWvl [A]")
+  plt.xlabel("Vacuum wvl [A]")
+  plt.plot(wvl, wvlVacCiddor-wvlVacEdlen, 'b.-')
+  plt.subplot(2,1,2)
+  plt.title("Difference in air wavelength (Ciddor-Edlen, in RV)")
+  plt.ylabel("dRV [m/s]")
+  plt.xlabel("Vacuum wvl [A]")
+  plt.plot(wvl, (wvlVacCiddor-wvlVacEdlen)/wvlVacCiddor*299792458., 'b.-')
+  plt.show()
+
+
+API documentation: `airtovac2` and `vactoair2`
+----------------------------------------------------
+
+.. currentmodule:: PyAstronomy.pyasl
+.. autofunction:: airtovac2
+.. autofunction:: vactoair2
+
+
+Obtaining the refractive index
+----------------------------------------------------
+
+Although the conversion of wavelength between air and vacuum conditions
+is the primary application targeted here, what is really needed to carry
+out the conversion is the refractive index.
+
+.. currentmodule:: PyAstronomy.pyasl
+.. autoclass:: RefractiveIndexAV
+   :members:
+   :private-members:
+   
+Example: Obtain refractive index of standard air
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+  from PyAstronomy import pyasl
+  import numpy as np
   
   # Define wavelength array
-  wvl = numpy.arange(10) + 5000.0
-  print "Input wavelengths: ", wvl
+  wvl = np.arange(10) + 5000.0
   
-  # Convert wavelength in air to wavelength
-  # in vacuum
-  wvlVac = pyasl.airtovac(wvl)
-  print "Wavelength in vacuum: ", wvlVac
+  # Obtain refractive index according to Ciddor 1996
+  ri = pyasl.RefractiveIndexAV(mode="ciddor")
+  n = ri.refractiveIndex(wvl)
   
-  # Convert wavelength from vacuum to air
-  wvlAir = pyasl.vactoair(wvlVac)
-  print "Wavelength in air: ", wvlAir
+  print "Wavelength and 1.0 - Refractive index of 'standard air':"
+  for w, nc in zip(wvl, n):
+    print "{0:5.1f}  {1:10.8e}".format(w, nc-1.0)
 
-----------------------------------------------------
 
 Transform spectrum, but retain wavelength axis
 -----------------------------------------------------------
@@ -52,7 +125,7 @@ Transform spectrum, but retain wavelength axis
 .. autofunction:: specAirVacConvert
 
 Example: Convert spectrum from vacuum into air conditions
------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -84,3 +157,16 @@ Example: Convert spectrum from vacuum into air conditions
   plt.plot(wvl, flux, "b.-")
   plt.plot(wvl, airflux, "r.-")
   plt.show()
+
+------------------------------------------------  
+
+API documentation: `airtovac` and `vactoair`
+----------------------------------------------------
+
+.. note:: These function are now considered deprecated.
+
+Both functions have been ported from IDL's astrolib.
+
+.. currentmodule:: PyAstronomy.pyasl
+.. autofunction:: airtovac
+.. autofunction:: vactoair

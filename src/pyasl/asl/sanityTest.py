@@ -1,4 +1,4 @@
-from airtovac import airtovac, vactoair
+from airtovac import airtovac, vactoair, vactoair2, airtovac2
 import numpy
 import unittest
 from PyAstronomy.pyaC import SaniBase
@@ -21,14 +21,61 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
   def tearDown(self):
     pass
   
+  def sanity_airtovacExample1(self):
+    """
+      Checking conversion example for `airtovac2`
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    # Define wavelength array
+    wvl = np.arange(10) + 5000.0
+    print "Input wavelengths: ", wvl
+    
+    # Convert wavelength in air to wavelength
+    # in vacuum. By default, the conversion
+    # specified by Ciddor 1996 rae used.
+    wvlVac = pyasl.airtovac2(wvl)
+    print "Wavelength in vacuum: ", wvlVac
+    
+    # Convert wavelength from vacuum to air
+    wvlAir = pyasl.vactoair2(wvlVac)
+    print "Wavelength in air: ", wvlAir
+  
+  def sanity_airtovacExample2(self):
+    """
+      Checking difference example for `airtovac2`
+    """
+    from PyAstronomy import pyasl
+    import numpy
+    import matplotlib.pylab as plt
+    
+    # Compare the Edlen and Ciddor conversions
+    wvl = numpy.arange(3000, 10000, 1.0)
+    wvlVacCiddor = pyasl.airtovac2(wvl, mode="ciddor")
+    wvlVacEdlen = pyasl.airtovac2(wvl, mode="edlen53")
+    
+    plt.subplot(2,1,1)
+    plt.title("Difference in air wavelength (Ciddor-Edlen)")
+    plt.ylabel("dWvl [A]")
+    plt.xlabel("Vacuum wvl [A]")
+    plt.plot(wvl, wvlVacCiddor-wvlVacEdlen, 'b.-')
+    plt.subplot(2,1,2)
+    plt.title("Difference in air wavelength (Ciddor-Edlen, in RV)")
+    plt.ylabel("dRV [m/s]")
+    plt.xlabel("Vacuum wvl [A]")
+    plt.plot(wvl, (wvlVacCiddor-wvlVacEdlen)/wvlVacCiddor*299792458., 'b.-')
+#    plt.show()
+  
   def sanity_airtovac(self):
     """
       Checking `airtovac` and back...
     """
-    wvl_air = numpy.random.random(100) * 10000.0 + 1000.0
-    wvl_vac = airtovac(wvl_air)
-    wvl_air2 = vactoair(wvl_vac)
-    self.assertTrue(self.mrd(wvl_air, wvl_air2) < 1e-6)
+    wvl_vac = numpy.arange(700.0)*10.0 + 3001.0
+    for mode in ["ciddor", "edlen53", "peckReeder"]:
+      wvl_air = vactoair2(wvl_vac)
+      wvl_vac2 = airtovac2(wvl_air)
+      self.assertTrue(self.mrd(wvl_vac, wvl_vac2) < 1e-10, msg="Problem with vac<->air conversion (mode = " + str(mode) + ")")
   
   def sanity_specAirVacConvertExample(self):
     """
@@ -62,6 +109,24 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     plt.plot(wvl, flux, "b.-")
     plt.plot(wvl, airflux, "r.-")
 #    plt.show()
+
+  def sanity_refractiveIndexExample(self):
+    """
+      Checking example of refractive index.
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    
+    # Define wavelength array
+    wvl = np.arange(10) + 5000.0
+    
+    # Obtain refractive index according to Ciddor 1996
+    ri = pyasl.RefractiveIndexAV(mode="ciddor")
+    n = ri.refractiveIndex(wvl)
+    
+    print "Wavelength and 1.0 - Refractive index of 'standard air':"
+    for w, nc in zip(wvl, n):
+      print "{0:5.1f}  {1:10.8e}".format(w, nc-1.0)
   
   def sanity_aitoff(self):
     """

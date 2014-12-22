@@ -1,3 +1,16 @@
+pro test_airtovac
+  openw, fw, 'airvac2.test', /get_lun, WIDTH=1000
+  printf, fw, "#wvl, airtovac, vactoair"
+  for i=0,700 do begin
+    wvl = 3000.0d + double(i)*10.0d
+    vactoair, wvl, vta
+    airtovac, wvl, atv
+    printf, fw, wvl, atv, vta, FORMAT="(F20.10, F20.10, F20.10)"
+  endfor
+  close, fw
+end
+
+
 pro test_mphase
   openw, fw, 'mphase.test', /get_lun, WIDTH=1000
   printf, fw, "#jd, illumfrac"
@@ -383,4 +396,5 @@ pro create_test_data
  test_mphase
  test_posangle
  test_helcorr
+ test_airtovac
 end

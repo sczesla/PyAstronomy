@@ -11,6 +11,7 @@ import sunpos
 import moonpos
 import moonphase
 import posAngle
+from airtovac import airtovac2, vactoair2
 
 class AstroTimeLegacyTest(unittest.TestCase):
 
@@ -408,6 +409,22 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(dat[i,7]+2.4e6, hjd, delta=1e-5, msg="HJD does not match.")
 #    plt.hist(diffs)
 #    plt.show()
+
+  def test_airtovac(self):
+    """
+      Testing air to vac conversion
+    """
+    dat = self.getData("airvac2.test")[1]
+    wvl = dat[::,0]
+    atv = dat[::,1]
+    vta = dat[::,2]
+    atv2 = airtovac2(wvl)
+    vta2 = vactoair2(wvl)
+    print "test_airtovac"
+    print "  max diff in airtovac", numpy.max(numpy.abs(atv-atv2))
+    print "  max diff in vactoair", numpy.max(numpy.abs(vta-vta2))
+    self.assertAlmostEqual(numpy.max(numpy.abs(atv-atv2)), 0.0, delta=1e-6, msg="Air to Vac conversion inconsistent.")
+    self.assertAlmostEqual(numpy.max(numpy.abs(vta-vta2)), 0.0, delta=1e-6, msg="Vac to air conversion inconsistent.")
 
 if __name__ == "__main__":
   suite = unittest.TestLoader().loadTestsFromTestCase(AstroTimeLegacyTest)
