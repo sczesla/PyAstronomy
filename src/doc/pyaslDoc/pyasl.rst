@@ -33,7 +33,6 @@ Uncategorized algorithms
    aslDoc/atomicNo.rst
    aslDoc/aslExt_1Doc/pizzolato2003Doc.rst
 
-
 General data analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -108,6 +107,7 @@ Statistics
    :maxdepth: 1
 
    aslDoc/statTest.rst
+   aslDoc/aslExt_1Doc/expCorrRN.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~
