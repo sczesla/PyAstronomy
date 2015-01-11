@@ -601,20 +601,22 @@ class Params:
 
   def untie(self, parName, forceFree=False):
     """
-      Remove all relations of parameter parName, i.e., the parameter is not dependend 
-      on other parameters. The parameter parName is set to "freeze".
+      Remove all relations of parameter "parName".
+      
+      After this operation, the parameter no longer depends 
+      on other parameters. Unless foreFree is True, the parameter
+      referred to by "parName" is "frozen".
       
       Parameters
       ----------
       parName : string
-          The name of the dependent variable which should become "unrelated".
+          The name of the dependent variable, which shall be untied.
       forceFree : boolean
           Set parName to "free" instead of "frozen" if set to True.
     """      
     for p in self.relations.keys():
         self.relations[p] = [r for r in self.relations[p] if r[0] != parName]           
-    if forceFree: self.isFree[parName] = False
-    else: self.isFree[parName] = False
+    self.isFree[parName] = forceFree
 
   def relate(self, parName1, pars, func = None, force=False):
     """
