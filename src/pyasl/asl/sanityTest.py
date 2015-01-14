@@ -1614,12 +1614,38 @@ class SanityOfDecimalYear(unittest.TestCase):
     """
     import datetime as dt
     from PyAstronomy import pyasl
-    
+      
     # Convert July 2nd, 1998, 12:30:59 into decimal
     # representation
     d = dt.datetime(1998,7,2,12,30,59)
     
-    print "Decimal representation: ", pyasl.decimalYear(d)
+    # Obtain float representation of decimal year
+    decy = pyasl.decimalYear(d)
+    print "Decimal representation: ", decy
+    
+    # Convert back into gregorian date first
+    print "The decimal year %10.5f correspond to " % decy + \
+          pyasl.decimalYearGregorianDate(decy, "yyyy-mm-dd hh:mm:ss")
+    print " ... or equivalently (y, m, d, h, m, s, ms): ", \
+          pyasl.decimalYearGregorianDate(decy, "tuple")
+  
+  def sanity_decimalYear(self):
+    """
+      Decimal year: Check that conversion is reasonable.
+    """
+    import datetime as dt
+    from PyAstronomy import pyasl
+    d = dt.datetime(1998,7,2,12,30,59)
+    # Obtain float representation of decimal year
+    decy = pyasl.decimalYear(d)
+    t = pyasl.decimalYearGregorianDate(decy, "tuple")
+    
+    self.assertEqual(t[0], 1998, msg="Year does not match")
+    self.assertEqual(t[1], 7, msg="Month does not match")
+    self.assertEqual(t[2], 2, msg="Day does not match")
+    self.assertEqual(t[3], 12, msg="Hour does not match")
+    self.assertEqual(t[4], 30, msg="Minute does not match")
+    self.assertEqual(t[5], 59, msg="Second does not match")
 
 
 class SanityOfBroad(unittest.TestCase):
