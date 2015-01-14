@@ -69,10 +69,11 @@ def intep(x, y, xinter, boundsError=True, fillValue=None):
   else:
     result[iup] = fillValue
   
+  # No extrapolation (noepo)
   noepo = invertIndexSelection(xinter, np.concatenate((ilow, iup)))
   
-  if (len(noepo) > 0) and boundsError:
-    raise(PE.PyAValError("There are " + str(len(noepo)) + " points, which need to be extrapolated. " + \
+  if (len(noepo) < len(xinter)) and boundsError:
+    raise(PE.PyAValError("There are " + str(len(xinter) - len(noepo)) + " points, which need to be extrapolated. " + \
           "Attention: Extrapolation is simply done by using the closest valid value.", \
           solution=["Use only interpolation points (`xinter`) within the valid range.",
                     "Set the `boundsError` flag to False (will suppress this exception)."]))
