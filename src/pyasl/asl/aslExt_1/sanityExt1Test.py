@@ -112,3 +112,59 @@ class SanityOfPyaslExt1(unittest.TestCase):
     plt.plot(x, ac, 'b.')
     plt.plot(x, np.exp(-x/tau)*ac.max(), 'r--')
   #   plt.show()
+
+  def sanity_ramirez2005Example(self):
+    """
+      Check sanity of Ramirez/Melendez 2005 example
+    """
+    from PyAstronomy import pyasl
+  
+    # Create class instance
+    r = pyasl.Ramirez2005()
+  
+    # Which color bands are available
+    print "Available color bands: ", r.availableBands()
+    
+    # Convert B-V to effective temperature and back
+    bv = 0.75
+    feh = 0.0
+    teff = r.colorToTeff("B-V", bv, feh)
+    bv1 = r.teffToColor("B-V", teff, feh)
+    # Watch out for differences between input bv and the output bv1
+    print "B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1
+
+  def sanity_ramirez2005(self):
+    """
+      Check sanity Ramirez/Melendez 2005 conversions
+    """
+    from PyAstronomy import pyasl
+    import numpy as np
+    from itertools import product
+    
+    feh = 0.0
+    r = pyasl.Ramirez2005()
+    # Compare with numbers given in Allen (astrophysical quantities, 4th edition)
+    for teff, bv in zip([7000.,5950.,5310.,4410.],[0.35,0.58,0.74,1.15]):
+      self.assertAlmostEqual(bv, r.teffToColor("B-V", teff, feh), delta=0.03, \
+                             msg="B-V conversion (Teff " + str(teff) + ") out of sync with Allen")
+
+    for teff, bv in zip([6500.,6000.,5000.],[0.286,0.36,0.535]):
+      self.assertAlmostEqual(bv, r.teffToColor("b-y", teff, feh), delta=0.01, \
+                             msg="B-V conversion (Teff " + str(teff) + ") out of sync with Allen")
+
+    for teff, bv in zip([5000.,4500.,4000.],[0.433,0.51,0.735]):
+      self.assertAlmostEqual(bv, r.teffToColor("R_C-I_C", teff, feh, 'g'), delta=0.04, \
+                       msg="R_C-I_C conversion (Teff " + str(teff) + ") out of sync with Allen (giants)")
+  
+    for teff, bv in zip([5050.,4660.,4050.],[0.86,1.,1.5]):
+      self.assertAlmostEqual(bv, r.teffToColor("B-V", teff, feh, 'g'), delta=0.1, \
+                       msg="B-V conversion (Teff " + str(teff) + ") out of sync with Allen (giants)")
+    
+    # Check consistency
+    bv = np.arange(0.4, 1.01, 0.05)
+    feh = np.arange(-2., 0.3, 0.2)
+    for x in product(bv, feh):
+      teff = r.colorToTeff("B-V", x[0], x[1], 'ms')
+      col = r.teffToColor("B-V", teff, x[1], 'ms')
+      self.assertAlmostEqual(x[0], col, delta=1e-2, \
+                             msg="Two-way color-temperature conversion is inconsistent. bv = %.4e, feh = %.4e" % x)

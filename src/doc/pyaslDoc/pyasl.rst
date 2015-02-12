@@ -32,6 +32,7 @@ Uncategorized algorithms
    aslDoc/sindex.rst
    aslDoc/atomicNo.rst
    aslDoc/aslExt_1Doc/pizzolato2003Doc.rst
+   aslDoc/aslExt_1Doc/ramirez2005.rst
 
 General data analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
