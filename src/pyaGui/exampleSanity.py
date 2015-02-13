@@ -183,3 +183,33 @@ class ExampleSanity(unittest.TestCase):
 #    plt.title("Normalized data")
 #    plt.plot(x, c["normalizedData"], 'b.--')
 #    plt.show()
+
+  def sanity_IAGVFitExample(self):
+    """
+      Checking example of IAGVFit
+    """
+    from PyAstronomy import pyaGui
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    
+    # Data for the plot
+    x = np.linspace(5000., 5010, 200)
+    y = np.ones(len(x))
+    yerr = np.ones(len(x)) * 0.01
+    y += np.random.normal(0., 0.01, len(x))
+    
+    gf = fuf.GaussFit1d()
+    gf["A"] = -0.3
+    gf["mu"] = 5004.
+    gf["sig"] = 0.2
+    y += gf.evaluate(x)
+    
+    # Create interactive fitter
+    igv = pyaGui.IAGVFit(x, y, yerr=yerr, mode="gauss")
+#   
+#   r = igv.interactiveFit()
+#   
+#   print "Parameters of the fit: ", r[0]
+#   print "Parameters of active component: ", r[1]
+#   print "No. of components: ", r[2]
+
