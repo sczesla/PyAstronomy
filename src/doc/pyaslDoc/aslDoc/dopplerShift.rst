@@ -4,6 +4,30 @@ Doppler shifting a spectrum
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: dopplerShift
 
+Note on linear interpolation and noise
+------------------------------------------
+
+Linear interpolation can (apparently) affect the noise in the data set.
+Say we start with a number of iid (identically and independently
+distributed) residuals, which obey a Gaussian distribution with some
+fixed standard deviation characterizing the noise. This is what is
+typically and often implicitly assumed in noise estimation.
+Now we generate
+a new data set by averaging adjacent points, i.e., we apply a special case
+of linear interpolation with the new data points half way between the
+initial ones.
+If we now estimate the noise in the new data set under the
+same iid assumption, we will find that it decreased by a factor
+of sqrt(2). Now, it seems unlikely that we can increase the information content
+in our data by interpolation alone. In fact, we must acknowledge that the iid
+assumption does no longer hold, because the information previously contained in
+a single data point is now, by construction, contained in two of the new, interpolated
+data points, so that these points must no longer be considered independent.
+
+While the effect is strongest for the case outlined above, it also holds for the
+more general case, where interpolated data points are not half way between the
+original ones. 
+
 Example
 --------
 
