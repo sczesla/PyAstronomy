@@ -19,6 +19,7 @@ From 0.7.0 to 0.8.0
                         - Conversion from decimal year to gregorian
                           date
                         - Teff-color conversion
+                        - Stellar age
                       *Update*
                         - Updated air-vacuum wavelength conversion
   funcFit             *New functionality*

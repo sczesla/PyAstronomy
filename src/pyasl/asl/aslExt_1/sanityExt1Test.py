@@ -168,3 +168,53 @@ class SanityOfPyaslExt1(unittest.TestCase):
       col = r.teffToColor("B-V", teff, x[1], 'ms')
       self.assertAlmostEqual(x[0], col, delta=1e-2, \
                              msg="Two-way color-temperature conversion is inconsistent. bv = %.4e, feh = %.4e" % x)
+  
+  def sanity_gyroAgeBarnes(self):
+    """
+      Check Gyro age of Barnes 2007
+    """
+    # Eq 17, 18 (B-V, period, relative error)
+    dat = [[0.5, 7, 20], [0.65, 12, 15], [1.0, 20, 13], [1.5, 30, 13]]
+    for d in dat:
+      a, e = pyasl.gyroAgeBarnes(d[1], d[0])
+      self.assertAlmostEqual(e/a*100., d[2], delta=1.0, \
+                             msg="Relative errors of Barnes 2007 cannot be reproduced.")
+  
+  def sanity_sanity_gyroAgeBarnesExample(self):
+    """
+      Example gyro age (Barnes 2007)
+    """
+    from PyAstronomy import pyasl
+  
+    # Parameters of the Sun (Barnes 2007, p 1174)
+    bv = 0.642
+    p = 26.09
+    
+    # Obtain solar age ...
+    age = pyasl.gyroAgeBarnes(p, bv)
+    # ... and print it
+    print "Solar age: {0:4.2f} +/- {1:4.2f} Ga".format(*age)
+  
+  
+  def sanity_chromoAgeRHK(self):
+    """
+      Checking sanity of chromospheric age (Donahue)
+    """
+    import numpy as np
+    # R'HK vs log10(age) (estimated from Fig. 1 in Donahue 1998)
+    dat = [[-4.25, 7.], [-4.6, 9.1], [-5.0, 9.7]]
+    for d in dat:
+      a = np.log10(pyasl.chromoAgeRHK(d[0])*1e9)
+      print a, d[1]
+      self.assertAlmostEqual(a, d[1], delta=0.3,
+                             msg="Cannot reproduce age estimate from Donahue fig 1.")
+  
+  def sanity_chromoAgeRHKExample(self):
+    """
+      Example chromospheric age (Donahue)
+    """
+    from PyAstronomy import pyasl
+  
+    # Approximate chromospheric age of the Sun
+    print "Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95))
+  
