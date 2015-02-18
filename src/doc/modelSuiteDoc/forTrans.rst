@@ -9,8 +9,8 @@ fast computation of the light curve, PyAstronomy supplies
 funcFit's fitting framework.
 
 .. note:: The code contained within the files *occultnl.f* and *occultquad.f* is used
-          with kind permission of the authors. It is described in [#ManAg02]_
-          and Eastman et al. 2012 (in preperation).
+          with kind permission of the authors. It is described in [#ManAg02]_; further
+          explanations are given in Eastman et al. 2013 (PASP 125, 83).
 
 .. [#ManAg02] Mandel & Agol 2002, "Analytic Light Curves for Planetary Transit Searches", ApJ, 580, 171.
 
