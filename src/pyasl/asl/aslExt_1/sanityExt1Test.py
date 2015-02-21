@@ -169,6 +169,25 @@ class SanityOfPyaslExt1(unittest.TestCase):
       self.assertAlmostEqual(x[0], col, delta=1e-2, \
                              msg="Two-way color-temperature conversion is inconsistent. bv = %.4e, feh = %.4e" % x)
   
+  def sanity_BallesterosExample(self):
+    """
+      Checking example for Ballesteros
+    """
+    from PyAstronomy import pyasl
+  
+    b = pyasl.BallesterosBV_T()
+    
+    bv = 0.65
+    
+    # Convert B-V into effective temperature
+    teff = b.bv2T(0.65)
+    print "B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff)
+    
+    # Convert effective temperature into B-V color
+    teff = 4568.0
+    bv = b.t2bv(teff)
+    print "Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv)
+  
   def sanity_gyroAgeBarnes(self):
     """
       Check Gyro age of Barnes 2007
