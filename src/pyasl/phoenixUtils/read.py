@@ -123,7 +123,11 @@ def decomposeFilename(fn):
     return None
   result = {}
   result["fn"] = fn
-  result["teff"] = int(r.group(1)) * 100
+  teff = int(r.group(1))
+  if teff < 1000:
+    result["teff"] = teff * 100
+  else:
+    result["teff"] = teff
   result["logg"] = float(r.group(3))
   if r.group(2) == "+":
     result["logg"] *= -1.0
