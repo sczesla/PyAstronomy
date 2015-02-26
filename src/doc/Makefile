@@ -1,6 +1,9 @@
 # Makefile for Sphinx documentation
 #
 
+# Build docu with download sidebar
+# make THEME=pyaSphinx html
+
 # You can set these variables from the command line.
 # THEME can be used to modify html_theme for Sphinx. Use, e.g.,
 # make THEME=agogo to use the agogo theme.
