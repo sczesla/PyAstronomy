@@ -10,6 +10,7 @@ from anneal import PyAAnneal
 from PyAstronomy import pyaC 
 from time import time as timestamp
 from fufDS import FufDS
+from extFitter import NelderMead
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport
 if _pymcImport:
@@ -558,6 +559,70 @@ class _OndeDFitParBase:
   def showConditionalRestrictions(self, **kwargs):
     return self.pars.showConditionalRestrictions(**kwargs)
   showConditionalRestrictions.__doc__ = Params.showConditionalRestrictions.__doc__
+
+
+
+class IFitterBase:
+  
+  def __init__(self):
+    self._objfval = None
+  
+  def fit(self, minifunc, x0):
+    raise(PE.PyANotImplemented("IFitterBase: fit method needs to be implemented"))
+  
+  def _digestkwargs(self, kwargs):
+    """
+      Check validity of keywords.
+    """
+    if not hasattr(self, "_allowedKWs"):
+      raise(PE.PyANotImplemented("No _allowedKWs attribute. Must be set to use '_digestkwargs'.", \
+                                 solution="Specify _allowedKWs, e.g., in constructor."))
+    for k in kwargs.keys():
+      if not k in self._allowedKWs:
+        raise(PE.PyAValError("Keyword " + k + " not allowed in algorithm: " + self.name,
+                             solution="Allowed keywords: " + ', '.join(self._allowedKWs), \
+                             where=self.name))
+  
+  def getObjFuncValue(self):
+    return self._objfval
+  
+  def __call__(self, *args, **kwargs):
+    return self.fit(*args, **kwargs)
+
+
+class ScipyFMIN(IFitterBase):
+  
+  def __init__(self, *args, **kwargs):
+    IFitterBase.__init__(self)
+    self._allowedKWs = ["xtol", "ftol", "maxiter", "maxfun", "disp", "retall", "callback"]
+    self.name = "scipy.optimize.fmin"
+    
+  def fit(self, miniFunc, x0, *fminpars, **fminargs):
+    """
+    """
+    self._digestkwargs(fminargs)
+    self._result = sco.fmin(miniFunc, x0, *fminpars, full_output=True, **fminargs)
+    self._objfval = self._result[1]
+    return self._result[0], self._result[1]
+  
+
+class FuFNM(IFitterBase):
+
+  def __init__(self, *args, **kwargs):
+    IFitterBase.__init__(self)
+    self._allowedKWs = ["initDelta", "maxIter", "callback"]
+    self.name = "funcFit NM65"
+    self._obj = args[0]
+    self._nm = NelderMead()
+  
+  def fit(self, miniFunc, x0, *fminpars, **fminargs):
+    """
+    """
+    self._digestkwargs(fminargs)
+    self._bestFit = self._nm.fit(self._obj, self._obj._fufDS, self._obj.miniFunc, **fminargs)
+    self._bestFitVals = self._obj.pars.getFreeParams()
+    self._objfval = self._obj.miniFunc(self._bestFitVals)
+    return self._bestFitVals, self._objfval
 
 
 class OneDFit(_OndeDFitParBase, _PyMCSampler):
@@ -1335,6 +1400,58 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.updateModel() 
     self.MCMC.db.close()
     
+  def _resolveMinAlgo(self, minAlgo, default=None):
+    """
+      Resolve minimization algorithm (minAlgo).
+      
+      Parameters
+      ----------
+      minAlgo : callable, string, or None
+          If None, the default will be used. If it is
+          a callable, it will be assumed to be a valid
+          implementation of a minimization algorithm. If
+          it is a string, the function will try to resolve
+          it.
+      default : callable, string, or None
+          The algorithm used, if minAlgo itself is None.
+      
+      Returns
+      -------
+      minAlgo : callable
+          An instance of the minimization algorithm.
+    """
+    if minAlgo is None:
+      # If not specified use default.
+      minAlgo = default
+    
+    if minAlgo is None:
+      # This should not happen. Default must be specified.
+      raise(PE.PyAValError("No minimization algorithm specified.",\
+                           solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
+    
+    if hasattr(minAlgo, '__call__'):
+      # It is a callable. Just assume that it can be used
+      return minAlgo
+    
+    if isinstance(minAlgo, basestring):
+      if minAlgo == "fufnm":
+        return FuFNM(self)
+      elif minAlgo == "spfmin":
+        # scipy.optimize.fmin
+        global _scoImport
+        if not _scoImport:
+          raise(PE.PyARequiredImport("SciPy.optimize could not be imported.", \
+                                     solution=["Install SciPy (see www.scipy.org/).",
+                                               "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
+        return ScipyFMIN()
+      else:
+        raise(PE.PyAValError("Unknown string identifier for minimization algorithm: " + minAlgo))
+    
+    else:
+      raise(PE.PyAValError("Could not resolve 'minAlgo'.", \
+                           where="funcFit::OneDFit", \
+                           solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
+  
   def fit(self, x, y, yerr=None, X0=None, minAlgo=None, miniFunc=None, printTime=False, *fminPars, **fminArgs):
     """
       Carries out a fit.
@@ -1356,19 +1473,16 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           The initial guess. If not provided, it will be assumed
           that the current parameter values already contains
           the initial guess.
-      minAlgo : callable,
-          The minimization algorithm. Default is scipy.optimize.fmin;
-          other algorithms from scipy may be chosen. Alternatively,
-          any callable object taking the function to minimize as
-          the first, the vector of starting
-          values as the second, and a full_output flag as
-          arguments can be used.
+      minAlgo : callable or string, optional
+          The minimization algorithm. If not specified, scipy's 'fmin'
+          implementation will be used. If a callable is given, it
+          must adhere to funcFit's minimization algorithm model.
+          Valid strings are:
+            - 'spfmin' : scipy.optimize.fmin
+            - 'fufnm' : funcFit's implementation of the Nelder-Mead simplex algorithm.
       fminArgs : dict 
           Keywords passed to the minimization method
-          (e.g., `xtol` or `ftol` for scipy.optimize.fmin).
-      printTime: boolean, optional
-          If True, the number of seconds needed to carry out the fit
-          is printed. Default is False.     
+          (e.g., `xtol` or `ftol` for scipy.optimize.fmin).  
       fminPars :
           Non-keyword arguments passed to the  minimization method
           (e.g., fprime in scipy.optimize.fmin_ncg).
@@ -1379,6 +1493,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           be minimized. If a function is specified, that, potentially
           user defined, function will be used to calculated the
           statistics, which will be minimized.
+      printTime: boolean, optional
+          If True, the number of seconds needed to carry out the fit
+          is printed. Default is False.   
     """
     # Assign attributes and check x, y, and yerr.
     if (x is not None) and (y is not None):
@@ -1388,15 +1505,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       # unchanged.
       self._fufDS = FufDS(x, y, yerr)
     # Choose minimization algorithm
-    if minAlgo is None:
-      # If not specified use default.
-      # Check whether it is available...
-      global _scoImport
-      if not _scoImport:
-        raise(PE.PyARequiredImport("SciPy.optimize could not be imported.", solution="Install SciPy (see www.scipy.org/)."))
-      self.minAlgo = sco.fmin
-    else:
-      self.minAlgo = minAlgo
+    self.minAlgo = self._resolveMinAlgo(minAlgo, default="spfmin")
+    
     # Determine function to be minimized
     if (miniFunc is None) and (yerr is not None):
       miniFunc = "chisqr"
@@ -1407,13 +1517,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if X0 is not None:
       self.pars.setFreeParams(X0)
     # Save fminPars and fminArgs to internal variables
-    self.fminArgs = fminArgs
-    self.fminPars = fminPars
+    self.fminArgs, self.fminPars = fminArgs, fminPars
     # Carry out fit
     if printTime:
       fitStartTime = timestamp()
     self.fitResult = self.minAlgo(self.miniFunc, self.pars.getFreeParams(), *self.fminPars, \
-                             full_output=True, **self.fminArgs)
+                             **self.fminArgs)
+    # Set parameters and model to best-fit values 
     self.pars.setFreeParams(self.fitResult[0])
     self.updateModel()
     self._stepparEnabled = True
