@@ -1,6 +1,5 @@
 from __future__ import print_function 
 from PyAstronomy.pyaC import pyaErrors as PE
-from PyAstronomy import constants as PC
 import numpy as np
 
 class SMW_RHK:
@@ -110,6 +109,12 @@ class SMW_RHK:
       raise(PE.PyAValError("No such source for the conversion from arbitrary to physical units: " + str(self._afc), \
                            solution="Use either of: " + ', '.join(self._absCal.keys()) ))
     
+    from PyAstronomy.pyasl import _ic
+    if not _ic.check["quantities"]:
+      raise(PE.PyARequiredImport("The 'quantities' package is not installed, which is required to use 'SMW_RHK'.", \
+                                 where="SMW_RHK", \
+                                 solution="Install quantities (https://pypi.python.org/pypi/quantities/0.10.1)."))
+    from PyAstronomy import constants as PC
     self._pc = PC.PyAConstants()
     self._pc.setSystem("cgs")
   
