@@ -1,6 +1,6 @@
 from importCheck import ImportCheck
 
-ImportCheck(["numpy"], required=["numpy"])
+_ic = ImportCheck(["numpy", "scipy"], required=["numpy"])
 
 from sanity import *
 from nestedLoop import NestedLoop

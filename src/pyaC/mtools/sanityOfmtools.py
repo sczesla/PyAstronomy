@@ -72,3 +72,43 @@ class SanityOfmtools(unittest.TestCase):
       plt.plot(x[indi], np.polyval(y[i], x[indi]), 'b.')
       plt.plot(x[indi], der, 'r--')
 #      plt.show()
+
+  def sanity_ibtrapzExample(self):
+    """
+      mtools: Checking example of ibtrapz
+    """
+    from PyAstronomy.pyaC import mtools
+    import numpy as np
+    
+    x = np.arange(-2.,2.01,0.1)
+    y = x**3 + 1.7
+    
+    x0 = -1.375
+    x1 = +1.943
+    
+    # Analytical value of integral
+    analyt = 0.25*(x1**4 - x0**4) + 1.7*(x1-x0)
+    
+    print "Analytical value: ", analyt
+    print "ibtrapz: ", mtools.ibtrapz(x, y, x0, x1)
+
+  def sanity_ibtrapz(self):
+    """
+      mtools: Checking ibtrapz
+    """
+    from PyAstronomy.pyaC import mtools
+    import numpy as np
+    
+    x = np.arange(-2.,2.01,0.1)
+    y = 2. * x
+    
+    x0 = -1.375
+    x1 = +1.943
+    
+    # Analytical value of integral
+    analyt = x1**2 - x0**2
+
+    self.assertAlmostEqual(analyt, mtools.ibtrapz(x, y, x0, x1), delta=1e-10, msg="ibtrapz incorrect for linear function.")
+    self.assertAlmostEqual((-1.9)**2-(-2.0)**2, mtools.ibtrapz(x, y, -2.0, -2.0+0.1), delta=1e-10, msg="ibtrapz incorrect for linear function (-2,-1.9).")
+    self.assertAlmostEqual(0.0, mtools.ibtrapz(x, y, -2.0, +2.0), delta=1e-10, msg="ibtrapz incorrect for linear function (-2,+2).")
+    

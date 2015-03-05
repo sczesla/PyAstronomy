@@ -8,4 +8,5 @@ with potential application throughout PyAstronomy.
    :maxdepth: 1
    
    numericalDerivativesDoc.rst
+   integratDoc.rst
  
