@@ -117,6 +117,7 @@ packages = ['PyAstronomy', \
             'PyAstronomy.pyaC', \
             'PyAstronomy.pyaC.pyaErrors', \
             'PyAstronomy.pyaC.pyaPermanent', \
+            'PyAstronomy.pyaC.mtools', \
             'PyAstronomy.constants', \
             'PyAstronomy.pyaGui']
 

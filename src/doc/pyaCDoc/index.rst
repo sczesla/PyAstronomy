@@ -5,14 +5,23 @@ The **pyaC** package (pyaCore) is the place to collect functionality commonly re
 
 Moreover, pyaC's documentation is the place were general guide lines for PyAstronomy are formulated. 
 
-Contents:
+Functionality
+---------------
+
+.. toctree::
+   :maxdepth: 1
+   
+   pyaErrorsDoc/index.rst
+   pyaPermanentDoc/index.rst
+   mtoolsDoc/mtools.rst
+   needfulThings.rst
+
+Rules and guidelines
+----------------------
 
 .. toctree::
    :maxdepth: 1
    
    versioning.rst
-   pyaErrorsDoc/index.rst
    IDLPorting.rst
-   pyaPermanentDoc/index.rst
-   needfulThings.rst
-   
+
