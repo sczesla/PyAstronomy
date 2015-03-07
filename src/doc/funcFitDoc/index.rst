@@ -34,8 +34,8 @@ Basic models
 
     simplemodels.rst
 
-External fitters
----------------------
+Internal and external fitters
+--------------------------------
 
 .. toctree::
     :maxdepth: 2
