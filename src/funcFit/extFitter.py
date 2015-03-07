@@ -16,7 +16,15 @@ class NelderMead:
     
     is calculated. If it falls below the limit defined by the
     attribute `nmCritLim`, the iteration stops.
-   
+    
+    Parameters
+    ----------
+    abg : tuple of three floats, optional
+        Values for alpha, beta, and gamma.
+    isw : float, optional
+        Initial step width for simplex.
+    critlim : float, optional
+        Critical limit for stopping criterion.
     
     Attributes
     ----------
@@ -35,13 +43,13 @@ class NelderMead:
         
   """
   
-  def __init__(self):
+  def __init__(self, abg=(1.0, 0.5, 2.0), isw=0.05, critlim=1e-8):
     # Best guesses after NM 1965
-    self.alpha, self.beta, self.gamma = (1.0, 0.5, 2.0)
+    self.alpha, self.beta, self.gamma = abg
     # Step-width factor for initial simplex (if not specified otherwise)
-    self.initialStepWidthFac = 0.05
+    self.initialStepWidthFac = isw
     # Critical limit for the NM 1965 stopping criterion
-    self.nmCritLim = 1e-8
+    self.nmCritLim = critlim
     # Stopping criterion
     self._stopCrit = self._stopNM1965
   
