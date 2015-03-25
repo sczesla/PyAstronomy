@@ -9,7 +9,7 @@ class GaussFit1d(OneDFit):
     
     The functional form is:
     
-    .. math:: \\frac{A}{2\\pi\\sigma^2}e^{-(x-\\mu)^2/(2\\sigma^2)} + x \\times lin + off
+    .. math:: \\frac{A}{\\sqrt{2\\pi\\sigma^2}}e^{-(x-\\mu)^2/(2\\sigma^2)} + x \\times lin + off
     
     Here, `lin` and `off` denote the linear and the offset term.
     
