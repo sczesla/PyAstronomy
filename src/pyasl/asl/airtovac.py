@@ -236,6 +236,50 @@ def specAirVacConvert(wvl, flux, direction, dontUse2=False):
   return sflux, vind
   
   
+
+
+def _iocon(inp):
+  """
+    Convert input into np float array and create function to convert back.
+    
+    Parameters
+    ----------
+    inp : some numeric type
+        Input
+    
+    Returns
+    -------
+    output : float array
+        The input converted into a numpy float array
+    recovery function : callable
+        Function that converts the output back into a float
+        number unless the input was an numpy array. In the latter
+        case, it remains an array.
+  """
+  
+  try:
+    # Using ravel to avoid generating object with zero length
+    out = np.ravel(np.array(inp, dtype=np.float))
+  except Exception, e:
+    raise(PE.PyAValError("Could not convert input of type: " + str(type(inp)) + " into float array. Error: " + str(e), \
+          where="_IOCON", \
+          solution="Use an input which can be converted into a numpy float array."))
+  
+  if isinstance(inp, np.ndarray) or len(out) > 1:
+    return out, lambda x:x
+  else:
+    def recover(x):
+      try:
+        result = float(x)
+      except Exception, e:
+        raise(PE.PyAValError("Could not convert result into a float. Error: " + str(e), \
+                             where="_iocon", \
+                             solution="Use a float or numpy array as input. Are you maybe using a list?"))
+      return result
+    return out, recover
+    
+
+
   
 class RefractiveIndexAV:
   """
@@ -372,7 +416,9 @@ class RefractiveIndexAV:
       wvl : float or array
           Wavelength in air.
     """
-    return wvl/self.refractiveIndex(wvl, **kwargs)
+    wvl, rec = _iocon(wvl)
+    result = wvl/self.refractiveIndex(wvl, **kwargs)
+    return rec(result)
   
   def airtovac(self, wvl, precision=1e-12, maxiter=30, **kwargs):
     """
@@ -401,6 +447,7 @@ class RefractiveIndexAV:
           Wavelength in air.
     """
     # First guess for vacuum wavelength is wavelength in air
+    wvl, rec = _iocon(wvl)
     lvac = wvl.copy()
     counter = 0
     while True:
@@ -411,7 +458,7 @@ class RefractiveIndexAV:
       # current estimate of vacuum wavelength 
       dlair = self.vactoair(lvac) - wvl
       if np.abs(np.max(dlair)) < precision:
-        return lvac 
+        return rec(lvac) 
       if counter > maxiter:
         p = np.max(dlair)
         raise(PE.PyAValError("Maximum of iterations reached. Current precision is " + str(p) + " A.", \
@@ -420,7 +467,7 @@ class RefractiveIndexAV:
                                        "Try to use subrange of wavelengths", \
                                        "Try to adapt 'precision' to necessary value"]))
       
-    return lvac
+    return rec(lvac)
   
   def __init__(self, mode="ciddor"):
     
