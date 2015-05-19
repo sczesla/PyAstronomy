@@ -1,6 +1,6 @@
 import numpy
 from numpy import pi, abs, sqrt, cos, sin, arccos, arctan, tan
-
+from PyAstronomy.pyaC import pyaErrors as PE
 
 class MarkleyKESolver:
   """
@@ -237,7 +237,7 @@ class KeplerEllipse(object):
     i : float
         Orbit inclination [deg].
     w : float
-        Longitude of perihelion [deg]
+        Argument of periapsis [deg]
     Omega : float
         Longitude of the ascending node [deg]
     e : float
@@ -247,7 +247,7 @@ class KeplerEllipse(object):
     per : float
         Orbital period
     tau : float
-        Time of perihelion passage
+        Time of periapsis passage
     ks : Class object
         Solver for Kepler's equation
     _n : float
@@ -474,6 +474,64 @@ class KeplerEllipse(object):
     ae = self.a * self.e
     return (center + ae*direc, center - ae*direc)
     
+  def xyzNodes_LOSZ(self, los="+z"):
+    """
+      Calculate the nodes of the orbit for LOS in +/-z direction.
+      
+      The nodes of the orbit are the points at which
+      the orbit cuts the plane of the sky. In this case,
+      these are the points at which the z-coordinate
+      vanishes, i.e., the x-y plane is regarded the plane
+      of the sky.
+      
+      Parameters
+      ----------
+      los : string, {+z,-z}, optional
+          Line of sight points either in +z direction (observer
+          at -z) or vice versa. Changing the direction
+          interchanges the ascending and descending node.
+      
+      Returns
+      -------
+      Nodes : Tuple of two coordinate arrays
+          Returns the xyz coordinates of both nodes. The first is the
+          ascending node and the second is the descending node.
+    """
+    # f = -w (z-component vanishes there)
+    E = arctan( tan(-self._w/2.0) * sqrt((1.-self.e)/(1.+self.e)) ) * 2.
+    M = E - self.e * sin(E)
+    t = M/self._n + self.tau
+    node1 = self.xyzPos(t)
+    # Velocity is used to distinguish nodes
+    v1 = self.xyzVel(t)
+    # f = -w + pi
+    E = arctan( tan((-self._w + pi)/2.0) * sqrt((1.-self.e)/(1.+self.e)) ) * 2.
+    M = E - self.e * sin(E)
+    t = M/self._n + self.tau
+    node2 = self.xyzPos(t)
+    # Find the ascending and descending node
+    from PyAstronomy.pyasl import LineOfSight
+    l = LineOfSight(los).los
+    if abs(l[2]) != 1.0:
+      raise(PE.PyAValError("Invalid line of sight (LOS): " + str(los), \
+                           where="xyzNodes_LOSZ", \
+                           solution="Use '-z' or '+z'."))
+
+    if l[2] == 1.0:
+      # Looking in +z direction
+      if v1[2] > 0.0:
+        # First node is ascending
+        return (node1, node2)
+      else:
+        return (node2, node1)
+    else:
+      # Looking in -z direction
+      if v1[2] < 0.0:
+        # First node is ascending
+        return (node1, node2)
+      else:
+        return (node2, node1)
+    
   def xyzNodes(self):
     """
       Calculate the nodes of the orbit.
@@ -489,17 +547,9 @@ class KeplerEllipse(object):
       Nodes : Tuple of two coordinate arrays
           Returns the xyz coordinates of both nodes. 
     """
-    # f = -w
-    E = arctan( tan(-self._w/2.0) * sqrt((1.-self.e)/(1.+self.e)) ) * 2.
-    M = E - self.e * sin(E)
-    t = M/self._n + self.tau
-    node1 = self.xyzPos(t)
-    # f = -w + pi
-    E = arctan( tan((-self._w + pi)/2.0) * sqrt((1.-self.e)/(1.+self.e)) ) * 2.
-    M = E - self.e * sin(E)
-    t = M/self._n + self.tau
-    node2 = self.xyzPos(t)
-    return (node1, node2)
+    raise(PE.PyADeprecationError("xyzNodes is deprecated.", \
+                                 solution="Please use 'xyzNodes_LOSZ' instead."))
+
   
   def projPlaStDist(self, t):
     """

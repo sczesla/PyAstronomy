@@ -169,6 +169,49 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
       pos1 = ke.xyzPos(time[i])
       self.assertEqual( numpy.sum(numpy.abs((pos[i,::]-pos1))), 0.0)
   
+  def sanity_keplerOrbitNodes(self):
+    """
+      Checking node position of Kepler ellipse.
+    """
+    import numpy as np
+    ke = KeplerEllipse(1 ,1, e=0.0, i=90.0, Omega=0., w=0.0, tau=0.0)
+  
+    n1 = ke.xyzNodes_LOSZ(los='+z')
+    self.assertAlmostEqual(max(np.abs(n1[0] - np.array([1.0,0.0,0.0]))), 0.0, delta=1e-15, \
+                           msg="Location of ascending node does not match.")
+    self.assertAlmostEqual(max(np.abs(n1[1] - np.array([-1.0,0.0,0.0]))), 0.0, delta=1e-15, \
+                           msg="Location of descending node does not match.")
+    
+    n2 = ke.xyzNodes_LOSZ(los='-z')
+    for i in range(2):
+      md = np.max(np.abs(n1[i] - n2[(i+1)%2]))
+      self.assertAlmostEqual(md, 0.0, delta=1e-15, msg="Nodes are not exchanged when LOS is reversed.")
+    
+    # None of this should have an impact on the node
+    for w in xrange(0, 360, 80):
+      for tau in xrange(0, 100, 25):
+        for i in xrange(5, 85, 20):
+          ke2 = KeplerEllipse(1 , 1, e=0.0, i=i, Omega=0., w=w, tau=tau)
+          n3 = ke2.xyzNodes_LOSZ(los='+z')
+          for j in xrange(2):
+            md = np.max(np.abs(n1[j]-n3[j]))
+            self.assertAlmostEqual(md, 0.0, delta=1e-12, \
+                                   msg="Unexpected impact on position of node.")
+    
+    # Check node rotation
+    ke3 = KeplerEllipse(1 , 1, e=0.0, i=90., Omega=90., w=0.0, tau=0.0)
+    n4 = ke3.xyzNodes_LOSZ(los='+z')
+    self.assertAlmostEqual(np.max(np.abs(n4[0] - np.array([0.,1.,0.]))), 0.0, delta=1e-12, \
+                           msg="Wrong ascending node for Omega = 90")
+    ke3 = KeplerEllipse(1 , 1, e=0.0, i=90., Omega=180., w=0.0, tau=0.0)
+    n4 = ke3.xyzNodes_LOSZ(los='+z')
+    self.assertAlmostEqual(np.max(np.abs(n4[0] - np.array([-1.,0.,0.]))), 0.0, delta=1e-12, \
+                           msg="Wrong ascending node for Omega = 180")
+    ke3 = KeplerEllipse(1 , 1, e=0.0, i=90., Omega=270., w=0.0, tau=0.0)
+    n4 = ke3.xyzNodes_LOSZ(los='+z')
+    self.assertAlmostEqual(np.max(np.abs(n4[0] - np.array([0.,-1.,0.]))), 0.0, delta=1e-12, \
+                           msg="Wrong ascending node for Omega = 270") 
+  
   def sanity_MarkleyKESolver_precision(self):
     """
       Checking precision of Markley solver for Kepler's equation.
