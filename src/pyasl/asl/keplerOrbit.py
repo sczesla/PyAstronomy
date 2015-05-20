@@ -163,7 +163,7 @@ class KeplerEllipse(object):
     The definitions and most of the formulae used in this class
     derive from the book "Orbital Motion" by A.E. Roy.
     
-    Orientation of the ellipse in the coordinate system:
+    :Orientation of the ellipse in the coordinate system:
         For zero inclination the ellipse is located in the x-y plane.
         If the eccentricity is increased, the periastron will lie
         in +x direction. If the inclination is increased, the ellipse
@@ -174,6 +174,12 @@ class KeplerEllipse(object):
         not change the plane of the orbit, but rather represent a
         rotation of the orbit in the plane. In particular, the
         periapsis is shifted in the direction of motion.
+        
+    :Orbital angular momentum:
+        For all parameters set to zero, the (orbital) angular momentum
+        points into the +z direction. For an inclination of 90 deg (the
+        remaining parameters remaining zero), it points in the -y
+        direction.
     
     :Orientation of the ellipse on the sky:
         To project the ellipse on the sky, the coordinate system
@@ -550,6 +556,26 @@ class KeplerEllipse(object):
     raise(PE.PyADeprecationError("xyzNodes is deprecated.", \
                                  solution="Please use 'xyzNodes_LOSZ' instead."))
 
+  def orbAngMomentum(self, t=0.0):
+    """
+      The specific orbital angular momentum of a body in the current orbit.
+      
+      Parameters
+      ----------
+      t : float, optional
+          The time used to calculate the angular momentum. As
+          is it constant for a Kepler orbit, this parameter is
+          of no relevance.
+      
+      Results
+      -------
+      Specific angular momentum : array with three elements
+          The specific angular momentum (i.e., per unit mass)
+          of a body on the current orbit.
+    """
+    r = self.xyzPos(t)
+    v = self.xyzVel(t)
+    return numpy.cross(r, v)
   
   def projPlaStDist(self, t):
     """

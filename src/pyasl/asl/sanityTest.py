@@ -169,6 +169,31 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
       pos1 = ke.xyzPos(time[i])
       self.assertEqual( numpy.sum(numpy.abs((pos[i,::]-pos1))), 0.0)
   
+  def sanity_keplerAngMom(self):
+    """
+      Checking Kepler orbit: Angular momentum
+    """
+    import numpy as np
+    ke = KeplerEllipse(1 , 2.0*np.pi, e=0.0, i=90.0, Omega=0., w=0.0, tau=0.0)
+    am1 = ke.orbAngMomentum()
+    am2 = ke.orbAngMomentum(t=101.7)
+    d = np.max(np.abs(am1 - am2))
+    self.assertAlmostEqual(d, 0.0, delta=1e-12, msg="Angular momentum is not constant in time")
+    
+    d = np.max(np.abs(am1 - np.array([0,-1,0])))
+    self.assertAlmostEqual(d, 0.0, delta=1e-12, msg="Angular momentum wrong for i=90 deg")
+    
+    ke = KeplerEllipse(1 , 2.0*np.pi, e=0.0, i=0.0, Omega=0., w=0.0, tau=0.0)
+    am1 = ke.orbAngMomentum()
+    d = np.max(np.abs(am1 - np.array([0,0,1])))
+    self.assertAlmostEqual(d, 0.0, delta=1e-12, msg="Angular momentum wrong for i=0 deg")
+    
+    for w in [10.0, 87.0, 277.8]:
+      ke = KeplerEllipse(1 , 2.0*np.pi, e=0.0, i=0.0, Omega=0., w=w, tau=0.0)
+      ame = ke.orbAngMomentum()
+      d = np.max(np.abs(ame - am1))
+      self.assertAlmostEqual(d, 0.0, delta=1e-12, msg="Angular momentum changes with argument of periapsis")
+  
   def sanity_keplerOrbitNodes(self):
     """
       Checking node position of Kepler ellipse.
