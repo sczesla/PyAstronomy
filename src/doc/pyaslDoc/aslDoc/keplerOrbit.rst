@@ -8,8 +8,63 @@ is not trivial. The major
 complication is solving Kepler's Equation. The
 classes defined here do this job.
 
-We first give examples demonstrating the
-usage of the classes. The API described below.
+The definitions and most of the formulae used in this class
+derive from the book "Orbital Motion" by A.E. Roy.
+
+Orbital elements and orientation of the orbit
+----------------------------------------------------
+
+:Orientation of the ellipse in the coordinate system:
+    For zero inclination the ellipse is located in the x-y plane.
+    If the eccentricity is increased, the periastron will lie
+    in +x direction. If the inclination is increased, the ellipse
+    will be rotating around the x-axis, so that +y is rotated
+    toward +z. An increase in Omega corresponds to a rotation
+    around the z-axis so that +x is rotated toward +y.
+    Changing `w`, i.e., the argument of the periastron, will
+    not change the plane of the orbit, but rather represent a
+    rotation of the orbit in the plane. In particular, the
+    periapsis is shifted in the direction of motion.
+    
+:Orbital angular momentum:
+    For all parameters but semi-major axis and orbital period set to zero,
+    the (orbital) angular momentum points into the +z direction. For an
+    inclination of 90 deg (the remaining parameters remaining zero),
+    it points in the -y direction.
+
+:Orientation of the ellipse in the sky:
+    To project the ellipse onto the sky, the coordinate system
+    should be oriented so that the +x direction points North and
+    the +y direction points East (direction of increasing right
+    ascension). The +z axis must be chosen so that the coordinate
+    system becomes right handed. If the line of sight (LOS) points
+    in the +z direction, i.e., the observer is located on the
+    negative z axis, the parameters assume their conventional
+    meaning.
+
+:The ascending and descending nodes:
+    For systems outside the Solar System, the ascending node is the
+    point where the body "crosses" the plane of the sky away from the
+    observer. Likewise, the descending node is the point where the
+    plane is crossed with the body approaching the observer. For the
+    coordinate system described above and a value of zero for the longitude
+    of the ascending node, the latter is in the North and rotates
+    toward East (i.e., +y) when the longitude of the ascending node
+    is increased.  
+    
+:The argument and longitude of periapsis:
+    The argument of periapsis is the angle between the ascending node
+    and the periapsis of the body measured in the direction of motion.
+    For exoplanets with circular orbits, for which no well-defined periapsis
+    exists, the argument of periapsis is often chosen so that time
+    of periapsis and central transit time coincide. For the planet, this
+    is the case if the argument of periapsis is -90 deg. However, in the exoplanet
+    literature, the argument of periapsis often refers to the *stellar* orbit
+    (see, e.g., Pollacco et al. 2008, MNRAS 385, 1576-1584, Sect. 3.2.1). In
+    this case, the corresponding value is +90 deg.
+    The so-called longitude of the periapsis is given by the sum of the
+    longitude of the ascending node and the argument of periapsis.
+
 
 Example: Invoking the solver for Kepler's Equation
 ---------------------------------------------------
