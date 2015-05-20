@@ -39,18 +39,19 @@ Here we show how the orbit can be calculated.
 
 ::
 
-  import numpy
+  import numpy as np
   from PyAstronomy import pyasl
   import matplotlib.pylab as plt
   
   # Instantiate a Keplerian elliptical orbit with
   # semi-major axis of 1.3 length units,
-  # period of 2 time units, eccentricity of 0.5, and
-  # longitude of ascending node of 70 degrees.
-  ke = pyasl.KeplerEllipse(1.3, 2., e=0.5, Omega=70.)
+  # a period of 2 time units, eccentricity of 0.5,
+  # longitude of ascending node of 70 degrees, an inclination
+  # of 10 deg, and a periapsis argument of 110 deg.
+  ke = pyasl.KeplerEllipse(1.3, 2., e=0.5, Omega=70., i=10.0, w=110.0)
   
   # Get a time axis
-  t = numpy.linspace(0, 6.5, 200)
+  t = np.linspace(0, 1.9, 200)
   
   # Calculate the orbit position at the given points
   # in a Cartesian coordinate system.
@@ -63,13 +64,31 @@ Here we show how the orbit can be calculated.
   # Calculate orbit radius as a function of the
   radius = ke.radius(t)
   
+  # Calculate velocity on orbit
+  vel = ke.xyzVel(t)
+  
+  # Find the nodes of the orbit (Observer at -z)
+  ascn, descn = ke.xyzNodes_LOSZ()
+  
   # Plot x and y coordinates of the orbit
   plt.subplot(2,1,1)
-  plt.plot(pos[::,0], pos[::,1], 'bp')
-  # Plot orbit radius as a function of time
+  plt.title("Periapsis (red diamond), Asc. node (green circle), desc. node (red circle)")
+  plt.xlabel("East ->")
+  plt.ylabel("North ->")
+  plt.plot([0], [0], 'k+', markersize=9)
+  plt.plot(pos[::,1], pos[::,0], 'bp')
+  # Point of periapsis
+  plt.plot([pos[0,1]], [pos[0,0]], 'rd')
+  # Nodes of the orbit
+  plt.plot([ascn[1]], [ascn[0]], 'go', markersize=10)
+  plt.plot([descn[1]], [descn[0]], 'ro', markersize=10)
+  # Plot RV
   plt.subplot(2,1,2)
-  plt.plot(t, radius, 'bp')
+  plt.xlabel("Time")
+  plt.ylabel("Radial velocity [length/time]")
+  plt.plot(t, vel[::,2], 'r.-')
   plt.show()
+
 
 Module API
 ---------------
