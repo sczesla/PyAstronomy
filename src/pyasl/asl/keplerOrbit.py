@@ -176,13 +176,13 @@ class KeplerEllipse(object):
         periapsis is shifted in the direction of motion.
         
     :Orbital angular momentum:
-        For all parameters set to zero, the (orbital) angular momentum
-        points into the +z direction. For an inclination of 90 deg (the
-        remaining parameters remaining zero), it points in the -y
-        direction.
+        For all parameters but semi-major axis and orbital period set to zero,
+        the (orbital) angular momentum points into the +z direction. For an
+        inclination of 90 deg (the remaining parameters remaining zero),
+        it points in the -y direction.
     
-    :Orientation of the ellipse on the sky:
-        To project the ellipse on the sky, the coordinate system
+    :Orientation of the ellipse in the sky:
+        To project the ellipse onto the sky, the coordinate system
         should be oriented so that the +x direction points North and
         the +y direction points East (direction of increasing right
         ascension). The +z axis must be chosen so that the coordinate
@@ -198,7 +198,7 @@ class KeplerEllipse(object):
         plane is crossed with the body approaching the observer. For the
         coordinate system described above and a value of zero for the longitude
         of the ascending node, the latter is in the North and rotates
-        toward East (i.e., +y) when the longitude of the as ascending node
+        toward East (i.e., +y) when the longitude of the ascending node
         is increased.  
         
     :The argument and longitude of periapsis:
@@ -208,7 +208,7 @@ class KeplerEllipse(object):
         exists, the argument of periapsis is often chosen so that time
         of periapsis and central transit time coincide. For the planet, this
         is the case if the argument of periapsis is -90 deg. However, in the exoplanet
-        literature, the argument of periapsis, however, often refers to the *stellar* orbit
+        literature, the argument of periapsis often refers to the *stellar* orbit
         (see, e.g., Pollacco et al. 2008, MNRAS 385, 1576-1584, Sect. 3.2.1). In
         this case, the corresponding value is +90 deg.
         The so-called longitude of the periapsis is given by the sum of the
