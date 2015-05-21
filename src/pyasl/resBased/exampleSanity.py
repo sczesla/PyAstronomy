@@ -166,3 +166,5 @@ class SanityOfFIP(unittest.TestCase):
     
     self.assertAlmostEqual(25e-6, fip.getFIP(53)[1], 6, msg="FIP for iodine does not match (an).")
     self.assertAlmostEqual(25e-6, fip.getFIP("I")[1], 6, msg="FIP for iodine does not match (sym).")
+    
+    
