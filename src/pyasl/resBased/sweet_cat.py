@@ -1,5 +1,5 @@
 from PyAstronomy.pyaC import pyaPermanent as pp
-from PyAstronomy.pyaC import pyaErrors as PE 
+from PyAstronomy.pyaC import pyaErrors as PE
 import os
 import urllib
 import gzip
@@ -10,22 +10,55 @@ import ssl
 class SWEETCat(pp.PyAUpdateCycle):
   """
     Access the SWEET-Cat catalog.
-    
+
     The SWEET-Cat catalog provides parameters for planet host stars.
-    
-    TBD
-    
+
+    The following data are provided
+
+    ===========   ===================================  ======
+    Column        Description                          Unit
+    -----------   -----------------------------------  ------
+    star          Name of the star
+    hd            The HD number (if available)
+    ra            The right ascension                   hms
+    dec           The declination                       dms
+    vmag          V magnitude                           mag
+    ervmag        Error on V magnitude                  mag
+    par           Parallax                              mas
+    erpar         Error on parallax                     mas
+    parsource     If par is from Simbad or calculated
+    teff          Effective temperature                 K
+    erteff        Error on effective temperature        K
+    logg          Surface gravity                       cgs
+    erlogg        Error on surface gravity              cgs
+    logglc        Surface gravity from LC               cgs
+    erlogglc      Error on surface gravity from LC      cgs
+    vt            Micro turbulence                      km/s
+    ervt          Error on micro turbulence             km/s
+    metal         Metallicity ([Fe/H])
+    ermetal       Error on metallicity
+    mass          Mass calculated from Torres et al.    Solar
+    ermass        Error on calculated mass              Solar
+    author        Author of source
+    link          Link to paper in ADS
+    source        1 means CAUP's method. 0 otherwise
+    update        When the parameters were updated
+    comment1      Special comment
+    comment2      Blank
+
+
     Detailed information can be found here:
     https://www.astro.up.pt/resources/sweet-cat/
     and in the associated publications.
-    
+
     Attributes
     ----------
-    df : pandas data frame
+    data : pandas data frame
         The catalog data
-    
+
   """
-  
+
+
   def _downloadData(self):
     """
       Download SWEETCAT and write it to file
@@ -37,7 +70,8 @@ class SWEETCat(pp.PyAUpdateCycle):
     urllib.urlretrieve(url, dfn, context=context)
     d = self._fs.requestFile(dfn, 'r').readlines()
     self._fs.requestFile(dfn, 'w', gzip.open).writelines(d)
- 
+
+
   def _read_sweetcat(self):
     """
       Read SWEETCat into a pandas DataFrame
@@ -48,10 +82,11 @@ class SWEETCat(pp.PyAUpdateCycle):
     else:
       import pandas as pd
     ffn = self._fs.requestFile(self.dataFileName, 'r', gzip.open)
-    self.df = pd.read_csv(ffn, sep='\t', names=self.names, na_values=['~'])
+    self.data = pd.read_csv(ffn, sep='\t', names=self.names, na_values=['~'])
     # Adding luminosity to the DataFrame
-    self.df['lum'] = (self.df.teff/5777)**4 * self.df.mass 
-  
+    # self.data['lum'] = (self.data.teff/5777)**4 * self.data.mass
+
+
   def __init__(self, skipUpdate=False):
     self.dataFileName = os.path.join("pyasl", "resBased", "sweetcat.csv.gz")
     configFilename = os.path.join("pyasl", "resBased", "sweetcat.cfg")
@@ -61,7 +96,6 @@ class SWEETCat(pp.PyAUpdateCycle):
              'parsource', 'teff', 'erteff', 'logg', 'erlogg', 'logglc',
              'erlogglc', 'vt', 'ervt', 'metal', 'ermetal', 'mass', 'ermass',
              'author', 'link', 'source', 'update', 'comment1', 'comment2']
-                    
 
     # Check whether data file exists
     self._fs = pp.PyAFS()
@@ -75,9 +109,9 @@ class SWEETCat(pp.PyAUpdateCycle):
       print "You can use the `changeDownloadCycle` to change this behavior."
     self._read_sweetcat()
 
+
   def downloadData(self):
     """
       Trigger download of data.
     """
     self._update(self._downloadData)
-
