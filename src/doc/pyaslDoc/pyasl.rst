@@ -121,6 +121,7 @@ Resource based helpers
    resBasedDoc/nasaExoplanetArchive.rst
    resBasedDoc/exoplanetEU.rst
    resBasedDoc/exoplanetsOrg.rst
+   resBasedDoc/sweet_cat.rst
    resBasedDoc/kuruczModels.rst
    resBasedDoc/fip.rst
    
