@@ -45,6 +45,7 @@ class SWEETCat(pp.PyAUpdateCycle):
     update        When the parameters were updated
     comment1      Special comment
     comment2      Blank
+    ===========   ===================================  ======
 
 
     Detailed information can be found here:
