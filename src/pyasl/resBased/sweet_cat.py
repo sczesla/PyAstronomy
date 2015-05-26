@@ -66,9 +66,16 @@ class SWEETCat(pp.PyAUpdateCycle):
     """
     url = 'https://www.astro.up.pt/resources/sweet-cat/download.php'
     dfn = self._fs.composeFilename(self.dataFileName)
-    # The next two lines by-pass certificate verification
-    context = ssl._create_unverified_context()
-    urllib.urlretrieve(url, dfn, context=context)
+    try:
+      # The next two lines by-pass certificate verification
+      context = ssl._create_unverified_context()
+      urllib.urlretrieve(url, dfn, context=context)
+    except AttributeError:
+      # Python version does not support ssl._create_unverified_context()
+      urllib.urlretrieve(url, dfn)
+    except Exception, e:
+      # "Handle" unexpected error
+      raise(PE.PyANetworkError("Could not download SWEET-Cat data. The following error was raisded: " + str(e)))
     d = self._fs.requestFile(dfn, 'r').readlines()
     self._fs.requestFile(dfn, 'w', gzip.open).writelines(d)
 
