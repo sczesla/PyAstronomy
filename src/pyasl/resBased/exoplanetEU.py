@@ -17,40 +17,40 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     
     The available columns are:
     
-    ============  ==============================  =====
-     Column Name                     Description   Unit
+    ============  ==============================  ======
+     Column Name                     Description    Unit
 
           plName                  Name of planet       
-          plMass                  Mass of planet     MJ
-        plRadius                Radius of planet     RJ
-          period                  Orbital period      d
-             sma                 Semi-major axis     AU
+          plMass                  Mass of planet      MJ
+        plRadius                Radius of planet      RJ
+          period                  Orbital period       d
+             sma                 Semi-major axis      AU
     eccentricity            Orbital eccentricity       
-     inclination             Orbital inclination    deg
-     angDistance                Angular Distance arcsec
+     inclination             Orbital inclination     deg
+     angDistance                Angular Distance  arcsec
        pubStatus              Publication status       
-      discovered               Year of discovery     yr
+      discovered               Year of discovery      yr
          updated             Date of data update       
-           omega          Argument of Periastron    deg
-           tperi             Epoch of Periastron      d
+           omega          Argument of Periastron     deg
+           tperi             Epoch of Periastron       d
          detType                  Detection type       
        molecules      List of detected molecules       
           stName                    Name of star       
-              ra         Right ascension (J2000)    hms
-             dec             Declination (J2000)    dms
-           mag_v      V magnitude of a host star    mag
-           mag_i      I magnitude of a host star    mag
-           mag_j      J magnitude of a host star    mag
-           mag_h      H magnitude of a host star    mag
-           mag_k      K magnitude of a host star    mag
-            dist           Distance to host star     pc
-              mh        Metallicity of host star    dex
-          stMass                    Stellar mass  solar
-        stRadius                  Radius of star  solar
+              ra         Right ascension (J2000)     hms
+             dec             Declination (J2000)     dms
+           mag_v      V magnitude of a host star     mag
+           mag_i      I magnitude of a host star     mag
+           mag_j      J magnitude of a host star     mag
+           mag_h      H magnitude of a host star     mag
+           mag_k      K magnitude of a host star     mag
+            dist           Distance to host star      pc
+              mh        Metallicity of host star     dex
+          stMass                    Stellar mass   solar
+        stRadius                  Radius of star   solar
              SpT      Spectral type of host star       
-           stAge                     Stellar age     Ga
-          stTeff   Stellar effective temperature      K
-    ============  ==============================  =====
+           stAge                     Stellar age      Ga
+          stTeff   Stellar effective temperature       K
+    ============  ==============================  ======
     
     Parameters
     ----------
@@ -82,6 +82,7 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     # and initialize array
     dtype = map(lambda x: (self._columns[x][0], self._columns[x][3]), range(len(self._columns)))
     self.data = np.recarray((nplanets+1,), dtype=dtype)
+    colnotfilled = map(lambda x:self._columns[x][0], self._columns.keys())
     for i, x in enumerate(r):
       for k, v in x.iteritems():
         # Remove hash and white spaces from column names
@@ -97,7 +98,16 @@ class ExoplanetEU(pp.PyAUpdateCycle):
         # Accept only expected fields 
         if not key in self.data.dtype.names:
           continue
+        try:
+          colnotfilled.remove(key)
+        except ValueError:
+          # Ignoring already removed value
+          pass
         self.data[key][i] = v
+    if len(colnotfilled) > 0:
+      PE.warn(PE.PyAAlgorithmFailure("Not all columns could be filled with data. The following columns must not be used: " + ", ".join(colnotfilled), \
+                                     where="ExoplanetEU", \
+                                     solution="The format of the data base must be checked. Please consider issuing a bug report via github."))
 
   def availableColumns(self):
     """
@@ -189,6 +199,6 @@ class ExoplanetEU(pp.PyAUpdateCycle):
                    "mag_i":"mag_i", "mag_j":"mag_j", "mag_h":"mag_h", \
                    "mag_k":"mag_k", "star_distance":"dist", "star_metallicity":"mh", \
                    "star_mass":"stMass", "star_radius":"stRadius", "star_sp_type":"SpT", \
-                   "star_age":"stAge", "star_teff":"stTeff"}
+                   "star_age":"stAge", "star_teff":"stTeff", "orbital_period":"period"}
     
     self._readData()
