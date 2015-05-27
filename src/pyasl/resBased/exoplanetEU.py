@@ -3,39 +3,40 @@ from PyAstronomy.pyaC import pyaErrors as PE
 import os
 import urllib2
 import gzip
-import csv
 import numpy as np
+import pandas as pd
+
 
 class ExoplanetEU(pp.PyAUpdateCycle):
   """
     Provides access to exoplanet.eu data base.
-    
+
     This class downloads the data base as a csv
     file and converts it into a numpy recarray.
     By default, the data are re-downloaded
     every 7 days.
-    
+
     The available columns are:
-    
+
     ============  ==============================  =====
      Column Name                     Description   Unit
 
-          plName                  Name of planet       
+          plName                  Name of planet
           plMass                  Mass of planet     MJ
         plRadius                Radius of planet     RJ
           period                  Orbital period      d
              sma                 Semi-major axis     AU
-    eccentricity            Orbital eccentricity       
+    eccentricity            Orbital eccentricity
      inclination             Orbital inclination    deg
      angDistance                Angular Distance arcsec
-       pubStatus              Publication status       
+       pubStatus              Publication status
       discovered               Year of discovery     yr
-         updated             Date of data update       
+         updated             Date of data update
            omega          Argument of Periastron    deg
            tperi             Epoch of Periastron      d
-         detType                  Detection type       
-       molecules      List of detected molecules       
-          stName                    Name of star       
+         detType                  Detection type
+       molecules      List of detected molecules
+          stName                    Name of star
               ra         Right ascension (J2000)    hms
              dec             Declination (J2000)    dms
            mag_v      V magnitude of a host star    mag
@@ -47,20 +48,20 @@ class ExoplanetEU(pp.PyAUpdateCycle):
               mh        Metallicity of host star    dex
           stMass                    Stellar mass  solar
         stRadius                  Radius of star  solar
-             SpT      Spectral type of host star       
+             SpT      Spectral type of host star
            stAge                     Stellar age     Ga
           stTeff   Stellar effective temperature      K
     ============  ==============================  =====
-    
+
     Parameters
     ----------
     skipUpdate : boolean, optional
         If True, no re-download of the data
         will be initiated no matter how old
         they are.
-    
+
   """
-  
+
   def _download(self):
     """
       Download data.
@@ -68,41 +69,29 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     response = urllib2.urlopen("http://exoplanet.eu/catalog/csv")
     data = response.read()
     self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
-  
+
   def _readData(self):
     """
     """
-    # Determine number of planets in the csv file
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
-    for nplanets, x in enumerate(r):
-      pass
-    # Reinitialize csv file
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
-    # Determine data types for numpy recarray from columns
-    # and initialize array
-    dtype = map(lambda x: (self._columns[x][0], self._columns[x][3]), range(len(self._columns)))
-    self.data = np.recarray((nplanets+1,), dtype=dtype)
-    for i, x in enumerate(r):
-      for k, v in x.iteritems():
-        # Remove hash and white spaces from column names
-        k = k.strip('#')
-        k = k.strip()
-        # Translate csv column name into internal column name
-        if k in self._ident:
-          key = self._ident[k]
-        else:
-          key = k
-        if len(v) == 0:
-          v = None
-        # Accept only expected fields 
-        if not key in self.data.dtype.names:
-          continue
-        self.data[key][i] = v
+    # Read the data structure into a pandas DataFrame
+    self.data = pd.read_csv(self._fs.requestFile(self.dataFileName, 'r', gzip.open))
+    # Remove # from the keys, and trailing whitespaces
+    for key in self.data.keys():
+        if '#' in key:
+            self.data.rename(columns={key: key.replace('#', '')}, inplace=True)
+            key = key.replace('#', '')
+        if ' ' in key:
+            # Replace whitespaces inside names with underscore, otherwise strip it
+            if not key.startswith(' ') or not key.endswith(' '):
+                self.data.rename(columns={key: key.replace(' ', '_')}, inplace=True)
+            else:
+                self.data.rename(columns={key: key.strip(' ')}, inplace=True)
+
 
   def availableColumns(self):
     """
       Show a summary of the available columns.
-      
+
       Returns
       -------
       Column names : list of strings
@@ -117,12 +106,12 @@ class ExoplanetEU(pp.PyAUpdateCycle):
       cols.append(v[0])
     print "-"*51
     return cols
-    
-  
+
+
   def getAllData(self):
     """
       Provides all data as a numpy recarray.
-      
+
       Returns
       -------
       Data : numpy recarray
@@ -136,12 +125,12 @@ class ExoplanetEU(pp.PyAUpdateCycle):
   def forceUpdate(self):
     """
       Force a fresh download of the data.
-      
+
       By default, the data will be updated every
-      7 days. 
+      7 days.
     """
     self._update(self._download)
-  
+
   def __init__(self, skipUpdate=False):
     configFilename = os.path.join("pyasl", "resBased", "epeu.cfg")
     pp.PyAUpdateCycle.__init__(self, configFilename, "ExoUpdate")
@@ -190,5 +179,5 @@ class ExoplanetEU(pp.PyAUpdateCycle):
                    "mag_k":"mag_k", "star_distance":"dist", "star_metallicity":"mh", \
                    "star_mass":"stMass", "star_radius":"stRadius", "star_sp_type":"SpT", \
                    "star_age":"stAge", "star_teff":"stTeff"}
-    
+
     self._readData()
