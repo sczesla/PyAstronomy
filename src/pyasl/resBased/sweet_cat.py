@@ -123,3 +123,4 @@ class SWEETCat(pp.PyAUpdateCycle):
       Trigger download of data.
     """
     self._update(self._downloadData)
+    self._read_sweetcat()
