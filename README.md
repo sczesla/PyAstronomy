@@ -42,8 +42,8 @@ Documentation and further information
   Docs](https://pyastronomy.readthedocs.org/en/latest/)
 
   Visit the documentation of the latest release:
-
-    http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/index.html
+  
+  http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/index.html
 
 Licensing
 ---------
