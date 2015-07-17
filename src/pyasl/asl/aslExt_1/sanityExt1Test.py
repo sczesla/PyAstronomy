@@ -237,3 +237,39 @@ class SanityOfPyaslExt1(unittest.TestCase):
     # Approximate chromospheric age of the Sun
     print "Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95))
   
+  def sanity_abundancepatternsExample(self):
+    """
+      Checking example of AbundancePatterns
+    """
+    from PyAstronomy import pyasl
+
+    ap = pyasl.AbundancePatterns()
+
+    print "Names of the available abundance patterns:"
+    print ap.availablePatterns()
+
+    print
+    print "Get the Asplund et al. pattern (aspl) as a dictionary using"
+    print "atomic number as a key:"
+    print ap.pattern("aspl", form="dict", key="number")
+
+    print
+    print "Get (relative) number abundance of oxygen using elemental symbol:"
+    print ap.abundance("O", pat="wilm")
+    print "or atomic number"
+    print ap.abundance(8, pat="wilm")
+  
+  def sanity_abundancePatterns(self):
+    """
+      Checking abundance pattern
+    """
+    from PyAstronomy import pyasl
+
+    ap = pyasl.AbundancePatterns()
+    
+    self.assertAlmostEqual(2.82e-07, ap.abundance("P", pat="feld"), delta=1e-12, \
+                           msg="Abundance of P (feld) incorrect.")
+    p = ap.pattern("wilm", form="dict", key="symbol")
+    self.assertAlmostEqual(p["Ti"], 6.46e-08, delta=1e-12, \
+                           msg="Ti abundance broken (wilm)")
+    
