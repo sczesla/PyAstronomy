@@ -137,22 +137,24 @@ class FFModelPlotFit:
         else:
             self.fitLims = lims
             self.fitIdx = numpy.where(numpy.logical_and(self.x >= self.fitLims[0], self.x <= self.fitLims[1]))[0]
-	    if verbose>1:
-	      print "fit index: ",self.fitIdx
-	      print "         x ",self.x[self.fitIdx]
-	      print "         y ", self.y[self.fitIdx]
-	      if self.yerr: print "    yerr ",self.yerr[self.fitIdx]
-	      print "     model ",odf.evaluate(self.x[self.fitIdx])
-            if self.yerr  is not None:
-	       odf.fit(self.x[self.fitIdx], self.y[self.fitIdx], yerr=self.yerr[self.fitIdx])
-	    else:
-	       odf.fit(self.x[self.fitIdx], self.y[self.fitIdx])
+            if verbose > 1:
+              print "fit index: ",self.fitIdx
+              print "         x ",self.x[self.fitIdx]
+              print "         y ", self.y[self.fitIdx]
+              if self.yerr: print "    yerr ",self.yerr[self.fitIdx]
+              print "     model ",odf.evaluate(self.x[self.fitIdx])
+            if self.yerr is not None:
+              odf.fit(self.x[self.fitIdx], self.y[self.fitIdx], yerr=self.yerr[self.fitIdx])
+            else:
+              odf.fit(self.x[self.fitIdx], self.y[self.fitIdx])
     else:
         if self.yerr is not None:
-	    odf.fit(self.x, self.y, yerr=self.yerr)
+          odf.fit(self.x, self.y, yerr=self.yerr)
         else:
-	    odf.fit(self.x, self.y)
+          odf.fit(self.x, self.y)
 
+
+    
 class SetToDialog(tk.Toplevel):
   
   def __init__(self, parent, oldVal, pname):
@@ -269,8 +271,11 @@ class ValueSetSummary(tk.Toplevel):
     self.showText.config(background='white')
     self.showText.grid(row=1,column=0,columnspan=2) #.pack(expand=True)
     
+    self.clipboardButton = tk.Button(self.showFrame, text="Copy to Clipboard", command=self._copyToClipboard)
+    self.clipboardButton.grid(row=2, column=0, columnspan=2)
+    
     self.helpLabel = tk.Label(self.showFrame, text="You may use the above code for pasting...")
-    self.helpLabel.grid(row=2, column=0, columnspan=2)
+    self.helpLabel.grid(row=3, column=0, columnspan=2)
     
     self.showFrame.pack()
     
@@ -300,6 +305,10 @@ class ValueSetSummary(tk.Toplevel):
     self.showText.insert(tk.END, t)
     self.showText.config(state=tk.DISABLED)
 
+  def _copyToClipboard(self):
+    self.clipboard_clear()
+    text = self.showText.get("1.0",tk.END)
+    self.clipboard_append(text)
   def _windowClosed(self):
     """
       The window is closed.
@@ -392,7 +401,7 @@ class FFModelExplorerList:
         self._parameterValueChanged()
       return change  
     
-    # defines what heppens when a parameter's value is changed, but not set yet, i.e., not current (closures)
+    # defines what happens when a parameter's value is changed, but not set yet, i.e., not current (closures)
     def parameterValueChanged(k):
         def valueChanged(*args):
             pp,ll = str(self.singleParameterVar[k].get()).find("."), len(str(self.singleParameterVar[k].get()))
@@ -402,11 +411,19 @@ class FFModelExplorerList:
                 self.singleParameterEntry[k].configure(bg = "white")
         return valueChanged    
     
+    
     # Create an entry for each parameter
+      ## Create a scrollable region
+      ## Check maximum number of characters for parameter names:
+    maxParamLen = 0
+    for k in sorted(self.odf.parameters().keys()):
+      if len(k) > maxParamLen:
+        maxParamLen = len(k)
+      ## Create an entry for each parameter	
     for k in sorted(self.odf.parameters().keys()):
       x = tk.Frame(self.parameterFrame, height=2, bd=2, relief=tk.SUNKEN,pady=2)
       self.singleParameterFrames[k] = x 
-      y0 = tk.Radiobutton(x, text=k,variable=self.selectedPar,value=k, width=3)
+      y0 = tk.Radiobutton(x, text=k,variable=self.selectedPar,value=k, width=maxParamLen+1, indicatoron=0)
       y0.pack(side=tk.LEFT)
       #y1 = tk.StringVar()
       y1 = tk.DoubleVar()
@@ -612,10 +629,13 @@ class FFModelExplorerList:
       self.dofValue.set(len(self.plotter.fitIdx)- len(self.odf.freeParameters())-1)
       
   def _updateChi2(self):
-      if self.plotter.chi2 > 1e-3 and self.plotter.chi2 < 1e4:
+      try:
+        if self.plotter.chi2 > 1e-3 and self.plotter.chi2 < 1e4:
           self.chi2value.set("%8.3f" % self.plotter.chi2)
-      else:
+        else:
           self.chi2value.set("%8.3e" % self.plotter.chi2)
+      except:
+        self.chi2value.set("N/A")
   
   def _parameterSummaryClicked(self, *args):
     """
@@ -711,8 +731,8 @@ class FFModelExplorerList:
       self.singleParameterVar[self.selectedPar.get()].set(newText)
     else:
       for p in self.odf.freeParamNames():
-	newText = "% g" % (self.odf[p])
-	self.singleParameterVar[p].set(newText)
+        newText = "% g" % (self.odf[p])
+        self.singleParameterVar[p].set(newText)
 
     self.plotter.plot(self.f, self.odf)
     #print self.plotter.chi2
@@ -734,8 +754,8 @@ class FFModelExplorerList:
     if self.modModus.get() == "mul":
         if event.delta>0:
           self.odf[pname] = val * mf
-	else:
-	  self.odf[pname] = val / mf
+        else:
+          self.odf[pname] = val / mf
     else:
         self.odf[pname] = val + mf * event.delta/2.
     self._parameterValueChanged()
