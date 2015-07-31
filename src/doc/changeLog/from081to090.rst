@@ -9,5 +9,8 @@ From 0.8.1 (or 0.8.0) to 0.9.0
                         - trapz integration with interpolated
                           boundaries
   pyasl               *New functionality*
-  						- Abundance patterns
+  						          - Abundance patterns
+  modelSuite          *Update*
+                        - Maintenance of transit models
+                        - Full support of keplerian orbits
   ==================  =============================================

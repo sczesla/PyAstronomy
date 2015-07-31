@@ -12,9 +12,9 @@ In this first example, we demonstrate how to calculate a model transit light-cur
 ::
 
   from PyAstronomy.modelSuite import palTrans
-  import matplotlib.pylab as mpl
-  import numpy
-
+  import matplotlib.pylab as plt
+  import numpy as np
+  
   # Create a PalLC instance
   plc = palTrans.PalLC()
   
@@ -36,15 +36,15 @@ In this first example, we demonstrate how to calculate a model transit light-cur
   plc.parameterSummary()
   
   # Create a time axis
-  time = numpy.arange(1000)/1000.0 - 0.5
+  time = np.arange(1000)/1000.0 - 0.5
   
   # Calculate the light curve using above set
   # model parameters
   lightcurve = plc.evaluate(time)
   
   # Plot the result
-  mpl.plot(time, lightcurve, 'bp')
-  mpl.show()
+  plt.plot(time, lightcurve, 'bp')
+  plt.show()
 
 
 Fitting a transit
@@ -59,10 +59,10 @@ can are shown in the *funcFit tutorial*).
              calculations will be quite slow.
 
 ::
-  
+   
   from PyAstronomy.modelSuite import palTrans
-  import matplotlib.pylab as mpl
-  import numpy
+  import matplotlib.pylab as plt
+  import numpy as np
   
   # Create a PalLC instance
   plc = palTrans.PalLC()
@@ -86,20 +86,20 @@ can are shown in the *funcFit tutorial*).
   plc.parameterSummary()
   
   # Create a time axis
-  time = numpy.arange(100)/100.0 * 0.2 - 0.2
+  time = np.arange(100)/100.0 * 0.2 - 0.2
   
   # Calculate the light curve using above set
   # model parameters
   lc = plc.evaluate(time)
   
   # Save the result and add some noise
-  flux = lc + numpy.random.normal(0.0, 0.002, time.size)
+  flux = lc + np.random.normal(0.0, 0.002, time.size)
   
   # Now lets try to recover what we put in
   # Choose some "guess" parameters
-  plc["p"] = 0.12    # Planet radius / Stellar radius
+  plc["p"] = 0.1     # Planet radius / Stellar radius
   plc["per"] = 1.0   # Orbital period
-  plc["a"] = 7.0     # Large semi major axis [R_S]
+  plc["a"] = 7.5     # Large semi major axis [R_S]
   plc["i"] = 90.0    # Orbital inclination [deg]
   # Specify limb darkening
   # (quadratic limb-darkening law)
@@ -111,23 +111,24 @@ can are shown in the *funcFit tutorial*).
   plc["b"] = 0.0
   
   # Assume we want to fit "p", "a", "i", and "T0"
-  plc.thaw(["p", "a", "T0", "i"])
+  plc.thaw(["T0", "i"])
   
   # Before we start fitting, check how the elliptical integrals
   # are evaluated (mpmath or Boost)
   print "Which elliptical integrals are used?: ", plc.whichEllInts()
   
   # Carry out the fit
-  plc.fit(time, flux, yerr=numpy.ones(time.size)*0.002)
+  plc.fit(time, flux, yerr=np.ones(time.size)*0.002)
   
   print "Fit parameters: "
   plc.parameterSummary()
   
   # Plot the result
-  mpl.plot(time, flux, 'bp')
-  mpl.plot(time, plc.model, 'r-')
-  mpl.show()
+  plt.plot(time, flux, 'bp')
+  plt.plot(time, plc.model, 'r-')
+  plt.show()
 
+ 
 Obtain a model taking finite integration time into account
 -------------------------------------------------------------
 
@@ -138,8 +139,8 @@ This example is very similar to the first one.
 ::
   
   from PyAstronomy.modelSuite import palTrans
-  import matplotlib.pylab as mpl
-  import numpy
+  import matplotlib.pylab as plt
+  import numpy as np
   
   # Create a PalLC_Rebin instance
   plc = palTrans.PalLC_Rebin()
@@ -162,7 +163,7 @@ This example is very similar to the first one.
   plc.parameterSummary()
   
   # Create a time axis
-  time = numpy.arange(50)/50.0 - 0.51
+  time = np.arange(50)/50.0 - 0.51
   
   # Specify oversampling parameters.
   # Here use 10 points per observed bin.
@@ -174,7 +175,8 @@ This example is very similar to the first one.
   
   # Plot the result (both the overbinned and final
   # model light-curves)
-  mpl.plot(plc.rebinTimes, plc.unbinnedModel, 'b.-')
-  mpl.plot(time, plc.binnedModel, 'rd--')
-  mpl.legend(["Overbinned LC", "Averaged LC"])
-  mpl.show()
+  plt.plot(plc.rebinTimes, plc.unbinnedModel, 'b.-')
+  plt.plot(time, plc.binnedModel, 'rd--')
+  plt.legend(["Overbinned LC", "Averaged LC"])
+  plt.show()
+

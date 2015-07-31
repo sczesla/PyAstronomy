@@ -1,3 +1,5 @@
+.. _keplerorbitpyasl:
+
 Calculate a Keplerian (two body) orbit
 ========================================
 

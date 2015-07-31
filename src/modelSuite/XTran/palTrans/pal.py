@@ -353,16 +353,9 @@ class PalLC(_ZList, fuf.OneDFit):
     
 class PalLCKep(PalLC):
   """
-    Calculate and fit analytical transit light-curves using the formulae
-    provided by Pal 2008.
+    Analytical transit light-curves using the formulae provided by Pal 2008.
     
-    In the **special case of the circular orbit** with e=0, w=0, and Omega=0,
-    the time of periastron passage, `T0pa`, will be related to the central
-    time of the transit, `T0` as
-      
-      T0 = T0pa + period/4 .
-    
-    In general, however, this will not be the case.
+    More information on the Keplerian orbit can be found here: :ref:`keplerorbitpyasl`
     
     .. note :: The **evaluation of elliptical integrals** is essential
                in calculating the transit model. While both
@@ -380,7 +373,7 @@ class PalLCKep(PalLC):
       - `i` - Inclination of orbit in degrees (90 deg is *edge on* view).
       - `linLib` - Linear limb-darkening coefficient.
       - `quadLimb` - Quadratic limb-darkening coefficient.
-      - `T0pa` - Time of periastron passage.
+      - `tau` - Time of periastron passage.
       - `per` - Period of planetary orbit.
       - `b` - Describes the flux ratio between a stellar companion and the main star (default is 0).
 
@@ -398,13 +391,14 @@ class PalLCKep(PalLC):
   """
   
   def __init__(self, collisionCheck=False):
-    _ZList.__init__(self, "keplerian")
-    fuf.OneDFit.__init__(self, ["p", "a", "i", "linLimb", "quadLimb", "T0pa", "per", "b", \
+    _ZList.__init__(self, "keplerian", collisionCheck)
+    fuf.OneDFit.__init__(self, ["p", "a", "i", "linLimb", "quadLimb", "tau", "per", "b", \
                                 "w", "Omega", "e"])
-    self.freeze(["p", "a", "i", "linLimb", "quadLimb", "T0pa", "per", "b", \
+    self.freeze(["p", "a", "i", "linLimb", "quadLimb", "tau", "per", "b", \
                  "w", "Omega", "e"])
     self.setRootName("Pal08")
     self["per"] = 1.0
+    self["w"] = -90
     
     self._zlist=None
     
@@ -415,9 +409,24 @@ class PalLCKep(PalLC):
     if boostEll_imported:
       self.useBoost = True
       self.ell = ell.ell()
-    
-    self.ke = KeplerEllipse(self["a"], self["per"])
+
     self.collisionCheck = collisionCheck
+    
+    # Wrap get/setitem to inform about change in parameter name
+    T0paE = PE.PyADeprecationError("The parameter 'T0pa' in PalLCKep had to be renamed 'tau'.", \
+                                   solution="Use 'tau' instead of 'T0pa'.")
+    
+    def getitem(specifier, **kwargs):
+      if specifier == "T0pa":
+        raise(T0paE)
+      return PalLC.__getitem__(self, specifier, **kwargs)
+    self.__getitem__ = getitem
+    
+    def setitem(specifier, value):
+      if specifier == "T0pa":
+        raise(T0paE)
+      PalLC.__setitem__(self, specifier, value)
+    self.__setitem__ = setitem
 
   def evaluate(self, time):
     """ 

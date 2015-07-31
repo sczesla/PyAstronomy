@@ -17,7 +17,7 @@ class MandelAgolNLLC(_ZList, fuf.OneDFit):
     provided by Mandel & Agol 2002. This model uses the non-linear
     limb-darkening prescription by Claret 2011:
     
-    .. math :: \\frac{I(\mu)}{I(1)}= \\sum_{n=1}^{4}{a_n(1-\mu^{n/2})}
+    .. math :: \\frac{I(\mu)}{I(1)}= 1 - \\sum_{n=1}^{4}{a_n(1-\mu^{n/2})}
     
     .. note :: The computation of transit light curves
                is done using the external *occultnl* FORTRAN library.

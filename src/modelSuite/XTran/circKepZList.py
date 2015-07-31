@@ -1,5 +1,6 @@
 import numpy
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy import pyasl
 
 class _ZList:
   """
@@ -60,41 +61,49 @@ class _ZList:
           parameters used for calculation).
     """
     # Assign values to KeplerEllipse
-    self.ke.a = self["a"]
-    self.ke.e = self["e"]
-    self.ke.i = self["i"]
-    self.ke.Omega = self["Omega"]
-    self.ke.per = self["per"]
-    self.ke.tau = self["T0pa"]
-    self.ke.w = self["w"]
+    self._ke.a = self["a"]
+    self._ke.e = self["e"]
+    self._ke.i = self["i"]
+    self._ke.Omega = self["Omega"]
+    self._ke.per = self["per"]
+    self._ke.tau = self["tau"]
+    self._ke.w = self["w"]
     
     # Initialize the z-list (NaN values will be neglected)
     self._zlist = numpy.empty(len(time))
     self._zlist[:] = numpy.NAN
     # Get position of body from Keplerian orbit
-    pos = self.ke.xyzPos(time)
+    pos = self._ke.xyzPos(time)
+    
+    # Default line of sight is in +z direction (i.e., observer
+    # located at -z)
+    
+    # Calculate projected distance between centers of star and
+    # planet sqrt(x**2 + y**2)
+    z = numpy.sqrt(pos[::,0]**2 + pos[::,1]**2)
     
     # If enabled, check for body collisions
-    if self.collisionCheck:
+    if self._collisionCheck:
       r = numpy.sqrt(pos[::,0]**2+pos[::,1]**2+pos[::,2]**2)
       indi = numpy.where(r < 1.+self["p"])[0]
       if len(indi) > 0:
         raise(PE.PyAValError("There is a body collision on this orbit.", \
                              where="_ZList"))
     
-    # Calculate projected distance between centers of star and planet sqrt(x**2 + y**2)
-    z = numpy.sqrt(pos[::,0]**2 + pos[::,1]**2)
+
     # Determine which values are relevant. In particular, these are those
     # for which the planet is in front of the star (z > 0) and the distance
     # between stellar and planetary distance is lower than 1+p.
-    self._intrans = numpy.where(numpy.logical_and(z <= (1.+self["p"]), pos[::,2] > 0.0))[0]
+    self._intrans = numpy.where(numpy.logical_and(z <= (1.+self["p"]), pos[::,2] < 0.0))[0]
     
-    # Calculate the 'orbit' and store z-values in __zlist
+    # Calculate the 'orbit' and store z-values in _zlist
     self._zlist[self._intrans] = z[self._intrans]
   
   
-  def __init__(self, orbit):
+  def __init__(self, orbit, cc=True):
     if orbit == "circular":
       self._calcZList = self._zlistCirc
     elif orbit == "keplerian":
+      self._collisionCheck = cc
+      self._ke = pyasl.KeplerEllipse(1.,1.)
       self._calcZList = self._zlistKep
