@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy
 import PyAstronomy.funcFit as fuf
-from PyAstronomy.pyasl import KeplerEllipse
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.modelSuite.XTran import _ZList
 
