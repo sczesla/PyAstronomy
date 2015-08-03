@@ -418,13 +418,13 @@ class PalLCKep(PalLC):
     
     def getitem(specifier, **kwargs):
       if specifier == "T0pa":
-        raise(T0paE)
+        PE.warn(T0paE)
       return PalLC.__getitem__(self, specifier, **kwargs)
     self.__getitem__ = getitem
     
     def setitem(specifier, value):
       if specifier == "T0pa":
-        raise(T0paE)
+        PE.warn(T0paE)
       PalLC.__setitem__(self, specifier, value)
     self.__setitem__ = setitem
 
