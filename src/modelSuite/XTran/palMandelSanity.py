@@ -39,3 +39,32 @@ class palMandelSanity(unittest.TestCase):
       
       np.testing.assert_almost_equal(yp, ym, 5, "The Pal and Mandel models differ."+"\n\n"+"\n".join(pal.parameterSummary(False)) + \
                                      "\n\n"+"\n".join(onl.parameterSummary(False)) , True)
+      
+  def sanity_basicCirc(self):
+    """
+      Checking basic MA and Pal transit configuration. Must be identical.
+    """
+    from PyAstronomy.modelSuite import XTran as xt
+    mac = xt.forTrans.MandelAgolLC()
+    mak = xt.forTrans.MandelAgolLC(orbit="keplerian")
+    
+    mac["p"] = 0.16
+    mac["per"] = 2.1
+    mac["linLimb"] = 0.37
+    mac["a"] = 5.4
+    
+    for p in ["p", "per", "linLimb", "a"]:
+      mak[p] = mac[p]
+    
+    t = np.linspace(0,4,1001)
+    cc = mac.evaluate(t)
+    ck = mak.evaluate(t)
+    self.assertAlmostEqual(np.max(np.abs(cc-ck)), 0.0, delta=1e-12, \
+                           msg="MandelAgol: Default for circ and kep orbit not identical")
+    
+    pa = xt.palTrans.PalLC()
+    for p in ["p", "per", "linLimb", "a"]:
+      pa[p] = mac[p]
+    cp = pa.evaluate(t)
+    self.assertAlmostEqual(np.max(np.abs(cc-cp)), 0.0, delta=1e-12, \
+                           msg="MandelAgol vs. Pal: Default for circ orbit not identical")
