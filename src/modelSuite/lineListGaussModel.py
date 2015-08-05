@@ -257,7 +257,7 @@ class LLGauss(fuf.OneDFit):
       self._mg["A"+p] = -self["A"+p] * self["lineScale"]
       self._mg["sig"+p] = self["sig"+p]
       # Apply doppler shift of lines
-      self._mg["mu"+p] = (1.0 + self["vrad"]/299792.458) * self._lineList[i,0]
+      self._mg["mu"+p] = (1.0 + self["vrad"]/299792.458) * self["mu"+p]
     mflux += self._mg.evaluate(mwvl)
     
     if abs(self["vsini"]) > 0.0:
