@@ -3,7 +3,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import funcFit as fuf
 
 
-def broadGaussFast(x, y, sigma, edgeHandling=None):
+def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
   """
     Apply Gaussian broadening. 
     
@@ -23,6 +23,12 @@ def broadGaussFast(x, y, sigma, edgeHandling=None):
         the spectrum will be extended by using the first and
         last value at the start or end. Note that this is
         not necessarily appropriate. The default is None.
+    maxsig : float, optional
+        The extent of the broadening kernel in terms of
+        standrad deviations. By default, the Gaussian broadening
+        kernel will be extended over the entire given spectrum,
+        which can cause slow evaluation in the case of large spectra.
+        A reasonable choice could, e.g., be five.  
     
     Returns
     -------
@@ -36,9 +42,13 @@ def broadGaussFast(x, y, sigma, edgeHandling=None):
     raise(PE.PyAValError("The x-axis is not equidistant, which is required.", \
                          where="broadGaussFast"))
   
+  if maxsig is None:
+    lx = len(x)
+  else:
+    lx = int(((sigma*maxsig) / dxs[0]) * 2.0) + 1
   # To preserve the position of spectral lines, the broadening function
   # must be centered at N//2 - (1-N%2) = N//2 + N%2 - 1
-  nx = (np.arange(len(x), dtype=np.int) - sum(divmod(len(x),2)) + 1) * dxs[0]
+  nx = (np.arange(lx, dtype=np.int) - sum(divmod(lx,2)) + 1) * dxs[0]
   gf = fuf.GaussFit1d()
   gf["A"] = 1.0
   gf["sig"] = sigma
@@ -59,7 +69,7 @@ def broadGaussFast(x, y, sigma, edgeHandling=None):
   return result
   
 
-def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False):
+def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False, maxsig=None):
   """
     Apply Gaussian instrumental broadening. 
     
@@ -86,6 +96,12 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False)
         not necessarily appropriate. The default is None.
     fullout : boolean, optional
         If True, also the FWHM of the Gaussian will be returned.
+    maxsig : float, optional
+        The extent of the broadening kernel in terms of
+        standrad deviations. By default, the Gaussian broadening
+        kernel will be extended over the entire given spectrum,
+        which can cause slow evaluation in the case of large spectra.
+        A reasonable choice could, e.g., be five.  
     
     Returns
     -------
@@ -105,7 +121,7 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False)
   fwhm = 1.0/float(resolution) * meanWvl
   sigma = fwhm/(2.0*np.sqrt(2.*np.log(2.)))
   
-  result = broadGaussFast(wvl, flux, sigma, edgeHandling=edgeHandling)
+  result = broadGaussFast(wvl, flux, sigma, edgeHandling=edgeHandling, maxsig=maxsig)
   
   if not fullout:
     return result

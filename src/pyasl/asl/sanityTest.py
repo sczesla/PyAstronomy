@@ -1764,14 +1764,22 @@ class SanityOfBroad(unittest.TestCase):
     
     # Apply Gaussian instrumental broadening, setting the resolution to 10000.
     r, fwhm = pyasl.instrBroadGaussFast(x, y, 10000,
-                                        edgeHandling="firstlast", fullout=True)
+              edgeHandling="firstlast", fullout=True)
     
+    # Apply Gaussian instrumental broadening, setting the resolution to 10000.
+    # Limit the extent of the Gaussian broadening kernel to five standard
+    # deviations.
+    r2, fwhm = pyasl.instrBroadGaussFast(x, y, 10000,
+              edgeHandling="firstlast", fullout=True, maxsig=5.0)
+              
     print "FWHM used for the Gaussian kernel: ", fwhm, " A"
     
     # Plot the output
-    plt.plot(x,r, 'r--p')
-    plt.plot(x,y, 'b-')
-#    plt.show()
+    plt.plot(x,r, 'r--p', label="Broadened curve (full)")
+    plt.plot(x, r2, 'k:', label="Broadened curve (5 stds)")
+    plt.plot(x,y, 'b-', label="Input")
+    plt.legend(loc=4)
+#     plt.show()
 
   def sanity_tests(self):
     """
@@ -1816,6 +1824,40 @@ class SanityOfBroad(unittest.TestCase):
     y = gf.evaluate(x)
     
     y2 = pyasl.broadGaussFast(x, y, 1.5-gf["sig"], edgeHandling="firstlast")
+    
+    print np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2)
+    print np.sqrt(np.sum( x**2*y)/np.sum(y))
+    print np.sqrt(np.sum( x**2*y2)/np.sum(y2))
+    print np.sum(y), np.sum(y2)
+    
+    mean2 = np.mean(x*y2)/np.sum(y2)
+    self.assertAlmostEqual(mean2, 0.0, delta=1e-9, \
+                           msg="Barycenter of convoluted Gaussian (" + str(mean2) + ") deviates from 0.0.")
+    std2 = np.sqrt(np.sum( x**2*y2)/np.sum(y2))
+    std2_nom = np.sqrt(gf["sig"]**2 + (1.5-gf["sig"])**2)
+    self.assertAlmostEqual(std2, std2_nom, delta=1e-5, \
+                           msg="Std of convoluted Gaussian (" + str(std2) +") deviates from nominal value.")
+    self.assertAlmostEqual(np.sum(y), np.sum(y2), delta=1e-4,
+                           msg="Normalization of convoluted Gaussian (" + str(np.sum(y2)) +") is incorrect.")
+
+  def sanity_convolutionGaussianMaxsig(self):
+    """
+      Check the sanity of broadGaussFast including maxsig
+    """
+    import numpy as np
+    from PyAstronomy import pyasl
+    from PyAstronomy import funcFit as fuf
+    
+    x = np.arange(-10.0, 10.0, 0.001)
+    gf = fuf.GaussFit1d()
+    gf["A"] = 0.8
+    gf["sig"] = 0.471
+    y = gf.evaluate(x)
+    
+    y3 = pyasl.broadGaussFast(x, y, 1.5-gf["sig"], edgeHandling="firstlast", maxsig=5.0)
+    y2 = pyasl.broadGaussFast(x, y, 1.5-gf["sig"], edgeHandling="firstlast", maxsig=None)
+    
+    self.assertAlmostEqual(np.max(np.abs(y2-y3)), 0.0, delta=2e-7, msg="Deviation in profiles using maxsig (broadGaussFast)")
     
     print np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2)
     print np.sqrt(np.sum( x**2*y)/np.sum(y))
