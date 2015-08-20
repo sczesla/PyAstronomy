@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import numpy
+import numpy as np
 from params import Params
 import re
 import copy
@@ -683,11 +683,11 @@ class FuFPrior:
   
   def _jeffreyPoissonScale(self, **kwargs):
     def jps(ps, n, **rest):
-      return -0.5 * numpy.log(ps[n])
+      return -0.5 * np.log(ps[n])
     return jps
   
   def _gaussian(self, **kwargs):
-    r = -0.5*numpy.log(2.0*numpy.pi*kwargs["sig"]**2)
+    r = -0.5*np.log(2.0*np.pi*kwargs["sig"]**2)
     def gaussianPrior(ps, n, **rest):
       return r - (ps[n] - kwargs["mu"])**2 / (2.0*kwargs["sig"]**2)
     return gaussianPrior
@@ -925,9 +925,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         continue
       elif len(coDat[k]) >= 2:
         # Get all component counters pertaining to that root
-        cs = numpy.array([c.naming.getComponentCounter() for c in coDat[k]])
+        cs = np.array([c.naming.getComponentCounter() for c in coDat[k]])
         # What is the current maximum
-        highest = numpy.max(cs)
+        highest = np.max(cs)
         # Check whether one or more counters are zero;
         # if so, increase the number and set it to "highest + 1".
         for c in coDat[k]:
@@ -936,8 +936,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             highest += 1
         # Now re-check whether counters are unique 
         while True:
-          cs = numpy.array([c.naming.getComponentCounter() for c in coDat[k]])
-          u = numpy.unique(cs)
+          cs = np.array([c.naming.getComponentCounter() for c in coDat[k]])
+          u = np.unique(cs)
           if len(u) == len(cs):
             # All counters are unique, work is finished
             break
@@ -945,7 +945,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           again = False
           for c in coDat[k]:
             # Loop over components
-            if len(numpy.where(cs == c.naming.getComponentCounter())[0]) > 1:
+            if len(np.where(cs == c.naming.getComponentCounter())[0]) > 1:
               # If there are nonunique counters, make them unique and retry
               c.naming.setComponentCounter(highest + 1)
               highest += 1
@@ -1056,7 +1056,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     @MiniFunc(self)
     def miniSqrDiff(odf, P):
       # Calculate squared difference
-      chi = numpy.sum((self._fufDS.y - self.model)**2)
+      chi = np.sum((self._fufDS.y - self.model)**2)
       return chi
     return miniSqrDiff   
   
@@ -1064,7 +1064,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     @MiniFunc(self)
     def miniChiSqr(odf, P):
       # Calculate chi^2 and apply penalty if boundaries are violated.
-      chi = numpy.sum(((self._fufDS.y - self.model)/self._fufDS.yerr)**2)
+      chi = np.sum(((self._fufDS.y - self.model)/self._fufDS.yerr)**2)
       return chi
     return miniChiSqr
 
@@ -1072,7 +1072,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     @MiniFunc(self)
     def miniCash79(odf, P):
       # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
-      c = -2.0 * numpy.sum(self._fufDS.y * numpy.log(self.model) - self.model)
+      c = -2.0 * np.sum(self._fufDS.y * np.log(self.model) - self.model)
       return c
     return miniCash79
 
@@ -1467,7 +1467,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if not quiet: self._basicStatMCMCOutput(self.basicStats)
     
     # Setting values to ``best fit values'' (lowest deviance)
-    mindex = numpy.argmin(self.MCMC.trace("deviance")[:])
+    mindex = np.argmin(self.MCMC.trace("deviance")[:])
     if not quiet:
       print "Searching for lowest-deviance solution."
       print "  Index of lowest-deviance solution: ", mindex
@@ -1483,7 +1483,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
   def fitEMCEE(self, nwalker=None, priors=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
     """
     """
-    
+  
     if not ic.check["emcee"]:
       raise(PE.PyARequiredImport("Could not import the 'emcee' package.", \
                                  solution="Please install 'emcee'."))
@@ -1548,13 +1548,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       # Generate starting values
       pos = []
       for _ in xrange(nwalker):
-        pos.append(numpy.zeros(ndims))
+        pos.append(np.zeros(ndims))
         for i, n in enumerate(fpns):
           if not n in scales:
             s = 1.0
           else:
             s = scales[n]
-          pos[-1][i] = numpy.random.normal(fps[n], s)
+          pos[-1][i] = np.random.normal(fps[n], s)
       
       # Default value for state
       state = None
@@ -1585,8 +1585,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     
     # Save the chain to a file
     if not dbfile is None:
-      numpy.savez_compressed(open(dbfile, 'w'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
-                             pnames=numpy.array(fpns, dtype=numpy.string_))
+      np.savez_compressed(open(dbfile, 'w'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
+                             pnames=np.array(fpns, dtype=np.string_))
     
     return pos, state
     
@@ -1841,11 +1841,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                solution="Use either 'lin' or 'log' as the fourth entry."))
         mode = r[3]
       if mode == 'lin':
-        rs.append(numpy.linspace(r[0], r[1], r[2]))
+        rs.append(np.linspace(r[0], r[1], r[2]))
       elif mode == 'log':
         # Calculate factor
-        s = numpy.power((r[1]/r[0]), 1.0/r[2])
-        rs.append( r[0] * numpy.power(s, numpy.arange(r[2])) )
+        s = np.power((r[1]/r[0]), 1.0/r[2])
+        rs.append( r[0] * np.power(s, np.arange(r[2])) )
       else:
         raise(PE.PyAValError("Unknown mode: " + str(mode), \
                              solution="Use either 'lin' or 'log'."))
