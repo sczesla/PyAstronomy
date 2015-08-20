@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import pymc
-import matplotlib.pylab as mpl
 from numpy import mean, median, std
 import numpy
 import re
@@ -10,6 +8,88 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.funcFit.utils import ic
 import itertools
 from PyAstronomy import pyaC as PC
+
+try:
+  import pymc
+except ImportError:
+  pass
+
+try:
+  import matplotlib.pylab as plt
+except ImportError:
+  pass
+
+
+
+def hpd(trace, cred):
+  """
+    Estimate the highest probability density interval.
+    
+    This function determines the shortest, continous interval
+    containing the specified fraction (cred) of steps of
+    the Markov chain. Note that multi-modal distribution
+    may require further scrutiny.
+    
+    Parameters
+    ----------
+    trace : array
+        The steps of the Markov chain.
+    cred : float
+        The probability mass to be included in the
+        interval (between 0 and 1).
+    
+    Returns
+    -------
+    start, end : float
+        The start and end points of the interval.
+  """
+  # Sort the trace steps in ascending order
+  st = numpy.sort(trace)
+  
+  # Number of steps in the chain
+  n = len(st)
+  # Number of steps to be included in the interval
+  nin = int(n * cred)
+  
+  # All potential intervals must be 1) continous and 2) cover
+  # the given number of trace steps. Potential start and end
+  # points of the HPD are given by
+  starts = st[0:-nin]
+  ends = st[nin:]
+  # All possible widths are
+  widths = ends - starts
+  # The density is highest in the shortest one
+  imin = numpy.argmin(widths)
+  return starts[imin], ends[imin]
+  
+
+def quantiles(trace, qs):
+  """
+    Get quantiles for trace.
+    
+    Parameters
+    ----------
+    trace : array
+        The steps of the Markov chain.
+    qs : list or array
+        The quantiles in *percent*.
+    
+    Returns
+    -------
+    Quantiles : dictionary
+        For each quantile, the corresponding value.
+  """
+  # Sort the trace steps in ascending order
+  st = numpy.sort(trace)
+  n = len(st)
+  # Convert percent into fractions 
+  qfrac = numpy.array(qs) / 100.0
+  # Evaluate quantiles
+  result = {}
+  for i in xrange(len(qfrac)):
+    result[qs[i]] = st[int(n*qfrac[i])]
+  return result
+
 
 class TraceAnalysis:
   """
@@ -67,32 +147,89 @@ class TraceAnalysis:
       c+=1
       if c*r>=size: break
       else: r+=1
-    return [c,r]
+    return c, r
 
+  def _loadEMCEEChain(self, fn=None, burn=0):
+    """
+    """
+    if not fn is None: 
+      self._emceedat = numpy.load(fn)
+    self.emceepnames = list(self._emceedat["pnames"]) + ["deviance"]
+    # Dummy tracesDic
+    self.tracesDic = dict(zip( self.emceepnames, [None]*len(self.emceepnames)))
+    # Build stateDic
+    self.stateDic = {"stochastics":dict(zip( self.emceepnames, [None]*len(self.emceepnames))), "sampler":{}}
+    for n in self.emceepnames:
+      self.stateDic["stochastics"][n] = None
+    
+    # Flatten the chain
+    s = self._emceedat["chain"].shape
+    self.emceechain = numpy.zeros((s[0] * (s[1]-burn), s[2]+1))
+    self.emceechain[::,0:-1] = self._emceedat["chain"][::,burn:,::].reshape(s[0] * (s[1]-burn), s[2])
+    self.emceelnp = self._emceedat["lnp"][::,burn:]
+    self.emceelnp = self.emceelnp.reshape(s[0] * (s[1]-burn))
+    
+    # Incorporate "deviance" into the usual chain
+    self.emceechain[::,-1] = -2.0 * self.emceelnp
+    
+    self.stateDic["sampler"]["_iter"] = self.emceechain.shape[0]
+    self.stateDic["sampler"]["_burn"] = None
+    self.stateDic["sampler"]["_thin"] = None
+    
+    
+  def _checkPackage(self, p):
+    """
+      Check whether package is availabel and raise exception otherwise.
+      
+      Parameters
+      ----------
+      p : string
+          Name of package
+    """
+    if not ic.check[p]:
+      raise(PE.PyARequiredImport("The package '" + str(p) + "' is not currently installed.", \
+                                 solution="Please install " + str(p)))
+  
   def __init__(self, resource, db="pickle"):
     if isinstance(resource, basestring):
+      # Resource is a filename
       if not os.path.isfile(resource):
         raise(PE.PyAFileError(resource, "ne"))
       self.file = resource
+      
       if not (re.match(".*\.hdf5", resource) is None):
         db = "hdf5"
       if not (re.match(".*\.zlib", resource) is None):
         db = "hdf5"
+      if not (re.match(".*\.emcee", resource) is None):
+        db = "emcee"
+        
       if db == "pickle":
+        self.dbtype = "pymc"
+        self._checkPackage("pymc")
         self.db = pymc.database.pickle.load(resource)
+        self.stateDic = self.db.getstate()
+        self.tracesDic = self.db._traces
       elif db == "hdf5":
+        self.dbtype = "pymc"
+        self._checkPackage("pymc")
         self.db = pymc.database.hdf5.load(resource)
+        self.stateDic = self.db.getstate()
+        self.tracesDic = self.db._traces
+      elif db == "emcee":
+        self.dbtype = "emcee"
+        self._loadEMCEEChain(resource)
       else:
         raise(PE.PyAValError("Database type '"+db+"' is currently not supported."))
+      
     elif isinstance(resource, pymc.database.base.Database):
       self.db = resource
     else:
       raise(PE.PyAValError("'resource' must be a filename or a pymc database object.", where="TraceAnalysis::__init__"))
-    self.stateDic = self.db.getstate()
-    self.tracesDic = self.db._traces           # dictionary of available traces
-    self.noc = self.db.chains                  # number of chains
-    self.burn = 0                              # Use this as "post burn-in"
-    self.thin = 1                              # Use this as "post-thinner"
+    
+    # Set default burn-in and thinning 
+    self.burn = 0                             
+    self.thin = 1                         
 
   def __getitem__(self, parm):
     """
@@ -101,20 +238,20 @@ class TraceAnalysis:
       Parameters
       ----------
       parm : string
-          Variable name.
+          Name of the parameter.
       
       Returns
       -------
       trace : array
-          The trace for the parameters.
-      
-      Notes
-      -----
-      The returned trace comprises all chains possibly present in the
-      data base.
+          The trace for the parameter.
     """
     self._parmCheck(parm)
-    return self.tracesDic[parm].gettrace()[self.burn::self.thin]
+    if self.dbtype == "pymc":
+      return self.tracesDic[parm].gettrace()[self.burn::self.thin]
+    elif self.dbtype == "emcee":
+      index = self.emceepnames.index(parm)
+      print "      INDEX: ", index
+      return self.emceechain[self.burn::self.thin,index]
 
   def __str__(self):
     """
@@ -150,7 +287,7 @@ class TraceAnalysis:
     """
     return self.stateDic
 
-  def plotTrace(self, parm, **traceArgs):
+  def plotTrace(self, parm):
     """
       Plots the trace.
       
@@ -158,17 +295,16 @@ class TraceAnalysis:
       ----------
       parm : string
           The variable name.
-      traceArgs : dict
-          Keyword arguments handed to `pymc.Matplot.trace`.
     """
     if not ic.check["matplotlib"]:
       PE.warn(PE.PyARequiredImport("To use 'plotTrace', matplotlib has to be installed.", \
                                    solution="Install matplotlib."))
       return
     self._parmCheck(parm)
-    pymc.Matplot.trace(self[parm],parm,fontmap={0.5: 10, 1:10, 2:8, 3:6, 4:5, 5:4},**traceArgs)
+    plt.plot(self[parm], 'b-', label=parm + " trace")
+    plt.legend()
 
-  def plotTraceHist(self, parm, **plotArgs):
+  def plotTraceHist(self, parm):
     """
       Plots trace and histogram (distribution).
 
@@ -176,17 +312,19 @@ class TraceAnalysis:
       ----------
       parm : string
           The variable name.
-      plotArgs : dict
-          Keyword arguments handed to `pymc.Matplot.plot`.
     """
     if not ic.check["matplotlib"]:
       PE.warn(PE.PyARequiredImport("To use 'plotTraceHist', matplotlib has to be installed.", \
                                    solution="Install matplotlib."))
       return
     self._parmCheck(parm)
-    pymc.Matplot.plot(self[parm], parm, **plotArgs)
+    
+    plt.subplot(1,2,1)
+    self.plotTrace(parm)
+    plt.subplot(1,2,2)
+    self.plotHist(parm)
 
-  def plotHist(self, parsList=None, **histArgs):
+  def plotHist(self, parsList=None):
     """
       Plots distributions for a number of traces.
 
@@ -195,9 +333,6 @@ class TraceAnalysis:
       parsList : string or list of strings, optional,
           Refers to a parameter name or a list of parameter names.
           If None, all available parameters are plotted.
-      histArgs : dict, optional
-          Keyword arguments (e.g., `nbins`) passed to the
-          histogram plotter (`pymc.Matplot.histogram`).
     """
     if not ic.check["matplotlib"]:
       PE.warn(PE.PyARequiredImport("To use 'plotHists', matplotlib has to be installed.", \
@@ -215,11 +350,13 @@ class TraceAnalysis:
       for parm in self.availableParameters():
         tracesDic[parm] = self[parm]
 
-    ps = self.__plotsizeHelper(len(tracesDic))
+    cols, rows = self.__plotsizeHelper(len(tracesDic))
 
     for i,[pars,trace] in enumerate(tracesDic.items()):
-      pymc.Matplot.histogram(trace,pars,columns=ps[0],rows=ps[1],num=i+1,**histArgs)
-
+      if len(parsList) > 1:
+        plt.subplot(rows, cols, i+1)
+      plt.hist(trace, label=pars + " hist")
+      plt.legend()
 
   def plotDeviance(self, parsList=None):
     """
@@ -250,10 +387,10 @@ class TraceAnalysis:
     ps = self.__plotsizeHelper(len(tracesDic))
 
     for i,[pars,trace] in enumerate(tracesDic.items()):
-      mpl.subplot(ps[0],ps[1],i)
-      mpl.xlabel(pars)
-      mpl.ylabel("Deviance")
-      mpl.plot(self[pars],self["deviance"],'.')
+      plt.subplot(ps[0],ps[1],i)
+      plt.xlabel(pars)
+      plt.ylabel("Deviance")
+      plt.plot(self[pars],self["deviance"],'.')
 
 
   def plotHists(self, parsList=None, **histArgs):
@@ -263,10 +400,7 @@ class TraceAnalysis:
 
   def hpd(self, parm, trace=None, cred=0.95):
     """
-      Calculates highest probability density (HPD, minimum width BCI).
-      
-      interval for
-      parameter `parm` given a certain probability level 'cred'.
+      Calculates highest probability density interval (HPD, minimum width BCI).
       
       Parameters
       ----------
@@ -282,35 +416,35 @@ class TraceAnalysis:
       
       Returns
       -------
-        HPD : array
-            The lower and upper bound of the credibility
-            interval.
+      HPD : tuple
+          The lower and upper bound of the credibility interval.
     """
     if trace is None:
       self._parmCheck(parm)
-      return pymc.utils.hpd(self[parm], 1.-cred)
+      return hpd(self[parm], cred)
     else:
-      return pymc.utils.hpd(trace, 1.-cred)
+      return hpd(trace, cred)
 
   def quantiles(self, parm, qlist=None):
     """
-      Returns a dictionary of requested quantiles for given
-      parameter name.
+      Quantiles for given trace.
       
       Parameters
       ----------
       parm : string
           Name of parameter
       qlist : list of floats (0-100), optional
-          Specifies which quantiles shall be calculated.
+          Specifies which quantiles shall be calculated. The default is
+          2.5, 25, 50, 75, and 97.5 percent.
       
       Returns
       -------
-      Quantiles : list of quantiles
+      Quantiles : dictionary
+          For each quantile (in percent) the corresponding value.
     """
     if qlist is None:
       qlist = [2.5, 25, 50, 75, 97.5]
-    return pymc.utils.quantiles(self[parm],qlist)
+    return quantiles(self[parm],qlist)
 
   def plotCorr(self, parsList=None, **plotArgs):
     """
@@ -354,15 +488,15 @@ class TraceAnalysis:
     for j in range(len(tracesDic)):
       for i in range(len(tracesDic)):
         if i>j:
-          mpl.subplot(len(tracesDic)-1,len(tracesDic)-1,k)
-          mpl.title("Pearson's R: %1.5f" % self.pearsonr(pars[j],pars[i])[0], fontsize='x-small')
-          mpl.xlabel(pars[j], fontsize='x-small')
-          mpl.ylabel(pars[i], fontsize='x-small')
-          tlabels = mpl.gca().get_xticklabels()
-          mpl.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
-          tlabels = mpl.gca().get_yticklabels()
-          mpl.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
-          mpl.plot(traces[j],traces[i],'.',**plotArgs)
+          plt.subplot(len(tracesDic)-1,len(tracesDic)-1,k)
+          plt.title("Pearson's R: %1.5f" % self.pearsonr(pars[j],pars[i])[0], fontsize='x-small')
+          plt.xlabel(pars[j], fontsize='x-small')
+          plt.ylabel(pars[i], fontsize='x-small')
+          tlabels = plt.gca().get_xticklabels()
+          plt.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
+          tlabels = plt.gca().get_yticklabels()
+          plt.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
+          plt.plot(traces[j],traces[i],'.',**plotArgs)
         if i!=j:
           k+=1
 
@@ -375,11 +509,11 @@ class TraceAnalysis:
     H, xedges, yedges = numpy.histogram2d(x, y, bins)
     extent = [xedges.min(), xedges.max(), yedges.min(), yedges.max()]
     if not contour:
-      mpl.imshow(H, extent=extent, interpolation=interpolation,origin=origin, cmap=cmap, aspect="auto")
-#      mpl.colorbar(fontsize=4)
+      plt.imshow(H, extent=extent, interpolation=interpolation,origin=origin, cmap=cmap, aspect="auto")
+#      plt.colorbar(fontsize=4)
     else:
-      CS = mpl.contour(H, extent=extent,origin=origin,colors=colors)
-      mpl.clabel(CS, inline=1, fontsize=10)
+      CS = plt.contour(H, extent=extent,origin=origin,colors=colors)
+      plt.clabel(CS, inline=1, fontsize=10)
 
   def correlationTable(self, parsList=None, coeff="pearson", noPrint=False):
     """
@@ -489,15 +623,15 @@ class TraceAnalysis:
     for j in range(len(tracesDic)):
       for i in range(len(tracesDic)):
         if i>j:
-          mpl.subplot(len(tracesDic)-1,len(tracesDic)-1,k)
-#          mpl.title("Pearson's R: %1.5f" % self.pearsonr(pars[j],pars[i])[0], fontsize='x-small')
-          mpl.xlabel(pars[j], fontsize=fontmap[len(tracesDic)-1])
-          mpl.ylabel(pars[i], fontsize=fontmap[len(tracesDic)-1])
-          tlabels = mpl.gca().get_xticklabels()
-          mpl.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
-          tlabels = mpl.gca().get_yticklabels()
-          mpl.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
-#          mpl.plot(traces[j],traces[i],'.',**plotArgs)
+          plt.subplot(len(tracesDic)-1,len(tracesDic)-1,k)
+#          plt.title("Pearson's R: %1.5f" % self.pearsonr(pars[j],pars[i])[0], fontsize='x-small')
+          plt.xlabel(pars[j], fontsize=fontmap[len(tracesDic)-1])
+          plt.ylabel(pars[i], fontsize=fontmap[len(tracesDic)-1])
+          tlabels = plt.gca().get_xticklabels()
+          plt.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
+          tlabels = plt.gca().get_yticklabels()
+          plt.setp(tlabels, 'fontsize', fontmap[len(tracesDic)-1])
+#          plt.plot(traces[j],traces[i],'.',**plotArgs)
           self.__hist2d(traces[j],traces[i],**plotArgs)
         if i!=j:
           k+=1
@@ -600,7 +734,7 @@ class TraceAnalysis:
     """
     self._parmCheck(parm1)
     self._parmCheck(parm2)
-    return pearsonr(self.tracesDic[parm1].gettrace(), self.tracesDic[parm2].gettrace())
+    return pearsonr(self[parm1], self[parm2])
 
   def spearmanr(self, parm1, parm2):
     """
@@ -640,7 +774,7 @@ class TraceAnalysis:
     """
     self._parmCheck(parm1)
     self._parmCheck(parm2)
-    return spearmanr(self.tracesDic[parm1].gettrace(), self.tracesDic[parm2].gettrace())
+    return spearmanr(self[parm1], self[parm2])
 
   def mean(self, parm):
     """
@@ -695,7 +829,7 @@ class TraceAnalysis:
       Call *show()* from matplotlib to bring graphs to screen.
     """
     try:
-      mpl.show()
+      plt.show()
     except Exception, e:
       PE.warn(PE.PyAUnclassifiedError("Plot could not be shown. The following exception occurred:\n" \
                                       + str(e)))
@@ -704,17 +838,18 @@ class TraceAnalysis:
     """
       Change value of "post burn-in".
       
+      In the case of an emcee trace, the "post burn-in" is
+      applied to the trace of all walkers.
+      
       Parameters
       ----------
       burn : int
           The number of samples to be neglected.
-      
-      Notes
-      -----
-      Use the "post burn-in" to neglect all sampling points before
-      the specified iteration.
     """
     self.burn = burn
+    if self.dbtype == "emcee":
+      # Apply burn-in to individual walkers
+      self._loadEMCEEChain(burn=self.burn)
   
   def setThin(self, thin):
     """
