@@ -12,11 +12,15 @@ from time import time as timestamp
 from fufDS import FufDS
 from extFitter import NelderMead
 
-from PyAstronomy.funcFit import _pymcImport, _scoImport
+from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
 if _pymcImport:
   import pymc
 if _scoImport:
   import scipy.optimize as sco
+if ic.check["emcee"]:
+  import emcee
+if ic.check["progressbar"]:
+  import progressbar
 
 def addEval(self, x):
   return (self.leftCompo.evaluate(x) + self.rightCompo.evaluate(x))
@@ -668,6 +672,37 @@ class FuFNM(IFitterBase):
     return self._bestFitVals, self._objfval
 
 FuFNM.__doc__ = NelderMead.__doc__
+
+
+class FuFPrior:
+  
+  def _laplace(self, **kwargs):
+    def laplace(ps, n, **rest):
+      return 0.0
+    return laplace
+  
+  def _jeffreyPoissonScale(self, **kwargs):
+    def jps(ps, n, **rest):
+      return -0.5 * numpy.log(ps[n])
+    return jps
+  
+  def _gaussian(self, **kwargs):
+    r = -0.5*numpy.log(2.0*numpy.pi*kwargs["sig"]**2)
+    def gaussianPrior(ps, n, **rest):
+      return r - (ps[n] - kwargs["mu"])**2 / (2.0*kwargs["sig"]**2)
+    return gaussianPrior
+  
+  def __init__(self, lnp, **kwargs):
+    """
+    """
+    if isinstance(lnp, basestring):
+      if lnp == "laplace":
+        self.lnp = self._laplace(**kwargs)
+      elif lnp == "jeffreyPS":
+        self.lnp = self._jeffreyPoissonScale(**kwargs)
+      elif lnp == "gaussian":
+        self.lnp = self._gaussian(**kwargs)
+        
 
 
 class OneDFit(_OndeDFitParBase, _PyMCSampler):
@@ -1444,6 +1479,117 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         print "  Parameter: ", par, ", value: ", self[par]
     self.updateModel() 
     self.MCMC.db.close()
+    
+  def fitEMCEE(self, nwalker=None, priors=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
+    """
+    """
+    
+    if not ic.check["emcee"]:
+      raise(PE.PyARequiredImport("Could not import the 'emcee' package.", \
+                                 solution="Please install 'emcee'."))
+        
+    # Names and values of free parameters
+    fps = self.freeParameters()
+    # Names of the free parameters in specific order
+    fpns = self.freeParamNames()
+    # Number of dimensions 
+    ndims = len(fps)
+    
+    # Number of walkers
+    if nwalker is None:
+      nwalker = ndims * 2
+    
+    # Use default prior for those parameters not listed
+    if priors is None:
+      priors = {}
+    for n in fpns:
+      if not n in priors:
+        priors[n] = FuFPrior("laplace")
+    
+    # Chi square calucaltor
+    chisqr = self.__chiSqr()
+    
+    def likeli(names, vals):
+      # The likelihood function
+      likeli = -0.5 * chisqr(vals)
+      return likeli
+    
+    def lnpostdf(values):
+      # Parameter-Value dictionary
+      ps = dict(zip(fpns, values))
+      # Likelihood
+      pdf = likeli(fpns, values)
+      # Add prior information
+      for name in fpns:
+        pdf += priors[name].lnp(ps, name)
+      return pdf
+    
+    # Set default values for sampleArgs
+    if sampleArgs is None:
+      sampleArgs = {}
+    if not "burn" in sampleArgs:
+      sampleArgs["burn"] = 0
+    if not "iters" in sampleArgs:
+      sampleArgs["iters"] = 1000
+    if not "progress" in sampleArgs:
+      sampleArgs["progress"] = sampleArgs["iters"] / 100
+    
+    if ps is None:
+      
+      if emcp is None:
+        emcp = {}
+    
+      # Generate the sampler
+      self.emceeSampler = emcee.EnsembleSampler(nwalker, ndims, lnpostdf, **emcp)
+    
+      if scales is None:
+        scales = {}
+      
+      # Generate starting values
+      pos = []
+      for _ in xrange(nwalker):
+        pos.append(numpy.zeros(ndims))
+        for i, n in enumerate(fpns):
+          if not n in scales:
+            s = 1.0
+          else:
+            s = scales[n]
+          pos[-1][i] = numpy.random.normal(fps[n], s)
+      
+      # Default value for state
+      state = None
+      
+      if sampleArgs["burn"] > 0:
+        # Run burn-in
+        pos, prob, state = self.emceeSampler.run_mcmc(pos, sampleArgs["burn"])
+        # Reset the chain to remove the burn-in samples.
+        self.emceeSampler.reset()
+    
+    else:
+      # Assign position and state from previous run
+      pos, state = ps
+
+    if (not sampleArgs["progress"] is None) and ic.check["progressbar"]:
+      widgets = ['EMCEE progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker=progressbar.RotatingMarker()),
+           ' ', progressbar.ETA()]
+      pbar = progressbar.ProgressBar(widgets=widgets, maxval=sampleArgs["iters"]).start()
+    
+    n = 0
+    for pos, prob, state in self.emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+      n += 1
+      if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
+        if ic.check["progressbar"]:
+          pbar.update(n)
+        else:
+          print "EMCEE: Reached iteration ", n, " of ", sampleArgs["iters"]
+    
+    # Save the chain to a file
+    if not dbfile is None:
+      numpy.savez_compressed(open(dbfile, 'w'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
+                             pnames=numpy.array(fpns, dtype=numpy.string_))
+    
+    return pos, state
+    
     
   def _resolveMinAlgo(self, minAlgo, default=None, mAA=None):
     """
