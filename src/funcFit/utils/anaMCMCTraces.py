@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from numpy import mean, median, std
-import numpy
+import numpy as np
 import re
 import os
 from scipy.stats import spearmanr, pearsonr
@@ -44,7 +44,7 @@ def hpd(trace, cred):
         The start and end points of the interval.
   """
   # Sort the trace steps in ascending order
-  st = numpy.sort(trace)
+  st = np.sort(trace)
   
   # Number of steps in the chain
   n = len(st)
@@ -59,7 +59,7 @@ def hpd(trace, cred):
   # All possible widths are
   widths = ends - starts
   # The density is highest in the shortest one
-  imin = numpy.argmin(widths)
+  imin = np.argmin(widths)
   return starts[imin], ends[imin]
   
 
@@ -80,10 +80,10 @@ def quantiles(trace, qs):
         For each quantile, the corresponding value.
   """
   # Sort the trace steps in ascending order
-  st = numpy.sort(trace)
+  st = np.sort(trace)
   n = len(st)
   # Convert percent into fractions 
-  qfrac = numpy.array(qs) / 100.0
+  qfrac = np.array(qs) / 100.0
   # Evaluate quantiles
   result = {}
   for i in xrange(len(qfrac)):
@@ -93,15 +93,20 @@ def quantiles(trace, qs):
 
 class TraceAnalysis:
   """
-    This class provides a wrapper around PyMC's own
-    plotting and statistics engine.
+    Support to analyze MCMC chains.
+
+    This class provides a number of plotting methods. Note that
+    **you still need to call *show()* from pylab** to see the
+    result.
 
     Parameters
     ----------
     resource : string or pymc database object
         If string, it assumed to be the filename of the
         Markov Chain file. Otherwise, it is supposed
-        to be a pymc database object already. 
+        to be a pymc database object. If the filename is
+        of the form "*.emcee", it is assumed to be
+        a trace produced by emcee. 
     
     Attributes
     ----------
@@ -112,16 +117,7 @@ class TraceAnalysis:
     thin : int
         Applies thinning to each chain.
         Retains every `k` th sample,
-        where `k` is an integer value.
-        
-    
-    Notes
-    -----
-    The class provides a number of plotting methods, which
-    either use PyMC's capabilities or refer to matplotlib
-    directly. Note that to see the plots
-    **you still need to call *show()* from pylab**.
-    
+        where `k` is an integer value.  
   """
 
   def _parmCheck(self, parm):
@@ -153,7 +149,7 @@ class TraceAnalysis:
     """
     """
     if not fn is None: 
-      self._emceedat = numpy.load(fn)
+      self._emceedat = np.load(fn)
     self.emceepnames = list(self._emceedat["pnames"]) + ["deviance"]
     # Dummy tracesDic
     self.tracesDic = dict(zip( self.emceepnames, [None]*len(self.emceepnames)))
@@ -164,7 +160,7 @@ class TraceAnalysis:
     
     # Flatten the chain
     s = self._emceedat["chain"].shape
-    self.emceechain = numpy.zeros((s[0] * (s[1]-burn), s[2]+1))
+    self.emceechain = np.zeros((s[0] * (s[1]-burn), s[2]+1))
     self.emceechain[::,0:-1] = self._emceedat["chain"][::,burn:,::].reshape(s[0] * (s[1]-burn), s[2])
     self.emceelnp = self._emceedat["lnp"][::,burn:]
     self.emceelnp = self.emceelnp.reshape(s[0] * (s[1]-burn))
@@ -506,7 +502,7 @@ class TraceAnalysis:
       ----------
       bins : tuple of two ints
     """
-    H, xedges, yedges = numpy.histogram2d(x, y, bins)
+    H, xedges, yedges = np.histogram2d(x, y, bins)
     extent = [xedges.min(), xedges.max(), yedges.min(), yedges.max()]
     if not contour:
       plt.imshow(H, extent=extent, interpolation=interpolation,origin=origin, cmap=cmap, aspect="auto")
@@ -684,7 +680,7 @@ class TraceAnalysis:
         stds[p] = self.std(p)
     # Calculate the matrix
     n = len(parList)
-    matrix = numpy.zeros( (n, n) )
+    matrix = np.zeros( (n, n) )
     for i in xrange(n):
       for j in xrange(n):
         matrix[i, j] = corFunc(parList[i], parList[j])[0]
@@ -892,7 +888,7 @@ class TraceAnalysis:
     """
     if prescription == "lowestDev":
       result = {}
-      indi = numpy.argmin(self["deviance"])
+      indi = np.argmin(self["deviance"])
       for par in self.availableParameters():
         result[par] = self[par][indi]
       return result, indi
@@ -931,7 +927,7 @@ class TraceAnalysis:
       print "Setting model to state: ", state
     if state == "best":
       # Setting to best state as measured by deviance
-      indi = numpy.argmin(self["deviance"])
+      indi = np.argmin(self["deviance"])
       if verbose:
         print "Lowest deviance of ", self["deviance"][indi], " at index ", indi
       for par in self.availableParameters():
@@ -945,7 +941,7 @@ class TraceAnalysis:
       for par in self.availableParameters():
         if not par in model.parameters().keys():
           continue
-        model[par] = numpy.mean(self[par])
+        model[par] = np.mean(self[par])
         if verbose:
           print "Setting parameter: ", par, " to mean value: ", model[par]
         
