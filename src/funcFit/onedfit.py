@@ -676,10 +676,10 @@ FuFNM.__doc__ = NelderMead.__doc__
 
 class FuFPrior:
   
-  def _laplace(self, **kwargs):
-    def laplace(ps, n, **rest):
+  def _uniform(self, **kwargs):
+    def uniform(ps, n, **rest):
       return 0.0
-    return laplace
+    return uniform
   
   def _jeffreyPoissonScale(self, **kwargs):
     def jps(ps, n, **rest):
@@ -696,8 +696,8 @@ class FuFPrior:
     """
     """
     if isinstance(lnp, basestring):
-      if lnp == "laplace":
-        self.lnp = self._laplace(**kwargs)
+      if lnp == "uniform":
+        self.lnp = self._uniform(**kwargs)
       elif lnp == "jeffreyPS":
         self.lnp = self._jeffreyPoissonScale(**kwargs)
       elif lnp == "gaussian":
@@ -1480,8 +1480,68 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.updateModel() 
     self.MCMC.db.close()
     
-  def fitEMCEE(self, nwalker=None, priors=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
+  def fitEMCEE(self, nwalker=None, priors=None, pots=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
     """
+      MCMC samplign using emcee package.
+      
+      Sample from the posterior probability distribution using the emcee
+      package. By default the likelihood is calculated as -0.5 times the
+      model chi-square value.
+      
+      The emcee sampler can be accessed via the `emceeSampler` attribute,
+      which may be used to continue or manipulate sampling.
+      
+      Parameters
+      ----------
+      nwalker : int, optional
+          The number of walker to be used. By default, two times the
+          number of free parameters is used.
+      scales : dictionary, optional
+          The scales argument can be used to control the initial distribution
+          of the walkers. By default, all walkers are distributed around the
+          location given by the current state of the object, i.e., the current
+          parameter values. In each direction, the walker are randomly distributed
+          with a Gaussian distribution, whose default standard deviation is one.
+          The scales argument can be used to control the width of Gaussians used
+          to distribute the walkers.
+      sampleArgs : dictionary, optional
+          Number controling the sampling process. Use 'burn' (int) to specify
+          the number of burn-in iterations (default is 0). Via 'iters' (int)
+          the numbers of iterations after the burn-in can be specified (default 1000).
+          The 'process' (int) key can be used to control the number of iterations after
+          which the progress bar is updated (default is iters/100). Note that the
+          'progressbar' package must be installed to get a progress bar. Otherwise
+          more mundane print statements will be used.  
+      priors : dictionary, optional
+          For each parameter, a primary can be specified. In particular, a
+          prior is a function, which is called with two arguments: first, a
+          dictionary mapping the names of the free parameters to their
+          current values, and second, a string specifying the name of the
+          parameter for which the prior is to apply. The return value must be
+          the logarithmic prior probability (natural logarithm). A number of default
+          priors are available in the form of the `FuFPrior` class. By
+          default, a uniform (improper) prior is used for all parameter, for
+          which no other prior was specified.
+      pots : list, optional
+          A list of 'potentials'. A potential is a function, which is called using
+          a dictionary holding the current value for all parameters and returns
+          the logarithm of the associated probability. Potentials may, e.g., be
+          used to implement certain relations between parameter values not otherwise
+          accounted for. 
+      dbfile : string, optional
+          The result of the sampling, i.e., the chain(s), the corresponding
+          values of the posterior, and the names of the free parameters are
+          saved to the specified file (by default 'chain.emcee' is used).
+          The traces stored there can be analyzed using the 'TraceAnalysis'
+          class. Set this parameter to 'None' to avoid saving the results.
+      ps : tuple, optional
+          A tuple holding the current position and state of the sampler. This
+          tuple is returned by this method. The `ps` argument can be used
+          to continue sampling from the last state. Note that no burn-in will
+          ne carried out and the other arguments should be given as previously
+          to continue sampling successfully. 
+      emcp : dictionary, optional
+          Extra arguemnts handed to `EnsembleSampler` object.
     """
   
     if not ic.check["emcee"]:
@@ -1506,6 +1566,10 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       if not n in priors:
         priors[n] = FuFPrior("laplace")
     
+    # Ensure that potentials is at least an empty list
+    if pots is None:
+      pots = []
+    
     # Chi square calucaltor
     chisqr = self.__chiSqr()
     
@@ -1522,6 +1586,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       # Add prior information
       for name in fpns:
         pdf += priors[name].lnp(ps, name)
+      # Add information from potentials
+      for p in pots:
+        pdf += p(ps)
       return pdf
     
     # Set default values for sampleArgs
