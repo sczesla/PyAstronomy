@@ -24,6 +24,7 @@ package. The most important aspects are demonstrated by example.
 
     tutorial.rst
     tutorial2.rst
+    tutorialMCMC.rst
     traceAnalysisTutorial.rst
 
 Basic models
