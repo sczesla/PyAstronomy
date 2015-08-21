@@ -1,5 +1,12 @@
 import numpy
+from PyAstronomy.funcFit.utils import ic
+from PyAstronomy.pyaC import pyaErrors as PE
 
+try:
+  import pymc
+except ImportError:
+  pass
+  
 def bayesFactors(model1, model2):
   """
     Computes the Bayes factor for two competing models.
@@ -21,7 +28,9 @@ def bayesFactors(model1, model2):
         is favored, i.e., BF=p(M2)/p(M1).
     
   """
-  import pymc
+  if not ic.check["pymc"]:
+    raise(PE.PyARequiredImport("pymc is required to evaluate the bayesFactor", \
+                               solution="Install pymc"))
   
   logp1 = model1["deviance"]/(-2.)
   logp2 = model2["deviance"]/(-2.)

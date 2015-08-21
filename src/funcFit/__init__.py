@@ -20,7 +20,7 @@ _scoImport = ic.check["scipy"]
 _pymcImport = ic.check["pymc"]
 _mplImport = ic.check["matplotlib"]
 
-if _pymcImport: from PyAstronomy.funcFit.utils import *
+from PyAstronomy.funcFit.utils import *
 from modelRebin import turnIntoRebin, _ModelRebinDocu
 from onedfit import *
 from gauss1d import *
