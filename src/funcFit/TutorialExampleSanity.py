@@ -422,8 +422,8 @@ class ExampleSanity(unittest.TestCase):
   def sanity_Overbinning(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
-    import matplotlib.pylab as mpl
-    # ... and now the funcFit module
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
     # Creating a Gaussian with some noise
@@ -436,7 +436,7 @@ class ExampleSanity(unittest.TestCase):
     # Add some noise
     y += random.normal(0.0, 0.01, x.size)
     # Let us see what we have done...
-    mpl.plot(x, y, 'bp')
+    plt.plot(x, y, 'bp')
     
     # First, we create a "GaussFit1d_Rebin" class object (note that the
     # class object has still to be instantiated, the name is arbitrary).
@@ -481,15 +481,18 @@ class ExampleSanity(unittest.TestCase):
     # Write the result to the screen and plot the best fit model
     gf.parameterSummary()
     # Plot the final best-fit model
-    mpl.plot(x, gf.model, 'rp--')
+    plt.plot(x, gf.model, 'rp--')
     # Show the overbinned (=unbinned) model, indicate by color
     # which point are averaged to obtain a point in the binned
     # model.
     for k, v in gf.rebinIdent.iteritems():
       c = "y"
       if k % 2 == 0: c = "k"
-      mpl.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
+      plt.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
     
+    # Show the data and the best fit model
+#     plt.show()
+
   def sanity_simultaneousFit(self):
     from PyAstronomy import funcFit as fuf
     import numpy

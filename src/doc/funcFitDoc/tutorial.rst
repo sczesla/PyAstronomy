@@ -1192,78 +1192,78 @@ such "overbinned" models; a demonstration is given in the example below.
 
 ::
 
-  # Import numpy and matplotlib
-  from numpy import arange, sqrt, exp, pi, random, ones
-  import matplotlib.pylab as mpl
-  # ... and now the funcFit package
-  from PyAstronomy import funcFit as fuf
-  
-  # Creating a Gaussian with some noise
-  # Choose some parameters...
-  gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-  # Calculate profile
-  x = arange(20)/20.0 * 100.0 - 50.0
-  y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
-      * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-  # Add some noise
-  y += random.normal(0.0, 0.01, x.size)
-  # Let us see what we have done...
-  mpl.plot(x, y, 'bp')
-  
-  # First, we create a "GaussFit1d_Rebin" class object (note that the
-  # class object has still to be instantiated, the name is arbitrary).
-  GaussFit1d_Rebin = fuf.turnIntoRebin(fuf.GaussFit1d)
-  # Do the instantiation and specify how the overbinning should be
-  # carried out.
-  gf = GaussFit1d_Rebin()
-  gf.setRebinArray_Ndt(x, 10, x[1]-x[0])
-  # See what parameters are available
-  print "List of available parameters: ", gf.availableParameters()
-  # Set guess values for the parameters
-  gf["A"] = -10.0
-  gf["sig"] = 15.77
-  gf["off"] = 0.87
-  gf["mu"] = 7.5
-  # Let us see whether the assignment worked
-  print "Parameters and guess values: "
-  print "  A   : ", gf["A"]
-  print "  sig : ", gf["sig"]
-  print "  off : ", gf["off"]
-  print "  mu  : ", gf["mu"]
-  print ""
-  
-  # Now some of the strengths of funcFit are demonstrated; namely, the
-  # ability to consider some parameters as free and others as fixed.
-  # By default, all parameters of the GaussFit1d are frozen.
-  
-  # Show values and names of frozen parameters
-  print "Names and values if FROZEN parameters: ", gf.frozenParameters()
-  
-  # Which parameters shall be variable during the fit?
-  # 'Thaw' those (the order is irrelevant)
-  gf.thaw(["A", "sig", "off", "mu"])
-  
-  # Let us assume that we know that the amplitude is negative, i.e.,
-  # no lower boundary (None) and 0.0 as upper limit.
-  gf.setRestriction({"A":[None,0.0]})
-  
-  # Now start the fit
-  gf.fit(x, y, yerr=ones(x.size)*0.01)
-  
-  # Write the result to the screen and plot the best fit model
-  gf.parameterSummary()
-  # Plot the final best-fit model
-  mpl.plot(x, gf.model, 'rp--')
-  # Show the overbinned (=unbinned) model, indicate by color
-  # which point are averaged to obtain a point in the binned
-  # model.
-  for k, v in gf.rebinIdent.iteritems():
-    c = "y"
-    if k % 2 == 0: c = "k"
-    mpl.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
-  
-  # Show the data and the best fit model
-  mpl.show()
+    # Import numpy and matplotlib
+    from numpy import arange, sqrt, exp, pi, random, ones
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
+    from PyAstronomy import funcFit as fuf
+    
+    # Creating a Gaussian with some noise
+    # Choose some parameters...
+    gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
+    # Calculate profile
+    x = arange(20)/20.0 * 100.0 - 50.0
+    y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
+        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
+    # Add some noise
+    y += random.normal(0.0, 0.01, x.size)
+    # Let us see what we have done...
+    plt.plot(x, y, 'bp')
+    
+    # First, we create a "GaussFit1d_Rebin" class object (note that the
+    # class object has still to be instantiated, the name is arbitrary).
+    GaussFit1d_Rebin = fuf.turnIntoRebin(fuf.GaussFit1d)
+    # Do the instantiation and specify how the overbinning should be
+    # carried out.
+    gf = GaussFit1d_Rebin()
+    gf.setRebinArray_Ndt(x, 10, x[1]-x[0])
+    # See what parameters are available
+    print "List of available parameters: ", gf.availableParameters()
+    # Set guess values for the parameters
+    gf["A"] = -10.0
+    gf["sig"] = 15.77
+    gf["off"] = 0.87
+    gf["mu"] = 7.5
+    # Let us see whether the assignment worked
+    print "Parameters and guess values: "
+    print "  A   : ", gf["A"]
+    print "  sig : ", gf["sig"]
+    print "  off : ", gf["off"]
+    print "  mu  : ", gf["mu"]
+    print ""
+    
+    # Now some of the strengths of funcFit are demonstrated; namely, the
+    # ability to consider some parameters as free and others as fixed.
+    # By default, all parameters of the GaussFit1d are frozen.
+    
+    # Show values and names of frozen parameters
+    print "Names and values if FROZEN parameters: ", gf.frozenParameters()
+    
+    # Which parameters shall be variable during the fit?
+    # 'Thaw' those (the order is irrelevant)
+    gf.thaw(["A", "sig", "off", "mu"])
+    
+    # Let us assume that we know that the amplitude is negative, i.e.,
+    # no lower boundary (None) and 0.0 as upper limit.
+    gf.setRestriction({"A":[None,0.0]})
+    
+    # Now start the fit
+    gf.fit(x, y, yerr=ones(x.size)*0.01)
+    
+    # Write the result to the screen and plot the best fit model
+    gf.parameterSummary()
+    # Plot the final best-fit model
+    plt.plot(x, gf.model, 'rp--')
+    # Show the overbinned (=unbinned) model, indicate by color
+    # which point are averaged to obtain a point in the binned
+    # model.
+    for k, v in gf.rebinIdent.iteritems():
+      c = "y"
+      if k % 2 == 0: c = "k"
+      plt.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
+    
+    # Show the data and the best fit model
+    plt.show()
 
 This example is very similar to the very first one. Some differences shall, however, be
 emphasized:
