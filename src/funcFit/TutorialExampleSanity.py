@@ -210,7 +210,7 @@ class ExampleSanity(unittest.TestCase):
   def sanity_CombiningModels(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
@@ -227,7 +227,7 @@ class ExampleSanity(unittest.TestCase):
     # Add some noise
     y += random.normal(0.0, 0.01, x.size)
     # Let us see what we have done...
-    mpl.plot(x, y, 'bp')
+    plt.plot(x, y, 'bp')
     
     # Now let us come to the fitting
     # First, we create two Gauss1d fit objects
@@ -289,8 +289,8 @@ class ExampleSanity(unittest.TestCase):
     twoG.parameterSummary()
     
     # Show the data and the best fit model
-    mpl.plot(x, twoG.model, 'r--')
-    # mpl.show()
+    plt.plot(x, twoG.model, 'r--')
+#     plt.show()
 
   def sanity_CustomObjectiveFunctions(self):
     # Import numpy and matplotlib

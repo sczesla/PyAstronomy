@@ -390,94 +390,95 @@ can be summed.
 
 ::
 
-  # Import numpy and matplotlib
-  from numpy import arange, sqrt, exp, pi, random, ones
-  import matplotlib.pylab as mpl
-  # ... and now the funcFit package
-  from PyAstronomy import funcFit as fuf
-  
-  # Creating Gaussians with some noise
-  # Choose some parameters...
-  gPar1 = {"A":-5.0, "sig":10.0, "mu":20.0, "off":1.0, "lin":0.0}
-  gPar2 = {"A":+10.0, "sig":10.0, "mu":-20.0, "off":0.0, "lin":0.0}
-  # Calculate profile
-  x = arange(100) - 50.0
-  y = gPar1["off"] + gPar1["A"] / sqrt(2*pi*gPar1["sig"]**2) \
-      * exp(-(x-gPar1["mu"])**2/(2*gPar1["sig"]**2))
-  y -= gPar2["off"] + gPar2["A"] / sqrt(2*pi*gPar2["sig"]**2) \
-      * exp(-(x-gPar2["mu"])**2/(2*gPar2["sig"]**2))
-  # Add some noise
-  y += random.normal(0.0, 0.01, x.size)
-  # Let us see what we have done...
-  mpl.plot(x, y, 'bp')
-  
-  # Now let us come to the fitting
-  # First, we create two Gauss1d fit objects
-  gf1 = fuf.GaussFit1d()
-  gf2 = fuf.GaussFit1d()
-  
-  # Assign guess values for the parameters
-  gf1["A"] = -0.3
-  gf1["sig"] = 3.0
-  gf1["off"] = 0.0
-  gf1["mu"] = +5.0
-  
-  gf2["A"] = 3.0
-  gf2["sig"] = 15.0
-  gf2["off"] = 1.0
-  gf2["mu"] = -10.0
-  
-  # Which parameters shall be variable during the fit?
-  # 'Thaw' those (the order is irrelevant)
-  gf1.thaw(["A", "sig", "mu"])
-  gf2.thaw(["sig", "mu", "off"])
-  
-  # Our actual model is the sum of both Gaussians
-  twoG = gf1 + gf2
-  
-  # Show a description of the model depending on the
-  # names of the individual components
-  print
-  print "Description of the model: ", twoG.description()
-  print
-  
-  # Note that now the parameter names changed!
-  # Each parameter is now named using the "property"
-  # (e.g., 'A' or 'sig') as the first part, the component
-  # "root name" (in this case 'Gaussian') and a component
-  # number in paranthesis.
-  print "New parameter names and values: "
-  twoG.parameterSummary()
-  
-  # We forgot to thaw the amplitude of the second Gaussian, but
-  # we can still do it, but we have to refer to the correct name:
-  # either by using the (new) variable name:
-  twoG.thaw("A_Gaussian(2)")
-  # or by specifying property name, root name, and component number
-  # separately (note that a tuple is used to encapsulate them):
-  twoG.thaw(("A", "Gaussian", 2))
-  # We decide to rather freeze the offset of the second
-  # Gaussian (we could have used a tuple here, too).
-  twoG.freeze("off_Gaussian(2)")
-  
-  # Start fit as usual
-  twoG.fit(x,y,yerr=ones(x.size)*0.01)
-  
-  # Write the result to the screen and plot the best fit model
-  print
-  print "--------------------------------"
-  print "Parameters for the combined fit:"
-  print "--------------------------------"
-  twoG.parameterSummary()
-  
-  # Show the data and the best fit model
-  mpl.plot(x, twoG.model, 'r--')
-  mpl.show()
+    # Import numpy and matplotlib
+    from numpy import arange, sqrt, exp, pi, random, ones
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
+    from PyAstronomy import funcFit as fuf
+    
+    # Creating Gaussians with some noise
+    # Choose some parameters...
+    gPar1 = {"A":-5.0, "sig":10.0, "mu":20.0, "off":1.0, "lin":0.0}
+    gPar2 = {"A":+10.0, "sig":10.0, "mu":-20.0, "off":0.0, "lin":0.0}
+    # Calculate profile
+    x = arange(100) - 50.0
+    y = gPar1["off"] + gPar1["A"] / sqrt(2*pi*gPar1["sig"]**2) \
+        * exp(-(x-gPar1["mu"])**2/(2*gPar1["sig"]**2))
+    y -= gPar2["off"] + gPar2["A"] / sqrt(2*pi*gPar2["sig"]**2) \
+        * exp(-(x-gPar2["mu"])**2/(2*gPar2["sig"]**2))
+    # Add some noise
+    y += random.normal(0.0, 0.01, x.size)
+    # Let us see what we have done...
+    plt.plot(x, y, 'bp')
+    
+    # Now let us come to the fitting
+    # First, we create two Gauss1d fit objects
+    gf1 = fuf.GaussFit1d()
+    gf2 = fuf.GaussFit1d()
+    
+    # Assign guess values for the parameters
+    gf1["A"] = -0.3
+    gf1["sig"] = 3.0
+    gf1["off"] = 0.0
+    gf1["mu"] = +5.0
+    
+    gf2["A"] = 3.0
+    gf2["sig"] = 15.0
+    gf2["off"] = 1.0
+    gf2["mu"] = -10.0
+    
+    # Which parameters shall be variable during the fit?
+    # 'Thaw' those (the order is irrelevant)
+    gf1.thaw(["A", "sig", "mu"])
+    gf2.thaw(["sig", "mu", "off"])
+    
+    # Our actual model is the sum of both Gaussians
+    twoG = gf1 + gf2
+    
+    # Show a description of the model depending on the
+    # names of the individual components
+    print
+    print "Description of the model: ", twoG.description()
+    print
+    
+    # Note that now the parameter names changed!
+    # Each parameter is now named using the "property"
+    # (e.g., 'A' or 'sig') as the first part, the component
+    # "root name" (in this case 'Gaussian') and a component
+    # number in paranthesis.
+    print "New parameter names and values: "
+    twoG.parameterSummary()
+    
+    # We forgot to thaw the amplitude of the second Gaussian, but
+    # we can still do it, but we have to refer to the correct name:
+    # either by using the (new) variable name:
+    twoG.thaw("A_Gaussian(2)")
+    # or by specifying property name, root name, and component number
+    # separately (note that a tuple is used to encapsulate them):
+    twoG.thaw(("A", "Gaussian", 2))
+    # We decide to rather freeze the offset of the second
+    # Gaussian (we could have used a tuple here, too).
+    twoG.freeze("off_Gaussian(2)")
+    
+    # Start fit as usual
+    twoG.fit(x,y,yerr=ones(x.size)*0.01)
+    
+    # Write the result to the screen and plot the best fit model
+    print
+    print "--------------------------------"
+    print "Parameters for the combined fit:"
+    print "--------------------------------"
+    twoG.parameterSummary()
+    
+    # Show the data and the best fit model
+    plt.plot(x, twoG.model, 'r--')
+    plt.show()
 
 .. note:: `twoG` contains copies (not references) two its "ancestors" (`gf1` and `gf2`). You can, thus, continue using those as usual.
 
 When the models are combined (added in this case), funcFit adds "component identifiers" to the variable names to ensure that they
-remain unique. A component identifier is simply an appendix to the variable name consisting of an underscore and a number. The combined
+remain unique. A component identifier is simply an appendix to the variable name consisting of an underscore, the model name,
+and a number. The combined
 model behaves exactly like the individual ones. It should also be noted that model characteristics such as relations, restrictions, etc.,
 are preserved in the combined model.
 
