@@ -154,9 +154,7 @@ class TraceAnalysis:
     # Dummy tracesDic
     self.tracesDic = dict(zip( self.emceepnames, [None]*len(self.emceepnames)))
     # Build stateDic
-    self.stateDic = {"stochastics":dict(zip( self.emceepnames, [None]*len(self.emceepnames))), "sampler":{}}
-    for n in self.emceepnames:
-      self.stateDic["stochastics"][n] = None
+    self.stateDic = {"stochastics":dict(zip( list(self._emceedat["pnames"]), [None]*len(list(self._emceedat["pnames"])))), "sampler":{}}
     
     # Flatten the chain
     s = self._emceedat["chain"].shape
@@ -246,7 +244,6 @@ class TraceAnalysis:
       return self.tracesDic[parm].gettrace()[self.burn::self.thin]
     elif self.dbtype == "emcee":
       index = self.emceepnames.index(parm)
-      print "      INDEX: ", index
       return self.emceechain[self.burn::self.thin,index]
 
   def __str__(self):
