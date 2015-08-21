@@ -1519,7 +1519,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.MCMC.db.close()
     
   def fitEMCEE(self, x=None, y=None, yerr=None, nwalker=None, priors=None, pots=None, scales=None, \
-               sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
+               sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMD=True):
     """
       MCMC samplign using emcee package.
       
@@ -1581,6 +1581,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           to continue sampling successfully. 
       emcp : dictionary, optional
           Extra arguemnts handed to `EnsembleSampler` object.
+      toMD : boolean, optional
+          If True (default), the object is set to the lowest-deviance solution
+          after sampling. Otherwise, it remains in a random state.
     """
   
     if not ic.check["emcee"]:
@@ -1727,6 +1730,12 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if not dbfile is None:
       np.savez_compressed(open(dbfile, 'w'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
                              pnames=np.array(fpns, dtype=np.string_))
+    
+    if toMD:
+      # Set to lowest-deviance solution
+      indimin = np.argmin(self.emceeSampler.lnprobability)
+      for i, p in enumerate(self.freeParamNames()):
+        self[p] = self.emceeSampler.flatchain[indimin, i] 
     
     return pos, state
     
