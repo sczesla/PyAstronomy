@@ -487,7 +487,7 @@ Applying conditional restrictions
 --------------------------------------
 
 Via `conditional restrictions` complex penalty (or reward) functions can be
-defined, which keep the fit out or force into a specific subspace of the
+defined, which keep the fit out or force it into a specific subspace of the
 parameter space. Conditional restrictions are self-defined callables such
 as function, which take a number of parameters and return a float, which
 specifies the penalty. The latter is added to the objective function.
