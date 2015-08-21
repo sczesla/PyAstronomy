@@ -93,8 +93,8 @@ class ExampleSanity(unittest.TestCase):
   def sanity_CustomModel(self):
     # Import numpy and matplotlib
     from numpy import arange, random
-    import matplotlib.pylab as mpl
-    # ... and now the funcFit module
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
     class StraightLine(fuf.OneDFit):
@@ -116,7 +116,7 @@ class ExampleSanity(unittest.TestCase):
         """
         y = self["off"] + (self["lin"] * x)
         return y
-    
+      
     # Generate some data and add noise
     x = arange(100)
     y = 10.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
@@ -134,10 +134,10 @@ class ExampleSanity(unittest.TestCase):
     
     # Investigate the result
     lf.parameterSummary()
-    mpl.plot(x, y, 'bp')
-    mpl.plot(x, lf.model, 'r--')
-    #  mpl.show()
-
+    plt.plot(x, y, 'bp')
+    plt.plot(x, lf.model, 'r--')
+#     plt.show()
+    
   def sanity_Relations(self):
     # import numpy and matplotlib
     from numpy import arange, random

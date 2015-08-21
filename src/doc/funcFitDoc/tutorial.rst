@@ -211,70 +211,70 @@ are given.
 Introducing a custom model
 -------------------------------
 
-The funcFit package comes with some fitting models, but in many cases it will be necessary \
-to use custom models. Introducing a new model is easy in funcFit and will be demonstrated \
+The funcFit package comes with some fitting models, but in many cases it will be necessary
+to use custom models. Introducing a new model is easy in funcFit and will be demonstrated
 in the next example. Here we implement a straight line and fit it to some artificial data.
 
 ::
 
-  # Import numpy and matplotlib
-  from numpy import arange, random
-  import matplotlib.pylab as mpl
-  # ... and now the funcFit package
-  from PyAstronomy import funcFit as fuf
-  
-  class StraightLine(fuf.OneDFit):
-    """
-      Implements a straight line of the form y = "off" + x * "lin".
-    """
-  
-    def __init__(self):
-      fuf.OneDFit.__init__(self, ["off", "lin"])
-  
-    def evaluate(self, x):
-      """
-        Calculates and returns model according to the \
-        current parameter values.
-  
-        Parameters:
-          - `x` - Array specifying the positions at \
-                  which to evaluate the model.
-      """
-      y = self["off"] + (self["lin"] * x)
-      return y
+    # Import numpy and matplotlib
+    from numpy import arange, random
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
+    from PyAstronomy import funcFit as fuf
     
-  # Generate some data and add noise
-  x = arange(100)
-  y = 10.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
-  
-  # Create fitting class instance and set initial guess
-  # Note that all parameters are frozen by default
-  lf = StraightLine()
-  lf["off"] = 20.0
-  lf["lin"] = 1.0
-  # Thaw parameters
-  lf.thaw(["off", "lin"])
-  
-  # Start fitting
-  lf.fit(x, y)
-  
-  # Investigate the result
-  lf.parameterSummary()
-  mpl.plot(x, y, 'bp')
-  mpl.plot(x, lf.model, 'r--')
-  mpl.show()
+    class StraightLine(fuf.OneDFit):
+      """
+        Implements a straight line of the form y = "off" + x * "lin".
+      """
+    
+      def __init__(self):
+        fuf.OneDFit.__init__(self, ["off", "lin"])
+    
+      def evaluate(self, x):
+        """
+          Calculates and returns model according to the \
+          current parameter values.
+    
+          Parameters:
+            - `x` - Array specifying the positions at \
+                    which to evaluate the model.
+        """
+        y = self["off"] + (self["lin"] * x)
+        return y
+      
+    # Generate some data and add noise
+    x = arange(100)
+    y = 10.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
+    
+    # Create fitting class instance and set initial guess
+    # Note that all parameters are frozen by default
+    lf = StraightLine()
+    lf["off"] = 20.0
+    lf["lin"] = 1.0
+    # Thaw parameters
+    lf.thaw(["off", "lin"])
+    
+    # Start fitting
+    lf.fit(x, y)
+    
+    # Investigate the result
+    lf.parameterSummary()
+    plt.plot(x, y, 'bp')
+    plt.plot(x, lf.model, 'r--')
+    plt.show()
 
-This example resembles the first one. The new thing is that we defined a custom fitting \
-model at the top instead of using the *GaussFit1d* class seen in the first example.
+This example resembles the first one, but here we defined a custom fitting
+model at the top instead of using the *GaussFit1d* class as in the first example.
 
-A new fitting model is a class, which inherits from the *OneDFit* class. Additionally, two \
+A new fitting model is a class, which inherits from the *OneDFit* class. Additionally, two
 methods (*__init__* and *evaluate*) must be implemented.
-In the example, we \
-provide a minimal constructor (__init__ method), which only consists of a call to the \
-base class (OneDFit) constructor. The argument is a list of strings with the names of the \
-variables characterizing the model. The *evaluate* method takes a single argument, which is \
-an array of values at which to evaluate the model. It returns the function values at the \
-given position. Note how, e.g., *self["off"]*, is used to get the current value if the offset \
+In the example, we
+provide a minimal constructor (__init__ method), which only consists of a call to the
+base class (OneDFit) constructor. The argument is a list of strings with the names of the
+variables characterizing the model. The *evaluate* method takes a single argument, which is
+an array of values at which to evaluate the model. It returns the function values at the
+given position. Note how, e.g., *self["off"]*, is used to get the current value if the offset
 variable in *evaluate*.
 
 Applying *relations*
