@@ -496,7 +496,7 @@ class ExampleSanity(unittest.TestCase):
   def sanity_simultaneousFit(self):
     from PyAstronomy import funcFit as fuf
     import numpy
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     
     # Set up two different x axes.
     x1 = numpy.arange(100.)/100. - 0.5
@@ -514,10 +514,10 @@ class ExampleSanity(unittest.TestCase):
     y2 = calor.evaluate(x2) + numpy.random.normal(0., 0.01, 150)
     
     # Plot the noisy data.
-    mpl.subplot(2,1,1)
-    mpl.errorbar(x1, y1, yerr=numpy.ones(100)*0.01)
-    mpl.subplot(2,1,2)
-    mpl.errorbar(x2, y2, yerr=numpy.ones(150)*0.01)
+    plt.subplot(2,1,1)
+    plt.errorbar(x1, y1, yerr=numpy.ones(100)*0.01)
+    plt.subplot(2,1,2)
+    plt.errorbar(x2, y2, yerr=numpy.ones(150)*0.01)
     
     # Now, get ready two fit the data sets simultaneously.
     sf = fuf.SyncFitContainer()
@@ -570,13 +570,12 @@ class ExampleSanity(unittest.TestCase):
     sf.parameterSummary()
     
     # Plot the best-fit model(s).
-    mpl.subplot(2,1,1)
-    mpl.plot(x1, sf.models[gaussCno], 'r--')
-    mpl.subplot(2,1,2)
-    mpl.plot(x2, sf.models[calorCno], 'r--')
+    plt.subplot(2,1,1)
+    plt.plot(x1, sf.models[gaussCno], 'r--')
+    plt.subplot(2,1,2)
+    plt.plot(x2, sf.models[calorCno], 'r--')
     
-    # mpl.show()
-
+#     plt.show()
 
   def sanity_MCMCPriorExample(self):
     from PyAstronomy import funcFit as fuf

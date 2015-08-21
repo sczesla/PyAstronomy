@@ -1287,85 +1287,87 @@ x-axes simultaneously.
  
 ::
  
-  from PyAstronomy import funcFit as fuf
-  import numpy
-  import matplotlib.pylab as mpl
-  
-  # Set up two different x axes.
-  x1 = numpy.arange(100.)/100. - 0.5
-  x2 = numpy.arange(150.)/150. - 0.25
-  
-  # Getting the models ...
-  gauss = fuf.GaussFit1d()
-  calor = fuf.CauchyLorentz1d()
-  # and assign parameters.
-  gauss.assignValue({"A":0.02, "sig":0.1, "mu":0.0, "off":1.0, "lin":0.0})
-  calor.assignValue({"A":0.07, "g":0.1, "mu":0.2, "off":1.0, "lin":0.0})
-  
-  # Create noisy data.
-  y1 = gauss.evaluate(x1) + numpy.random.normal(0., 0.01, 100)
-  y2 = calor.evaluate(x2) + numpy.random.normal(0., 0.01, 150)
-  
-  # Plot the noisy data.
-  mpl.subplot(2,1,1)
-  mpl.errorbar(x1, y1, yerr=numpy.ones(100)*0.01)
-  mpl.subplot(2,1,2)
-  mpl.errorbar(x2, y2, yerr=numpy.ones(150)*0.01)
-  
-  # Now, get ready two fit the data sets simultaneously.
-  sf = fuf.SyncFitContainer()
-  # Tell the class about the two components and save the
-  # component numbers assigned to them:
-  gaussCno = sf.addComponent(gauss)
-  calorCno = sf.addComponent(calor)
-  
-  print "Component numbers in the syncFit container:"
-  print "  Gauss: ", gaussCno, ",  Cauchy-Lorentz: ", calorCno
-  print
-  
-  # See what happened to the parameters in the
-  # simultaneous fitting class.
-  # The variable names have changed.
-  sf.parameterSummary()
-  
-  # Thaw all parameters (for later fit) ...
-  sf.thaw(sf.parameters().keys())
-  # but not the linear term.
-  sf.freeze(["lin_Gaussian[s1]", "lin_CauLor[s2]"])
-  
-  # Tell the class about the identity of parameters,
-  # either by using the "property name" of the parameter:
-  sf.treatAsEqual("off")
-  # or by specifying the names explicitly.
-  sf.treatAsEqual(["g_CauLor[s2]", "sig_Gaussian[s1]"])
-  
-  # See what happened to the parameters in the
-  # simultaneous fitting class.
-  print
-  print "Parameters after 'treatAsEqual' has been applied:"
-  sf.parameterSummary()
-  
-  # Randomize starting values.
-  for fp in sf.freeParamNames():
-    sf[fp] = sf[fp] + numpy.random.normal(0., 0.05)
-  
-  # Set up the data appropriately.
-  data = {gaussCno:[x1, y1], calorCno:[x2, y2]}
-  yerr = {gaussCno: numpy.ones(100)*0.01, \
-          calorCno: numpy.ones(150)*0.01}
-  
-  # Start the fit.
-  sf.fit(data, yerr=yerr)
-  
-  # Show the best-fit values.
-  print
-  print "Best-fit parameters:"
-  sf.parameterSummary()
-  
-  # Plot the best-fit model(s).
-  mpl.subplot(2,1,1)
-  mpl.plot(x1, sf.models[gaussCno], 'r--')
-  mpl.subplot(2,1,2)
-  mpl.plot(x2, sf.models[calorCno], 'r--')
-  
-  mpl.show()
+    from PyAstronomy import funcFit as fuf
+    import numpy
+    import matplotlib.pylab as plt
+    
+    # Set up two different x axes.
+    x1 = numpy.arange(100.)/100. - 0.5
+    x2 = numpy.arange(150.)/150. - 0.25
+    
+    # Getting the models ...
+    gauss = fuf.GaussFit1d()
+    calor = fuf.CauchyLorentz1d()
+    # and assign parameters.
+    gauss.assignValue({"A":0.02, "sig":0.1, "mu":0.0, "off":1.0, "lin":0.0})
+    calor.assignValue({"A":0.07, "g":0.1, "mu":0.2, "off":1.0, "lin":0.0})
+    
+    # Create noisy data.
+    y1 = gauss.evaluate(x1) + numpy.random.normal(0., 0.01, 100)
+    y2 = calor.evaluate(x2) + numpy.random.normal(0., 0.01, 150)
+    
+    # Plot the noisy data.
+    plt.subplot(2,1,1)
+    plt.errorbar(x1, y1, yerr=numpy.ones(100)*0.01)
+    plt.subplot(2,1,2)
+    plt.errorbar(x2, y2, yerr=numpy.ones(150)*0.01)
+    
+    # Now, get ready two fit the data sets simultaneously.
+    sf = fuf.SyncFitContainer()
+    # Tell the class about the two components and save the
+    # component numbers assigned to them:
+    gaussCno = sf.addComponent(gauss)
+    calorCno = sf.addComponent(calor)
+    
+    print "Component numbers in the syncFit container:"
+    print "  Gauss: ", gaussCno, ",  Cauchy-Lorentz: ", calorCno
+    print
+    
+    # See what happened to the parameters in the
+    # simultaneous fitting class.
+    # The variable names have changed.
+    sf.parameterSummary()
+    
+    # Thaw all parameters (for later fit) ...
+    sf.thaw(sf.parameters().keys())
+    # but not the linear term.
+    sf.freeze(["lin_Gaussian[s1]", "lin_CauLor[s2]"])
+    
+    # Tell the class about the identity of parameters,
+    # either by using the "property name" of the parameter:
+    sf.treatAsEqual("off")
+    # or by specifying the names explicitly.
+    sf.treatAsEqual(["g_CauLor[s2]", "sig_Gaussian[s1]"])
+    
+    # See what happened to the parameters in the
+    # simultaneous fitting class.
+    print
+    print "Parameters after 'treatAsEqual' has been applied:"
+    sf.parameterSummary()
+    
+    # Randomize starting values.
+    for fp in sf.freeParamNames():
+      sf[fp] = sf[fp] + numpy.random.normal(0., 0.05)
+    
+    # Set up the data appropriately.
+    data = {gaussCno:[x1, y1], calorCno:[x2, y2]}
+    yerr = {gaussCno: numpy.ones(100)*0.01, \
+            calorCno: numpy.ones(150)*0.01}
+    
+    # Start the fit.
+    sf.fit(data, yerr=yerr)
+    
+    # Show the best-fit values.
+    print
+    print "Best-fit parameters:"
+    sf.parameterSummary()
+    
+    # Plot the best-fit model(s).
+    plt.subplot(2,1,1)
+    plt.plot(x1, sf.models[gaussCno], 'r--')
+    plt.subplot(2,1,2)
+    plt.plot(x2, sf.models[calorCno], 'r--')
+    
+    plt.show()
+
+ 
