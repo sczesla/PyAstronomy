@@ -295,7 +295,7 @@ class ExampleSanity(unittest.TestCase):
   def sanity_CustomObjectiveFunctions(self):
     # Import numpy and matplotlib
     from numpy import arange, exp, random, ones, sum, abs
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # Import funcFit
     from PyAstronomy import funcFit as fuf
     
@@ -324,7 +324,7 @@ class ExampleSanity(unittest.TestCase):
     # Do not use chi square, but the linear deviation from model
     # to evaluate quality of fit.
     # Use the "MiniFunc" decorator to define your custom objective
-    # function. This decorator takes the fitting objexct as an
+    # function. This decorator takes the fitting object as an
     # argument. The function has to accept two arguments: the
     # fitting object and the list of free parameters.
     @fuf.MiniFunc(edf)
@@ -338,9 +338,9 @@ class ExampleSanity(unittest.TestCase):
     
     # Show parameter values and plot best-fit model.
     edf.parameterSummary()
-    mpl.errorbar(x,y,yerr)
-    mpl.plot(x, edf.model, 'r-')
-    # mpl.show()
+    plt.errorbar(x,y,yerr)
+    plt.plot(x, edf.model, 'r-')
+#     plt.show()
 
   def sanity_MCMCSampler(self):
     # Import some required modules

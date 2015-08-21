@@ -826,54 +826,54 @@ model and data (weighted by the error) to define the fit quality.
 
 ::
 
-  # Import numpy and matplotlib
-  from numpy import arange, exp, random, ones, sum, abs
-  import matplotlib.pylab as mpl
-  # Import funcFit
-  from PyAstronomy import funcFit as fuf
-  
-  # Define parameters of faked data
-  A = 1.0
-  tau = 10.
-  off = 0.2
-  t0 = 40.
-  
-  # Caculate fake data set
-  x = arange(100)
-  y = A*exp(-(x-t0)/tau) * (x>t0) + off
-  y += random.normal(0., 0.1, 100)
-  yerr = ones(100)*0.01
-  
-  # Exponential decay model
-  edf = fuf.ExpDecayFit1d()
-  
-  # Define free quantities
-  edf.thaw(["A", "tau", "off", "t0"])
-  # Let the amplitude be positive
-  edf.setRestriction({"A":[0.0,None]})
-  # Define initial guess
-  edf.assignValue({"A":1.0, "tau": 15., "off":0.2, "t0":50.})
-  
-  # Do not use chi square, but the linear deviation from model
-  # to evaluate quality of fit.
-  # Use the "MiniFunc" decorator to define your custom objective
-  # function. This decorator takes the fitting object as an
-  # argument. The function has to accept two arguments: the
-  # fitting object and the list of free parameters.
-  @fuf.MiniFunc(edf)
-  def mini(edf, P):
-    m = sum(abs(edf.model - edf.y)/edf.yerr)
-    print "mini - current parameters: ", P, ", value is: ", m
-    return m
-  
-  # Carry out fit WITH SELF-DEFINED OBJECTIVE FUNCTION
-  edf.fit(x, y, yerr=yerr, miniFunc=mini)
-  
-  # Show parameter values and plot best-fit model.
-  edf.parameterSummary()
-  mpl.errorbar(x,y,yerr)
-  mpl.plot(x, edf.model, 'r-')
-  mpl.show()
+    # Import numpy and matplotlib
+    from numpy import arange, exp, random, ones, sum, abs
+    import matplotlib.pylab as plt
+    # Import funcFit
+    from PyAstronomy import funcFit as fuf
+    
+    # Define parameters of faked data
+    A = 1.0
+    tau = 10.
+    off = 0.2
+    t0 = 40.
+    
+    # Caculate fake data set
+    x = arange(100)
+    y = A*exp(-(x-t0)/tau) * (x>t0) + off
+    y += random.normal(0., 0.1, 100)
+    yerr = ones(100)*0.01
+    
+    # Exponential decay model
+    edf = fuf.ExpDecayFit1d()
+    
+    # Define free quantities
+    edf.thaw(["A", "tau", "off", "t0"])
+    # Let the amplitude be positive
+    edf.setRestriction({"A":[0.0,None]})
+    # Define initial guess
+    edf.assignValue({"A":1.0, "tau": 15., "off":0.2, "t0":50.})
+    
+    # Do not use chi square, but the linear deviation from model
+    # to evaluate quality of fit.
+    # Use the "MiniFunc" decorator to define your custom objective
+    # function. This decorator takes the fitting object as an
+    # argument. The function has to accept two arguments: the
+    # fitting object and the list of free parameters.
+    @fuf.MiniFunc(edf)
+    def mini(edf, P):
+      m = sum(abs(edf.model - edf.y)/edf.yerr)
+      print "mini - current parameters: ", P, ", value is: ", m
+      return m
+    
+    # Carry out fit WITH SELF-DEFINED OBJECTIVE FUNCTION
+    edf.fit(x, y, yerr=yerr, miniFunc=mini)
+    
+    # Show parameter values and plot best-fit model.
+    edf.parameterSummary()
+    plt.errorbar(x,y,yerr)
+    plt.plot(x, edf.model, 'r-')
+    plt.show()
 
 Some points may be highlighted in this example:
   * You may have noticed that although the parameter `P` is given to the *mini* function, it is not
