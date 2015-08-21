@@ -15,6 +15,7 @@ is desirable.
 .. _SciPy: www.scipy.org/
 .. _numpy: numpy.scipy.org/
 .. _XSPEC: http://heasarc.nasa.gov/xanadu/xspec/
+.. _emcee: http://dan.iel.fm/emcee/current/
 
 Prerequisites
 -------------------
@@ -22,7 +23,11 @@ To run the example in this tutorial you need to have installed the following pac
  * numpy_
  * SciPy_
  * matplotlib_
- * pymc_ (only MCMC example).
+ 
+For MCMC sampling, at least one of the following packages should be installed
+ 
+ * pymc_ (in version *2.x*, unfortunately, version 3.x is not supported)
+ * emcee_
 
 We also assume that you have a basic knowledge of Python and these packages (except for
 pymc).
