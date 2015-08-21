@@ -433,7 +433,7 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     # 2500 further iterations (per walker).
     sampleArgs = {"iters":2500, "burn":200}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
     print
     
@@ -478,7 +478,7 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     # information contained in the likelihood function.
     priors = {"c0":fuf.FuFPrior("gaussian", sig=1.0/snr/np.sqrt(npoint), mu=7.0)}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs, priors=priors)
     
     print
