@@ -653,7 +653,8 @@ class Params:
     for p in pars:
       # If parameter 'p' is set, redefine 'parName1' using function 'func' with parameters 'pars'
       self.relations[p].append( [parName1, func, pars] )
-    # Update parameter values
+    # Update parameter values (on re-assigned the values of the independent
+    # parameters, the value of the dependent parameter will be updated)
     for p in pars:
       self.assignValue({p:self.__params[p]})
     self.isFree[parName1] = False
