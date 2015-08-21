@@ -141,8 +141,8 @@ class ExampleSanity(unittest.TestCase):
   def sanity_Relations(self):
     # import numpy and matplotlib
     from numpy import arange, random
-    import matplotlib.pylab as mpl
-    # ... and now the funcFit module
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
     class StraightLine(fuf.OneDFit):
@@ -172,6 +172,7 @@ class ExampleSanity(unittest.TestCase):
           Function used to relate parameters "lin" and "off".
         """
         return factor * off
+      return linOffRel
     
     # Note, above we used a nested function (a closure) to define
     # the relation. This approach is very flexible. If we were already
@@ -183,7 +184,7 @@ class ExampleSanity(unittest.TestCase):
     
     # Generate some data with noise
     x = arange(100)
-    y = 10.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
+    y = 100.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
     
     # Create fitting class instance and set initial guess
     lf = StraightLine()
@@ -195,17 +196,17 @@ class ExampleSanity(unittest.TestCase):
     # Assume we know about a relation between 'lin' and 'off'
     # In particular, lin = 9.0 * off. We use the function getLinearRelation
     # to obtain a function object defining the relation.
-    lf.relate("lin", ["off"], getLinearRelation(9.0))
+    lf.relate("lin", ["off"], getLinearRelation(9))
     
     # Start fitting
     lf.fit(x, y)
     
     # Investigate the result
     lf.parameterSummary()
-    mpl.plot(x, y, 'bp')
-    mpl.plot(x, lf.model, 'r--')
-    # mpl.show()
-
+    plt.plot(x, y, 'bp')
+    plt.plot(x, lf.model, 'r--')
+#     plt.show()
+  
   def sanity_CombiningModels(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones

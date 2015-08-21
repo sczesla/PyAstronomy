@@ -285,84 +285,90 @@ In particular, we will assume that the gradient of our line is a multiple of the
 
 ::
   
-  # import numpy and matplotlib
-  from numpy import arange, random
-  import matplotlib.pylab as mpl
-  # ... and now the funcFit package
-  from PyAstronomy import funcFit as fuf
-  
-  class StraightLine(fuf.OneDFit):
-    """
-      Implements a straight line of the form y = "off" + x * "lin".
-    """
-  
-    def __init__(self):
-      fuf.OneDFit.__init__(self, ["off", "lin"])
-  
-    def evaluate(self, x):
+    # import numpy and matplotlib
+    from numpy import arange, random
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
+    from PyAstronomy import funcFit as fuf
+    
+    class StraightLine(fuf.OneDFit):
       """
-        Calculates and returns model according to the current parameter values.
-  
-        Parameters:
-          - x - Array specifying the positions at which to evaluate the model.
+        Implements a straight line of the form y = "off" + x * "lin".
       """
-      y = self["off"] + (self["lin"] * x)
-      return y
+    
+      def __init__(self):
+        fuf.OneDFit.__init__(self, ["off", "lin"])
+    
+      def evaluate(self, x):
+        """
+          Calculates and returns model according to the current parameter values.
+    
+          Parameters:
+            - x - Array specifying the positions at which to evaluate the model.
+        """
+        y = self["off"] + (self["lin"] * x)
+        return y
+    
+    
+    # Create a function, which defines the relation.
+    
+    def getLinearRelation(factor):
+      def linOffRel(off):
+        """
+          Function used to relate parameters "lin" and "off".
+        """
+        return factor * off
+      return linOffRel
+    
+    # Note, above we used a nested function (a closure) to define
+    # the relation. This approach is very flexible. If we were already
+    # sure about the value of ``factor'' (e.g., 10.0), we could
+    # simply have used:
+    #
+    # def linOffRel(off):
+    #   return 10.0 * off
+    
+    # Generate some data with noise
+    x = arange(100)
+    y = 100.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
+    
+    # Create fitting class instance and set initial guess
+    lf = StraightLine()
+    lf["off"] = 20.0
+    lf["lin"] = 1.0
+    # Thaw parameters
+    lf.thaw(["off", "lin"])
+    
+    # Assume we know about a relation between 'lin' and 'off'
+    # In particular, lin = 9.0 * off. We use the function getLinearRelation
+    # to obtain a function object defining the relation.
+    lf.relate("lin", ["off"], getLinearRelation(9))
+    
+    # Start fitting
+    lf.fit(x, y)
+    
+    # Investigate the result
+    lf.parameterSummary()
+    plt.plot(x, y, 'bp')
+    plt.plot(x, lf.model, 'r--')
+    plt.show()
   
-  
-  # Create a function, which defines the relation.
-  
-  def getLinearRelation(factor):
-    def linOffRel(off):
-      """
-        Function used to relate parameters "lin" and "off".
-      """
-      return factor * off
-  
-  # Note, above we used a nested function (a closure) to define
-  # the relation. This approach is very flexible. If we were already
-  # sure about the value of ``factor'' (e.g., 10.0), we could
-  # simply have used:
-  #
-  # def linOffRel(off):
-  #   return 10.0 * off
-  
-  # Generate some data with noise
-  x = arange(100)
-  y = 10.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
-  
-  # Create fitting class instance and set initial guess
-  lf = StraightLine()
-  lf["off"] = 20.0
-  lf["lin"] = 1.0
-  # Thaw parameters
-  lf.thaw(["off", "lin"])
-  
-  # Assume we know about a relation between 'lin' and 'off'
-  # In particular, lin = 9.0 * off. We use the function getLinearRelation
-  # to obtain a function object defining the relation.
-  lf.relate("lin", ["off"], getLinearRelation(9.0))
-  
-  # Start fitting
-  lf.fit(x, y)
-  
-  # Investigate the result
-  lf.parameterSummary()
-  mpl.plot(x, y, 'bp')
-  mpl.plot(x, lf.model, 'r--')
-  mpl.show()
 
 The output of the script reads (numbers may differ):
 
 ::
 
-  Optimization terminated successfully.
-           Current function value: 4684.711018
-           Iterations: 23
-           Function evaluations: 46
-  Parameter: lin, value:      2.120667, free: False, restricted: False,  \
-    Relation: lin = f(off)
-  Parameter: off, value:      2.120667, free: True, restricted: False
+    Optimization terminated successfully.
+             Current function value: 251539.530679
+             Iterations: 27
+             Function evaluations: 54
+    ---------------------------------
+    Parameters for Component: unnamed
+    ---------------------------------
+    Parameter: lin  , [lin], value:       3.5004, free: False, restricted: False, related:  True
+         Relation: lin = f(off)
+    Parameter: off  , [off], value:     0.388933, free:  True, restricted: False, related: False
+
 
 .. note:: The `lin` parameter is no longer free, as it depends on `off`.
 
