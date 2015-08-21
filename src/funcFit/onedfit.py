@@ -678,6 +678,12 @@ class FuFPrior:
   """
     A number of priors.
     
+    Properly initialized, an object of type "FuFPrior"
+    is callable. On call, it expects a dictionary with
+    the names and values of the parameters as first
+    argument and the name of the parameter under consideration
+    as second argument. 
+    
     Parameters
     ----------
     lnp : string, {uniform, jeffreyPS, gaussian}
