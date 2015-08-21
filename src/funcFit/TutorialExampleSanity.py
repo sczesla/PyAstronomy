@@ -24,8 +24,8 @@ class ExampleSanity(unittest.TestCase):
   def sanity_firstExample(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
-    import matplotlib.pylab as mpl
-    # ... and now the funcFit module
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
     # Before we can start fitting, we need something to fit.
@@ -41,12 +41,12 @@ class ExampleSanity(unittest.TestCase):
     # Add some noise
     y += random.normal(0.0, 0.01, x.size)
     # Let us see what we have done...
-    mpl.plot(x, y, 'bp') 
-  
+    plt.plot(x, y, 'bp')
+    
     # Now we can start exploiting the funcFit functionality to
     # fit a Gaussian to our data. In the following lines, we
     # create a fitting object representing a Gaussian and set guess parameters.
-  
+    
     # Now let us come to the fitting
     # First, we create the Gauss1d fit object
     gf = fuf.GaussFit1d()
@@ -64,14 +64,14 @@ class ExampleSanity(unittest.TestCase):
     print "  off : ", gf["off"]
     print "  mu  : ", gf["mu"]
     print ""
-  
+    
     # Now some of the strengths of funcFit are demonstrated; namely, the
     # ability to consider some parameters as free and others as fixed.
     # By default, all parameters of the GaussFit1d are frozen.
     
     # Show values and names of frozen parameters
-    print "Names and values if FROZEN parameters: ", gf.frozenParameters()
-  
+    print "Names and values of FROZEN parameters: ", gf.frozenParameters()
+    
     # Which parameters shall be variable during the fit?
     # 'Thaw' those (the order is irrelevant)
     gf.thaw(["A", "sig", "off", "mu"])
@@ -85,10 +85,10 @@ class ExampleSanity(unittest.TestCase):
     
     # Write the result to the screen and plot the best fit model
     gf.parameterSummary()
-    mpl.plot(x, gf.model, 'r--')
+    plt.plot(x, gf.model, 'r--')
     
     # Show the data and the best fit model
-    # mpl.show()
+#     plt.show()
 
   def sanity_CustomModel(self):
     # Import numpy and matplotlib

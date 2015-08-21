@@ -92,98 +92,100 @@ It shows how free parameters can be specified and restrictions can be applied.
 
 ::
 
-  # Import numpy and matplotlib
-  from numpy import arange, sqrt, exp, pi, random, ones
-  import matplotlib.pylab as mpl
-  # ... and now the funcFit package
-  from PyAstronomy import funcFit as fuf
-  
-  # Before we can start fitting, we need something to fit.
-  # So let us create some data...
-  
-  # Creating a Gaussian with some noise
-  # Choose some parameters...
-  gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-  # Calculate profile
-  x = arange(100) - 50.0
-  y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
-      * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-  # Add some noise
-  y += random.normal(0.0, 0.01, x.size)
-  # Let us see what we have done...
-  mpl.plot(x, y, 'bp') 
-
-  # Now we can start exploiting the funcFit functionality to
-  # fit a Gaussian to our data. In the following lines, we
-  # create a fitting object representing a Gaussian and set guess parameters.
-
-  # Now let us come to the fitting
-  # First, we create the Gauss1d fit object
-  gf = fuf.GaussFit1d()
-  # See what parameters are available
-  print "List of available parameters: ", gf.availableParameters()
-  # Set guess values for the parameters
-  gf["A"] = -10.0
-  gf["sig"] = 15.77
-  gf["off"] = 0.87
-  gf["mu"] = 7.5
-  # Let us see whether the assignment worked
-  print "Parameters and guess values: "
-  print "  A   : ", gf["A"]
-  print "  sig : ", gf["sig"]
-  print "  off : ", gf["off"]
-  print "  mu  : ", gf["mu"]
-  print ""
-
-  # Now some of the strengths of funcFit are demonstrated; namely, the
-  # ability to consider some parameters as free and others as fixed.
-  # By default, all parameters of the GaussFit1d are frozen.
-  
-  # Show values and names of frozen parameters
-  print "Names and values if FROZEN parameters: ", gf.frozenParameters()
-
-  # Which parameters shall be variable during the fit?
-  # 'Thaw' those (the order is irrelevant)
-  gf.thaw(["A", "sig", "off", "mu"])
-  
-  # Let us assume that we know that the amplitude is negative, i.e.,
-  # no lower boundary (None) and 0.0 as upper limit.
-  gf.setRestriction({"A":[None,0.0]})
-  
-  # Now start the fit
-  gf.fit(x, y, yerr=ones(x.size)*0.01)
-  
-  # Write the result to the screen and plot the best fit model
-  gf.parameterSummary()
-  mpl.plot(x, gf.model, 'r--')
-  
-  # Show the data and the best fit model
-  mpl.show()
+    # Import numpy and matplotlib
+    from numpy import arange, sqrt, exp, pi, random, ones
+    import matplotlib.pylab as plt
+    # ... and now the funcFit package
+    from PyAstronomy import funcFit as fuf
+    
+    # Before we can start fitting, we need something to fit.
+    # So let us create some data...
+    
+    # Creating a Gaussian with some noise
+    # Choose some parameters...
+    gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
+    # Calculate profile
+    x = arange(100) - 50.0
+    y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
+        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
+    # Add some noise
+    y += random.normal(0.0, 0.01, x.size)
+    # Let us see what we have done...
+    plt.plot(x, y, 'bp')
+    
+    # Now we can start exploiting the funcFit functionality to
+    # fit a Gaussian to our data. In the following lines, we
+    # create a fitting object representing a Gaussian and set guess parameters.
+    
+    # Now let us come to the fitting
+    # First, we create the Gauss1d fit object
+    gf = fuf.GaussFit1d()
+    # See what parameters are available
+    print "List of available parameters: ", gf.availableParameters()
+    # Set guess values for the parameters
+    gf["A"] = -10.0
+    gf["sig"] = 15.77
+    gf["off"] = 0.87
+    gf["mu"] = 7.5
+    # Let us see whether the assignment worked
+    print "Parameters and guess values: "
+    print "  A   : ", gf["A"]
+    print "  sig : ", gf["sig"]
+    print "  off : ", gf["off"]
+    print "  mu  : ", gf["mu"]
+    print ""
+    
+    # Now some of the strengths of funcFit are demonstrated; namely, the
+    # ability to consider some parameters as free and others as fixed.
+    # By default, all parameters of the GaussFit1d are frozen.
+    
+    # Show values and names of frozen parameters
+    print "Names and values of FROZEN parameters: ", gf.frozenParameters()
+    
+    # Which parameters shall be variable during the fit?
+    # 'Thaw' those (the order is irrelevant)
+    gf.thaw(["A", "sig", "off", "mu"])
+    
+    # Let us assume that we know that the amplitude is negative, i.e.,
+    # no lower boundary (None) and 0.0 as upper limit.
+    gf.setRestriction({"A":[None,0.0]})
+    
+    # Now start the fit
+    gf.fit(x, y, yerr=ones(x.size)*0.01)
+    
+    # Write the result to the screen and plot the best fit model
+    gf.parameterSummary()
+    plt.plot(x, gf.model, 'r--')
+    
+    # Show the data and the best fit model
+    plt.show()
 
 
 Running the above script yields the following output (numbers may slightly differ):
 
 ::
 
-  List of available parameters:  ['A', 'mu', 'lin', 'sig', 'off']
-  Parameters and guess values: 
-    A   :  -10.0
-    sig :  15.77
-    off :  0.87
-    mu  :  7.5
-  
-  Names and values if FROZEN parameters: \
-    {'A': -10.0, 'mu': 7.5, 'lin': 0.0, 'sig': 15.77, 'off': 0.87}
-  Optimization terminated successfully.
-           Current function value: 89.047028
-           Iterations: 182
-           Function evaluations: 317
-  Parameter:   A, value:     -4.932741, free: True, restricted: True, \
-    lower bound: None, upper bound:     0.000000
-  Parameter: lin, value:      0.000000, free: False, restricted: False
-  Parameter:  mu, value:      9.942224, free: True, restricted: False
-  Parameter: off, value:      1.000320, free: True, restricted: False
-  Parameter: sig, value:      9.877148, free: True, restricted: False
+    List of available parameters:  ['A', 'mu', 'lin', 'sig', 'off']
+    Parameters and guess values: 
+      A   :  -10.0
+      sig :  15.77
+      off :  0.87
+      mu  :  7.5
+    
+    Names and values of FROZEN parameters:  {'A': -10.0, 'mu': 7.5, 'lin': 0.0, 'sig': 15.77, 'off': 0.87}
+    Optimization terminated successfully.
+             Current function value: 111.455503
+             Iterations: 176
+             Function evaluations: 310
+    ----------------------------------
+    Parameters for Component: Gaussian
+    ----------------------------------
+    Parameter:   A  Gaussian, [  A], value:     -4.92037, free:  True, restricted:  True, related: False
+        Restriction: [None,  0]
+    Parameter:  mu  Gaussian, [ mu], value:      9.83938, free:  True, restricted: False, related: False
+    Parameter: lin  Gaussian, [lin], value:            0, free: False, restricted: False, related: False
+    Parameter: sig  Gaussian, [sig], value:      9.97104, free:  True, restricted: False, related: False
+    Parameter: off  Gaussian, [off], value:     0.999786, free:  True, restricted: False, related: False
 
 
 Some points in the example shall be emphasized:
@@ -191,17 +193,17 @@ Some points in the example shall be emphasized:
   * Parameter values can be set and obtained using brackets,
   * Individual parameters can be thawed or frozen depending on the needs of the user,
   * Restrictions on the parameter ranges can be applied either on both or just on side of the range,
-  * After the fit, the best fit values become the current parameters, i.e., they can be obtained using the bracket operator,
-  * After the fit, the best fit model can be accessed through the `model` property. 
+  * After the fit, the best-fit values become the current parameters, i.e., they can be obtained using the bracket operator,
+  * After the fit, the best-fit model can be accessed through the `model` property. 
 
-The central step of the script is the call to *fit*. The method takes at least two arguments: the \
-x-axis and corresponding y-axis values; errors on the y-axis values can be given optionally \
-via the *yerr* keyword as shown in the example. In default configuration, the *fit* method \
-uses the *fmin* routine provided by SciPy.optimize to minimize :math:`\chi^2` if errors (yerr) \
-are given. If no errors are provided, it will simply minimize the quadratic deviation between \
-model and data.
+The central step of the script is the call to *fit*. The method takes at least two arguments: the
+x-axis and corresponding y-axis values; errors on the y-axis values can be given optionally
+via the *yerr* keyword as shown in the example. In default configuration, the *fit* method
+uses the *fmin* routine provided by SciPy.optimize to minimize either the sum of quadratic residuals
+of no error is provided, or :math:`\chi^2` if errors (yerr)
+are given.
 
-.. note:: Restrictions are implemented using a penalty function. The steepness of the penalty
+.. note:: Restrictions are implemented using a **penalty function**. The steepness of the penalty
           may be changed by the *setPenaltyFactor* method or by accessing the `penaltyFactor`
           property directly.
 
