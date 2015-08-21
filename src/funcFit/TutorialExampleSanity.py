@@ -1514,3 +1514,15 @@ class MCMCExampleSanity(unittest.TestCase):
     
     plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
 #     plt.show()
+
+  def sanity_InstatiatePrior(self):
+    from PyAstronomy import funcFit as fuf
+    
+    # Instantiate prior
+    gp = fuf.FuFPrior("gaussian", sig=0.1, mu=1.0)
+    
+    # Current values (arbitrary)
+    cvals = {"a":1.4, "b":0.86, "c":1.1}
+    
+    # Get log(prior) for parameter "b"
+    print gp(cvals, "b")

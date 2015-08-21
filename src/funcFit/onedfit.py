@@ -682,7 +682,9 @@ class FuFPrior:
     is callable. On call, it expects a dictionary with
     the names and values of the parameters as first
     argument and the name of the parameter under consideration
-    as second argument. 
+    as second argument. The return value should be the
+    (natural) logarithm of the associated prior probability
+    distribution.
     
     Parameters
     ----------

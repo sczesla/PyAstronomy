@@ -393,6 +393,8 @@ the result from sampling with classical error estimation; note that in this
 simple case Bayesian credibility intervals are, indeed, numerically identical
 to classical confidence intervals, which is, however, not generally the case.
 Second, we introduce (strong) prior information and repeat the sampling.
+
+A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     
 ::    
 

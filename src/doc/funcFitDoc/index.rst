@@ -53,6 +53,7 @@ Parameters and further functionality
     onedfit.rst
     modelRebin.rst
     syncFit.rst
+    emceePriors.rst
     traceAnalysis.rst
     coordinateGrid.rst
 
