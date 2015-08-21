@@ -327,7 +327,7 @@ Whether this should be considered reasonable or not is not a question the sample
 Sampling using emcee (fitEMCEE)
 ---------------------------------------------
 
-The emcee_ package relies on sampling an ensemble of chains, the so-called walkers. In this
+The emcee_ package relies on sampling with an ensemble of chains, the so-called walkers. In this
 way, the sampling is automatically adapted to the scale of the problem, which simplifies
 obtained reasonable acceptance rates.
 
@@ -336,7 +336,7 @@ Basic sampling with emcee
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following example shows a basic application of fitEMCEE. By default,
-the resulting Markov chain is saved to a 
+the resulting Markov chain is saved to a file called 'chain.emcee'.
 
 ::
 
