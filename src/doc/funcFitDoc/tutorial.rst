@@ -57,10 +57,10 @@ works and how it can make your work easier.
 Diving into the first example
 -------------------------------
 
-After you have installed PyAstronomy (PyA), the funcFit package \
-is ready for being used. As a very first step, let us import the \
-package and see whether we will be able to actually fit something. \
-Therefore, execute the following lines as a script or from the \
+After you have installed PyAstronomy (PyA), the funcFit package
+is ready for being used. As a very first step, let us import the
+package and see whether we will be able to actually fit something.
+Therefore, execute the following lines as a script or from the
 Python interactive command shell: 
 
 ::
@@ -71,16 +71,15 @@ Python interactive command shell:
 
 Depending on your installation the output should look like:
 
-
 ::
 
-  Status of funcFit:
-  --------------------------
-  Is scipy.optimize available?  yes
-  Is pymc available?  yes
-
-.. note:: At the moment, you do not need to be concerned about pymc support, but SciPy is indispensable.
-
+    Status of funcFit:
+    --------------------------
+    Is scipy.optimize available?  yes
+    Is pymc available?  yes
+      pymc is available in version:  2.3.4
+    Is emcee available?  yes
+    
 
 Now let us dive into the business of fitting. The first example shown below demonstrates how to \
 exploit the functionality of funcFit to fit a Gaussian to artificially created data. \

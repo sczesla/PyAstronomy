@@ -57,6 +57,19 @@ def status():
   if not _pymcImport:
     print "  No Markov-Chain Monte-Carlo sampling via pymc will be possible."
     print "  Install pymc to enable it (see http://code.google.com/p/pymc/)."
+  else:
+    import pymc
+    print "  pymc is available in version: ", pymc.__version__
+    try:
+      majorversion = int(pymc.__version__.split('.')[0])
+      if majorversion > 2:
+        print "  NOTE: Sampling is only supported with pymc 2.x (not 3.x)!"
+    except:
+      print "  Could not parse pymc version string..."
+  print "Is emcee available? ", __question(ic.check["emcee"])
+  if not ic.check["emcee"]:
+    print "  No Markov-Chain Monte-Carlo sampling via emcee will be possible."
+    print "  Install emcee to enable it (see http://dan.iel.fm/emcee/current/)."
 
 __all__ = ["cauchyLorentz1d", "gauss1d", "modelRebin", "onedfit", "params", "voigt1d", "sinexp1d", "polyModel",
            "BoltzmannSAS", "PyAAnneal"]
