@@ -675,6 +675,18 @@ FuFNM.__doc__ = NelderMead.__doc__
 
 
 class FuFPrior:
+  """
+    A number of priors.
+    
+    Parameters
+    ----------
+    lnp : string, {uniform, jeffreyPS, gaussian}
+        uniform : improper uniform prior. jeffreyPS: Jeffreys
+        prior for a Poisson scaling parameter. gaussian: A
+        Gaussian prior. The keyswords 'mu' and 'sig' must be
+        specified to define the mean and standard deviation of
+        the Gaussian.
+  """
   
   def _uniform(self, **kwargs):
     def uniform(ps, n, **rest):
@@ -693,15 +705,17 @@ class FuFPrior:
     return gaussianPrior
   
   def __init__(self, lnp, **kwargs):
-    """
-    """
     if isinstance(lnp, basestring):
       if lnp == "uniform":
-        self.lnp = self._uniform(**kwargs)
+        self.__call__ = self._uniform(**kwargs)
       elif lnp == "jeffreyPS":
-        self.lnp = self._jeffreyPoissonScale(**kwargs)
+        self.__call__ = self._jeffreyPoissonScale(**kwargs)
       elif lnp == "gaussian":
-        self.lnp = self._gaussian(**kwargs)
+        self.__call__ = self._gaussian(**kwargs)
+      else:
+        raise(PE.PyAValError("No prior defined for " + str(lnp), \
+                             where="FuFPrior", \
+                             solution="Use either of {uniform, jeffreyPS, gaussian}"))
         
 
 
@@ -1480,7 +1494,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     self.updateModel() 
     self.MCMC.db.close()
     
-  def fitEMCEE(self, nwalker=None, priors=None, pots=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
+  def fitEMCEE(self, x=None, y=None, yerr=None, nwalker=None, priors=None, pots=None, scales=None, \
+               sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
     """
       MCMC samplign using emcee package.
       
@@ -1514,7 +1529,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           more mundane print statements will be used.  
       priors : dictionary, optional
           For each parameter, a primary can be specified. In particular, a
-          prior is a function, which is called with two arguments: first, a
+          prior is a callable, which is called with two arguments: first, a
           dictionary mapping the names of the free parameters to their
           current values, and second, a string specifying the name of the
           parameter for which the prior is to apply. The return value must be
@@ -1547,7 +1562,20 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if not ic.check["emcee"]:
       raise(PE.PyARequiredImport("Could not import the 'emcee' package.", \
                                  solution="Please install 'emcee'."))
-        
+
+    if (not x is None) and (not y is None) and (not yerr is None):
+      # Assign attributes and check x, y, and yerr.
+      self._fufDS = FufDS(x, y, yerr)
+    elif (not x is None) and (not y is None) and (yerr is None):
+      raise(PE.PyAValError("An error on the y values is required.", \
+                           where="fitEMCEE", \
+                           solution="Please specify 'yerr'"))
+    if self._fufDS is None:
+      raise(PE.PyAValError("Please specify the data completely.", \
+                           where="fitEMCEE", \
+                           solution="Specify x, y, and yerr."))
+    
+
     # Names and values of free parameters
     fps = self.freeParameters()
     # Names of the free parameters in specific order
@@ -1555,16 +1583,37 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Number of dimensions 
     ndims = len(fps)
     
+    if ndims == 0:
+      raise(PE.PyAValError("At least one free parameter is required for sampling.", \
+                           where="fitEMCEE", \
+                           solution="Use 'thaw' to free same parameters."))
+    
+    if not dbfile is None:
+      if re.match(".*\.emcee$", dbfile) is None:
+        PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.", \
+                               solution="Use a filename of the form *.emcee"))
+    
     # Number of walkers
     if nwalker is None:
-      nwalker = ndims * 2
-    
+      self.nwalker = ndims * 2
+    else:
+      self.nwalker = nwalker
+      
+    if self.nwalker < ndims * 2:
+      raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.", \
+                           where="fitEMCEE", \
+                           solution="Increase the number of walkers."))
+    if self.nwalker % 2 == 1:
+      raise(PE.PyAValError("The number of walkers must be even.", \
+                           where="fitEMCEE", \
+                           solution="Use an even number of walkers."))
+      
     # Use default prior for those parameters not listed
     if priors is None:
       priors = {}
     for n in fpns:
       if not n in priors:
-        priors[n] = FuFPrior("laplace")
+        priors[n] = FuFPrior("uniform")
     
     # Ensure that potentials is at least an empty list
     if pots is None:
@@ -1585,7 +1634,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       pdf = likeli(fpns, values)
       # Add prior information
       for name in fpns:
-        pdf += priors[name].lnp(ps, name)
+        pdf += priors[name](ps, name)
       # Add information from potentials
       for p in pots:
         pdf += p(ps)
@@ -1607,14 +1656,14 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         emcp = {}
     
       # Generate the sampler
-      self.emceeSampler = emcee.EnsembleSampler(nwalker, ndims, lnpostdf, **emcp)
+      self.emceeSampler = emcee.EnsembleSampler(self.nwalker, ndims, lnpostdf, **emcp)
     
       if scales is None:
         scales = {}
       
       # Generate starting values
       pos = []
-      for _ in xrange(nwalker):
+      for _ in xrange(self.nwalker):
         pos.append(np.zeros(ndims))
         for i, n in enumerate(fpns):
           if not n in scales:
