@@ -686,8 +686,11 @@ class FuFPrior:
     
     Parameters
     ----------
-    lnp : string, {uniform, jeffreyPS, gaussian}
-        uniform : improper uniform prior. jeffreyPS: Jeffreys
+    lnp : string, {uniform, jeffreyPS, gaussian, limuniform}
+        uniform : improper uniform prior. limuniform: proper
+        uniform prior. 'lower' and 'upper' define the lower and
+        upper bounds of the interval.
+        jeffreyPS: Jeffreys
         prior for a Poisson scaling parameter. gaussian: A
         Gaussian prior. The keyswords 'mu' and 'sig' must be
         specified to define the mean and standard deviation of
@@ -698,6 +701,19 @@ class FuFPrior:
     def uniform(ps, n, **rest):
       return 0.0
     return uniform
+  
+  def _uniformLimit(self, **kwargs):
+    if kwargs["upper"] < kwargs["lower"]:
+      raise(PE.PyAValError("upper needs to be larger than lower", \
+                           where="FuFPrior (limited uniform distribution)", \
+                           solution="Adapt upper and lower."))
+    p = np.log(1.0/(kwargs["upper"] - kwargs["lower"]))
+    def unilimit(ps, n, **rest):
+      if (ps[n] >= kwargs["lower"]) and (ps[n] <= kwargs["upper"]):
+        return p
+      else:
+        return -np.Inf
+    return unilimit
   
   def _jeffreyPoissonScale(self, **kwargs):
     def jps(ps, n, **rest):
@@ -714,6 +730,8 @@ class FuFPrior:
     if isinstance(lnp, basestring):
       if lnp == "uniform":
         self.__call__ = self._uniform(**kwargs)
+      elif lnp == "limuniform":
+        self.__call__ = self._uniformLimit(**kwargs)
       elif lnp == "jeffreyPS":
         self.__call__ = self._jeffreyPoissonScale(**kwargs)
       elif lnp == "gaussian":
