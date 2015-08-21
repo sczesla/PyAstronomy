@@ -61,9 +61,9 @@ class Voigt1d(OneDFit):
     try:
         
         
-      z = ((x-self["mu"]) + (1.j)*self["al"])/(numpy.sqrt(2.0) * self["ad"])
+      z = ((x-self["mu"]) + (1.j)*abs(self["al"]))/(numpy.sqrt(2.0) * abs(self["ad"]))
       y = self["A"] * numpy.real(sps.wofz(z)) 
-      y /= (self["ad"] * numpy.sqrt(2.0*numpy.pi))
+      y /= (abs(self["ad"]) * numpy.sqrt(2.0*numpy.pi))
       y += x * self["lin"] + self["off"]
   
       y[numpy.where(numpy.isnan(y))] = 0.0
