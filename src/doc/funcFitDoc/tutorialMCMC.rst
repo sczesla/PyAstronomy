@@ -372,7 +372,7 @@ the resulting Markov chain is saved to a file called 'chain.emcee'.
     # 1000 further iterations (per walker).
     sampleArgs = {"iters":1000, "burn":200}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = gf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
     
     # Plot the distributions of the chains
