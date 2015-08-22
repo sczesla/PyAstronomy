@@ -78,11 +78,11 @@ class NelderMead:
         self._simplex[i+1, i] += initDelta[p]
       else:
         if self._simplex[0,i] == 0.0:
-          raise(PE.PyAValError("The start value of the parameter '" + p + "' is 0.0. This will lead" + \
-                         " to an appropriate simplex.", \
-                          solution="Specify an initial step via the `initDelta` parameter.\n" + \
-                          "The size of the step should reflect the 'scale' of the problem."))
-        self._simplex[i+1, i] += self._simplex[0,i] * self.initialStepWidthFac
+          # Construct simplex by adding initial step width
+          self._simplex[i+1, i] = self._simplex[0,i] + self.initialStepWidthFac
+        else:
+          # Construct simplex by adding fraction of the value
+          self._simplex[i+1, i] += self._simplex[0,i] * self.initialStepWidthFac
       self._yi[i+1] = m.miniFunc(self._simplex[i+1,::])
     
   def _step(self, m):
