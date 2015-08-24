@@ -13,4 +13,6 @@ From 0.8.1 (or 0.8.0) to 0.9.0
   modelSuite          *Update*
                         - Maintenance of transit models
                         - Full support of keplerian orbits
+  funcFit             *New functionality*
+                        - emcee sampling
   ==================  =============================================
