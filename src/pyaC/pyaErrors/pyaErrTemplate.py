@@ -50,18 +50,18 @@ class PyaErrTemplate(Exception):
       e += "---------------------\n"
       e += "Type of error: " + self.errorType + "\n"
     e += "What happened?\n"
-    e += self.what + "\n"
+    e += "    " + self.what + "\n"
     if not self.where is None:
       e += "Where did it happen?\n"
-      e += self.where + "\n"
+      e += "    " + self.where + "\n"
     if not self.why is None:
       e += "Why did it happen?\n"
-      e += self.why + "\n"
+      e += "    " + self.why + "\n"
     if not self.solution is None:
       e += "What are possible solutions?\n"
       for s in self.solution:
-        e += " - " + s + "\n"
+        e += "  - " + s + "\n"
     if not self.addInfo is None:
       e += "Additional information:\n"
-      e += self.addInfo + "\n"
+      e += "    " + self.addInfo + "\n"
     return e
