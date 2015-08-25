@@ -1604,6 +1604,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                            where="fitEMCEE", \
                            solution="Specify x, y, and yerr."))
     
+    if not self._fufDS.xyyerrDefined():
+      raise(PE.PyAValError("Please specify the data completely. Either of x, y, and/or yerr are missing.", \
+                           where="fitEMCEE", \
+                           solution="Specify x, y, and yerr.")) 
+
 
     # Names and values of free parameters
     fps = self.freeParameters()

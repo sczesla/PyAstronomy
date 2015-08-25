@@ -36,3 +36,28 @@ class FufDS:
       self.x = x.copy()
     else:
       self.x = copy.copy(x)
+  
+  def yerrDefined(self):
+    """
+      Check whether yerr is defined or None.
+      
+      Returns
+      -------
+      Defined : boolean
+          True, if yerr is not None.
+    """
+    return not (self.yerr is None)
+  
+  def xyyerrDefined(self):
+    """
+      Check whether x, y, and yerr are not None:
+      
+      Returns
+      -------
+      Defined : boolean
+          True, if x, y, and yerr are not None. 
+    """
+    xnn = not (self.x is None)
+    ynn = not (self.y is None)
+    yenn = self.yerrDefined()
+    return (xnn & ynn & yenn)
