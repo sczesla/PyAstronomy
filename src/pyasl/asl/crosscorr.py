@@ -108,23 +108,24 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edg
     meanWl = np.mean(w)
     dwlmax = meanWl * (rvmax/c)
     dwlmin = meanWl * (rvmin/c)
-    if (w.min() + dwlmin) < tw[0]:
-      raise(PE.PyAValError("The minimum wavelength is not covered by the template.", \
+    if (tw[0] + dwlmax) > w[0]:
+      raise(PE.PyAValError("The minimum wavelength is not covered by the template for all indicated RV shifts.", \
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
-    if (w.max() + dwlmax) > tw[-1]:
-      raise(PE.PyAValError("The maximum wavelength is not covered by the template.", \
+    if (tw[-1] + dwlmin) < w[-1]:
+      raise(PE.PyAValError("he maximum wavelength is not covered by the template for all indicated RV shifts.", \
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
   elif mode == "doppler":
-    maxwl = w[-1] * (1.0+rvmax/c)
-    minwl = w[0] * (1.0+rvmin/c)
-    if minwl < tw[0]:
-      raise(PE.PyAValError("The minimum wavelength is not covered by the template.", \
+    # Ensure that the template covers the entire observaion for all shifts
+    maxwl = tw[-1] * (1.0+rvmin/c)
+    minwl = tw[0] * (1.0+rvmax/c)
+    if minwl > w[0]:
+      raise(PE.PyAValError("he minimum wavelength is not covered by the template for all indicated RV shifts.", \
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
-    if maxwl > tw[-1]:
-      raise(PE.PyAValError("The maximum wavelength is not covered by the template.", \
+    if maxwl < w[-1]:
+      raise(PE.PyAValError("The maximum wavelength is not covered by the template for all indicated RV shifts.", \
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
   else:
