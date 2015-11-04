@@ -8,7 +8,7 @@ _majV, _minV = sys.version_info[0:2]
 if _minV < 7:
   PE.warn("funcFit needs 2.7.x or greater (but not Python 3.x). See documentation (Prerequisites) for explanation.")
   
-ic = ImportCheck(["numpy", "scipy", "pymc", "matplotlib", "pyfits", "emcee", "progressbar"])
+ic = ImportCheck(["numpy", "scipy", "pymc", "matplotlib", "matplotlib.pylab", "pyfits", "emcee", "progressbar"])
 
 # Get out if numpy not present
 if not ic.check["numpy"]:
