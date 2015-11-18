@@ -50,6 +50,7 @@ class ExoplanetEU(pp.PyAUpdateCycle):
              SpT      Spectral type of host star       
            stAge                     Stellar age      Ga
           stTeff   Stellar effective temperature       K
+        plRadMM          Measuring method of Rpl
     ============  ==============================  ======
     
     Parameters
@@ -192,6 +193,7 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     self._columns[27] = ["SpT", "Spectral type of host star", "", "S5"]
     self._columns[28] = ["stAge", "Stellar age", "Ga", np.float]
     self._columns[29] = ["stTeff", "Stellar effective temperature", "K", np.float]
+    self._columns[30] = ["plRadMM", "Measuring method of Rpl", "", "S15"]
     # Identify exoplanet.eu csv column names with internal column names
     self._ident = {"name":"plName", "mass":"plMass", "radius":"plRadius", \
                    "semi_major_axis":"sma", "angular_distance":"angDistance", "publication_status":"pubStatus", \
@@ -199,6 +201,7 @@ class ExoplanetEU(pp.PyAUpdateCycle):
                    "mag_i":"mag_i", "mag_j":"mag_j", "mag_h":"mag_h", \
                    "mag_k":"mag_k", "star_distance":"dist", "star_metallicity":"mh", \
                    "star_mass":"stMass", "star_radius":"stRadius", "star_sp_type":"SpT", \
-                   "star_age":"stAge", "star_teff":"stTeff", "orbital_period":"period"}
+                   "star_age":"stAge", "star_teff":"stTeff", "orbital_period":"period", \
+                   "radius_detection_type":"plRadMM"}
     
     self._readData()
