@@ -103,7 +103,7 @@ class SWEETCat(pp.PyAUpdateCycle):
     self.names = ['star', 'hd', 'ra', 'dec', 'vmag', 'ervmag', 'par', 'erpar',
              'parsource', 'teff', 'erteff', 'logg', 'erlogg', 'logglc',
              'erlogglc', 'vt', 'ervt', 'metal', 'ermetal', 'mass', 'ermass',
-             'author', 'link', 'source', 'update', 'comment1', 'comment2']
+             'author', 'source', 'update', 'comment']
 
     # Check whether data file exists
     self._fs = pp.PyAFS()
