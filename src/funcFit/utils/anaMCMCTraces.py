@@ -147,6 +147,19 @@ class TraceAnalysis:
 
   def _loadEMCEEChain(self, fn=None, burn=0):
     """
+      Load chains from file or adjust parameters.
+      
+      Based on the loaded data base, burn-in and walker selection
+      is applied.
+      
+      Parameters
+      ----------
+      fn : string, optional
+          If given, the filename of the emcee chain file.
+          If not given, the previously saved data base will
+          be used.
+      burn : int, optional
+          Number of burn-in steps.
     """
     if not fn is None: 
       self._emceedat = np.load(fn)
@@ -158,10 +171,28 @@ class TraceAnalysis:
     
     # Flatten the chain
     s = self._emceedat["chain"].shape
-    self.emceechain = np.zeros((s[0] * (s[1]-burn), s[2]+1))
-    self.emceechain[::,0:-1] = self._emceedat["chain"][::,burn:,::].reshape(s[0] * (s[1]-burn), s[2])
-    self.emceelnp = self._emceedat["lnp"][::,burn:]
-    self.emceelnp = self.emceelnp.reshape(s[0] * (s[1]-burn))
+    # s[0] = No. of chains, s[1] = Length of individual chain, s[2] = No. of parameters
+    
+    if not hasattr(self, "_selectedWalker"):
+      # Select all walker ...
+      selectedWalker = np.arange(s[0])
+      # ... and save selection
+      self._selectedWalker = selectedWalker
+    # Use saved selection
+    selectedWalker = self._selectedWalker
+    
+    # No. of walker considered in the analysis
+    nchains = len(selectedWalker)
+    
+    # Check selected chains
+    if np.any(selectedWalker > s[0]) or np.any(selectedWalker < 0):
+      raise(PE.PyAValError("You selected at least one walker beyond the valid range (0 - " + str(s[0]-1) + ").",
+                           solution="Adjust walker selection."))
+    
+    self.emceechain = np.zeros((nchains * (s[1]-burn), s[2]+1))
+    self.emceechain[::,0:-1] = self._emceedat["chain"][selectedWalker,burn:,::].reshape(nchains * (s[1]-burn), s[2])
+    self.emceelnp = self._emceedat["lnp"][selectedWalker,burn:]
+    self.emceelnp = self.emceelnp.reshape(nchains * (s[1]-burn))
     
     # Incorporate "deviance" into the usual chain
     self.emceechain[::,-1] = -2.0 * self.emceelnp
@@ -183,6 +214,24 @@ class TraceAnalysis:
     if not ic.check[p]:
       raise(PE.PyARequiredImport("The package '" + str(p) + "' is not currently installed.", \
                                  solution="Please install " + str(p)))
+  
+  def selectWalkers(self, ws):
+    """
+      Select walkers for emcee chains.
+      
+      Parameters
+      ----------
+      ws : list or array of integers
+          The walker to be considered in the analysis. Counting
+          starts at zero.
+    """
+    self._selectedWalker = np.array(ws, dtype=np.int)
+    if self.dbtype == "emcee":
+      # Apply burn-in to individual walkers
+      self._loadEMCEEChain(burn=self.burn)
+    else:
+      raise(PE.PyAAlgorithmFailure("Walkers can only be selected for emcee data bases. Current data base type: " + str(self.dbtype)))
+    
   
   def __init__(self, resource, db="pickle"):
     if isinstance(resource, basestring):
@@ -280,7 +329,7 @@ class TraceAnalysis:
     """
     return self.stateDic
 
-  def plotTrace(self, parm):
+  def plotTrace(self, parm, fmt='b-'):
     """
       Plots the trace.
       
@@ -288,13 +337,16 @@ class TraceAnalysis:
       ----------
       parm : string
           The variable name.
+      fmt : string, optional
+          The matplotlib format string used to plot the trace.
+          Default is 'b-'.
     """
     if not ic.check["matplotlib"]:
       PE.warn(PE.PyARequiredImport("To use 'plotTrace', matplotlib has to be installed.", \
                                    solution="Install matplotlib."))
       return
     self._parmCheck(parm)
-    plt.plot(self[parm], 'b-', label=parm + " trace")
+    plt.plot(self[parm], fmt, label=parm + " trace")
     plt.legend()
 
   def plotTraceHist(self, parm):
