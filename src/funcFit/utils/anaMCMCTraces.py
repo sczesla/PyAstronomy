@@ -398,7 +398,7 @@ class TraceAnalysis:
     cols, rows = self.__plotsizeHelper(len(tracesDic))
 
     for i,[pars,trace] in enumerate(tracesDic.items()):
-      if len(parsList) > 1:
+      if len(tracesDic) > 1:
         plt.subplot(rows, cols, i+1)
       plt.hist(trace, label=pars + " hist")
       plt.legend()
