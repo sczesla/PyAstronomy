@@ -431,7 +431,7 @@ class TraceAnalysis:
 
     ps = self.__plotsizeHelper(len(tracesDic))
 
-    for i,[pars,trace] in enumerate(tracesDic.items()):
+    for i,[pars,trace] in enumerate(tracesDic.items(), 1):
       plt.subplot(ps[0],ps[1],i)
       plt.xlabel(pars)
       plt.ylabel("Deviance")
