@@ -212,3 +212,93 @@ def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False)
   if fullOutput:
     return indiin, indi, p, model
   return indiin, indi
+
+
+
+def slidingPolyResOutlier(x, y, points, count=1, deg=0, stdlim=3.0, controlPlot=False, dx=1):
+  """
+    Outlier detection based on polynomial fit in sliding box.
+
+    This algorithm fits a polynomial of the specified degree
+    to a sliding chunk of the data, subtracts it to find the
+    residuals, determines the standard deviations of the residuals,
+    and, finally, identifies all points with residuals further
+    than the specified number of standard deviations from the fit.
+    
+    The length of the chunk is determined by `points`. In each step,
+    the chunk is advanced by `dx` data points (default is one). To be finally
+    maked as an outlier, a point must be detected as an outlier in at least
+    `count` instances, when the chunk slides over it. By default, a single
+    such detection is sufficient to establish its outlier status.  
+
+    Parameters
+    ----------
+    x, y : arrays
+        The abscissa and ordinate of the data.
+    points : int
+        Number of points for the sliding box
+    count : int, optional
+        Number of "slides" in which the point shall
+        deviate from the fit by the stdlim
+    deg : int, optional
+        The degree of the polynomial to be fitted.
+        The default is 0, i.e., a constant.
+    stdlim : float, optional
+        The number of standard deviations acceptable
+        for points not categorized as outliers.
+    controlPlot : boolean, optional
+        If True, a control plot will be generated
+        showing the location of outliers (default is
+        False).
+    dx : int, optional
+        The number of data points by which the chunk
+        is advanced in each step.
+
+    Returns
+    -------
+    indiin : array
+        The indices of the points *not* categorized
+        as outliers.
+    indiout : array
+        Indices of the oulier points.
+  """
+  if len(x) < deg + 1:
+    raise(PE.PyAValError("Only " + str(len(x)) + " points given to fit a polynomial of degree " + str(deg) + ".", \
+                         solution="Use more points and/or change degree of polynomial.", \
+                         where="slidingPolyResOutlier"))
+  if len(x) != len(y):
+    raise(PE.PyAValError("x and y need to have the same length.", \
+                         solution="Check the lengths of the input arrays.", \
+                         where="slidingPolyResOutlier"))
+  if deg < 0:
+    raise(PE.PyAValError("Polynomial degree must be > 0.",
+                         where="slidingPolyResOutlier"))
+
+  good = np.ones(len(x))*count
+
+  if controlPlot:
+    import matplotlib.pylab as plt
+    # Produce control plot
+    plt.close()
+    plt.cla()
+    plt.plot(x, y, 'b.-')
+
+  for i in range(0, len(x) - points + 1, dx):
+    # Indices of the chunk
+    gi0 = np.arange(i,i+points)
+    # Exclude points that have been already discarded
+    gi = gi0[good[gi0]>0]
+    
+    iin, iout = polyResOutlier(x[gi], y[gi], deg=deg, stdlim=stdlim)
+    
+    good[gi[iout]] -= 1
+
+  indiout = np.where(good <= 0)
+  indiin = np.where(good > 0)
+
+  if controlPlot:
+    plt.plot(x[indiout], y[indiout], 'ro')
+    plt.show()
+
+  return indiin[0], indiout[0]
+

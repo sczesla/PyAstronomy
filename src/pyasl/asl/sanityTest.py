@@ -1066,6 +1066,25 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     plt.plot(xnew, ynew, 'bp')
 #     plt.show()
 
+  def sanity_slidingPolyResOutlier(self):
+    """
+      Checking slidingPolyResOutlier
+    """
+    import numpy as np
+    from PyAstronomy import pyasl
+
+    N = 50
+    x = np.arange(N)
+    y = np.random.normal(0., 1., N)
+    
+    y[5] = 30
+    y[6] = 10
+    
+    iin, iout = pyasl.slidingPolyResOutlier(x, y, 15, controlPlot=False)
+    
+    self.assertEqual(len(iout), 2, msg="slidingPolyResOutlier: Wrong number of outliers detected (" + str(len(iout)) + ").")
+    self.assertTrue(np.all(iout==np.array([5,6])), msg="slidingPolyResOutlier: Wrong outliers detected (indices " + str(iout) + ").")
+
 
 class SanityOfMagnitudes(unittest.TestCase, SaniBase):
   
