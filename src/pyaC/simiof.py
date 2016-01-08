@@ -101,3 +101,25 @@ class SimIOF(file):
         else:
           # There is a list of formats
           self._addOneProp(n, v, fmt=fmt[i])
+          
+  def addColInfo(self, cns, oneLine=True):
+    """
+      Add enumerated column names to file.
+      
+      Parameters
+      ----------
+      cns : list of strings
+          List of names
+      oneLine : boolean, optional
+          If True, all definitions will be written into
+          a single line. Otherwise each definition is written
+          on its own line.
+    """
+    self.write("# ")
+    for i, c in enumerate(cns, 1):
+      self.write(str(i) + ") " + c)
+      if oneLine and (i < len(cns)):
+        self.write(", ")
+      else:
+        self.write("\n# ")
+    self.write("\n")
