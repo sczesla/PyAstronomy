@@ -1196,7 +1196,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       else:  
         return c.naming.getRoot()
       
-  def parameterSummary(self, toScreen=True, prefix=""):
+  def parameterSummary(self, toScreen=True, prefix="", sorting='none'):
     """
       Writes a summary of the parameters in text form.
       
@@ -1206,6 +1206,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           If True, the output is written to the screen.
       prefix : string, optional, default = ""
           A prefix for each line (e.g., '#').
+      sorting : string, optional, {'none', 'ps'}
+          Determines the order in which the parameters are
+          printed out. If 'none' is given (default), no
+          particular order is imposed. If 'ps', Python's
+          `sorting` routine is used to impose an order.
       
       Returns
       -------
@@ -1256,7 +1261,19 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         lines.append(cono)
         lines.append("-" * len(cono))
         
-        for prop, var in c.propMap.iteritems():
+        # Sorting of the parameter names (component-wise)  
+        cprops = c.propMap.keys()
+        if sorting == "none":
+          pass
+        elif sorting == "ps":
+          cprops = sorted(cprops)
+        else:
+          raise(PE.PyAValError("Unknown sorting mode: " + str(sorting), \
+                where="OneDFit::parameterSummary", \
+                solution="Use 'None' or 'alpha'"))
+        
+        for prop in cprops:
+          var = c.propMap[prop]
           # Loop over properties and variables
           restricted = (self.getRestrictions()[var][0] is not None) or (self.getRestrictions()[var][1] is not None)
           lines.append(("Parameter: %"+str(maxPropLen)+"s  %"+str(maxIdentLen)+"s, [%"+str(maxVarLen)+"s], value: % 12g, free: %5s, restricted: %5s, related: %5s") % \
