@@ -664,6 +664,9 @@ class FuFNM(IFitterBase):
   def fit(self, miniFunc, x0, *fminpars, **fminargs):
     """
       Wrapper around funcFit's NelderMead implementation.
+      
+      See the implementation of the `fit` method of :py:func:`NelderMead`
+      for the available keyword arguments (fminargs).
     """
     self._digestkwargs(fminargs)
     self._bestFit = self._nm.fit(self._obj, self._obj._fufDS, self._obj.miniFunc, **fminargs)

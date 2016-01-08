@@ -22,8 +22,11 @@ ScipyFMIN
 FuFNM
 ~~~~~~~~~~~
 
+FuFNM is based on the Nelder-Mead-Simplex implemenetation of funcFit (see :py:func:`NelderMead`).
+
 .. autoclass:: FuFNM
    :members:
+   
 
 
 External optimizers
