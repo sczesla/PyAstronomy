@@ -33,9 +33,10 @@ def estimateSNR(x, y, xlen, deg=1, controlPlot=False, xlenMode="dataPoints"):
     controlPlot : boolean, optional
         If True, a control plot will be shown to
         verify the validity of the estimate.
-    xlenMode : string, {"dataPoints", "excerpt"}, optional
+    xlenMode : string, {"dataPoints", "excerpt", "all"}, optional
         Determines whether `xlen` refers to data points
-        or a fixed length scale on the abscissa.
+        or a fixed length scale on the abscissa. If 'all' is specified,
+        all available data will be used in the estimation.
     
     Returns
     -------
@@ -59,6 +60,11 @@ def estimateSNR(x, y, xlen, deg=1, controlPlot=False, xlenMode="dataPoints"):
       indi = np.where(np.logical_and(x >= i*float(xlen), x < (i+1)*float(xlen)))[0]
       i += 1
       if i*float(xlen) > max(x): break
+    elif xlenMode == "all":
+      if i > 1:
+        break
+      indi = range(len(x))
+      i += 1
     else:
       raise(PE.PyAValError("Unknown xlenMode (" + str(xlenMode) + ").", \
                            solution = "Use either 'dataPoints' or 'excerpt'."))
