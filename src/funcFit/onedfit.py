@@ -656,7 +656,7 @@ class FuFNM(IFitterBase):
 
   def __init__(self, *args, **kwargs):
     IFitterBase.__init__(self)
-    self._allowedKWs = ["initDelta", "maxIter", "callback"]
+    self._allowedKWs = ["initDelta", "maxIter", "callback", "nmCritLim"]
     self.name = "funcFit NM65"
     self._obj = args[0]
     self._nm = NelderMead(**kwargs)

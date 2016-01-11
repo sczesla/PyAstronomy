@@ -146,7 +146,7 @@ class NelderMead:
     ym = np.mean(self._yi)
     return (np.sqrt(np.sum((self._yi-ym)**2))/self._n) < self.nmCritLim
   
-  def fit(self, m, ds, objf="chisqr", initDelta=None, maxIter=1e4, callback=None):
+  def fit(self, m, ds, objf="chisqr", initDelta=None, maxIter=1e4, callback=None, nmCritLim=None):
     """
       Carry out the model fit.
       
@@ -174,6 +174,9 @@ class NelderMead:
       maxIter : int, optional
           The maximum number of iterations. The default is
           10000.
+      nmCritLim : float, optional
+          Critical value for stopping criterion. The default is
+          1e-8.
       callback : callable, optional
           If not None, "callback" will be called with the
           three parameters: number of iteration (int), current
@@ -184,6 +187,9 @@ class NelderMead:
       Best-fit values : dictionary
           Maps parameter name to the best-fit value.
     """
+    # Stopping criterion
+    if not nmCritLim is None:
+      self.nmCritLim = nmCritLim
     # Number of free parameters
     self._n = m.numberOfFreeParams()
     # Set objective function
