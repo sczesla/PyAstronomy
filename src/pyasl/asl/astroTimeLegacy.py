@@ -5,7 +5,7 @@ from numpy import sin, cos, tan, sqrt, arcsin
 from PyAstronomy.pyaC import pyaErrors as PE
 
 
-def daycnv(xjd):
+def daycnv(xjd, mode="idl"):
   """
     Converts Julian dates to Gregorian calendar dates.
     
@@ -13,11 +13,22 @@ def daycnv(xjd):
     ----------
     xjd : float
         The Julian date
+    mode : string, {idl, dtlist, dt}, optional
+        Determines format of output. If 'idl' is given (default),
+        a list holding [year, month, day, (fractional) hours] is
+        returned; this mimics the behavior of the IDL atsrolib function.
+        If 'dtlist' is given,  a list holding [year,
+        month, day, hours, minutes, seconds, microseconds] is
+        returned. Finally, if 'dt' is specified, a Python
+        datetime object will be returned.
     
     Returns
     -------
-    Calendar date : list
-        A list holding [year, month, day, (fractional) hours]
+    Calendar date : list or datetime object
+        A list holding [year, month, day, (fractional) hours] (default)
+        or [year, month, day, hours, minutes, seconds, microseconds].
+        Alternatively, a Python datetime object is returned. The format
+        depends in the 'mode' specified.
 
     Notes
     -----
@@ -63,7 +74,11 @@ def daycnv(xjd):
           B. Pfarr, STX, 6/16/88
           Converted to IDL V5.0   W. Landsman   September 1997
   """
-
+  
+  if not mode in ('idl', 'dtlist', 'dt'):
+    raise(PE.PyAValError("Unknown mode: " + str(mode), \
+                         where="daycnv", \
+                         solution="Use any of 'idl', 'dtlist', or 'dt'."))
 
   # Adjustment needed because Julian day starts at noon, calendar day at midnight
 
@@ -84,7 +99,21 @@ def daycnv(xjd):
   l = mn/11
   mn = mn + 2 - 12*l
   yr = 100*(n-49) + yr + l
+  if mode in ('dt', 'dtlist'):
+    # [year, month, day, hours, minutes, seconds, microseconds] requested
+    hour = int(numpy.floor(hr))
+    minute = int(numpy.floor((hr - numpy.floor(hr))*60))
+    sec = int(numpy.floor((hr - hour - minute/60.)*3600.))
+    msec = int((hr - hour - minute/60. - sec/3600.)*3600.*1e6)
+    if mode == 'dtlist':
+      return [yr, mn, day, hour, minute, sec, msec]
+    # Return datetime object
+    dt = datetime.datetime(*(yr, mn, day, hour, minute, sec, msec))
+    return dt
   return [yr, mn, day, hr]
+
+
+
 
 
 

@@ -149,6 +149,32 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     self.assertEqual(m, 2)
     self.assertEqual(d, 22)
     self.assertEqual(h, 7.5)
+    
+    jd = 2451596.812500
+    # Subtract 30 min
+    jd -= 30./(24.*60.)
+    for i in range(1, 59):
+      jd2 = jd + float(i)/(24.*60.)
+      y, m, d, h, minu, sec, ms = tuple(daycnv(jd2, mode='dtlist'))
+      minu += round(sec/60.)
+      self.assertAlmostEqual(minu, i, delta=1e-7, msg="Problem with minutes in daycnv")
+
+  def sanity_daycnvExample(self):
+    """
+      Example of daycnv
+    """
+    from PyAstronomy import pyasl
+    
+    # Convert JD to calendar date
+    jd = 2440000.0 + 18614./(24.*3600.)
+    print "year = %4d, month = %2d, day = %2d, hour = %5.3f" \
+          % tuple(pyasl.daycnv(jd))
+    print
+    print "year = %4d, month = %2d, day = %2d, hour = %2d, minute = %2d, seconds = %2d, microseconds = %6d" \
+          % tuple(pyasl.daycnv(jd, mode='dtlist'))
+    print
+    dt = pyasl.daycnv(jd, mode='dt')
+    print "Datetime object: ", dt
   
   def sanity_juldate(self):
     """

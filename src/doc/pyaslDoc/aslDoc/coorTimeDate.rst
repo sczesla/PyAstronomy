@@ -15,6 +15,25 @@ Below you find the documentation of the following routines:
  * :py:func:`juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.juldate>`
  * :py:func:`localTime <PyAstronomy.pyasl.asl.localTime>`
 
+Example: Convert from JD into calendar date (daycnv)
+--------------------------------------------------------------
+
+::
+
+    from PyAstronomy import pyasl
+    
+    # Convert JD to calendar date
+    jd = 2440000.0 + 18614./(24.*3600.)
+    print "year = %4d, month = %2d, day = %2d, hour = %5.3f" \
+          % tuple(pyasl.daycnv(jd))
+    print
+    print "year = %4d, month = %2d, day = %2d, hour = %2d, minute = %2d, seconds = %2d, microseconds = %6d" \
+          % tuple(pyasl.daycnv(jd, mode='dtlist'))
+    print
+    dt = pyasl.daycnv(jd, mode='dt')
+    print "Datetime object: ", dt
+
+
 Example: daycnv, helio_jd, jdcnv, get_juldate, and juldate
 ------------------------------------------------------------
 
