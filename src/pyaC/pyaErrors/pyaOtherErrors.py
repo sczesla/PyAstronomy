@@ -1,4 +1,5 @@
-from pyaErrTemplate import PyaErrTemplate
+from __future__ import absolute_import
+from .pyaErrTemplate import PyaErrTemplate
 
 class PyAOrderError(PyaErrTemplate):
   

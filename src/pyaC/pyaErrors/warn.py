@@ -1,4 +1,6 @@
-from pyaErrTemplate import PyaErrTemplate
+from __future__ import print_function
+from __future__ import absolute_import
+from .pyaErrTemplate import PyaErrTemplate
 
 def warn(w):
   """
@@ -8,10 +10,10 @@ def warn(w):
     
     Warnings are printed to stdout.
   """
-  print "--------------------"
-  print "| PyA User warning |"
-  print "--------------------"
+  print("--------------------")
+  print("| PyA User warning |")
+  print("--------------------")
   if isinstance(w, PyaErrTemplate):
-    print w.__str__(head=False)
+    print(w.__str__(head=False))
     return
-  print str(w)
+  print(str(w))
