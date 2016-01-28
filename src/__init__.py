@@ -1,3 +1,4 @@
+from __future__ import print_function
 from .PyA_Version import PyA_Version 
 import os
 
