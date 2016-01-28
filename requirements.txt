@@ -3,3 +3,4 @@ matplotlib>=1.0
 quantities==0.10.1
 numpydoc>=0.4
 mock==1.0.1
+six>=1.10.0
