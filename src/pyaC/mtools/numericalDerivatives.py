@@ -1,7 +1,9 @@
+from __future__ import division
 import re
 import os.path
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class _FDs:
   
@@ -79,10 +81,10 @@ def diffCFD(x, y, derivative, errOrd=2):
   imin = abs(min(offs))
   imax = len(x) - imin
   der = np.zeros(imax-imin)
-  for i in xrange(imin, imax):
+  for i in smo.range(imin, imax):
     der[i-imin] = np.sum(y[i+offs] * fds) / h**derivative
   
-  return range(imin, imax), der
+  return list(range(imin, imax)), der
   
   
   

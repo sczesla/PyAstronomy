@@ -1,4 +1,4 @@
-import pyaErrors as PE
+from . import pyaErrors as PE
 import numpy as np
 
 def invertIndexSelection(a, indi):

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import os
 
@@ -15,7 +16,7 @@ class SanityOfmtools(unittest.TestCase):
       mtools: Checking accuracy of numerical derivatives.
     """
     # Check polynomial
-    from numericalDerivatives import diffCFD
+    from .numericalDerivatives import diffCFD
     import numpy as np
     
     # Analytical derivatives
@@ -44,7 +45,7 @@ class SanityOfmtools(unittest.TestCase):
     y = np.exp(x)
     for erro in [2,4,6]:
       for i in range(1,5):
-        print i, erro
+        print(i, erro)
         indi, der = diffCFD(x, y, i, erro)
         self.assertLess(np.max(np.abs(der/y[indi] - 1.0)), 1e-3*pow(10.0,erro-2))
 
@@ -89,8 +90,8 @@ class SanityOfmtools(unittest.TestCase):
     # Analytical value of integral
     analyt = 0.25*(x1**4 - x0**4) + 1.7*(x1-x0)
     
-    print "Analytical value: ", analyt
-    print "ibtrapz: ", mtools.ibtrapz(x, y, x0, x1)
+    print("Analytical value: ", analyt)
+    print("ibtrapz: ", mtools.ibtrapz(x, y, x0, x1))
 
   def sanity_ibtrapz(self):
     """

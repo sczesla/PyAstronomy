@@ -1,8 +1,9 @@
 import datetime
 import re
-import pyaErrors as PE
+from . import pyaErrors as PE
+import six
 
-class SimIOF(file):
+class SimIOF:
   """
     Simple Input/Output file.
     
@@ -23,25 +24,37 @@ class SimIOF(file):
         Passed to the constructor of a file object.
   """ 
   
+  def close(self):
+    """
+      Close file.
+    """
+    self.file.close()
+  
+  def write(self, *args, **kwargs):
+    """
+      Write to file object
+    """
+    self.file.write(*args, **kwargs)
+  
   def __init__(self, origin, *args, **kwargs):
     self.origin = origin
-    file.__init__(self, *args, **kwargs)
-    if self.mode == 'w':
+    self.file = open(*args, **kwargs)
+    if self.file.mode == 'w':
       self.write("# File created by " + str(origin) + "\n")
       self.write("# Date: " + str(datetime.datetime.now()).split('.')[0] + "\n")
       self.write("#\n")
-    elif self.mode == 'r':
+    elif self.file.mode == 'r':
       self._readProps()
 
   def __del__(self):
-    self.close()
+    self.file.close()
 
   def _readProps(self):
     """
       Reads the properties from input file.
     """
     self.args = {}
-    for l in self:
+    for l in self.file:
       r = re.match("^#\s+([^:]+):\s*(.*)$", l)
       if r is not None:
         p = r.group(2)
@@ -50,7 +63,7 @@ class SimIOF(file):
         except ValueError:
           pass
         self.args[r.group(1)] = p
-    self.seek(0)
+    self.file.seek(0)
 
   def _addOneProp(self, n, v, fmt=None):
     """
@@ -89,13 +102,13 @@ class SimIOF(file):
           properties. Otherwise, one format string for every
           property should be given. 
     """
-    if isinstance(name, basestring):
+    if isinstance(name, six.string_types):
       # There is only one value to be added
       self._addOneProp(name, value, fmt=fmt)
     else:
       # There is more than one
       for i, (n, v) in enumerate(zip(name, value)):
-        if (fmt is None) or isinstance(fmt, basestring):
+        if (fmt is None) or isinstance(fmt, six.string_types):
           # There is only no or one format string
           self._addOneProp(n, v, fmt=fmt)
         else:
@@ -123,3 +136,10 @@ class SimIOF(file):
       else:
         self.write("\n# ")
     self.write("\n")
+    
+  def __getattr__(self, attr):
+    return getattr(self.file, attr)
+  
+  def __iter__(self):
+    return iter(self.file)
+  

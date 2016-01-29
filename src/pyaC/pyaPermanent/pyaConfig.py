@@ -1,6 +1,8 @@
+from __future__ import print_function
 import os
 from PyAstronomy.pyaC import pyaErrors as PE 
-import ConfigParser
+import six.moves.configparser as ConfigParser
+import six.moves as smo
 
 class PyAConfig:
   """
@@ -88,30 +90,30 @@ class PyAConfig:
     self.configWhere = os.path.join(self.homeDir, ".pyaConfigWhere")
     if not os.path.isfile(self.configWhere):
       # Ask user whether she/he wants to configure data path
-      print " -------------- Configure PyA's data path ------------------------"
-      print "  Why do you get this message?"
-      print "    Most probably PyA tries to save permanent data on your"
-      print "    system for the first time. This may be the case when, e.g.,"
-      print "    a table is downloaded and saved. These data are stored"
-      print "    under PyA's 'data path', i.e., a regular directory on"
-      print "    your disk, which PyA can access."
-      print "  Is anything else saved to the disk?" 
-      print "    The location of the data path"
-      print "    directory will be written to the file '.pyaConfigWhere' in"
-      print "    your home directory, so that you need not provide it"
-      print "    again."
-      print "  Can I delete it?"
-      print "    Yes, you are free to delete anything of this at any time."
-      print "  What is a valid data path?"
-      print "    You may provide any existing or non-existing path, although"
-      print "    it is strongly encouraged to use a fresh directory to avoid any"
-      print "    confusion. The given path needs to be absolute, to uniquely"
-      print "    identify it."
-      print " -----------------------------------------------------------------"
-      print ""
-      yn = raw_input("Configure PyA's data path now (y/n)? ")
+      print(" -------------- Configure PyA's data path ------------------------")
+      print("  Why do you get this message?")
+      print("    Most probably PyA tries to save permanent data on your")
+      print("    system for the first time. This may be the case when, e.g.,")
+      print("    a table is downloaded and saved. These data are stored")
+      print("    under PyA's 'data path', i.e., a regular directory on")
+      print("    your disk, which PyA can access.")
+      print("  Is anything else saved to the disk?") 
+      print("    The location of the data path")
+      print("    directory will be written to the file '.pyaConfigWhere' in")
+      print("    your home directory, so that you need not provide it")
+      print("    again.")
+      print("  Can I delete it?")
+      print("    Yes, you are free to delete anything of this at any time.")
+      print("  What is a valid data path?")
+      print("    You may provide any existing or non-existing path, although")
+      print("    it is strongly encouraged to use a fresh directory to avoid any")
+      print("    confusion. The given path needs to be absolute, to uniquely")
+      print("    identify it.")
+      print(" -----------------------------------------------------------------")
+      print("")
+      yn = smo.input("Configure PyA's data path now (y/n)? ")
       if not (yn.lower() == "y" or yn.lower() == "yes"):
-        print "  Configure data path later."
+        print("  Configure data path later.")
         return
       # There is not yet a file '.pyaConfigWhere', which stores the place to look
       # for the real configure-file and data files.
@@ -123,23 +125,23 @@ class PyAConfig:
         return
       try:
         while True:
-          print "Please provide a directory where PyA can store data (may already exist):"
-          print "Press enter to accept default; use 'exit' to abort."
+          print("Please provide a directory where PyA can store data (may already exist):")
+          print("Press enter to accept default; use 'exit' to abort.")
           suggestion = os.path.join(self.homeDir, "PyAData")
-          dpath = raw_input("  Path (default = "+suggestion+"): ")
+          dpath = smo.input("  Path (default = "+suggestion+"): ")
           if dpath.lower().strip() == "exit":
-            print "  Process aborted. No data path configured."
+            print("  Process aborted. No data path configured.")
             dpath = None
             break
           if dpath == "":
             dpath = suggestion
           # Check whether data path is an absolute path
           if not os.path.isabs(dpath):
-            print "The path you specified (" + dpath + ") is not absolute, but it needs to be."
+            print("The path you specified (" + dpath + ") is not absolute, but it needs to be.")
             dpatha = os.path.abspath(dpath)
-            print "Did you intend to use this path:"
-            print "  ", dpatha
-            yn = raw_input("(y/n) ?")
+            print("Did you intend to use this path:")
+            print("  ", dpatha)
+            yn = smo.input("(y/n) ?")
             if yn.lower() == "y" or yn.lower() == "yes":
               dpath = dpatha
               break
@@ -151,8 +153,8 @@ class PyAConfig:
             os.makedirs(dpath)
             break
           else:
-            print "Directory '"+dpath+"' exists."
-            yn = raw_input("Use as PyA data directory (you may want to use, e.g., a subdirectory instead) (y/n) ")
+            print("Directory '"+dpath+"' exists.")
+            yn = smo.input("Use as PyA data directory (you may want to use, e.g., a subdirectory instead) (y/n) ")
             if yn.lower() == "y" or yn.lower() == "yes": break
         self.dpath = dpath
         if self.dpath is None:
@@ -170,8 +172,8 @@ class PyAConfig:
         os.remove(self.configWhere)
         return
       # All could be created appropriately
-      print "PyA data path configured successfully. Using path: "
-      print "  " + self.dpath
+      print("PyA data path configured successfully. Using path: ")
+      print("  " + self.dpath)
     else:
       # There is a .pyaConfigWhere file.
       try:

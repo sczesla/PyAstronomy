@@ -1,4 +1,6 @@
-import pyaErrors as PE
+from __future__ import print_function, division
+import six.moves as smo
+from . import pyaErrors as PE
 import numpy as np
 
 def matrix2doutput(m, oformat="% 6.2e", colsep=" | ", rowNames=None, colNames=None, transpose=False, toScreen=True):
@@ -68,18 +70,18 @@ def matrix2doutput(m, oformat="% 6.2e", colsep=" | ", rowNames=None, colNames=No
   
   # Find width of columns
   if colNames is not None:
-    colWidth = map(lambda x:len(x), colNames)
+    colWidth = [len(x) for x in colNames]
   else:
     colWidth = [0] * ncol
   if rowNames is not None:
     # Width of "zeros" column with row names
-    colWidth.insert(0, max(map(lambda x:len(x), rowNames)))
+    colWidth.insert(0, max([len(x) for x in rowNames]))
   else:
     # Use -1, if there are no row names
     colWidth.insert(0, -1) 
   # Determine width of rest of columns
-  for i in xrange(ncol):
-    l = max(map(lambda x:len(oformat[i] % x), m[::,i]))
+  for i in smo.range(ncol):
+    l = max([len(oformat[i] % x) for x in m[::,i]])
     colWidth[i+1] = max(colWidth[i+1], l)
   
   lines = []
@@ -97,14 +99,14 @@ def matrix2doutput(m, oformat="% 6.2e", colsep=" | ", rowNames=None, colNames=No
     lines.append(h)
     lines.append("-" * len(h))
   # Add the data
-  for i in xrange(nrow):
+  for i in smo.range(nrow):
     l = ""
     if rowNames is not None:
       # First, add the name of the row
       l += ("%" + str(colWidth[0]) + "s") % rowNames[i]
       l += colsep
     # Loop over the column indices
-    for j in xrange(ncol - 1):
+    for j in smo.range(ncol - 1):
       l += ("%" + str(colWidth[j+1]) + "s") % (oformat[j] % m[i, j]) + colsep
     # Add last one
     l += ("%" + str(colWidth[-1]) + "s") % ((oformat[-1] % m[i, -1]))
@@ -115,7 +117,7 @@ def matrix2doutput(m, oformat="% 6.2e", colsep=" | ", rowNames=None, colNames=No
   
   if toScreen:
     for l in lines:
-      print l
+      print(l)
   return lines
 
   

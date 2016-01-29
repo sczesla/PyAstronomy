@@ -1,4 +1,6 @@
+from __future__ import print_function
 import copy
+import six
 
 class PyaErrTemplate(Exception):
   
@@ -28,7 +30,7 @@ class PyaErrTemplate(Exception):
     # Check whether solution is iterable
     self.solution = solution
     if solution is not None:
-      if hasattr(solution,"__iter__"):
+      if not isinstance(solution, six.string_types):
         self.solution = copy.deepcopy(solution)
       else:
         self.solution = [solution]    

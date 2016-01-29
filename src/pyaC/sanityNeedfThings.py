@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 import os
 
@@ -21,25 +22,25 @@ class SanityOfNeedfulThings(unittest.TestCase):
     x = np.exp(np.arange(20.0)/20.0)
     indi = np.where(np.logical_and(x > 1.4, x < 1.7))
     
-    print "Selected indices and values:"
-    print "  indices: ", indi
-    print "  values : ", x[indi]
+    print("Selected indices and values:")
+    print("  indices: ", indi)
+    print("  values : ", x[indi])
     
     indiInv = pc.invertIndexSelection(x, indi)
     
-    print
-    print "Inverted selection:"
-    print "  indices: ", indiInv
-    print "  values : ", x[indiInv]
+    print()
+    print("Inverted selection:")
+    print("  indices: ", indiInv)
+    print("  values : ", x[indiInv])
     
     # Check that the same result is obtained by simply
     # passing the length of the array `x`
     
     indiInvLen = pc.invertIndexSelection(len(x), indi)
     
-    print
-    print "Are indiInv and indiInvLen are the same? "
-    print "  ", np.all(indiInvLen == indiInv)
+    print()
+    print("Are indiInv and indiInvLen are the same? ")
+    print("  ", np.all(indiInvLen == indiInv))
   
   def sanity_invertIndexSelection(self):
     """
@@ -67,13 +68,13 @@ class SanityOfNeedfulThings(unittest.TestCase):
     wordList = ["one", "two", "three", "four", "o-ne"]
     
     r = pyaC.fuzzyMatch("One", wordList)
-    print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+    print("Exact match: {em:}, close match(es): {cm:}".format(**r))
     
     r = pyaC.fuzzyMatch("One", wordList, cutoff=0.4)
-    print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+    print("Exact match: {em:}, close match(es): {cm:}".format(**r))
     
     r = pyaC.fuzzyMatch("One", wordList, caseSensitive=False)
-    print "Exact match: {em:}, close match(es): {cm:}".format(**r)
+    print("Exact match: {em:}, close match(es): {cm:}".format(**r))
     
   def sanity_matrix2doutputExample(self):
     """
@@ -91,13 +92,13 @@ class SanityOfNeedfulThings(unittest.TestCase):
         m[j,i] = (i+1) * 10**(j+1) * np.sin(i*j)
     
     PC.matrix2doutput(m, colNames=colNames, rowNames=rowNames)
-    print
+    print()
     PC.matrix2doutput(m, rowNames=rowNames)
-    print
+    print()
     PC.matrix2doutput(m, colsep=" ")
-    print
+    print()
     PC.matrix2doutput(m, oformat="% 12.5f", colNames=colNames, rowNames=rowNames)
-    print
+    print()
     PC.matrix2doutput(m, oformat=["% 12.5f", "% 6.3f", "% e"], colNames=colNames)
 
   def sanity_SimIOF_Example(self):
@@ -124,6 +125,6 @@ class SanityOfNeedfulThings(unittest.TestCase):
     g = PC.SimIOF("origin", "test.tmp", 'r')
     
     # See the properties assigned
-    print g.args
+    print(g.args)
     # Use loadtxt to load the data
-    print np.loadtxt(g)
+    print(np.loadtxt(g))

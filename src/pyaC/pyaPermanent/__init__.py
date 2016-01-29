@@ -1,3 +1,3 @@
-from pyaConfig import *
-from pyaFS import *
-from updateCycler import PyAUpdateCycle
+from .pyaConfig import *
+from .pyaFS import *
+from .updateCycler import PyAUpdateCycle

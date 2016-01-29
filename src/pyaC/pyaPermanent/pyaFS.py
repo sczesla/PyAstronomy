@@ -1,7 +1,8 @@
+from __future__ import print_function, division
 import os
 from PyAstronomy.pyaC import pyaErrors as PE
-from pyaConfig import *
-import urllib
+from .pyaConfig import *
+import six.moves.urllib.request as UR
 
 class PyAFS:
   """
@@ -135,9 +136,9 @@ class PyAFS:
     self.touchFile(ana["fullname"])
     try:
       if verbose:
-        print "PyA download info:"
-        print "  - Downloading from URL: " + str(url)
-      filename, header = urllib.urlretrieve(url, ana["fullname"])
+        print("PyA download info:")
+        print("  - Downloading from URL: " + str(url))
+      filename, header = UR.urlretrieve(url, ana["fullname"])
     except (KeyboardInterrupt, SystemExit):
       self.removeFile(ana["fullname"])
       raise
@@ -147,8 +148,8 @@ class PyAFS:
             "Error message: " + str(e), \
             solution="Check whether URL exists and is spelled correctly."))
     if verbose:
-      print "  - Downloaded " + str(os.path.getsize(filename) / 1000.0) + " kb"
-      print "    to file: " + filename
+      print("  - Downloaded " + str(os.path.getsize(filename) / 1000.0) + " kb")
+      print("    to file: " + filename)
 
   def requestFile(self, relName, mode='r', openMethod=open, *args, **kwargs):
     """
@@ -182,7 +183,7 @@ class PyAFS:
       self.createSubfolder(ana["absPath"])
     try:
       fileObject = openMethod(fullName, mode=mode, *args, **kwargs)
-    except IOError, ioe:
+    except IOError as ioe:
       raise(PE.PyAValError("Could not access file (relative name): "+relName+", full name: "+fullName + "\n" + \
                            "Caught exception: "+str(ioe)))
     return fileObject

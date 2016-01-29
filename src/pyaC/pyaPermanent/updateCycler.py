@@ -1,5 +1,6 @@
-from pyaFS import PyAFS
-import ConfigParser as CP
+from __future__ import division
+from .pyaFS import PyAFS
+import six.moves.configparser as CP
 import datetime as DT
 from PyAstronomy.pyaC import pyaErrors as PE
 

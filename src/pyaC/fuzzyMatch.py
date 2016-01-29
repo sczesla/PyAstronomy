@@ -1,4 +1,4 @@
-import pyaErrors as PE
+from . import pyaErrors as PE
 import difflib
  
 
@@ -44,7 +44,7 @@ def fuzzyMatch(inkey, wordList, caseSensitive=True, n=3, cutoff=0.6, raises=Fals
   """
   if not caseSensitive:
     key = inkey.lower()
-    wordList = map(lambda x:x.lower(), wordList)
+    wordList = [x.lower() for x in wordList]
   else:
     key = inkey
   result = {"em":None, "cm":None, "index":None}

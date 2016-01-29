@@ -1,4 +1,5 @@
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class Counter:
   """
@@ -64,7 +65,7 @@ class NestedLoop:
       if len(self.lowerLimits) != len(limits):
         raise(PE.PyAValError("You need to specify as many lower as upper limits.", \
                              solution="Make `limits` and `lowerLimits` the same length."))
-    for i in xrange(len(self.limits)):
+    for i in smo.range(len(self.limits)):
       if self.limits[i] <= self.lowerLimits[i]:
         raise(PE.PyAValError("Upper limit needs to be larger than lower limit", \
                              solution="Adapt ranges!"))
@@ -72,10 +73,10 @@ class NestedLoop:
     self._nl = len(limits)
     # Total number of points 
     self._np = 1
-    for i in xrange(self._nl):
+    for i in smo.range(self._nl):
       self._np *= (self.limits[i] - self.lowerLimits[i])
     # List of counters
-    self.counters = map(Counter, zip(self.lowerLimits, self.limits))
+    self.counters = list(map(Counter, list(zip(self.lowerLimits, self.limits))))
 
   def __iter__(self):
     """
@@ -86,8 +87,8 @@ class NestedLoop:
       Loop index : tuple
           A tuple with an int for every loop index.
     """
-    for j in xrange(self._np):
-      yield tuple(map(lambda x:x.counter, self.counters))
-      for i in xrange(self._nl):
+    for j in smo.range(self._np):
+      yield tuple([x.counter for x in self.counters])
+      for i in smo.range(self._nl):
         x = self.counters[i].increment()
         if x == 0: break
