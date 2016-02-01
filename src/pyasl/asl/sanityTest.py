@@ -158,6 +158,27 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
       y, m, d, h, minu, sec, ms = tuple(daycnv(jd2, mode='dtlist'))
       minu += round(sec/60.)
       self.assertAlmostEqual(minu, i, delta=1e-7, msg="Problem with minutes in daycnv")
+    
+    import numpy as np
+    jds = [2345678., 2345679.]
+    dts = daycnv(jds, mode="dt")
+    self.assertEqual((dts[0] - datetime.datetime(1710, 2, 23, 12)).total_seconds(), 0.0,
+                     msg="Wrong date returned for JD 2345678 (mode dt)")
+    self.assertEqual((dts[1] - dts[0]).total_seconds(), 86400.,
+                     msg="Wrong distance between JDs 2345678 and 2345679 (mode dt)")
+    
+    ll = daycnv(jds, mode="dtlist")
+    self.assertEqual(np.sum(np.abs(np.array(ll[1]) - np.array(ll[0]))), 1,
+                     msg="Wrong distance between JDs 2345678 and 2345679 (mode dtlist)")
+    
+    fa = daycnv(jds, mode="idl")
+    self.assertEqual(np.sum(np.abs(np.array(fa[1]) - np.array(fa[0]))), 1,
+                     msg="Wrong distance between JDs 2345678 and 2345679 (mode idl)")
+    
+    jds = np.array([2345678., 2345678. + 19876.0/86400.])
+    dts = daycnv(jds, mode="dt")
+    self.assertEqual(np.round((dts[1] - dts[0]).total_seconds()), 19876.,
+                     msg="Distance of 19876 s not reproduced by daycvn.")
 
   def sanity_daycnvExample(self):
     """
