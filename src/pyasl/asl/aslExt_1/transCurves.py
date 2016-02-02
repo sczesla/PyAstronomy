@@ -10,7 +10,9 @@ import scipy.interpolate as sci
 
 class TransmissionCurves:
   """
-    Photometric transmission curves for various bands.
+    Photometric transmission curves for various photometric bands.
+    
+    Currently, Bessel and Johnson bands are supported.
     
     Parameters
     ----------
@@ -76,6 +78,9 @@ class TransmissionCurves:
         if l.find('#') != -1:
           # It is a comment not specifying a band
           # Ignore this...
+          continue
+        elif len(l.rstrip("\n")) == 0:
+          # Ignore empty lines
           continue
         else:
           # It is not a comment but data
