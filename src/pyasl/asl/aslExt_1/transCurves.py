@@ -1,6 +1,6 @@
 from __future__ import print_function
 from __future__ import division
-import six
+import six.moves as smo
 import numpy as np
 import re
 import os
@@ -36,7 +36,7 @@ class TransmissionCurves:
                              where="TransmissionCurves (reading data from file)", \
                              solution="Use unique band names."))
     self.bands[bn] = np.zeros( (len(lines), 2) )
-    for i in six.moves.range(len(lines)):
+    for i in smo.range(len(lines)):
       self.bands[bn][i,::] = np.array(lines[i].split(), dtype=np.float)
   
   def _readData(self, fn):
