@@ -67,6 +67,7 @@ Spectral routines
    aslDoc/lineWidth.rst
    aslDoc/fluxConversion.rst
    aslDoc/readFitsSpec.rst
+   aslDoc/aslExt_1Doc/transCurves.rst
 
 
 Coordinates, time, and observation tools

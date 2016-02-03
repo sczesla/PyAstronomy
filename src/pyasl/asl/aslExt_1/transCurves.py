@@ -12,7 +12,7 @@ class TransmissionCurves:
   """
     Photometric transmission curves for various photometric bands.
     
-    Currently, Bessel and Johnson bands are supported.
+    A list of supported bands can be obtained by calling `availableBands`.
     
     Parameters
     ----------
@@ -146,6 +146,31 @@ class TransmissionCurves:
     """
     self._checkBand(bn)
     return self.bands[bn]
+  
+  def convolveWith(self, wvl, spec, bn, ik="linear"):
+    """
+      Convolve spectrum with transmission curve.
+      
+      Parameters
+      ----------
+      wvl, spec : arrays
+          Wavelength axis [A] and spectral data.
+      bn : string
+          Name of the band.
+      ik : string, optional
+          The type of interpolation. Accepts all values also
+          accepted by the `kind` keyword of scipy's `interp1d` rountine.
+          Default is 'linear'.
+      
+      Returns
+      -------
+      Convolved spectrum : array
+          Input spectrum multiplied with transmission curve
+          of the specified band.
+    """
+    self._checkBand(bn)
+    tc = self.getTransCurve(bn, ik)
+    return spec*tc(wvl)
     
   def __init__(self, fn="default"):
     self._readData(os.path.join(os.path.dirname(__file__), "transCurves.dat"))
