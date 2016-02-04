@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
-    
+import copy
 
 def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, removeEmpty=True, \
-                removeNoError=False, useBinCenter=True, useMeanX=False):
+                removeNoError=False, useBinCenter=True, useMeanX=False, nanHandling=None):
   """
     A simple binning algorithm.
     
@@ -61,6 +61,21 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
         If True, the binned x-values refer to the mean x-value
         of all points in that bin.
         Therefore, the new time axis does not have to be equidistant.
+    nanHandling : None, "ignore", float, (optional)
+        Controls how NaNs in the data are handled.
+          - None: By default (None),
+            nothing is done and NaNs are treated as if they were valid
+            input data, so that they are carried over into the binned data.
+            This means that output bins containing NaN(s) will also end up
+            as NaN(s). If 'ignore'
+          - 'ignore': In this case, NaNs contained in the input data are
+            removed from the data prior binning. Note however, that `x0`,
+            unless specified explicitly, will still refer to the first data
+            point, whether or not this holds a NaN value. 
+          - float: If a float is given, input data values containing NaNs
+            are replaced by the given float before binning. Note that no error on
+            the data (yerr) can be considered in this case, to avoid 
+            erronous treatment of un- or misspecified error values.
     
     Returns
     -------
@@ -86,6 +101,51 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
   if x0 > np.max(x):
     raise(PE.PyAValError("The starting point, `x0`, is larger than the end time of the data.", \
                          solution="Use a smaller value."))
+
+  # Use arrays in calculation. Only copy if conversion to numpy array
+  # is required
+  xl, yl, yerrl = False, False, False
+  if not isinstance(x, np.ndarray):
+    x = np.array(x)
+    xl = True
+  if not isinstance(y, np.ndarray):
+    y = np.array(y)
+    yl = True
+  if not yerr is None:
+    if not isinstance(yerr, np.ndarray):
+      yerr = np.array(yerr)
+      yerrl = True 
+
+  # nanHandling
+  if nanHandling is not None:
+    # As some manipulation of the data may be required, generate
+    # local copies, unless this has already happened.
+    if not xl:
+      x = copy.copy(x)
+    if not yl:
+      y = copy.copy(y)
+    if not yerrl:
+      yerr = copy.copy(yerr)
+    
+    if nanHandling == "ignore": # Remove bins containing NaN from the input data
+      gi = np.isfinite(y)
+      x, y = x[gi], y[gi]
+      if not yerr is None:
+        # Check if bins containing NaN from the input data
+        yerr = yerr[gi]
+    else: 
+      try:
+        nanValue = float(nanHandling)
+      except ValueError as ve:
+        raise(PE.PyAValError("Invalid value given for 'nanHandling'. Error was: " + str(ve), \
+                             solution="Use None, 'ignore', or float number."))
+
+      gi = np.isnan(y)
+      y[gi] = nanValue
+      if yerr is not None:
+        raise(PE.PyAValError("yerr is not permitted for option 'nanHandling=float'.", \
+                             solution="Remove yerr=... from the call."))
+          
   # Calculate the new number of array elements.                         
   if reduceBy is not None:
     nbins = int(round(len(x)/float(reduceBy))) 
@@ -147,23 +207,3 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     indi = np.where(np.invert(np.isnan(result[::,2])))[0]
     result = result[indi,::]
   return result, dt
-
-
-def binByGrouping(x, y, grp, yerr=None):
-  """
-  """
-  # Determine the number of bins (+1 for trailing bin)
-  nb = len(x) / grp + 1
-  result = np.zeros((nb, 5))
-  for si in xrange(nb, 0, grp):
-    # Which bins are to be grouped here
-    indi = range(si, min(si+grp, len(x)))
-    # Center of bin
-    result[i,0] = (x[indi[0]] + x[indi[-1]])/2.0
-    # Width of bin
-    result[i,1] = (x[indi[-1]] - x[indi[0]])/2.0
-    # Mean of y-values
-    result[i,2] = np.mean(y[indi])
-    # Std of y-values
-    result[i,2] = np.std(y[indi])
-  

@@ -521,6 +521,56 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
     plt.errorbar(r2[::,0], r2[::,1], yerr=r2[::,2], fmt='rp--')
 #    plt.show()
 
+  def sanity_example_binningx0dt_example3(self):
+    """
+      Chacking example 3 for binningx0dt (nanHandling)
+    """
+    from PyAstronomy.pyasl import binningx0dt
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    # Set up figures
+    fig = plt.figure()
+    ax0 = fig.add_subplot(411)
+    ax1 = fig.add_subplot(412, sharex=ax0, sharey=ax0)
+    ax2 = fig.add_subplot(413, sharex=ax0, sharey=ax0)
+    ax3 = fig.add_subplot(414, sharey=ax0)
+    
+    # Set up data
+    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    y = [0.3, 0.5, 0.7, 0.2, 0.5, 0.9, 0.2, 0.7, 0.8, 0.6]
+    yerr = [0.1]*len(x)
+    
+    r, dt = binningx0dt(x, y, yerr=yerr, x0=0.5, dt=2)
+    ax0.plot(x, y, marker='o')
+    ax0.plot(r[::,0], r[::,1], linestyle='--', drawstyle='steps-mid', marker='s')
+    ax0.set_title("Normal (w/o NaNs)")
+    ax0.set_xticklabels([])
+    
+    y = [0.3, 0.5, np.nan, 0.2, 0.5, 0.9, np.nan, np.nan, 0.8, 0.6]
+    x, y = np.array(x), np.array(y)
+    r, dt = binningx0dt(x, y, yerr=yerr, x0=0.5, dt=2)
+    ax1.plot(x, y, marker='o')
+    ax1.plot(r[::,0], r[::,1], linestyle='--', drawstyle='steps-mid', marker='s')
+    ax1.set_title("With NaNs and nanHandling='None' (default)")
+    #ax1.set_xticklabels([])
+    
+    r, dt = binningx0dt(x, y, yerr=yerr, x0=0.5, dt=2, nanHandling="ignore")
+    ax2.plot(x, y, marker='o')
+    ax2.plot(r[::,0], r[::,1], linestyle='--', drawstyle='steps-mid', marker='s')
+    ax2.set_title("With NaNs and nanHandling='ignore'")
+    
+    r, dt = binningx0dt(x, y, x0=0.5, dt=2, nanHandling=0.5)
+    ax3.plot(x, y, marker='o')
+    ax3.plot(r[::,0], r[::,1], linestyle='--', drawstyle='steps-mid', marker='s')
+    ax3.set_title("With NaNs and nanHandling=0.5")
+    
+    ax0.set_xlim(0, 11.5)
+    ax3.set_xlim(0, 11.5)
+    ax0.set_ylim(0,1.1)
+    
+#     plt.show()
+
 class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
   
   def setUp(self):
