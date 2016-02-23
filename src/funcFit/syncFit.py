@@ -53,6 +53,8 @@ class MiniFuncSync:
       val = f(self.odf, P)
       # Assign penalty
       val += self.odf.pars.getPenalty(penaltyFact=self.odf.penaltyFactor)[0]
+      val += self.odf.pars.applyConditionalRestrictions()
+     
       return val
     return miniFunc
 
