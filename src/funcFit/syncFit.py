@@ -161,6 +161,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
         r = re.match(parameter+"_.*", p)
         if r is not None:
           ps.append(p)
+      ps = sorted(ps)    
     else:
       ps = parameter
     for i in xrange(1,len(ps)):
