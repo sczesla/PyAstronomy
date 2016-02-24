@@ -53,6 +53,8 @@ class MiniFuncSync:
       val = f(self.odf, P)
       # Assign penalty
       val += self.odf.pars.getPenalty(penaltyFact=self.odf.penaltyFactor)[0]
+      val += self.odf.pars.applyConditionalRestrictions()
+     
       return val
     return miniFunc
 
@@ -159,6 +161,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
         r = re.match(parameter+"_.*", p)
         if r is not None:
           ps.append(p)
+      ps = sorted(ps)    
     else:
       ps = parameter
     for i in xrange(1,len(ps)):
