@@ -773,7 +773,10 @@ class Params:
     else:
       pd = resource
     # Free ALL values
-    self.thaw(self.parameters().keys())
+    for k in self.parameters().keys():
+      rels = self.getRelationsOf(k)
+      if len(rels) == 0:
+        self.thaw([k])
     # Assign parameter values
     self.assignValue(pd["parameters"])
     # Assign restrictions
