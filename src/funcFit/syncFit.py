@@ -6,6 +6,7 @@ from onedfit import MiniFunc
 from params import equal
 from onedfit import _PyMCSampler, _OndeDFitParBase
 from nameIdentBase import ModelNameIdentBase
+from PyAstronomy import pyaC 
 
 from PyAstronomy.funcFit import _scoImport, _pymcImport
 if _scoImport:
@@ -132,15 +133,25 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       return chi
     return miniChiSqr
   
-  def __sqrdiff(self):
+  def __sqrDiff(self):
     @MiniFuncSync(self)
     def minisqr(odf, P):
       # Calculate squared difference
       sqr = 0.0
       for k in self._compos.iterkeys():
-        sqr += numpy.sum((self.data[k][1] - self.models[k])**2)
+        sqr += numpy.nansum((self.data[k][1] - self.models[k])**2)
       return sqr
     return minisqr
+
+  def __cash79(self):
+      @MiniFuncSync(self)
+      def miniCash79(odf, P):
+        # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
+        cc = 0
+        for k in self._compos.iterkeys():
+          cc += -2.0 * numpy.nansum(self.data[k][1] * numpy.log(self.models[k]) - self.models[k])
+        return cc
+      return miniCash79
   
   def treatAsEqual(self, parameter):
     """
@@ -180,6 +191,41 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       for l in lines:
         print l
     return lines
+  def setObjectiveFunction(self, miniFunc="chisqr"):
+    """
+      Define the objective function.
+      
+      This function sets the `miniFunc` attribute, which is used
+      to calculate the quantity to be minimized.
+      
+      Parameters
+      ----------
+      miniFunc : str {chisqr, cash79, sqrdiff} or callable
+          The objective function. If "chisqr", chi-square will be
+          minimzed. If "cash 79", the Cash statistics 
+          (Cash 1979, ApJ 228, 939, Eq. 5) will be used.
+          If "sqrdiff" is specified, 
+          Otherwise, a user-defined function is assumed.
+    """
+    # Determine function to be minimized
+    if miniFunc == "chisqr":
+      self.miniFunc = self.__chiSqr()
+      return
+    elif miniFunc == "cash79":
+      self.miniFunc = self.__cash79()
+      return
+    elif miniFunc == "sqrdiff":
+      self.miniFunc = self.__sqrDiff()
+      return
+    else:
+      if not hasattr(miniFunc, '__call__'):
+        raise(PE.PyAValError("`miniFunc` is neither None, a valid string, or a function.",
+                             where="OneDFit::fit",
+                             solution="Use, e.g., 'chisqr' or another valid choice from the documentation."))
+      
+      # A function has been specified
+      self.miniFunc = miniFunc
+      return
   
   def fit(self, data, yerr=None, X0 = None, minAlgo=None, miniFunc=None, *fminPars, **fminArgs):
     """
@@ -208,7 +254,15 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
                        scipy.optimize.fmin_ncg).
     """
     # Assign internal data properties.
-    self.data = data
+    
+    if data is not None:
+      self.data = data
+    elif self.data is not None:
+        data = self.data
+    else:
+        raise(PE.PyAValError("You must provide data to fit.", solution="Call fit with data."))
+        
+    
     if yerr is not None:
       self.yerr = yerr
     # Choose minimization algorithm
@@ -222,13 +276,11 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     else:
       self.minAlgo = minAlgo
     # Determine function to be minimized
-    if miniFunc is None:
-        if yerr is None:
-          self.miniFunc = self.__sqrdiff()
-        else:
-          self.miniFunc = self.__chiSqr()
-    else:
-      self.miniFunc = miniFunc
+    if (miniFunc is None) and (yerr is not None):
+        miniFunc = "chisqr"
+    elif (miniFunc is None) and (yerr is None):
+        miniFunc = "sqrdiff"
+    self.setObjectiveFunction(miniFunc)
     # Assign initial guess if necessary
     if X0 is not None:
       self.pars.setFreeParams(X0)
@@ -240,6 +292,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
                              full_output=True, **self.fminArgs)
     self.pars.setFreeParams(self.fitResult[0])
     self.updateModel()    
+    self._stepparEnabled = True
 
   def fitMCMC(self, data, X0, Lims, Steps, yerr=None, pymcPars=None, pyy=None, \
               potentials=None, dbfile="mcmcSample.tmp", dbArgs=None, adaptiveMetropolis=False,
@@ -419,6 +472,158 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       self[par] = self.MCMC.trace(par)[mindex]
     self.updateModel()
     self.MCMC.db.close() 
+
+  
+  def __extractFunctionValue(self, fr):
+    """
+      Returns the function value (e.g., chi-square).
+      
+      Parameters
+      ----------
+      fr : list
+          The fit result returned by the fit method
+          used by the `fit` method.
+      
+      Returns
+      -------
+      Function value : float
+          For example, chi-square.
+    """
+    return fr[1]
+
+  def steppar(self, pars, ranges, extractFctVal=None, quiet=False):
+    """
+      Allows to step a parameter through a specified range.
+      
+      This function steps the specified parameters through the given
+      ranges. During each steps, all free parameters, except for those
+      which are stepped, are fitted. The resulting contours allow
+      to estimate confidence intervals.
+      
+      This command uses the fitting parameters specified on a call
+      to the `fit` method. In particular, the same values for `x`,
+      `y`, `yerr`, `minAlgo`, `miniFunc`, `fminPars`, and `fminArgs`
+      are used.
+      
+      .. note:: You need to have carried out a fit before you can
+                use `steppar`.
+      
+      Parameters
+      ----------
+      pars : string or list of strings
+          The parameter(s) which are to be stepped.
+      ranges : dictionary
+          A dictionary mapping parameter name to range specifier.
+          The latter is a list containing [lower limit, upper limit,
+          no. of steps, 'lin'/'log']. The fourth entry, which
+          is optional, is a string specifying whether a constant
+          linear step size ('lin') or a constant logarithmic
+          step size ('log') shall be used.
+      quiet : boolean, optional
+          If True, output will be suppressed.
+      extractFctVal : callable, optional
+          A function specifying how the function value is extracted
+          from the fit result. If standard settings are used, the
+          default of None is adequate.
+      
+      Returns
+      -------
+      Parameter steps : list
+          The return value is a list of lists. Each individual list
+          contains the values of the stepped parameters as the first
+          entries (same order as the input `pars` list), the
+          following entry is the value of the objective function
+          (e.g., chi square), and the last entry is a tuple
+          containing the indices of the steps of the parameter values.
+          This last entry can be useful to convert the result into
+          an arrow to plot, e.g., contours. 
+    """
+    if not self._stepparEnabled:
+      raise(PE.PyAOrderError("Before you can use steppar, you must call a function, which enables its use (e.g., `fit`).", \
+            solution="Call the `fit` method first and then try again."))
+    if isinstance(pars, basestring):
+      # Make it a list
+      pars = [pars]
+    # Check parameter consistency
+    for p in pars:
+      # Check existence
+      tmp = self[p]
+      if not p in ranges:
+        raise(PE.PyAValError("There is no range for parameter: " + p, \
+                             solution="Specify a range; e.g., {'xyz':[0.5,1.9,20,'lin']}"))
+    # Function to extract function value from the fit result
+    if extractFctVal is None:
+      self._extractFctVal = self.__extractFunctionValue
+    else:
+      if not hasattr(extractFctVal, "__call__"):
+        raise(PE.PyAValError("`extractFctVal` needs to be callable!", \
+                             solution="Specify a function here or try to use None."))
+      self._extractFctVal = extractFctVal
+    # Set up ranges
+    rs = []
+    for par in pars:
+      r = ranges[par]
+      if len(r) > 4:
+        # Use the axis as given
+        rs.append(r)
+        continue
+      if len(r) < 4:
+        # By default, use linear spacing
+        mode = 'lin'
+      else:
+        if not isinstance(r[3], basestring):
+          raise(PE.PyAValError("If the range has 4 entries, the fourth must be a string specifying the mode.", \
+                               solution="Use either 'lin' or 'log' as the fourth entry."))
+        mode = r[3]
+      if mode == 'lin':
+        rs.append(numpy.linspace(r[0], r[1], r[2]))
+      elif mode == 'log':
+        # Calculate factor
+        s = numpy.power((r[1]/r[0]), 1.0/r[2])
+        rs.append( r[0] * numpy.power(s, numpy.arange(r[2])) )
+      else:
+        raise(PE.PyAValError("Unknown mode: " + str(mode), \
+                             solution="Use either 'lin' or 'log'."))
+    # Save state of object
+    saveObj = self.saveState()
+    saveFitResult = self.fitResult
+    saveModels = {}
+    for k in self._compos.iterkeys():
+      saveModels[k] = self.models[k].copy()
+    # Freeze parameters, which are affected
+    self.freeze(pars)
+    # Store result
+    result = []
+    # Loop over the axes
+    nli = pyaC.NestedLoop(map(len, rs))
+    for index in nli:
+      for i, p in enumerate(pars):
+        self[p] = rs[i][index[i]]
+      # Fit using previous setting
+      # Note that mAA is dispensable, because self.minAlgo will be a callable.
+      self.fit(None, None, minAlgo=self.minAlgo, miniFunc=self.miniFunc, \
+               *self.fminPars, **self.fminArgs)
+      # Build up result
+      ppr = []
+      for par in pars:
+        ppr.append(self[par])
+      try:
+        ppr.append(self._extractFctVal(self.fitResult))
+      except Exception as e:
+        PE.warn(PE.PyAValError("The call to the `extractFctVal` function failed. Using full output." + \
+                               "\n  Original message: " + str(e)))
+        ppr.append(self.fitResult)
+      if not quiet:
+        print "Result from last iteration:"
+        print "  ", ppr
+      ppr.append(index)
+      result.append(ppr)
+    # Restore old state of object
+    self.restoreState(saveObj)
+    self.fitResult = saveFitResult
+    for k in self._compos.iterkeys():
+      self.models[k] = saveModels[k]
+    return result
   
   def __init__(self):
     """
@@ -451,3 +656,5 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     self.pars = None
     self.penaltyFactor = 1e20
     self.naming = ModelNameIdentBase()
+    self._stepparEnabled = False
+    
