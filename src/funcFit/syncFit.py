@@ -139,11 +139,41 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       # Calculate squared difference
       sqr = 0.0
       for k in self._compos.iterkeys():
-        sqr += numpy.nansum((self.data[k][1] - self.models[k])**2)
+        sqr += numpy.sum((self.data[k][1] - self.models[k])**2)
       return sqr
     return minisqr
 
   def __cash79(self):
+      @MiniFuncSync(self)
+      def miniCash79(odf, P):
+        # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
+        cc = 0
+        for k in self._compos.iterkeys():
+          cc += -2.0 * numpy.sum(self.data[k][1] * numpy.log(self.models[k]) - self.models[k])
+        return cc
+      return miniCash79
+  
+    def __chiSqrRobust(self):
+    @MiniFuncSync(self)
+    def miniChiSqr(odf, P):
+      # Calculate chi^2 and apply penalty if boundaries are violated.
+      chi = 0.0
+      for k in self._compos.iterkeys():
+        chi += numpy.nansum(((self.data[k][1] - self.models[k])/self.yerr[k])**2)
+      return chi
+    return miniChiSqr
+  
+  def __sqrDiffRobust(self):
+    @MiniFuncSync(self)
+    def minisqr(odf, P):
+      # Calculate squared difference
+      sqr = 0.0
+      for k in self._compos.iterkeys():
+        sqr += numpy.nansum((self.data[k][1] - self.models[k])**2)
+      return sqr
+    return minisqr
+
+  def __cash79Robust(self):
       @MiniFuncSync(self)
       def miniCash79(odf, P):
         # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
@@ -216,6 +246,15 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       return
     elif miniFunc == "sqrdiff":
       self.miniFunc = self.__sqrDiff()
+      return
+    elif miniFunc == "chisqrRobust":
+      self.miniFunc = self.__chiSqrRobust()
+      return
+    elif miniFunc == "cash79Robust":
+      self.miniFunc = self.__cash79Robust()
+      return
+    elif miniFunc == "sqrdiffRobust":
+      self.miniFunc = self.__sqrDiffRobust()
       return
     else:
       if not hasattr(miniFunc, '__call__'):
