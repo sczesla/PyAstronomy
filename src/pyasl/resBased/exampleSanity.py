@@ -97,6 +97,42 @@ class SanityOfNasaExoplanetEU(unittest.TestCase):
     plt.loglog(dat.plMass, dat.sma, 'b.')
 #    plt.show()
 
+  def sanity_exampleExoplanetEU2(self):
+    """
+      Example of ExoplanetEU2
+    """
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    
+    # Instantiate exoplanetEU2 object
+    v = pyasl.ExoplanetEU2()
+    
+    # Show the available data
+    v.showAvailableData()
+    print
+    
+    # Get a list of all available column names
+    acs = v.getColnames()
+    print "Available column names: " + ", ".join(acs)
+    print
+    
+    # Select data by planet name (returns a dictionary)
+    print v.selectByPlanetName("CoRoT-2 b")
+    print
+    
+    # Get all data as an astropy table
+    at = v.getAllDataAPT()
+    
+    # Export all data as a pandas DataFrame
+    pd = v.getAllDataPandas()
+    
+    # Plot mass vs. SMA
+    plt.title("Mass vs. SMA")
+    plt.xlabel("[" + v.getUnitOf("mass") + "]")
+    plt.ylabel("[" + v.getUnitOf("semi_major_axis") + "]")
+    plt.loglog(at["mass"], at["semi_major_axis"], 'b.')
+#     plt.show()
+
 class SanityOfNasaExoplanetsOrg(unittest.TestCase):
   
   def setUp(self):

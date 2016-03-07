@@ -8,6 +8,8 @@ From 0.9.0 to 0.10.0
                         - slidingPolyResOutlier
                         - New output/input options for daycnv
                         - 'nanHandling' for binningx0dt
+                        - ExoplanetEU2 for more convenient access
+                          to exoplanet.eu data
   funcFit             *Improved functionality*
                         - Sorting in parameterSummary
   ==================  =============================================
