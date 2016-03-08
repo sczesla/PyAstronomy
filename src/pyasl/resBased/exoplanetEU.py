@@ -402,6 +402,73 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
       raise(PE.PyAValError("No such column: " + str(col), \
                            solution="Choose one of: " + ", ".join(self.vot.colnames)))
     return self.vot[col].info('attributes', out=None)["unit"]
+  
+  def readableInfo(self, planetName, caseSensitive=False):
+    """
+      Produce human-readable summary of available information.
+      
+      Parameters
+      ----------
+      planetName : string
+          The name of the planet (includes planet letter,
+          e.g., "corot-2 b"
+      caseSensitive : boolean, optional
+          If False (default), the search will be case-insensitive.
+      
+      Returns
+      -------
+      Summary : list of strings
+          Formatted output as a list of strings
+    """
+    dat = self.selectByPlanetName(planetName)
+    # Search keys with/without errors
+    kwe, kwoe = [], []
+    for k in dat.keys():
+      if k.find("_error") != -1:
+        # Ignore keys containing the '_error' phrase
+        continue
+      if k.find("_err_") != -1:
+        # Ignore keys containing the '_error' phrase
+        continue        
+      if ((k + "_error_min") in dat) or ((k + "_err_min") in dat):
+        # Key has error
+        kwe.append(k)
+      else:
+        # Key has no error
+        kwoe.append(k)
+    
+    # Maximal length of column name
+    maxlen = max(list(smo.map(lambda x:len(x), self.getColnames())))
+    # Get units
+    units = {c:self.getUnitOf(c) for c in self.getColnames()}
+    # Maximum length of unit
+    mlu = max(list(smo.map(lambda x:len(x), units.values())))
+    
+    lines = []
+    
+    for k in self.getColnames():
+      if (k.find("_error") != -1) or (k.find("_err_") != -1):
+        # Ignore keys containing the '_error' phrase
+        continue
+      ep = "_error_"
+      if k.find("orbital_period") != -1:
+        ep = "_err_"
+      if k in kwoe:
+        lines.append( ("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]))
+      else:
+        lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+    
+    # Maximum length of output line
+    mll = max(list(smo.map(lambda x:len(x), lines)))
+    
+    # Print to screen
+    print "-"*mll
+    for l in lines :
+      print l   
+    print "-"*mll
+    
+    return lines
+    
     
   def selectByPlanetName(self, planetName, caseSensitive=False):
     """
