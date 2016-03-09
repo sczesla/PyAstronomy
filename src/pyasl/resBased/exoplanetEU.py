@@ -403,24 +403,15 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
                            solution="Choose one of: " + ", ".join(self.vot.colnames)))
     return self.vot[col].info('attributes', out=None)["unit"]
   
-  def readableInfo(self, planetName, caseSensitive=False):
+  def _printHRInfo(self, dat):
     """
       Produce human-readable summary of available information.
       
       Parameters
       ----------
-      planetName : string
-          The name of the planet (includes planet letter,
-          e.g., "corot-2 b"
-      caseSensitive : boolean, optional
-          If False (default), the search will be case-insensitive.
-      
-      Returns
-      -------
-      Summary : list of strings
-          Formatted output as a list of strings
+      dat : dictionary
+          Output of `selectByPlanetName`.
     """
-    dat = self.selectByPlanetName(planetName)
     # Search keys with/without errors
     kwe, kwoe = [], []
     for k in dat.keys():
@@ -465,12 +456,9 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     print "-"*mll
     for l in lines :
       print l   
-    print "-"*mll
+    print "-"*mll    
     
-    return lines
-    
-    
-  def selectByPlanetName(self, planetName, caseSensitive=False):
+  def selectByPlanetName(self, planetName, toScreen=True, caseSensitive=False):
     """
       Get entry by planet name.
       
@@ -481,6 +469,9 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
           e.g., "corot-2 b"
       caseSensitive : boolean, optional
           If False (default), the search will be case-insensitive.
+      toScreen : boolean, optional
+          If True (default), the information on the system is printed
+          to screen in human-readable format.
       
       Returns
       -------
@@ -491,6 +482,9 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     names = list(self.vot["name"])
     r = pyaC.fuzzyMatch(planetName, names, caseSensitive=caseSensitive, raises=True)
     result = {cn:self.vot[r["index"]][cn] for cn in self.vot.colnames}
+    if toScreen:
+      self._printHRInfo(result)
+    
     return result
   
   def getColnames(self):
