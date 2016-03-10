@@ -153,7 +153,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
         return cc
       return miniCash79
   
-    def __chiSqrRobust(self):
+  def __chiSqrRobust(self):
     @MiniFuncSync(self)
     def miniChiSqr(odf, P):
       # Calculate chi^2 and apply penalty if boundaries are violated.
