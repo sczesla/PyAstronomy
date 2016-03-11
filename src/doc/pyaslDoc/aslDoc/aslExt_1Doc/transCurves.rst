@@ -10,15 +10,20 @@ photometric transmission curves.
 
 Further information on photometric bands:
 
-  ==================  ==========================================================================================
+  ==================  ===========================================================================================
   Band                Destination
-  ==================  ==========================================================================================
+  ==================  ===========================================================================================
   Bessel              Bessel 1990, PASP 102, 1181B (`helpful link
                       <http://spiff.rit.edu/classes/phys440/lectures/filters/filters.html>`_)
                       
   Johnson             Johnson and Morgan 1951, ApJ 114, 522 (`helpful link
                       <http://obswww.unige.ch/gcpd/filters/fil01.html>`_)
-  ==================  ==========================================================================================
+                      
+  Spitzer IRAC        `Transmission curves for Spitzer IRAC instrument
+                      <http://irsa.ipac.caltech.edu/data/SPITZER/docs/irac/calibrationfiles/spectralresponse/>`_
+                      
+                      Call **addSpitzerIRACPassbands** to add to passband inventory.                     
+  ==================  ===========================================================================================
 
 
 Example of usage
@@ -35,6 +40,9 @@ Example of usage
     
     # Get transmission curve object
     tcs = pyasl.TransmissionCurves()
+    
+    # Add passbands from Spitzer IRAC
+    tcs.addSpitzerIRACPassbands()
     
     print("Available bands: ", tcs.availableBands())
     

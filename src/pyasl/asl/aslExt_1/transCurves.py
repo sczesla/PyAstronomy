@@ -5,6 +5,7 @@ import numpy as np
 import re
 import os
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy.pyaC import pyaPermanent as PP
 import scipy.interpolate as sci
 
 
@@ -171,7 +172,75 @@ class TransmissionCurves:
     self._checkBand(bn)
     tc = self.getTransCurve(bn, ik)
     return spec*tc(wvl)
+  
+  def addPassband(self, name, wvl, trans, snc=False):
+    """
+      Add a new passband to the inventory.
+      
+      Parameters
+      ----------
+      name : string
+          The name of the passband.
+      wvl : array
+          Wavelength in A.
+      trans : array
+          Transmission of the passband.
+      snc : boolean, optional
+          A `Skip Name Check` flag. If False (default), an
+          exception is raised if the passband name is already
+          present in the inventory of passbands. Otherwise
+          the old passband is replaced by the new specification.
+    """
+    if not snc:
+      if name in self.bands:
+        raise(PE.PyANameClash("A passband with name '" + str(name) + "' is already present.", \
+                              solution=["Change the name.", "Use `snc=True` to ignore and overwrite old passband."]))
+    self.bands[name] = np.vstack((wvl, trans)).transpose()
+
+  
+  def addSpitzerIRACPassbands(self, forceDownload=False, verbose=True):
+    """
+      Adds Spitzer IRAC passbands.
+      
+      On first call, the passband files are downloaded.
+      The files are downloaded from:
+      
+      http://irsa.ipac.caltech.edu/data/SPITZER/docs/irac/calibrationfiles/spectralresponse/
+      
+      Parameters
+      ----------
+      forceDownload : boolean, optional
+          If True, a re-download of the passband files is triggered.
+          Default is False.
+      verbose : boolean, optional
+          If True (default), download process will print information
+          on progress.
+    """
+    
+    fns = ["080924ch1trans_full.txt", "080924ch2trans_full.txt", "080924ch3trans_full.txt",
+           "080924ch4trans_full.txt", "080924ch1trans_sub.txt", "080924ch2trans_sub.txt",
+           "080924ch3trans_sub.txt", "080924ch4trans_sub.txt"]
+    
+    path = "pyasl/resBased/"
+    
+    for fn in fns:
+      fno = path + fn
+      if (not self._fs.fileExists(fn)) or forceDownload:
+        self._fs.downloadToFile("http://irsa.ipac.caltech.edu/data/SPITZER/docs/irac/calibrationfiles/spectralresponse/" + fn, fno, forceDownload, verbose)
+      
+      dat = np.loadtxt(self._fs.requestFile(fno))
+      dat[::,0] *= 1e4
+
+      wl = re.match(".*IRAC\s+(\d+\.\d+)\s+.*", self._fs.requestFile(fno).readline()).group(1)
+      if fn.find("_full") != -1:
+        win = "_full"
+      else:
+        win = "_sub"
+      
+      bn = "IRAC" + wl + win
+      self.addPassband(bn, dat[::,0], dat[::,1], snc=True)
     
   def __init__(self, fn="default"):
+    self._fs = PP.PyAFS()
     self._readData(os.path.join(os.path.dirname(__file__), "transCurves.dat"))
     

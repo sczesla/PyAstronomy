@@ -23,6 +23,9 @@ class SanityOfPyaslExt1(unittest.TestCase):
     # Get transmission curve object
     tcs = pyasl.TransmissionCurves()
     
+    # Add passbands from Spitzer IRAC
+    tcs.addSpitzerIRACPassbands()
+    
     print("Available bands: ", tcs.availableBands())
     
     # Wavelength axis
