@@ -1,6 +1,7 @@
 from __future__ import print_function
 from .PyA_Version import PyA_Version 
 import os
+import importlib
 
 class PyAIS:
   """
@@ -30,15 +31,15 @@ class PyAIS:
     
     self.packages = []
     self.findpackages()
-    
+
     self.importStatus = {}
     for m in self.packages:
       try:
-        __import__(m, globals(), locals())
+        importlib.import_module("." + m, "PyAstronomy")
         self.importStatus[m] = True
-      except ImportError:
+      except Exception :
         self.importStatus[m] = False
-
+        
 
 def importCheck():
   p = PyAIS()
