@@ -21,7 +21,7 @@ class PyAIS:
     print("-----------------------------------------------------")
     print("%20s  |  %5s" % ("Package Name", "Import Status"))
     print("-----------------------------------------------------")
-    for m, v in self.importStatus.items():
+    for m, v in sorted(self.importStatus.items()):
       print("%20s  |  %5s" % (m, v))
       
   def __init__(self):
