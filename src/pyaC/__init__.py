@@ -1,4 +1,4 @@
-from .importCheck import ImportCheck
+from .importCheck import ImportCheck, pyaimport
 
 _ic = ImportCheck(["numpy", "scipy"], required=["numpy"])
 

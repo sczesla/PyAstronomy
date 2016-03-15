@@ -1,5 +1,28 @@
 from . import pyaErrors as PE
+import importlib
 
+def pyaimport(mn, pak, globs, cra=True, rf=True):
+  """
+  """
+  try:
+    n = importlib.import_module("." + mn, pak)
+    try:
+      # If __all__ is defined, use it!
+      to_import = n.__all__
+    except AttributeError:
+      # Otherwise, import all names not starting with an underscore
+      to_import = [name for name in n.__dict__ if not name.startswith('_')]
+      if cra:
+        # Check reassignment
+        for name in to_import:
+          if name in globs:
+            print("Reassigning: ", name, " from ", n)
+      
+    globs.update({name: n.__dict__[name] for name in to_import})
+  except:
+    if rf:
+      # Report failure
+      print("FAILED to import module '" + str(mn) + "' from package '" + str(pak) + "'.")
 
 class ImportCheck:
   
