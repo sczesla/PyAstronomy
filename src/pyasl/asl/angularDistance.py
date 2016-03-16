@@ -6,18 +6,18 @@ def getAngDist(ra1, dec1, ra2, dec2):
     
     Parameters
     ----------
-    ra1 : float
+    ra1 : float, array
         Right ascension of the first object in degrees.
-    dec1 : float
+    dec1 : float, array
         Declination of the first object in degrees.
-    ra2 : float
+    ra2 : float, array
         Right ascension of the second object in degrees.
-    dec2 : float
+    dec2 : float, array
         Declination of the second object in degrees.
 
     Returns
     -------
-    Angle : float
+    Angle : float, array
         The angular distance in DEGREES between the first
         and second coordinate in the sky.
          
