@@ -9,4 +9,5 @@ with potential application throughout PyAstronomy.
    
    numericalDerivativesDoc.rst
    integratDoc.rst
+   zerocross.rst
  

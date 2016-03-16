@@ -113,3 +113,56 @@ class SanityOfmtools(unittest.TestCase):
     self.assertAlmostEqual((-1.9)**2-(-2.0)**2, mtools.ibtrapz(x, y, -2.0, -2.0+0.1), delta=1e-10, msg="ibtrapz incorrect for linear function (-2,-1.9).")
     self.assertAlmostEqual(0.0, mtools.ibtrapz(x, y, -2.0, +2.0), delta=1e-10, msg="ibtrapz incorrect for linear function (-2,+2).")
     
+  def sanity_zerocross1dExample(self):
+    """
+      Checking sanity of zerocross1d example
+    """
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import pyaC
+    
+    # Generate some 'data'
+    x = np.arange(100.)**2
+    y = np.sin(x)
+    
+    # Set the last data point to zero.
+    # It will not be counted as a zero crossing!
+    y[-1] = 0
+    
+    # Set point to zero. This will be counted as a
+    # zero crossing
+    y[10] = 0.0
+    
+    # Get coordinates and indices of zero crossings
+    xc, xi = pyaC.zerocross1d(x, y, getIndices=True)
+    
+    # Plot the data
+    plt.plot(x, y, 'b.-')
+    # Add black points where the zero line is crossed
+    plt.plot(xc, np.zeros(len(xc)), 'kp')
+    # Add green points at data points preceding an actual
+    # zero crossing.
+    plt.plot(x[xi], y[xi], 'gp')
+#     plt.show()
+
+  def sanity_zerocross1d(self):
+    """
+      Checking sanity of zerocross1d
+    """
+    import numpy as np
+    from PyAstronomy import pyaC
+    
+    x = np.arange(3.)
+    y = np.array([0, 3, 0])
+    
+    xz = pyaC.zerocross1d(x, y)
+    self.assertEqual(len(xz), 0, msg="Found zero crossing in 0,3,0 array (problem with first/last point).")
+    
+    y = np.array([-1., 1., -2.])
+    xz, xi = pyaC.zerocross1d(x, y, getIndices=True)
+    self.assertEqual(len(xz), 2, msg="Found the following zero crossings in -1,1,-2 array: " + str(xz))
+    self.assertEqual(len(xz), len(xi), "Number of values and indicies is not identical.")
+    
+    self.assertAlmostEqual(np.max(np.abs(np.array([0.5, 1.+1./3.])-xz)), 0.0, delta=1e-8, msg="Found unexpected zero crossings: " + str(xz))
+    self.assertEqual(np.max(np.abs(xi - np.array([0,1]))), 0, msg="Found unexpected indices: " + str(xi))
+    
