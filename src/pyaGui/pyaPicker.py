@@ -6,6 +6,7 @@ from matplotlib.figure import Figure
 from PyAstronomy.pyaC import pyaErrors as PE
 
 import Tkinter as tk
+import pickle
 
 
 class Point():
@@ -35,6 +36,15 @@ class Picker:
   """
     GUI for interactive point selection.
     
+    Parameters
+    ----------
+    saveFile : string, optional
+        If a filename is given, the list of points will be
+        saved to a file with that name using pickle when the
+        class instance if destructed. The points are saved as
+        a python list of two-float-tuples, holding the x and y
+        coordinates of the points. 
+    
     Attributes
     ----------
     f : mpl Figure
@@ -52,10 +62,22 @@ class Picker:
         Default is "yp".
   """
   
-  def __init__(self):
+  def __del__(self):
+    """
+      Destruct instance
+    """
+    if not self.saveFile is None:
+      # Save current point list to file if filename was given
+      pickle.dump(self.points, open(self.saveFile, 'w'))
+  
+  def __init__(self, saveFile=None):
     self.windowTitle = "PyA Picker"
     self.f = Figure()
     self.a = self.f.add_subplot(111)
+    
+    # Store save filename used to dump data on
+    # destruction of class instance
+    self.saveFile = saveFile
     
     # Active and Inactive plot style
     self.astyle = "ro"
@@ -257,9 +279,9 @@ class Picker:
     self.canvas.show()
     tk.mainloop()
     # Prepare return value
-    points = []
+    self.points = []
     for p in self.pointList:
-      points.append((p.xdata, p.ydata))
-    return points
+      self.points.append((p.xdata, p.ydata))
+    return self.points[:]
     
     
