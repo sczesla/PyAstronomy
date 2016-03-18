@@ -137,7 +137,7 @@ def pointDistGESD(x, maxOLs, alpha=0.05):
   return len(oll), oll
   
   
-def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False):
+def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False, mode="both"):
   """
     Simple outlier detection based on residuals.
     
@@ -157,6 +157,10 @@ def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False)
     stdlim : float, optional
         The number of standard deviations acceptable
         for points not categorized as outliers.
+    mode : string, {both, above, below}
+        If 'both' (default), outliers may be located on
+        both sides of the polynomial. If 'above/below', outliers
+        are only expected above/below it. 
     controlPlot : boolean, optional
         If True, a control plot will be generated
         showing the location of outliers (default is
@@ -197,7 +201,17 @@ def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False)
   
   std = np.std(residuals)
   # Find points too far off
-  indi = np.where(np.abs(residuals) >= stdlim*std)[0]
+  if mode == 'both':
+    # Outliers above and/or below the curve
+    indi = np.where(np.abs(residuals) >= stdlim*std)[0]
+  elif mode == 'above':
+    indi = np.where(residuals >= stdlim*std)[0]
+  elif mode == 'below':
+    indi = np.where(residuals <= -stdlim*std)[0]
+  else:
+    raise(PE.PyAValError("No such mode: " + str(mode), \
+                         where="polyResOutlier", \
+                         solution="Use any of 'both', 'above', or 'below'."))
   indiin = pyaC.invertIndexSelection(residuals, indi)
   if controlPlot:
     # Produce control plot
@@ -215,7 +229,7 @@ def polyResOutlier(x, y, deg=0, stdlim=3.0, controlPlot=False, fullOutput=False)
 
 
 
-def slidingPolyResOutlier(x, y, points, count=1, deg=0, stdlim=3.0, controlPlot=False, dx=1):
+def slidingPolyResOutlier(x, y, points, count=1, deg=0, stdlim=3.0, controlPlot=False, dx=1, mode='both'):
   """
     Outlier detection based on polynomial fit in sliding box.
 
@@ -246,6 +260,10 @@ def slidingPolyResOutlier(x, y, points, count=1, deg=0, stdlim=3.0, controlPlot=
     stdlim : float, optional
         The number of standard deviations acceptable
         for points not categorized as outliers.
+    mode : string, {both, above, below}
+        If 'both' (default), outliers may be located on
+        both sides of the polynomial. If 'above/below', outliers
+        are only expected above/below it. 
     controlPlot : boolean, optional
         If True, a control plot will be generated
         showing the location of outliers (default is
@@ -289,7 +307,7 @@ def slidingPolyResOutlier(x, y, points, count=1, deg=0, stdlim=3.0, controlPlot=
     # Exclude points that have been already discarded
     gi = gi0[good[gi0]>0]
     
-    iin, iout = polyResOutlier(x[gi], y[gi], deg=deg, stdlim=stdlim)
+    iin, iout = polyResOutlier(x[gi], y[gi], deg=deg, stdlim=stdlim, mode=mode)
     
     good[gi[iout]] -= 1
 
