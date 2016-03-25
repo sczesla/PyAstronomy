@@ -1,5 +1,4 @@
 from __future__ import print_function, division
-import importlib
 from PyAstronomy import pyaC
 from PyAstronomy.pyasl import _moduleImportStatus
 
