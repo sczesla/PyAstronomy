@@ -1,8 +1,33 @@
 from . import pyaErrors as PE
 import importlib
 
-def pyaimport(mn, pak, globs, cra=True, rf=True):
+def pyaimportallfrom(mn, pak, globs, cra=False, rf=False, re=False):
   """
+    Mimics the behavior of 'from X import *'.
+    
+    Get some help here.
+    # https://stackoverflow.com/questions/21221358/python-how-to-import-all-methods-and-attributes-from-a-module-dynamically
+
+    
+    Parameters
+    ----------
+    mn : string
+        Module name
+    pak : string
+        Name of the package to which the imported
+        names are added.
+    globs : dictionary
+        The `globals()` dictionary of that package.
+    cra : boolean, optional
+        If True, symbol reassignments will be checked
+        and some info printed.
+    rf : boolean, optional
+        If True, a warning will be given on import failure.
+        Default is False.
+    re : boolean, optional
+        If False (default), no exception will be raised on
+        import failure (note, also `rf` must be set True to
+        make this happen). 
   """
   try:
     n = importlib.import_module("." + mn, pak)
@@ -19,10 +44,19 @@ def pyaimport(mn, pak, globs, cra=True, rf=True):
             print("Reassigning: ", name, " from ", n)
       
     globs.update({name: n.__dict__[name] for name in to_import})
-  except:
+  except Exception as e:
     if rf:
-      # Report failure
-      print("FAILED to import module '" + str(mn) + "' from package '" + str(pak) + "'.")
+      f = PE.PyAImportFailure("Could not import module " + str(mn) + " to package " + str(pak) + ". " + \
+                              "Received message: " + str(e))
+      if not re:
+        # Report failure without raising exception
+        PE.warn(f)
+      else:
+        # Raise exception
+        raise(f)
+    return False
+  return True
+      
 
 class ImportCheck:
   
