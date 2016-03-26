@@ -1,7 +1,10 @@
+from __future__ import print_function, division
 import numpy as np
-from astroTimeLegacy import premat, daycnv, precess, helio_jd
-from idlMod import idlMod
+from .astroTimeLegacy import premat, daycnv, precess, helio_jd
+from .idlMod import idlMod
 from PyAstronomy.pyaC import pyaErrors as PE
+import six
+import six.moves as smo
 
 def baryvel(dje, deq):
   """
@@ -242,7 +245,7 @@ def baryvel(dje, deq):
   pertld = 0.0
   pertr = 0.0
   pertrd = 0.0
-  for k in xrange(15):
+  for k in smo.range(15):
     a = idlMod((dcargs[k,0] + dt*dcargs[k,1]), dc2pi)
     cosa = np.cos(a)
     sina = np.sin(a)
@@ -277,7 +280,7 @@ def baryvel(dje, deq):
   pertld = 0.0
   pertp = 0.0
   pertpd = 0.0
-  for k in xrange(3):
+  for k in smo.range(3):
     a = idlMod((dcargm[k,0] + dt*dcargm[k,1]), dc2pi)
     sina = np.sin(a)
     cosa = np.cos(a)
@@ -301,7 +304,7 @@ def baryvel(dje, deq):
   dxbd = dxhd*dc1mme
   dybd = dyhd*dc1mme
   dzbd = dzhd*dc1mme
-  for k in xrange(4):
+  for k in smo.range(4):
     plon = forbel[k+3]
     pomg = sorbel[k+1]
     pecc = sorbel[k+9]
@@ -504,7 +507,7 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
   tu = (rjd-51545.0)/36525.0
   gmst = 6.697374558 + ut + \
         (236.555367908*(rjd-51545.0) + 0.093104*tu**2 - 6.2e-6*tu**3)/3600.0
-  lmst = idlMod(gmst-obs_long/15, 24)
+  lmst = idlMod(gmst-obs_long/15., 24)
 
   # Projection of rotational velocity along the line of sight
   vdiurnal = v*np.cos(degtorad(lat))*np.cos(degtorad(dec))*np.sin(degtorad(ra-lmst*15))
@@ -522,24 +525,24 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
   corr = (vdiurnal + vbar) 
 
   if debug:
-    print ''
-    print '----- HELCORR.PRO - DEBUG INFO - START ----'
-    print '(obs_long (East positive),obs_lat,obs_alt) Observatory coordinates [deg,m]: ', -obs_long, obs_lat, obs_alt
-    print '(ra,dec) Object coordinates (for epoch 2000.0) [deg]: ', ra,dec
-    print '(ut) Universal time (middle of exposure) [hrs]: ', ut
-    print '(jd) Julian date (middle of exposure) (JD): ', jd
-    print '(hjd) Heliocentric Julian date (middle of exposure) (HJD): ', hjd
-    print '(gmst) Greenwich mean sidereal time [hrs]: ', idlMod(gmst, 24)
-    print '(lmst) Local mean sidereal time [hrs]: ', lmst
-    print '(dlat) Latitude correction [deg]: ', dlat
-    print '(lat) Geocentric latitude of observer [deg]: ', lat
-    print '(r) Distance of observer from center of earth [m]: ', r
-    print '(v) Rotational velocity of earth at the position of the observer [km/s]: ', v
-    print '(vdiurnal) Projected earth rotation and earth-moon revolution [km/s]: ', vdiurnal
-    print '(vbar) Barycentric velocity [km/s]: ', vbar
-    print '(vhel) Heliocentric velocity [km/s]: ', vhel
-    print '(corr) Vdiurnal+vbar [km/s]: ', corr
-    print '----- HELCORR.PRO - DEBUG INFO - END -----'
-    print ''
+    print('')
+    print('----- HELCORR.PRO - DEBUG INFO - START ----')
+    print('(obs_long (East positive),obs_lat,obs_alt) Observatory coordinates [deg,m]: ', -obs_long, obs_lat, obs_alt)
+    print('(ra,dec) Object coordinates (for epoch 2000.0) [deg]: ', ra,dec)
+    print('(ut) Universal time (middle of exposure) [hrs]: ', ut)
+    print('(jd) Julian date (middle of exposure) (JD): ', jd)
+    print('(hjd) Heliocentric Julian date (middle of exposure) (HJD): ', hjd)
+    print('(gmst) Greenwich mean sidereal time [hrs]: ', idlMod(gmst, 24))
+    print('(lmst) Local mean sidereal time [hrs]: ', lmst)
+    print('(dlat) Latitude correction [deg]: ', dlat)
+    print('(lat) Geocentric latitude of observer [deg]: ', lat)
+    print('(r) Distance of observer from center of earth [m]: ', r)
+    print('(v) Rotational velocity of earth at the position of the observer [km/s]: ', v)
+    print('(vdiurnal) Projected earth rotation and earth-moon revolution [km/s]: ', vdiurnal)
+    print('(vbar) Barycentric velocity [km/s]: ', vbar)
+    print('(vhel) Heliocentric velocity [km/s]: ', vhel)
+    print('(corr) Vdiurnal+vbar [km/s]: ', corr)
+    print('----- HELCORR.PRO - DEBUG INFO - END -----')
+    print('')
   
   return corr, hjd
