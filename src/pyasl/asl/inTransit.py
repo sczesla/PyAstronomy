@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
-from astroTimeLegacy import helio_jd, daycnv
-import observatory as pyaobs
-import eq2hor
-import sunpos
-import twilight
-from moonpos import moonpos
-from moonphase import moonphase
-from angularDistance import getAngDist
-from cardinalPoint import getCardinalPoint
+from .astroTimeLegacy import helio_jd, daycnv
+from . import observatory as pyaobs
+from . import eq2hor
+from . import sunpos
+from . import twilight
+from .moonpos import moonpos
+from .moonphase import moonphase
+from .angularDistance import getAngDist
+from .cardinalPoint import getCardinalPoint
 import sys
-import airmass
-import localtime
+from . import airmass
+from . import localtime
+import six
+import six.moves as smo
 
 def isInTransit(time, T0, period, halfDuration, boolOutput=False):
   """
@@ -288,7 +291,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
     
   if fileOutput is not None:
     oldStdout = sys.stdout
-    if isinstance(fileOutput, basestring):
+    if isinstance(fileOutput, six.string_types):
       sys.stdout = open(fileOutput, 'w')
     else:
       sys.stdout = fileOutput
@@ -328,7 +331,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         msg += "The required key '" + key + "' is missing in the input data!\n"
         fail = True
         continue
-      if isinstance(planetData[key], (int, long, float)):
+      if isinstance(planetData[key], (tuple(six.integer_types) + (float,))):
         if np.isnan(planetData[key]):
           msg += "The required key '" + key + "' has NaN value in the input data\n!"
           fail = True
@@ -346,10 +349,10 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       tmin = helio_jd(tmin, ra, dec)
       tmax = helio_jd(tmax, ra, dec)
   
-    print "Specified time span"
-    print "Start date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmin))
-    print "End date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmax))
-    print
+    print("Specified time span")
+    print("Start date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmin)))
+    print("End date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmax)))
+    print()
     
     # Transit parameters
     # Orbital period in days
@@ -364,13 +367,13 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       rp = planetData["RpJ"] # Mjup
       rs = planetData["RsSun"] # Msun
       dur = transitDuration(sma, rp, rs, inc, period)
-      print "Estimating transit duration using orbital inclination, semi-major axis,"
-      print "  planetary radius, and stellar radius"
+      print("Estimating transit duration using orbital inclination, semi-major axis,")
+      print("  planetary radius, and stellar radius")
     else:
       dur = planetData["Tdur"]
   
-    print "Transit duration: ", dur*24.*60., " minutes"
-    print "Off-transit time before and after transit: ", obsOffset*24.*60., " minutes"
+    print("Transit duration: ", dur*24.*60., " minutes")
+    print("Off-transit time before and after transit: ", obsOffset*24.*60., " minutes")
   
     # First and last epoch contained in specified range
     trnum_start = np.floor( (tmin - T0)/period )
@@ -437,12 +440,12 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
               "It was changed to 0.0.\n"+\
               "Please use a value >= 0.0 or None if specifying `moonDist'.")
 
-    print
+    print()
     if np.logical_and(lon != None, lat != None):
-      print "No. Tmid [HJD]      Obs. start [UT] [ALT, DIR(AZI)]     Transit mid [UT] [ALT, DIR(AZI)]     Obs. end [UT] [ALT, DIR(AZI)]   twilight"+\
-            " (SUN ALT)                   moon distance     moon phase"
+      print("No. Tmid [HJD]      Obs. start [UT] [ALT, DIR(AZI)]     Transit mid [UT] [ALT, DIR(AZI)]     Obs. end [UT] [ALT, DIR(AZI)]   twilight"+\
+            " (SUN ALT)                   moon distance     moon phase")
     else:
-      print "No. Tmid [HJD]      Obs. start [UT]    Transit mid [UT]   Obs. end [UT]"    
+      print("No. Tmid [HJD]      Obs. start [UT]    Transit mid [UT]   Obs. end [UT]")    
     
     allData = {}
     trcounter = 1
@@ -503,14 +506,14 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         if mdist < moonDist: continue
         # Get lunar phase in percent
         moonpha = moonphase(time_temp) * 100.
-        print "%3d %10.5f   %2d.%2d. %2d:%02d    [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d     [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d  [%3d°,%s(%3d°)]   %18s (%3d°,%3d°,%3d°)   (%3d°,%3d°,%3d°)  %3d%%" \
+        print("%3d %10.5f   %2d.%2d. %2d:%02d    [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d     [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d  [%3d°,%s(%3d°)]   %18s (%3d°,%3d°,%3d°)   (%3d°,%3d°,%3d°)  %3d%%" \
               %(trcounter, Tmid, obs_start[2], obs_start[1], np.floor(obs_start[3]), (obs_start[3]-np.floor(obs_start[3]))*60., \
                       altaz[0][0], getCardinalPoint(altaz[1][0]), altaz[1][0], \
                       obs_mid[2], obs_mid[1], np.floor(obs_mid[3]), (obs_mid[3]-np.floor(obs_mid[3]))*60., \
                       altaz[0][1], getCardinalPoint(altaz[1][1]), altaz[1][1], \
                       obs_end[2], obs_end[1], np.floor(obs_end[3]), (obs_end[3]-np.floor(obs_end[3]))*60., \
                       altaz[0][2], getCardinalPoint(altaz[1][2]), altaz[1][2], twi, sunpos_altaz[0][0], sunpos_altaz[0][1], sunpos_altaz[0][2], \
-                      mdists[0], mdists[1], mdists[2], np.max(moonpha))
+                      mdists[0], mdists[1], mdists[2], np.max(moonpha)))
         # Save transit data
         trData["Tmid"] = Tmid
         trData["Obs jd"] = time_temp
@@ -533,10 +536,10 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
         trData["Obs coord"] = [lon, lat, alt]
       else:
         # If you do not specify the observer's location, return all transits of the object  
-        print "%3d %10.5f   %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d" \
+        print("%3d %10.5f   %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d" \
               %(trcounter, Tmid, obs_start[2], obs_start[1], np.floor(obs_start[3]), (obs_start[3]-np.floor(obs_start[3]))*60., \
                       obs_mid[2], obs_mid[1], np.floor(obs_mid[3]), (obs_mid[3]-np.floor(obs_mid[3]))*60., \
-                      obs_end[2], obs_end[1], np.floor(obs_end[3]), (obs_end[3]-np.floor(obs_end[3]))*60. )
+                      obs_end[2], obs_end[1], np.floor(obs_end[3]), (obs_end[3]-np.floor(obs_end[3]))*60. ))
         trData["Tmid"] = Tmid
         trData["Obs jd"] = time_temp
         trData["Obs cal"] = [obs_start, obs_mid, obs_end]
@@ -546,18 +549,18 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
       allData[trcounter] = trData
       trcounter += 1
   
-    if len(allData.keys()) == 0:
-      print
-      print "------------------------------------------------------"
-      print "!!! No transits found for the given restrictions. !!!"
-      print "------------------------------------------------------"
-      print
+    if len(allData) == 0:
+      print()
+      print("------------------------------------------------------")
+      print("!!! No transits found for the given restrictions. !!!")
+      print("------------------------------------------------------")
+      print()
   
   except:
     raise
   finally:
     if fileOutput is not None:
-      if isinstance(fileOutput, basestring):
+      if isinstance(fileOutput, six.string_types):
         sys.stdout.close()
       sys.stdout = oldStdout
   
@@ -626,7 +629,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
   
   rcParams['xtick.major.pad'] = 12 
   
-  if len(allData.keys()) == 0:
+  if len(allData) == 0:
     raise(PE.PyAValError("Input dictionary is empty", \
           where="transitVisibilityPlot", \
           solution=["Use `transitTimes` to generate input dictionary",
@@ -639,7 +642,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     reqK.append("Transit jd")
   missingK = []
   for k in reqK:
-    if not k in allData[1].keys():
+    if not k in allData[1]:
       missingK.append(k)
   if len(missingK) > 0:
     raise(PE.PyAValError("The following keys are missing in the input dictionary: " + ', '.join(missingK), \
@@ -657,7 +660,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
   font1.set_family('sans-serif')
   font1.set_weight('medium')
 
-  for n in allData.keys():
+  for n in six.iterkeys(allData):
     # JD array
     jdbinsize = 1.0/24./10.
     jds = np.arange(allData[n]["Obs jd"][0], allData[n]["Obs jd"][2], jdbinsize)
@@ -682,11 +685,11 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     night = np.where( sunpos_altaz[0] <= -18. )[0]
     
     if (len(day) == 0) and (len(twi) == 0) and (len(night) == 0):
-      print
-      print "transitVisibilityPlot - no points to draw for date %2d.%2d.%4d" \
-            % (allData[n]["Obs cal"][0][2], allData[n]["Obs cal"][0][1], allData[n]["Obs cal"][0][0])
-      print "Skip transit and continue with next"
-      print
+      print()
+      print("transitVisibilityPlot - no points to draw for date %2d.%2d.%4d" \
+            % (allData[n]["Obs cal"][0][2], allData[n]["Obs cal"][0][1], allData[n]["Obs cal"][0][0]))
+      print("Skip transit and continue with next")
+      print()
       continue
 
     mpos = moonpos(jds)
@@ -783,8 +786,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
   ax22.spines['right'].set_position(('outward', 25))
   ax22.spines['right'].set_color('k')
   ax22.spines['right'].set_visible(True)
-  airmass2 = np.array(map(lambda ang: airmass.airmassSpherical(90. - ang, allData[n]["Obs coord"][2]), \
-                          airmass_ang))
+  airmass2 = np.array([airmass.airmassSpherical(90. - ang, allData[n]["Obs coord"][2]) for ang in airmass_ang])
   ax22.set_yticks(airmass_ang)
   airmassformat = []
   for t in range(airmass2.size): airmassformat.append("%2.2f" % airmass2[t])
