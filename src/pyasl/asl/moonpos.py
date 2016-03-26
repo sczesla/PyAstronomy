@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy as np
-from idlCirrange import cirrange
-from eq2hor import nutate
+from .idlCirrange import cirrange
+from .eq2hor import nutate
+import six.moves as smo
 
 
 def moonpos(jd, radian=False):
@@ -205,7 +207,7 @@ def moonpos(jd, radian=False):
   geolat = np.zeros(jd.size)
   dis = np.zeros(jd.size)
 
-  for i in xrange(jd.size):
+  for i in smo.range(jd.size):
     sinlng = sin_lng.copy()
     coslng = cos_lng.copy()
     sinlat = sin_lat.copy()
