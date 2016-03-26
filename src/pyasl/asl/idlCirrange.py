@@ -1,4 +1,5 @@
-from idlMod import idlMod
+from __future__ import print_function, division
+from .idlMod import idlMod
 import numpy as np
 
 def cirrange(x, radians=False):
