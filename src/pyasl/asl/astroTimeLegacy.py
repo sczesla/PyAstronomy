@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import datetime
 import numpy
 from numpy import sin, cos, tan, sqrt, arcsin
@@ -95,13 +96,13 @@ def daycnv(xjd, mode="idl"):
    
   hr = frac*24.0
   l = jd + 68569
-  n = 4*l / 146097
-  l = l - (146097*n + 3) / 4
-  yr = 4000*(l+1) / 1461001
-  l = l - 1461*yr / 4 + 31        #1461 = 365.25 * 4
-  mn = 80*l / 2447
-  day = l - 2447*mn / 80
-  l = mn/11
+  n = 4*l // 146097
+  l = l - (146097*n + 3) // 4
+  yr = 4000*(l+1) // 1461001
+  l = l - 1461*yr // 4 + 31        #1461 = 365.25 * 4
+  mn = 80*l // 2447
+  day = l - 2447*mn // 80
+  l = mn//11
   mn = mn + 2 - 12*l
   yr = 100*(n-49) + yr + l
   if mode in ('dt', 'dtlist'):
@@ -297,7 +298,7 @@ def bprecess(ra, dec, mu_radec = None,  \
   s1 = r1/rmag    ; s1_dot = r1_dot/rmag
 
   s = s1
-  for j in range(2):
+  for j in smo.range(2):
     r = s1 + A - ((s * A).sum())*s
     s = r/rmag
  
@@ -1065,8 +1066,8 @@ def jdcnv(dt):
   # L = leap years, -1 for Jan, Feb, else 0
   L = int((dt.month-14.0)/12.0)
   julian = dt.day - 32075 + \
-           int(1461*(dt.year+4800l+L)/4.0) + \
-           int(367*(dt.month - 2-L*12)/12.0) - int(int(3*((dt.year+4900l+L)/100.0))/4.0)
+           int(1461*(dt.year+4800+L)/4.0) + \
+           int(367*(dt.month - 2-L*12)/12.0) - int(int(3*((dt.year+4900+L)/100.0))/4.0)
   julian += ((dt.hour/24.0) + (dt.minute/(24.0*60.0)) + (dt.second/86400.) + (dt.microsecond/(86400.*1e6)) - 0.5)
 
   return julian
