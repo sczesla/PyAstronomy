@@ -1,5 +1,6 @@
+from __future__ import print_function, division
 import numpy as np
-from idlMod import idlMod
+from .idlMod import idlMod
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import _ic
 
