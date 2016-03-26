@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
-import ConfigParser
+import six.moves as smo
+import six
+from six.moves import configparser as ConfigParser
 import os
 
 def observatory(obsName):
@@ -78,18 +81,18 @@ def listObservatories(show=True):
     result[code] = observatory(code)
   
   if show:
-    print "List of available observatories"
-    print
-    maxCodeLen = max(map(len, result.keys()))
-    print ("{0:"+str(maxCodeLen)+"s}     ").format("Code") + "Observatory name"
-    print "-" * (21+maxCodeLen)
-    for k in sorted(result.keys(), key=lambda s: s.lower()):
-      print ("{0:"+str(maxCodeLen)+"s} --- ").format(k) + result[k]["name"]
-    print
-    print "Observatory location"
-    print "--------------------"
-    for k in sorted(result.keys(), key=lambda s: s.lower()):
-      print ("Code: {code:"+str(maxCodeLen)+"s}, " + \
+    print("List of available observatories")
+    print()
+    maxCodeLen = max([len(k) for k in six.iterkeys(result)])
+    print(("{0:"+str(maxCodeLen)+"s}     ").format("Code") + "Observatory name")
+    print("-" * (21+maxCodeLen))
+    for k in sorted(list(result), key=lambda s: s.lower()):
+      print(("{0:"+str(maxCodeLen)+"s} --- ").format(k) + result[k]["name"])
+    print()
+    print("Observatory location")
+    print("--------------------")
+    for k in sorted(list(result), key=lambda s: s.lower()):
+      print(("Code: {code:"+str(maxCodeLen)+"s}, " + \
              "Longitude = {longitude:7.3f}°, Latitude = {latitude:+7.3f}°, " + \
-            "Altitude = {altitude:5.0f} m, TZ = {tz: 5.1f}").format(code=k, **result[k])
+            "Altitude = {altitude:5.0f} m, TZ = {tz: 5.1f}").format(code=k, **result[k]))
   return result 
