@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy as np
-from sunpos import sunpos
-from observatory import observatory as observatory_function
-from idlMod import idlMod
-from idlCirrange import cirrange
+from .sunpos import sunpos
+from .observatory import observatory as observatory_function
+from .idlMod import idlMod
+from .idlCirrange import cirrange
 from PyAstronomy.pyasl import _ic
-import astroTimeLegacy as atleg
+from . import astroTimeLegacy as atleg
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 
 
@@ -161,7 +163,7 @@ def nutate(jd, radian=False, plot=False):
   arg = np.transpose(arg)
   sarg = np.sin(arg)
   carg = np.cos(arg)
-  for i in range(n):
+  for i in smo.range(n):
     nut_lon[i] = 0.0001*np.sum( (sdelt*jdcen[i] + sin_lng)*sarg[i] )
     nut_obliq[i] = 0.0001*np.sum( (cdelt*jdcen[i] + cos_lng)*carg[i] )
   
@@ -529,7 +531,7 @@ def co_aberration(jd, ra, dec, radian=False):
     sunlon = np.ravel(sunpos(jd, full_output=True)[3])
   else:
     sunlon = np.zeros( jd.size )
-    for i in range(jd.size):
+    for i in smo.range(jd.size):
       sunlon[i] = np.ravel(sunpos(jd[i], full_output=True)[3])
 
   # Earth's orbital eccentricity
@@ -1117,7 +1119,7 @@ def co_refract(alt, observer_alt=0.0, pressure=None, temperature=None, epsilon=0
   else:
     # Convert from real to observed altitude
     altout = np.zeros(old_alt.size)
-    for i in xrange(altout.size):
+    for i in smo.range(altout.size):
       dr = co_refract_forward(old_alt[i], pressure=pres[i], temperature=temper[i]-273.15)
       # Guess of observed location
       cur = old_alt[i] + dr
@@ -1376,11 +1378,11 @@ def eq2hor(jd, ra, dec, observatory=None, lon=None, lat=None, alt=None, B1950=Fa
   
   if precess:
     if B1950:
-      for i in xrange(ra_vals.size):
+      for i in smo.range(ra_vals.size):
         ra_vals[i], dec_vals[i] = atleg.precess(ra_vals[i], dec_vals[i], 1950.0, equinox_now[i])
     else:
       # Now B2000 is expected
-      for i in range(ra_vals.size):
+      for i in smo.range(ra_vals.size):
         ra_vals[i], dec_vals[i] = atleg.precess(ra_vals[i], dec_vals[i], 2000.0, equinox_now[i])
         
   # Calculate NUTATION and ABERRATION Corrections to Ra-Dec
