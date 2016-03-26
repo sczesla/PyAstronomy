@@ -1,6 +1,8 @@
+from __future__ import print_function, division
 import numpy
 from numpy import pi, abs, sqrt, cos, sin, arccos, arctan, tan
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class MarkleyKESolver:
   """
@@ -101,14 +103,14 @@ class MarkleyKESolver:
           input and output mean anomaly.
     """
     maxdev = 0.0
-    for i in xrange(trials):
+    for i in smo.range(trials):
       M = numpy.random.random() * 100. - 50.
       e = numpy.random.random()
       E = self.getE(M, e)
       M1 = E - e*sin(E)
       M = M - numpy.floor(M/(2.*pi))*2*pi
       maxdev = max(maxdev, abs(M-M1))
-    print "Maximal deviation in resulting mean anomaly (M): ", maxdev
+    print("Maximal deviation in resulting mean anomaly (M): ", maxdev)
     return maxdev
   
   def getE(self, M, e):
@@ -278,7 +280,7 @@ class KeplerEllipse(object):
     if not hasattr(t, "__iter__"):
       return self.ks.getE(M, self.e)
     E = numpy.zeros(len(t))
-    for i in xrange(len(t)):
+    for i in smo.range(len(t)):
       E[i] = self.ks.getE(M[i], self.e)
     return E
        
@@ -363,7 +365,7 @@ class KeplerEllipse(object):
     else:
       # Assume it is an array
       xyz = numpy.zeros( (len(t), 3) )
-      for i in xrange(len(t)):
+      for i in smo.range(len(t)):
         cos_wf = cos(wf[i])
         sin_wf = sin(wf[i])
         xyz[i,::] = numpy.array([cos_Omega*cos_wf - sin_Omega*sin_wf*cos_i,
@@ -420,7 +422,7 @@ class KeplerEllipse(object):
     else:
       # Assume it is an array
       vel = numpy.zeros( (len(t), 3) )
-      for i in xrange(len(t)):
+      for i in smo.range(len(t)):
         bcos_E = b*cos(E[i])
         asin_E = self.a*sin(E[i])
         vel[i,::] = nar[i] * numpy.array([l2*bcos_E - l1*asin_E,
@@ -603,7 +605,7 @@ class KeplerEllipse(object):
     else:
       # Assume it is an array
       psdist = numpy.zeros(len(t))
-      for i in xrange(len(t)):
+      for i in smo.range(len(t)):
         psdist[i] = p/(1.+self.e*cos(f[i]))*sqrt(1.-sin(self._i)**2*sin(wf[i])**2)
 
     return psdist
@@ -746,8 +748,8 @@ def phaseAngle(pos, los='-z'):
     # It is an array of positions
     N = len(pos[::,0])
     result = numpy.zeros(N)
-    for i in xrange(N):
-      print i, numpy.sum((-pos[i,::]) * (-l.los)), pos[i,::]
+    for i in smo.range(N):
+      print(i, numpy.sum((-pos[i,::]) * (-l.los)), pos[i,::])
       result[i] = numpy.arccos( numpy.sum((-pos[i,::]) * (-l.los)) / \
                   numpy.sqrt(numpy.sum(pos[i,::]**2)) )
     return result/numpy.pi*180.
