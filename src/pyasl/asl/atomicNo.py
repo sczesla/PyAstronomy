@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
 import os
+import six
 
 class AtomicNo:
   
@@ -57,7 +59,7 @@ class AtomicNo:
       Atomic number : int
           Atomic number
     """
-    if not isinstance(sym, basestring):
+    if not isinstance(sym, six.string_types):
       raise(PE.PyAValError("`sym` must be a string, e.g., 'Fe'."))
     
     if not sym in self._data:
@@ -72,7 +74,7 @@ class AtomicNo:
     for k in sorted(self._data.keys()):
       if not type(k) == int:
         continue
-      print "%3d | %3s | " % (k, self._data[k]) + self._elNames[k]
+      print("%3d | %3s | " % (k, self._data[k]) + self._elNames[k])
   
   def getElementName(self, atn):
     """
