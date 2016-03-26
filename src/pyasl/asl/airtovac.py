@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import _ic
 import numpy as np
@@ -260,7 +261,7 @@ def _iocon(inp):
   try:
     # Using ravel to avoid generating object with zero length
     out = np.ravel(np.array(inp, dtype=np.float))
-  except Exception, e:
+  except Exception as e:
     raise(PE.PyAValError("Could not convert input of type: " + str(type(inp)) + " into float array. Error: " + str(e), \
           where="_IOCON", \
           solution="Use an input which can be converted into a numpy float array."))
@@ -271,7 +272,7 @@ def _iocon(inp):
     def recover(x):
       try:
         result = float(x)
-      except Exception, e:
+      except Exception as e:
         raise(PE.PyAValError("Could not convert result into a float. Error: " + str(e), \
                              where="_iocon", \
                              solution="Use a float or numpy array as input. Are you maybe using a list?"))
