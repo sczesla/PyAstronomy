@@ -49,6 +49,17 @@ class PyANotImplemented(PyaErrTemplate):
     """
     PyaErrTemplate.__init__(self, what, "PyA Not Implemented", **keys)
     
+    
+class PyAImportFailure(PyaErrTemplate, ImportError):
+  
+  def __init__(self, what, **keys):
+    """
+      When to be raised?
+      
+      When an import fails. This may not be fatal.
+    """
+    PyaErrTemplate.__init__(self, what, "PyA import failure", **keys)
+    
 
 class PyARequiredImport(PyaErrTemplate, ImportError):
   
