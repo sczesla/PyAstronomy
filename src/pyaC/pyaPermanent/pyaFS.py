@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import os
 from PyAstronomy.pyaC import pyaErrors as PE
 from .pyaConfig import *
-import six.moves.urllib.request as UR
+import six.moves.urllib as urllib
 
 class PyAFS:
   """
@@ -112,7 +112,7 @@ class PyAFS:
     ana = self._analyzeFilename(fn, False)
     return os.path.isfile(ana["fullname"])
     
-  def downloadToFile(self, url, fn, clobber=False, verbose=True):
+  def downloadToFile(self, url, fn, clobber=False, verbose=True, openMethod=open):
     """
       Download content from URL.
       
@@ -138,7 +138,9 @@ class PyAFS:
       if verbose:
         print("PyA download info:")
         print("  - Downloading from URL: " + str(url))
-      filename, header = UR.urlretrieve(url, ana["fullname"])
+      response = urllib.request.urlopen(url)
+      data = response.read()      # a `bytes` object
+      self.requestFile(fn, 'w', openMethod).write(data)
     except (KeyboardInterrupt, SystemExit):
       self.removeFile(ana["fullname"])
       raise
@@ -148,8 +150,8 @@ class PyAFS:
             "Error message: " + str(e), \
             solution="Check whether URL exists and is spelled correctly."))
     if verbose:
-      print("  - Downloaded " + str(os.path.getsize(filename) / 1000.0) + " kb")
-      print("    to file: " + filename)
+      print("  - Downloaded " + str(os.path.getsize(ana["fullname"]) / 1000.0) + " kb")
+      print("    to file: " + ana["fullname"])
 
   def requestFile(self, relName, mode='r', openMethod=open, *args, **kwargs):
     """
