@@ -1,14 +1,15 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyaC
 from PyAstronomy.pyasl import _ic 
 import os
-import urllib2
 import gzip
 import csv
 import numpy as np
 import warnings
 import six.moves as smo
+import six
 import copy
 
 if _ic.check["astropy"]:
@@ -74,26 +75,25 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     """
       Download data.
     """
-    response = urllib2.urlopen("http://exoplanet.eu/catalog/csv")
-    data = response.read()
-    self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
+    self._fs.downloadToFile("http://exoplanet.eu/catalog/csv", self.dataFileName, clobber=True,
+                            verbose=False, openMethod=gzip.open)
   
   def _readData(self):
     """
     """
     # Determine number of planets in the csv file
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
     for nplanets, x in enumerate(r):
       pass
     # Reinitialize csv file
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
     # Determine data types for numpy recarray from columns
-    # and initialize array
-    dtype = map(lambda x: (self._columns[x][0], self._columns[x][3]), range(len(self._columns)))
+    # and initialize 
+    dtype = [(self._columns[x][0], self._columns[x][3]) for x in range(len(self._columns))]
     self.data = np.recarray((nplanets+1,), dtype=dtype)
-    colnotfilled = map(lambda x:self._columns[x][0], self._columns.keys())
+    colnotfilled = [self._columns[x][0] for x in six.iterkeys(self._columns)]
     for i, x in enumerate(r):
-      for k, v in x.iteritems():
+      for k, v in six.iteritems(x):
         # Remove hash and white spaces from column names
         k = k.strip('#')
         k = k.strip()
@@ -127,14 +127,14 @@ class ExoplanetEU(pp.PyAUpdateCycle):
       Column names : list of strings
           The names of the columns.
     """
-    print "-"*51
-    print "%12s  %30s  %5s" % ("Column Name", "Description", "Unit")
-    print "-"*51
+    print("-"*51)
+    print("%12s  %30s  %5s" % ("Column Name", "Description", "Unit"))
+    print("-"*51)
     cols = []
-    for k, v in self._columns.iteritems():
-      print "%12s  %30s  %5s" % tuple(v[0:3])
+    for k, v in six.iteritems(self._columns):
+      print("%12s  %30s  %5s" % tuple(v[0:3]))
       cols.append(v[0])
-    print "-"*51
+    print("-"*51)
     return cols
     
   
@@ -345,7 +345,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     # Information to be used in output
     fs = ["name", "dtype", "unit", "description"]
     dat = {}
-    cols = self.vot.columns.values()
+    cols = list(self.vot.columns.values())
     # Collect data
     for i in smo.range(len(cols)):
       dat[i] = {}
@@ -368,9 +368,9 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
         continue
       l += ("%" + str(maxlens[v]) + "s  ") % v
     # Output header
-    print sep
-    print l
-    print sep
+    print(sep)
+    print(l)
+    print(sep)
     
     # Output information
     for i in smo.range(len(cols)):
@@ -381,8 +381,8 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
           l += ("%-" + str(maxlens[v]) + "s  ") % dat[i][v]
           continue
         l += ("%" + str(maxlens[v]) + "s  ") % dat[i][v]
-      print l
-    print sep
+      print(l)
+    print(sep)
   
   def getUnitOf(self, col):
     """
@@ -414,7 +414,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     """
     # Search keys with/without errors
     kwe, kwoe = [], []
-    for k in dat.keys():
+    for k in six.iterkeys(dat):
       if k.find("_error") != -1:
         # Ignore keys containing the '_error' phrase
         continue
@@ -453,10 +453,10 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     mll = max(list(smo.map(lambda x:len(x), lines)))
     
     # Print to screen
-    print "-"*mll
+    print("-"*mll)
     for l in lines :
-      print l   
-    print "-"*mll    
+      print(l)   
+    print("-"*mll)    
     
   def selectByPlanetName(self, planetName, toScreen=True, caseSensitive=False):
     """
@@ -479,7 +479,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
           A dictionary with a key for every data column holding
           the associated value from the data table.
     """
-    names = list(self.vot["name"])
+    names = [n.decode("utf8") for n in self.vot["name"]]
     r = pyaC.fuzzyMatch(planetName, names, caseSensitive=caseSensitive, raises=True)
     result = {cn:self.vot[r["index"]][cn] for cn in self.vot.colnames}
     if toScreen:
@@ -534,16 +534,17 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     pp.PyAUpdateCycle.__init__(self, configFilename, "ExoUpdate")
     self.dataFileName = os.path.join("pyasl", "resBased", "epeu.vo.gz")
     self._fs = pp.PyAFS()
-    if self.needsUpdate() and (not skipUpdate):
+    if (self.needsUpdate() or (not self._fs.fileExists(self.dataFileName))) and (not skipUpdate):
+      # Download data if data file does not exist or
+      # regular update is indicated
       self._update(self._download)
     self._readData()
       
   def _download(self):
     """
       Download data.
-    """
-    response = urllib2.urlopen("http://exoplanet.eu/catalog/votable")
-    data = response.read()
-    self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
+    """    
+    self._fs.downloadToFile("http://exoplanet.eu/catalog/votable", self.dataFileName, clobber=True,
+                            verbose=False, openMethod=gzip.open)
   
   
