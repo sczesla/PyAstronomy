@@ -3,9 +3,8 @@ import os
 from PyAstronomy.pyaC import pyaErrors as PE 
 import six.moves.configparser as ConfigParser
 import six.moves as smo
-import io
 
-class PyAConfig:
+class PyAConfig(object):
   """
     Provide access to permanent PyA configuration.
     
@@ -29,13 +28,15 @@ class PyAConfig:
         The full name of the ".pyaConfigWhere" file.
   """
 
+  _rootConfig = None
+
   def __createConfigStub(self):
     """
       Creates a stub file for configuration if not yet existing.
     """
     if not os.path.isfile(os.path.join(self.dpath, "pyaConfig.cfg") ):
       config = ConfigParser.RawConfigParser()
-      with io.open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt', encoding='utf8') as configfile:
+      with open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt') as configfile:
         config.write(configfile)
     else:
       return
@@ -74,11 +75,10 @@ class PyAConfig:
       Configuration : ConfigParser object
           The content of the root configuration file "pyaConfig.cfg".
     """
-    return self.rootConfig
+    return PyAConfig._rootConfig
 
   def __init__(self):
     self.dpath = None
-    self.rootConfig = None
     # Try to locate home directory via environment variable
     self.homeDir = os.getenv("HOME")
     if self.homeDir is None:
@@ -119,7 +119,7 @@ class PyAConfig:
       # There is not yet a file '.pyaConfigWhere', which stores the place to look
       # for the real configure-file and data files.
       try:
-        f = io.open(self.configWhere, 'wt')
+        f = open(self.configWhere, 'wt')
       except:
         PE.warn(PE.PyAValError("Could not open file: "+self.configWhere+ \
                                " for writing. Data directory cannot be set up."))
@@ -178,7 +178,7 @@ class PyAConfig:
     else:
       # There is a .pyaConfigWhere file.
       try:
-        self.dpath = io.open(self.configWhere).readline()
+        self.dpath = open(self.configWhere).readline()
       except:
         PE.warn(PE.PyAValError("The file "+self.configWhere+ \
                                "exists, but could not be opened for reading.", \
@@ -202,12 +202,38 @@ class PyAConfig:
         return
     self.__createConfigStub()
     # Open the "root" configuration file for later access
-    self.rootConfig = ConfigParser.RawConfigParser()
-    self.rootConfig.read(os.path.join(self.dpath, "pyaConfig.cfg"))
+    if PyAConfig._rootConfig is None:
+      PyAConfig._rootConfig = ConfigParser.RawConfigParser()
+      PyAConfig._rootConfig.read(os.path.join(self.dpath, "pyaConfig.cfg"))
   
-  def __del__(self):
-    if self.rootConfig is not None:
-      # Save the state of the configuration file
-      with io.open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt', encoding="utf8") as configfile:
-        self.rootConfig.write(configfile)
-
+  def saveConfigToFile(self):
+    """
+      Save current state of configuration to file 'pyaConfig.cfg'.
+    """
+    with open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt') as configfile:
+      PyAConfig._rootConfig.write(configfile)
+  
+  def set(self, section, option, value):
+    """
+      Add an entry to the global configuration file.
+      
+      If the specified section does not already exist, it is created.
+    """
+    if not PyAConfig._rootConfig.has_section(section):
+      PyAConfig._rootConfig.add_section(section)
+    PyAConfig._rootConfig.set(section, option, value)
+    self.saveConfigToFile()
+  
+  def remove_option(self, section, option):
+    """
+      Remove option
+    """
+    PyAConfig._rootConfig.remove_option(section, option)
+    self.saveConfigToFile()
+  
+  def remove_section(self, section):
+    """
+      Remove section
+    """
+    PyAConfig._rootConfig.remove_section(section)
+    self.saveConfigToFile()
