@@ -208,6 +208,6 @@ class PyAConfig:
   def __del__(self):
     if self.rootConfig is not None:
       # Save the state of the configuration file
-      with io.open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt') as configfile:
+      with io.open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt', encoding="utf8") as configfile:
         self.rootConfig.write(configfile)
 
