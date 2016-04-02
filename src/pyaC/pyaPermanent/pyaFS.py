@@ -139,8 +139,8 @@ class PyAFS:
         print("PyA download info:")
         print("  - Downloading from URL: " + str(url))
       response = urllib.request.urlopen(url)
-      data = response.read()      # a `bytes` object
-      self.requestFile(fn, 'w', openMethod).write(data)
+      data = response.read()     # a `bytes` object
+      self.requestFile(fn, 'wb', openMethod).write(data)
     except (KeyboardInterrupt, SystemExit):
       self.removeFile(ana["fullname"])
       raise
