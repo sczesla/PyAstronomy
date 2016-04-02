@@ -3,6 +3,7 @@ import os
 from PyAstronomy.pyaC import pyaErrors as PE 
 import six.moves.configparser as ConfigParser
 import six.moves as smo
+import io
 
 class PyAConfig:
   """
@@ -34,7 +35,7 @@ class PyAConfig:
     """
     if not os.path.isfile(os.path.join(self.dpath, "pyaConfig.cfg") ):
       config = ConfigParser.RawConfigParser()
-      with open(os.path.join(self.dpath, "pyaConfig.cfg"), 'w') as configfile:
+      with io.open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt', encoding='utf8') as configfile:
         config.write(configfile)
     else:
       return
@@ -118,7 +119,7 @@ class PyAConfig:
       # There is not yet a file '.pyaConfigWhere', which stores the place to look
       # for the real configure-file and data files.
       try:
-        f = open(self.configWhere, 'w')
+        f = io.open(self.configWhere, 'wt')
       except:
         PE.warn(PE.PyAValError("Could not open file: "+self.configWhere+ \
                                " for writing. Data directory cannot be set up."))
@@ -177,7 +178,7 @@ class PyAConfig:
     else:
       # There is a .pyaConfigWhere file.
       try:
-        self.dpath = open(self.configWhere).readline()
+        self.dpath = io.open(self.configWhere).readline()
       except:
         PE.warn(PE.PyAValError("The file "+self.configWhere+ \
                                "exists, but could not be opened for reading.", \
@@ -207,6 +208,6 @@ class PyAConfig:
   def __del__(self):
     if self.rootConfig is not None:
       # Save the state of the configuration file
-      with open(os.path.join(self.dpath, "pyaConfig.cfg"), 'w') as configfile:
+      with io.open(os.path.join(self.dpath, "pyaConfig.cfg"), 'wt') as configfile:
         self.rootConfig.write(configfile)
 
