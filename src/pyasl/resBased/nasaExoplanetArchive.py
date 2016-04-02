@@ -1,11 +1,12 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE 
 import PyAstronomy.pyaC as pyaC
 import os
-import urllib2
 import gzip
 import csv
 import numpy as np
+import six
 
 class NasaExoplanetArchive(pp.PyAUpdateCycle):
   """
@@ -53,13 +54,13 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
     urlRoot = "http://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?"
     table = "&table=exoplanets"
     select = "&select="
-    for v in self._columns.itervalues():
+    for v in six.itervalues(self._columns):
       select = ''.join([select, ',', v[0]])
     outformat = "&format=csv"
     
-    response = urllib2.urlopen(''.join((urlRoot, table+select, outformat)))
-    data = response.read()
-    self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
+    url = ''.join((urlRoot, table+select, outformat))
+    self._fs.downloadToFile(url, self.dataFileName, clobber=True, verbose=False, \
+                            openMethod=gzip.open)
   
   def __init__(self):
     self.data = None
@@ -95,12 +96,12 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
     
     if self.needsUpdate():
       # Data needs update
-      print "Downloading exoplanet data from NASA exoplanet archive"
+      print("Downloading exoplanet data from NASA exoplanet archive")
       self._update(self._downloadData)
-      print "Saved data to file: ", self.dataFileName, " in data directory,"
-      print "  which has been configured as: ", self._fs.dpath
-      print "By default, the data will be downloaded anew every 7 days."
-      print "You can use the `changeDownloadCycle` to change this behavior."
+      print("Saved data to file: ", self.dataFileName, " in data directory,")
+      print("  which has been configured as: ", self._fs.dpath)
+      print("By default, the data will be downloaded anew every 7 days.")
+      print("You can use the `changeDownloadCycle` to change this behavior.")
     self._readData()
 
   def downloadData(self):
@@ -113,14 +114,14 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
     """
       Read the data from local file into numpy recarray.
     """
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
     for nplanets, x in enumerate(r):
       pass
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
-    dtype = map(lambda x: (self._columns[x][0], self._columns[x][3]), range(len(self._columns)))
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
+    dtype = [(self._columns[x][0], self._columns[x][3]) for x in range(len(self._columns))]
     self.data = np.recarray((nplanets+1,), dtype=dtype)
     for i, x in enumerate(r):
-      for k, v in x.iteritems():
+      for k, v in six.iteritems(x):
         if len(v) == 0:
           v = None
         self.data[k][i] = v
@@ -143,12 +144,12 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
     if self.data is None:
       return None
     if verbose:
-      print "{0:12s}  {1:35s}  {2:5s}".format("Column", "Description", "Unit")
-      print "-"*56
-      for v in self._columns.itervalues():
-        print "{0:12s}  {1:35s}  {2:5s}".format(*v)
+      print("{0:12s}  {1:35s}  {2:5s}".format("Column", "Description", "Unit"))
+      print("-"*56)
+      for v in six.itervalues(self._columns):
+        print("{0:12s}  {1:35s}  {2:5s}".format(*v))
     
-    return map(lambda x:self._columns[x][0], range(len(self._columns)))
+    return [self._columns[x][0] for x in range(len(self._columns))]
     
   def selectByPlanetName(self, planetName, caseSensitive=False):
     """
@@ -168,9 +169,10 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
           A dictionary with a key for every data column holding
           the associated value from the data table.
     """
-    r = pyaC.fuzzyMatch(planetName, self.data.pl_name, caseSensitive=caseSensitive, raises=True)
+    pnames = [name.decode("utf8") for name in self.data.pl_name]
+    r = pyaC.fuzzyMatch(planetName, pnames, caseSensitive=caseSensitive, raises=True)
     result = {}
-    for c in self._columns.itervalues():
+    for c in six.itervalues(self._columns):
       result[c[0]] = self.data[c[0]][r["index"]]
     return result
 
