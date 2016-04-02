@@ -112,7 +112,7 @@ class PyAFS:
     ana = self._analyzeFilename(fn, False)
     return os.path.isfile(ana["fullname"])
     
-  def downloadToFile(self, url, fn, clobber=False, verbose=True, openMethod=open):
+  def downloadToFile(self, url, fn, clobber=False, verbose=True, openMethod=open, context=None):
     """
       Download content from URL.
       
@@ -128,6 +128,11 @@ class PyAFS:
       verbose : boolean, optional
           If True, information on the download will be
           printed to the screen.
+      openMethod : callable
+          The method used to open the file to write to (default is
+          open, other choices may be gzip.open or io.ipen)
+      context : ssl context
+          SSL context parameter handed to urlopen.
     """
     if self.fileExists(fn) and (clobber == False):
       return
@@ -138,7 +143,7 @@ class PyAFS:
       if verbose:
         print("PyA download info:")
         print("  - Downloading from URL: " + str(url))
-      response = urllib.request.urlopen(url)
+      response = urllib.request.urlopen(url, context=context)
       data = response.read()     # a `bytes` object
       self.requestFile(fn, 'wb', openMethod).write(data)
     except (KeyboardInterrupt, SystemExit):
