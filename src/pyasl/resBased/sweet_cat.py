@@ -1,7 +1,7 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE
 import os
-import urllib
 import gzip
 from PyAstronomy.pyasl import _ic
 import ssl
@@ -69,16 +69,14 @@ class SWEETCat(pp.PyAUpdateCycle):
     try:
       # The next two lines by-pass certificate verification
       context = ssl._create_unverified_context()
-      urllib.urlretrieve(url, dfn, context=context)
+      self._fs.downloadToFile(url, dfn, clobber=True, verbose=False, openMethod=gzip.open, \
+                              context=context)
     except AttributeError:
       # Python version does not support ssl._create_unverified_context()
-      urllib.urlretrieve(url, dfn)
-    except Exception, e:
+      self._fs.downloadToFile(url, dfn, clobber=True, verbose=False, openMethod=gzip.open)
+    except Exception as e:
       # "Handle" unexpected error
-      raise(PE.PyANetworkError("Could not download SWEET-Cat data. The following error was raisded: " + str(e)))
-    d = self._fs.requestFile(dfn, 'r').readlines()
-    self._fs.requestFile(dfn, 'w', gzip.open).writelines(d)
-
+      raise(PE.PyANetworkError("Could not download SWEET-Cat data. The following error was raised: " + str(e)))
 
   def _read_sweetcat(self):
     """
@@ -91,9 +89,6 @@ class SWEETCat(pp.PyAUpdateCycle):
       import pandas as pd
     ffn = self._fs.requestFile(self.dataFileName, 'r', gzip.open)
     self.data = pd.read_csv(ffn, sep='\t', names=self.names, na_values=['~'])
-    # Adding luminosity to the DataFrame
-    # self.data['lum'] = (self.data.teff/5777)**4 * self.data.mass
-
 
   def __init__(self, skipUpdate=False):
     self.dataFileName = os.path.join("pyasl", "resBased", "sweetcat.csv.gz")
@@ -107,14 +102,14 @@ class SWEETCat(pp.PyAUpdateCycle):
 
     # Check whether data file exists
     self._fs = pp.PyAFS()
-    if self.needsUpdate():
+    if (self.needsUpdate() or (not self._fs.fileExists(self.dataFileName))) and (not skipUpdate) :
       # Data needs update
-      print "Downloading exoplanet data from SWEET-Cat archive"
+      print("Downloading exoplanet data from SWEET-Cat archive")
       self._update(self._downloadData)
-      print "Saved data to file: ", self.dataFileName, " in data directory,"
-      print "  which has been configured as: ", self._fs.dpath
-      print "By default, the data will be downloaded anew every 7 days."
-      print "You can use the `changeDownloadCycle` to change this behavior."
+      print("Saved data to file: ", self.dataFileName, " in data directory,")
+      print("  which has been configured as: ", self._fs.dpath)
+      print("By default, the data will be downloaded anew every 7 days.")
+      print("You can use the `changeDownloadCycle` to change this behavior.")
     self._read_sweetcat()
 
 
