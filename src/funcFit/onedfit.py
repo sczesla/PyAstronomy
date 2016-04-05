@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy as np
-from params import Params
+from .params import Params
 import re
 import copy
 from new import instancemethod
 from PyAstronomy.pyaC import pyaErrors as PE
-from nameIdentBase import ModelNameIdentBase
-from anneal import PyAAnneal
+from .nameIdentBase import ModelNameIdentBase
 from PyAstronomy import pyaC 
 from time import time as timestamp
-from fufDS import FufDS
-from extFitter import NelderMead
+from .fufDS import FufDS
+from .extFitter import NelderMead
+import six
+import six.moves as smo
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
+from astropy.extern.bundled.six import iterkeys
 if _pymcImport:
   import pymc
 if _scoImport:
@@ -112,7 +115,7 @@ class _PyMCSampler:
       else:
         message += " there are too few.\n"
       message += "  Needed entries: " + ', '.join(l) + "\n"
-      given = d.keys(); given.extend(forget)
+      given = list(d); given.extend(forget)
       message += "  Given entries: " + ', '.join(given)
       raise(PE.PyAValError(message, where="fitMCMC", solution="Adjust input dictionary."))
     for elem in l:
@@ -123,22 +126,22 @@ class _PyMCSampler:
         raise(PE.PyAValError(message, where="fitMCMC", solution="Adjust input dictionary."))
 
   def _basicStatMCMCOutput(self, bs):
-    print "Basic statistics of MCMC analysis: "
-    print "-----------------------------------------------------"
-    for k in bs.iterkeys():
-      print "Parameter: ", k
+    print("Basic statistics of MCMC analysis: ")
+    print("-----------------------------------------------------")
+    for k in six-iterkeys(bs):
+      print("Parameter: ", k)
       if bs[k] is None:
-        print "  No output available!"
+        print("  No output available!")
         continue
-      for k2, v2 in bs[k].iteritems():
+      for k2, v2 in six.iteritems(bs[k]):
         if k2 != "quantiles":
-          print "  "+k2+ " : "+str(v2)
+          print("  "+k2+ " : "+str(v2))
         else:
           s = "  quantiles : "
-          for qk, qv in bs[k]["quantiles"].iteritems():
-            print s + str(qk) + " : " + str(qv)
+          for qk, qv in six.iteritems(bs[k]["quantiles"]):
+            print(s + str(qk) + " : " + str(qv))
             s = "              "
-      print "-----------------------------------------------------"
+      print("-----------------------------------------------------")
 
   def _checkDbArgs(self, dbArgs):
     """
@@ -257,7 +260,7 @@ class _PyMCSampler:
     
     # Check if ranges are given for all free parameters
     for p in self.freeParameters():
-        if p not in ranges.keys():
+        if p not in ranges:
             if picky == False: self.freeze(p)
             missingParams.append(p)
     # Check if all given ranges pertain to free parameters        
@@ -373,7 +376,7 @@ class _OndeDFitParBase:
   def __getitem__(self, specifier, **kwargs):
     name = self.naming.convertSpecifier(specifier)[0]
     if not name in self.propMap:
-      if name in self.parameters().keys():
+      if name in self.parameters():
         return self.pars.__getitem__(name)
       else:
         raise(PE.PyAValError("No such parameter: "+str(name), where="OneDFit::__getitem__", \
@@ -383,7 +386,7 @@ class _OndeDFitParBase:
   def __setitem__(self, specifier, value):
     name = self.naming.convertSpecifier(specifier)[0]
     if not name in self.propMap:
-      if name in self.parameters().keys():
+      if name in self.parameters():
         self.pars.assignValue({name:value})
         return
       raise(PE.PyAValError("No such parameter: "+str(name), where="OneDFit::__setitem__", \
@@ -608,7 +611,7 @@ class IFitterBase:
     if not hasattr(self, "_allowedKWs"):
       raise(PE.PyANotImplemented("No _allowedKWs attribute. Must be set to use '_digestkwargs'.", \
                                  solution="Specify _allowedKWs, e.g., in constructor."))
-    for k in kwargs.keys():
+    for k in six.iterkeys(kwargs):
       if not k in self._allowedKWs:
         raise(PE.PyAValError("Keyword " + k + " not allowed in algorithm: " + self.name,
                              solution="Allowed keywords: " + ', '.join(self._allowedKWs), \
@@ -732,7 +735,7 @@ class FuFPrior:
     return gaussianPrior
   
   def __init__(self, lnp, **kwargs):
-    if isinstance(lnp, basestring):
+    if isinstance(lnp, six.string_types):
       if lnp == "uniform":
         self.__call__ = self._uniform(**kwargs)
       elif lnp == "limuniform":
@@ -906,22 +909,22 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if newName == oldName:
       # Ignore identical transformations
       return
-    if newName in self.propMap.values():
+    if newName in list(self.propMap.values()):
       raise(PE.PyANameClash("A variable named "+newName+ \
                       " does already exist.", where="OneDFit::renameVariable"))
     if newName in self.propMap:
       if self.propMap[newName] != oldName:
         raise(PE.PyANameClash("You may not assign a name to a variable, which corresponds to the name of another property.", \
                               where="OneDFit::renameVariable"))
-    if not oldName in self.propMap.values():
+    if not oldName in list(self.propMap.values()):
       raise(PE.PyAValError("A variable named "+oldName+ \
                       " does not exist.", where="OneDFit::renameVariable"))
-    for k in self.propMap.iterkeys():
+    for k in six.iterkeys(self.propMap):
       if self.propMap[k] == oldName:
         self.propMap[k] = newName
         break
     # Tell the parameter class about the renaming (if this did not already happen)
-    if not newName in self.pars.parameters().keys():
+    if not newName in six.iterkeys(self.pars.parameters()):
       self.pars.renameParameter(oldName, newName)
   
   def _isComposed(self):
@@ -961,7 +964,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     for c in right._compoWalk():
       extendCoDat(coDat, c)
 
-    for k in coDat.iterkeys():
+    for k in six.iterkeys(coDat):
       # Loop over all available root names
       if len(coDat[k]) == 1:
         # Only a single component with that root, no problem, no renaming
@@ -999,7 +1002,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     
     def renameIfNecessary(c, baseComponent):
       # Rename all variables according to standard naming rules
-      for prop in c.propMap.keys():
+      for prop in six.iterkeys(c.propMap):
         # Compose new name using "standard conventions"
         newName = c.naming.composeVariableName(prop)
         if not (newName == c.propMap[prop]):
@@ -1044,7 +1047,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Combine the Param instances
     npars = left.pars + right.pars
     # Obtain a new Fitting object
-    result = OneDFit(npars.parameters().keys())
+    result = OneDFit(list(npars.parameters().keys()))
     # Assign new combined Param instance
     result.pars = npars
     # Assign new parameter class to ``old'' individual fitting
@@ -1135,7 +1138,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                     solution="Did you call the constructor of OneDFit before you tried to access this? If not, you should do that."))
     self.naming.setRootName(root)
     if rename:
-      for par in self.propMap.iterkeys():
+      for par in six.iterkeys(self.propMap):
         oldName = self.propMap[par]
         newName = self.naming.composeVariableName(par)
         self.renameVariable(oldName, newName)
@@ -1239,10 +1242,10 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     maxRootLen = 0
     maxIdentLen = 0
     maxVarLen = 0
-    for k,c in rootNoComp.iteritems():
+    for k,c in six.iteritems(rootNoComp):
       maxRootLen = max(maxRootLen, len(k[0]))
       maxIdentLen = max(maxIdentLen, len(c.naming.identifier()))
-      for prop, var in c.propMap.iteritems():
+      for prop, var in six.iteritems(c.propMap):
         maxPropLen = max(maxPropLen, len(prop))
         maxVarLen = max(maxVarLen, len(var))
     
@@ -1262,7 +1265,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         lines.append("-" * len(cono))
         
         # Sorting of the parameter names (component-wise)  
-        cprops = c.propMap.keys()
+        cprops = list(c.propMap.keys())
         if sorting == "none":
           pass
         elif sorting == "ps":
@@ -1302,12 +1305,12 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           if re.match("\s*[^\s]+", app):
             lines.append(app)
       
-    for i in xrange(len(lines)):
+    for i in smo.range(len(lines)):
       lines[i] = prefix + lines[i]
     
     if toScreen:
       for l in lines:
-        print l
+        print(l)
     
     return lines
 
@@ -1445,11 +1448,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     dbArgs = dbArgs.copy()
     # Get the names of the free parameters
     freeNames = self.freeParamNames()
-    if not quiet: print "Free parameters: ", freeNames
+    if not quiet: print("Free parameters: ", freeNames)
     # Check whether parameter lists are complete, define default steps
     # if necessary. 
-    self._dictComplete(freeNames, X0, "start values", forget=pymcPars.keys())
-    self._dictComplete(freeNames, Lims, "limits", forget=pymcPars.keys())
+    self._dictComplete(freeNames, X0, "start values", forget=list(pymcPars.keys()))
+    self._dictComplete(freeNames, Lims, "limits", forget=list(pymcPars.keys()))
     self._dictComplete(freeNames, Steps, "steps")
     
     # Define (or complete) the pymcPars dictionary by defining uniformly distributed
@@ -1457,8 +1460,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     for par in freeNames:
       if par in pymcPars: continue
       if not quiet: 
-          print "Using uniform distribution for parameter: ", par
-          print "  Start value: ", X0[par], ", Limits = [", Lims[par][0], ", ", Lims[par][1], "]" 
+          print("Using uniform distribution for parameter: ", par)
+          print("  Start value: ", X0[par], ", Limits = [", Lims[par][0], ", ", Lims[par][1], "]") 
       pymcPars[par] = pymc.Uniform(par, lower=Lims[par][0], upper=Lims[par][1], value=X0[par], doc="Automatically assigned parameter.")
     
     # This function is used to update the model
@@ -1481,10 +1484,10 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Define the 'data' (y-values)
     if pyy is None:
       if yerr is None:
-        if not quiet: print "Assuming Poisson distribution for 'y'. Use 'pyy' parameter to change this!"
+        if not quiet: print("Assuming Poisson distribution for 'y'. Use 'pyy' parameter to change this!")
         pyy = pymc.Poisson("y", mu=modelDet, value=self._fufDS.y, observed=True)
       else:
-        if not quiet: print "Assuming Gaussian distribution for 'y'. Use 'pyy' parameter to change this!"
+        if not quiet: print("Assuming Gaussian distribution for 'y'. Use 'pyy' parameter to change this!")
         pyy = pymc.Normal("y", mu=modelDet, tau=1.0/self._fufDS.yerr**2, value=self._fufDS.y, observed=True)
 
     # Add data to the Model
@@ -1492,7 +1495,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Add potentials (e.g., priors)
     Model.extend(potentials)
     # Add free parameters
-    for v in pymcPars.itervalues():
+    for v in six.itervalues(pymcPars):
       Model.append(v)
     
     # Check database arguments
@@ -1500,14 +1503,14 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       dbArgs["dbname"] = dbfile
     dbArgs = self._checkDbArgs(dbArgs)
     
-    if not quiet: print "Using database arguments: ", dbArgs
+    if not quiet: print("Using database arguments: ", dbArgs)
     self.MCMC = pymc.MCMC(Model, **dbArgs)
     
     # Tell the MCMC class to use the MH algorithm with specified step width
     if adaptiveMetropolis:
-      self.MCMC.use_step_method(pymc.AdaptiveMetropolis, pymcPars.values(), shrink_if_necessary=True)
+      self.MCMC.use_step_method(pymc.AdaptiveMetropolis, list(pymcPars.values()), shrink_if_necessary=True)
     else:
-      for par in pymcPars.keys():
+      for par in six.iterkeys(pymcPars):
         self.MCMC.use_step_method(pymc.Metropolis, pymcPars[par], proposal_sd=Steps[par], proposal_distribution='Normal')
           
     if not "iter" in sampleArgs:
@@ -1518,8 +1521,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       sampleArgs["thin"] = 1
     
     if not quiet: 
-        print "Giving the following arguments to 'isample':"
-        print "  ", sampleArgs
+        print("Giving the following arguments to 'isample':")
+        print("  ", sampleArgs)
 
     if not quiet: self.MCMC.isample(**sampleArgs)
     else: self.MCMC.sample(**sampleArgs)
@@ -1529,14 +1532,14 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Setting values to ``best fit values'' (lowest deviance)
     mindex = np.argmin(self.MCMC.trace("deviance")[:])
     if not quiet:
-      print "Searching for lowest-deviance solution."
-      print "  Index of lowest-deviance solution: ", mindex
-    for par in pymcPars.iterkeys():
+      print("Searching for lowest-deviance solution.")
+      print("  Index of lowest-deviance solution: ", mindex)
+    for par in six.iterkeys(pymcPars):
       # Weird way of accessing element with index "mindex";
       # prevents slicing/indexing problem in pymc-Trace
       self[par] = (self.MCMC.trace(par)[mindex:mindex+1])[0]
       if not quiet:
-        print "  Parameter: ", par, ", value: ", self[par]
+        print("  Parameter: ", par, ", value: ", self[par])
     self.updateModel() 
     self.MCMC.db.close()
     
@@ -1717,7 +1720,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       
       # Generate starting values
       pos = []
-      for _ in xrange(self.nwalker):
+      for _ in smo.range(self.nwalker):
         pos.append(np.zeros(ndims))
         for i, n in enumerate(fpns):
           if not n in scales:
@@ -1751,7 +1754,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         if ic.check["progressbar"]:
           pbar.update(n)
         else:
-          print "EMCEE: Reached iteration ", n, " of ", sampleArgs["iters"]
+          print("EMCEE: Reached iteration ", n, " of ", sampleArgs["iters"])
     
     # Save the chain to a file
     if not dbfile is None:
@@ -1809,7 +1812,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     else:
       maa = mAA
     
-    if isinstance(minAlgo, basestring):
+    if isinstance(minAlgo, six.string_types):
       if minAlgo == "fufnm":
         return FuFNM(self, **maa)
       elif minAlgo == "spfmin":
@@ -1913,7 +1916,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     
     self.requiredTime = timestamp() - fitStartTime
     if printTime:
-      print "The fit took " + str(self.requiredTime) + " seconds."
+      print("The fit took " + str(self.requiredTime) + " seconds.")
   
   def __extractFunctionValue(self, fr):
     """
@@ -1982,7 +1985,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if not self._stepparEnabled:
       raise(PE.PyAOrderError("Before you can use steppar, you must call a function, which enables its use (e.g., `fit`).", \
             solution="Call the `fit` method first and then try again."))
-    if isinstance(pars, basestring):
+    if isinstance(pars, six.string_types):
       # Make it a list
       pars = [pars]
     # Check parameter consistency
@@ -2012,7 +2015,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # By default, use linear spacing
         mode = 'lin'
       else:
-        if not isinstance(r[3], basestring):
+        if not isinstance(r[3], six.string_types):
           raise(PE.PyAValError("If the range has 4 entries, the fourth must be a string specifying the mode.", \
                                solution="Use either 'lin' or 'log' as the fourth entry."))
         mode = r[3]
@@ -2034,7 +2037,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Store result
     result = []
     # Loop over the axes
-    nli = pyaC.NestedLoop(map(len, rs))
+    nli = pyaC.NestedLoop(list(map(len, rs)))
     for index in nli:
       for i, p in enumerate(pars):
         self[p] = rs[i][index[i]]
@@ -2053,8 +2056,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                "\n  Original message: " + str(e)))
         ppr.append(self.fitResult)
       if not quiet:
-        print "Result from last iteration:"
-        print "  ", ppr
+        print("Result from last iteration:")
+        print("  ", ppr)
       ppr.append(index)
       result.append(ppr)
     # Restore old state of object
