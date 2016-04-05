@@ -1,4 +1,6 @@
+from __future__ import print_function, division
 import numpy as np
+import six.moves as smo
 
 def coordinateGrid(*args):
   """
@@ -42,19 +44,19 @@ def coordinateGrid(*args):
   # Contains the number of data points in "sub-cubes"
   # Holds: nx, nx*ny, nx*ny*nz, etc.
   npcube = [1]
-  for i in xrange(len(la)):
+  for i in smo.range(len(la)):
     npcube.append(npcube[-1]*la[i])
   npcube.pop(0)
   # Loop over all points
   # ai = Array Index
   ai = [0]*na
-  for i in xrange(npo):
+  for i in smo.range(npo):
     itemp = i
-    for j in xrange(na-1,0,-1):
+    for j in smo.range(na-1,0,-1):
       ai[j] = itemp // npcube[j-1]
       itemp -= ai[j]*npcube[j-1]
     ai[0] = itemp
     # Assign the coordinates
-    for k in xrange(na):
+    for k in smo.range(na):
       g[tuple(ai)][k] = args[k][ai[k]]
   return g
