@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy
-from onedfit import OneDFit
+from .onedfit import OneDFit
 import scipy.special as sps
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class Voigt1d(OneDFit):
   """
@@ -67,7 +69,7 @@ class Voigt1d(OneDFit):
       y += x * self["lin"] + self["off"]
   
       y[numpy.where(numpy.isnan(y))] = 0.0
-    except FloatingPointError, fpe:
+    except FloatingPointError as fpe:
       raise(PE.PyAFloatingPointError("The following floating point error occurred:\n  " + str(fpe) + "\n" +
                                      "Current Parameter values:\n"+str(self.parameters()),
                                      solution=["Try to rescale/shift your abscissa. For instance, put" + 
@@ -137,7 +139,7 @@ class MultiVoigt1d(OneDFit):
     # Assign 'continuum'
     y = self["off"] + self["lin"]*x
     # Add Voigt lines
-    for i in xrange(self.n):
+    for i in smo.range(self.n):
       p = str(i+1)
       self._v1d.assignValues({"A":self["A"+p], "al":self["al"+p], "ad":self["ad"+p], "mu":self["mu"+p]})
       y += self._v1d.evaluate(x)

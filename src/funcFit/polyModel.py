@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy
-from onedfit import OneDFit
+from .onedfit import OneDFit
+import six.moves as smo
 
 class PolyFit1d(OneDFit):
   """
@@ -19,7 +21,7 @@ class PolyFit1d(OneDFit):
     coeffs = []
     self.degree = degree
     self.xoff = xoff
-    for i in xrange(degree+1):
+    for i in smo.range(degree+1):
       coeffs.append("c"+str(i))
     OneDFit.__init__(self, coeffs)
     self.setRootName("Poly")
@@ -35,7 +37,7 @@ class PolyFit1d(OneDFit):
           by the fit object. 
     """
     poly = []
-    for i in xrange(self.degree, -1, -1):
+    for i in smo.range(self.degree, -1, -1):
       poly.append(self["c"+str(i)])
     return numpy.poly1d(poly)
 
