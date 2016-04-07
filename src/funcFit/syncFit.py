@@ -1,12 +1,15 @@
+from __future__ import print_function, division
 import copy
 import re
 import numpy
 from PyAstronomy.pyaC import pyaErrors as PE
-from onedfit import MiniFunc
-from params import equal
-from onedfit import _PyMCSampler, _OndeDFitParBase
-from nameIdentBase import ModelNameIdentBase
+from .onedfit import MiniFunc
+from .params import equal
+from .onedfit import _PyMCSampler, _OndeDFitParBase
+from .nameIdentBase import ModelNameIdentBase
 from PyAstronomy import pyaC 
+import six
+import six.moves as smo
 
 from PyAstronomy.funcFit import _scoImport, _pymcImport
 if _scoImport:
@@ -86,7 +89,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     else:
       self.pars = copy.deepcopy(self._compos[n].pars)
     # Assign reference to updated parameter set (in ALL models)
-    for k in self._compos.iterkeys():
+    for k in six.iterkeys(self._compos):
       self._compos[k].pars = self.pars
       self._compos[k]._newPars(self.pars)
     # Define the propMap (identical mapping)
@@ -99,7 +102,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       Returns:
         A list holding the component names.
     """
-    return self._compos.keys()
+    return list(self._compos.keys())
       
   def evaluate(self, axes, component=None):
     """
@@ -113,14 +116,14 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     if component is not None:
       self.models[component] = self._compos[component].evaluate(axes)
     else:
-      for k, v in axes.iteritems():
+      for k, v in six.iteritems(axes):
         self.models[k] = self._compos[k].evaluate(v)
   
   def updateModel(self):
     """
       Evaluate all components. Updates the values in the `models` dictionary.
     """
-    for c in self._compos.iterkeys():
+    for c in six.iterkeys(self._compos):
       self.evaluate(self.data[c][0], component=c)
   
   def __chiSqr(self):
@@ -128,7 +131,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     def miniChiSqr(odf, P):
       # Calculate chi^2 and apply penalty if boundaries are violated.
       chi = 0.0
-      for k in self._compos.iterkeys():
+      for k in six.iterkeys(self._compos):
         chi += numpy.sum(((self.data[k][1] - self.models[k])/self.yerr[k])**2)
       return chi
     return miniChiSqr
@@ -138,7 +141,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     def minisqr(odf, P):
       # Calculate squared difference
       sqr = 0.0
-      for k in self._compos.iterkeys():
+      for k in six.iterkeys(self._compos):
         sqr += numpy.sum((self.data[k][1] - self.models[k])**2)
       return sqr
     return minisqr
@@ -148,7 +151,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       def miniCash79(odf, P):
         # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
         cc = 0
-        for k in self._compos.iterkeys():
+        for k in six.iterkeys(self._compos):
           cc += -2.0 * numpy.sum(self.data[k][1] * numpy.log(self.models[k]) - self.models[k])
         return cc
       return miniCash79
@@ -158,7 +161,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     def miniChiSqr(odf, P):
       # Calculate chi^2 and apply penalty if boundaries are violated.
       chi = 0.0
-      for k in self._compos.iterkeys():
+      for k in six.iterkeys(self._compos):
         chi += numpy.nansum(((self.data[k][1] - self.models[k])/self.yerr[k])**2)
       return chi
     return miniChiSqr
@@ -168,7 +171,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     def minisqr(odf, P):
       # Calculate squared difference
       sqr = 0.0
-      for k in self._compos.iterkeys():
+      for k in six.iterkeys(self._compos):
         sqr += numpy.nansum((self.data[k][1] - self.models[k])**2)
       return sqr
     return minisqr
@@ -178,7 +181,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       def miniCash79(odf, P):
         # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
         cc = 0
-        for k in self._compos.iterkeys():
+        for k in six.iterkeys(self._compos):
           cc += -2.0 * numpy.nansum(self.data[k][1] * numpy.log(self.models[k]) - self.models[k])
         return cc
       return miniCash79
@@ -196,30 +199,30 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       Dependent variables are thawed before the relation is applied, if they are not already
       free.
     """
-    if isinstance(parameter, basestring):
+    if isinstance(parameter, six.string_types):
       ps = []
-      for p in self.parameters().iterkeys():
+      for p in six.iterkeys(self.parameters()):
         r = re.match(parameter+"_.*", p)
         if r is not None:
           ps.append(p)
       ps = sorted(ps)    
     else:
       ps = parameter
-    for i in xrange(1,len(ps)):
+    for i in smo.range(1,len(ps)):
       if not ps[i] in self.freeParamNames():
         self.thaw(ps[i])
       self.relate(ps[i], [ps[0]], equal)
   
   def parameterSummary(self, toScreen=True, prefix=""):
     lines = []
-    for k, v in self._compos.iteritems():
+    for k, v in six.iteritems(self._compos):
       lines.append(prefix)
       lines.append(prefix + "Parameters for syncFit Component: " + str(k))
       lines.append(prefix + "=" * len(lines[-1]))
       lines.extend(v.parameterSummary(toScreen=False, prefix=prefix))
     if toScreen:
       for l in lines:
-        print l
+        print(l)
     return lines
   def setObjectiveFunction(self, miniFunc="chisqr"):
     """
@@ -404,7 +407,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     # Build up "concatenated" y-axis and yerr axis
     self.ycon = None
     self.yerrcon = None
-    for k in self._compos.iterkeys():
+    for k in six.iterkeys(self._compos):
       if self.ycon is None:
         self.ycon = self.data[k][1].copy()
       else:
@@ -418,24 +421,24 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     pymcPars = pymcPars.copy()
     # Get the names of the free parameters
     freeNames = self.freeParamNames()
-    print "Free parameters: ", freeNames
+    print("Free parameters: ", freeNames)
     # Check whether parameter lists are complete, define default steps
     # if necessary. 
-    self._dictComplete(freeNames, X0, "start values", forget=pymcPars.keys())
-    self._dictComplete(freeNames, Lims, "limits", forget=pymcPars.keys())
+    self._dictComplete(freeNames, X0, "start values", forget=list(pymcPars))
+    self._dictComplete(freeNames, Lims, "limits", forget=list(pymcPars))
     self._dictComplete(freeNames, Steps, "steps")
     
     # Define (or complete) the pymcPars dictionary by defining uniformly distributed
     # variables in the range [lim[0], lim[1]] with starting values defined by X0.
     for par in freeNames:
       if par in pymcPars: continue
-      print "Using uniform distribution for parameter: ", par
-      print "  Start value: ", X0[par], ", Limits = [", Lims[par][0], ", ", Lims[par][1], "]" 
+      print("Using uniform distribution for parameter: ", par)
+      print("  Start value: ", X0[par], ", Limits = [", Lims[par][0], ", ", Lims[par][1], "]")
       pymcPars[par] = pymc.Uniform(par, lower=Lims[par][0], upper=Lims[par][1], value=X0[par], doc="Automatically assigned parameter.")
     
     def getConcatenatedModel():
       result = None
-      for k in self._compos.iterkeys():
+      for k in six.iterkeys(self._compos):
         if result is None:
           result = self.models[k]
         else:
@@ -462,10 +465,10 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     # Define the 'data' (y-values)
     if pyy is None:
       if yerr is None:
-        print "Assuming Poisson distribution for 'y'. Use 'pyy' parameter to change this!"
+        print("Assuming Poisson distribution for 'y'. Use 'pyy' parameter to change this!")
         pyy = pymc.Poisson("y", mu=modelDet, value=self.ycon, observed=True)
       else:
-        print "Assuming Gaussian distribution for 'y'. Use 'pyy' parameter to change this!"
+        print("Assuming Gaussian distribution for 'y'. Use 'pyy' parameter to change this!")
         pyy = pymc.Normal("y", mu=modelDet, tau=1.0/self.yerrcon**2, value=self.ycon, observed=True)
 
     # Add data to the Model
@@ -473,7 +476,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     # Add potentials (e.g., priors)
     Model.extend(potentials)
     # Add free parameters
-    for v in pymcPars.itervalues():
+    for v in six.itervalues(pymcPars):
       Model.append(v)
     
     # Check database arguments
@@ -481,14 +484,14 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       dbArgs["dbname"] = dbfile
     dbArgs = self._checkDbArgs(dbArgs)
     
-    print "Using database arguments: ", dbArgs
+    print("Using database arguments: ", dbArgs)
     self.MCMC = pymc.MCMC(Model, **dbArgs)
     
     # Tell the MCMC class to use the MH algorithm with specified step width
     if adaptiveMetropolis:
-      self.MCMC.use_step_method(pymc.AdaptiveMetropolis, pymcPars.values(), shrink_if_necessary=True)
+      self.MCMC.use_step_method(pymc.AdaptiveMetropolis, list(pymcPars.values()), shrink_if_necessary=True)
     else:
-      for par in pymcPars.keys():
+      for par in six.iterkeys(pymcPars):
         self.MCMC.use_step_method(pymc.Metropolis, pymcPars[par], proposal_sd=Steps[par], proposal_distribution='Normal')
           
     if not "iter" in sampleArgs:
@@ -498,8 +501,8 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     if not "thin" in sampleArgs:
       sampleArgs["thin"] = 1
     
-    print "Giving the following arguments to 'isample':"
-    print "  ", sampleArgs
+    print("Giving the following arguments to 'isample':")
+    print("  ", sampleArgs)
     
     self.MCMC.isample(**sampleArgs)
     self.basicStats = self.MCMC.stats()
@@ -507,7 +510,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     
     # Setting values to ``best fit values'' (lowest deviance)
     mindex = numpy.argmin(self.MCMC.trace("deviance")[:])
-    for par in pymcPars.iterkeys():
+    for par in six.iterkeys(pymcPars):
       self[par] = self.MCMC.trace(par)[mindex]
     self.updateModel()
     self.MCMC.db.close() 
@@ -580,7 +583,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     if not self._stepparEnabled:
       raise(PE.PyAOrderError("Before you can use steppar, you must call a function, which enables its use (e.g., `fit`).", \
             solution="Call the `fit` method first and then try again."))
-    if isinstance(pars, basestring):
+    if isinstance(pars, six.string_types):
       # Make it a list
       pars = [pars]
     # Check parameter consistency
@@ -610,7 +613,7 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
         # By default, use linear spacing
         mode = 'lin'
       else:
-        if not isinstance(r[3], basestring):
+        if not isinstance(r[3], six.string_types):
           raise(PE.PyAValError("If the range has 4 entries, the fourth must be a string specifying the mode.", \
                                solution="Use either 'lin' or 'log' as the fourth entry."))
         mode = r[3]
@@ -627,14 +630,14 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     saveObj = self.saveState()
     saveFitResult = self.fitResult
     saveModels = {}
-    for k in self._compos.iterkeys():
+    for k in six.iterkeys(self._compos):
       saveModels[k] = self.models[k].copy()
     # Freeze parameters, which are affected
     self.freeze(pars)
     # Store result
     result = []
     # Loop over the axes
-    nli = pyaC.NestedLoop(map(len, rs))
+    nli = pyaC.NestedLoop(list(map(len, rs)))
     for index in nli:
       for i, p in enumerate(pars):
         self[p] = rs[i][index[i]]
@@ -653,14 +656,14 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
                                "\n  Original message: " + str(e)))
         ppr.append(self.fitResult)
       if not quiet:
-        print "Result from last iteration:"
-        print "  ", ppr
+        print("Result from last iteration:")
+        print("  ", ppr)
       ppr.append(index)
       result.append(ppr)
     # Restore old state of object
     self.restoreState(saveObj)
     self.fitResult = saveFitResult
-    for k in self._compos.iterkeys():
+    for k in six.iterkeys(self._compos):
       self.models[k] = saveModels[k]
     return result
   
