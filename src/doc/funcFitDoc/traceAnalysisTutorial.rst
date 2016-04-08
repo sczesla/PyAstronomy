@@ -21,7 +21,8 @@ The following example demonstrates how to **create
 the Markov-Chain**, which will later be analyzed. 
 
 ::
-
+    
+    from __future__ import print_function, division
     # Import some required modules
     import numpy as np
     import matplotlib.pylab as plt
@@ -61,7 +62,7 @@ the Markov-Chain**, which will later be analyzed.
     
     # Use current parameters as starting point for the sampling
     X0 = vp.freeParameters()
-    print "Starting point for sampling: ", X0
+    print("Starting point for sampling: ", X0)
     
     
     ##############################################################
@@ -141,27 +142,29 @@ Density (HPD) credibility intervals**.
 
 ::
 
-  from PyAstronomy import funcFit as fuf
-  
-  # Create an instance of TraceAnalysis
-  # telling it which file to use
-  ta = fuf.TraceAnalysis("mcmcTA.tmp")
-  
-  # Use the burn-in from the previous example
-  ta.setBurn(500)
-  
-  # See which model parameters have been sampled
-  print "Available parameters: ", ta.availableParameters()
-  
-  # Access the traces of these parameters
-  print "Trace for A: ", ta["A"]
-  
-  # Calculate mean, median, standard deviation, and
-  # credibility interval for the available parameters
-  for p in ta.availableParameters():
-    hpd = ta.hpd(p, cred=0.95)
-    print "Parameter %5s, mean = % g, median = % g, std = % g, 95%% HPD = % g - % g" \
-          % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1])
+    from __future__ import print_function, division
+    from PyAstronomy import funcFit as fuf
+    
+    # Create an instance of TraceAnalysis
+    # telling it which file to use
+    ta = fuf.TraceAnalysis("mcmcTA.tmp")
+    
+    # Use the burn-in from the previous example
+    ta.setBurn(500)
+    
+    # See which model parameters have been sampled
+    print("Available parameters: ", ta.availableParameters())
+    
+    # Access the traces of these parameters
+    print("Trace for A: ", ta["A"])
+    
+    # Calculate mean, median, standard deviation, and
+    # credibility interval for the available parameters
+    for p in ta.availableParameters():
+      hpd = ta.hpd(p, cred=0.95)
+      print("Parameter %5s, mean = % g, median = % g, std = % g, 95%% HPD = % g - % g" \
+            % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1]))
+    
 
 
 Analyze parameter correlations
@@ -173,29 +176,30 @@ be studied using the Markov-Chain.
 
 ::
 
-  from PyAstronomy import funcFit as fuf
-  
-  # Create an instance of TraceAnalysis
-  # telling it which file to use
-  ta = fuf.TraceAnalysis("mcmcTA.tmp")
-  
-  # Use the burn-in from the previous example
-  ta.setBurn(500)
-  
-  # Have a look at the parameter correlations
-  ta.correlationTable()
-  
-  # Calculate Pearson's and Spearman's r-coefficients
-  print "Pearson: ", ta.pearsonr("ad", "al")
-  print "Spearman: ", ta.spearmanr("ad", "al")
-  
-  # Show a plot of the correlation
-  # Note that the plotCorrEnh method can also
-  # be used, which is useful in the case of long
-  # chains.
-  ta.plotCorr(parsList=["ad", "al"])
-  # ta.plotCorrEnh(parsList=["ad", "al"])
-  ta.show()
+    from __future__ import print_function, division
+    from PyAstronomy import funcFit as fuf
+    
+    # Create an instance of TraceAnalysis
+    # telling it which file to use
+    ta = fuf.TraceAnalysis("mcmcTA.tmp")
+    
+    # Use the burn-in from the previous example
+    ta.setBurn(500)
+    
+    # Have a look at the parameter correlations
+    ta.correlationTable()
+    
+    # Calculate Pearson's and Spearman's r-coefficients
+    print("Pearson: ", ta.pearsonr("ad", "al"))
+    print("Spearman: ", ta.spearmanr("ad", "al"))
+    
+    # Show a plot of the correlation
+    # Note that the plotCorrEnh method can also
+    # be used, which is useful in the case of long
+    # chains.
+    ta.plotCorr(parsList=["ad", "al"])
+    # ta.plotCorrEnh(parsList=["ad", "al"])
+    ta.show()
    
 
 Obtain lowest-deviance, mean, and median set of parameters
@@ -205,42 +209,43 @@ This example demonstrates how to obtain certain parameter
 sets and use them with a model.
 
 ::
-
-  from PyAstronomy import funcFit as fuf
-  import matplotlib.pylab as plt
-  import numpy as np
-  
-  # Create an instance of TraceAnalysis
-  # telling it which file to use
-  ta = fuf.TraceAnalysis("mcmcTA.tmp")
-  
-  # Use the burn-in from the previous example
-  ta.setBurn(500)
-  
-  # Find sets of parameters
-  # First, the lowest deviance set
-  lds, index = ta.parameterSet(prescription="lowestDev")
-  print "Lowest deviance set: ", lds
-  print "  at chain index: ", index
-  means = ta.parameterSet(prescription="mean")
-  print "Set of mean values: ", means
-  medians = ta.parameterSet(prescription="median")
-  print "Set of median values: ", means
-  
-  # Create Voigt model and plot the models belonging
-  # to the lowest deviance, mean, and median parameter
-  # set.
-  vp = fuf.Voigt1d()
-  # Generate the model wavelength axis
-  x = np.linspace(5490., 5510., 200)
-  # Calculate and plot the models
-  vp.assignValues(lds)
-  plt.plot(x, vp.evaluate(x), 'b.-')
-  vp.assignValues(means)
-  plt.plot(x, vp.evaluate(x), 'r.-')
-  vp.assignValues(medians)
-  plt.plot(x, vp.evaluate(x), 'g.-')
-  plt.show()
+    
+    from __future__ import print_function, division
+    from PyAstronomy import funcFit as fuf
+    import matplotlib.pylab as plt
+    import numpy as np
+    
+    # Create an instance of TraceAnalysis
+    # telling it which file to use
+    ta = fuf.TraceAnalysis("mcmcTA.tmp")
+    
+    # Use the burn-in from the previous example
+    ta.setBurn(500)
+    
+    # Find sets of parameters
+    # First, the lowest deviance set
+    lds, index = ta.parameterSet(prescription="lowestDev")
+    print("Lowest deviance set: ", lds)
+    print("  at chain index: ", index)
+    means = ta.parameterSet(prescription="mean")
+    print("Set of mean values: ", means)
+    medians = ta.parameterSet(prescription="median")
+    print("Set of median values: ", means)
+    
+    # Create Voigt model and plot the models belonging
+    # to the lowest deviance, mean, and median parameter
+    # set.
+    vp = fuf.Voigt1d()
+    # Generate the model wavelength axis
+    x = np.linspace(5490., 5510., 200)
+    # Calculate and plot the models
+    vp.assignValues(lds)
+    plt.plot(x, vp.evaluate(x), 'b.-')
+    vp.assignValues(means)
+    plt.plot(x, vp.evaluate(x), 'r.-')
+    vp.assignValues(medians)
+    plt.plot(x, vp.evaluate(x), 'g.-')
+    plt.show()
 
 
 Other useful visualization utilities
@@ -252,25 +257,25 @@ Markov-Chains.
 
 ::
   
-  from PyAstronomy import funcFit as fuf
-  
-  # Create an instance of TraceAnalysis
-  # telling it which file to use
-  ta = fuf.TraceAnalysis("mcmcTA.tmp")
-  
-  # Use the burn-in from the previous example
-  ta.setBurn(500)
-  
-  # Investigate a trace
-  ta.plotTrace("mu")
-  ta.show()
-  # and its distribution.
-  ta.plotHist("mu")
-  ta.show()
-  # Combine trace and distribution
-  ta.plotTraceHist("mu")
-  ta.show()
-  # Plot correlations
-  ta.plotCorr(parsList=["mu", "ad", "al"])
-  ta.show()
-  
+    from PyAstronomy import funcFit as fuf
+    
+    # Create an instance of TraceAnalysis
+    # telling it which file to use
+    ta = fuf.TraceAnalysis("mcmcTA.tmp")
+    
+    # Use the burn-in from the previous example
+    ta.setBurn(500)
+    
+    # Investigate a trace
+    ta.plotTrace("mu")
+    ta.show()
+    # and its distribution.
+    ta.plotHist("mu")
+    ta.show()
+    # Combine trace and distribution
+    ta.plotTraceHist("mu")
+    ta.show()
+    # Plot correlations
+    ta.plotCorr(parsList=["mu", "ad", "al"])
+    ta.show()
+    

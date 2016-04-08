@@ -1199,7 +1199,7 @@ class MCMCExampleSanity(unittest.TestCase):
     
     # Use current parameters as starting point for the sampling
     X0 = vp.freeParameters()
-    print "Starting point for sampling: ", X0
+    print("Starting point for sampling: ", X0)
     
     # Now we specify the limits within which the individual parameters
     # can be varied. Actually, you specify the limits of uniform priors
@@ -1259,20 +1259,20 @@ class MCMCExampleSanity(unittest.TestCase):
     ta.setBurn(500)
     
     # See which model parameters have been sampled
-    print "Available parameters: ", ta.availableParameters()
+    print("Available parameters: ", ta.availableParameters())
     
     # Access the traces of these parameters
-    print "Trace for A: ", ta["A"]
+    print("Trace for A: ", ta["A"])
     
     # Calculate mean, median, standard deviation, and
     # credibility interval for the available parameters
     for p in ta.availableParameters():
       hpd = ta.hpd(p, cred=0.95)
-      print "Parameter %5s, mean = % g, median = % g, std = % g, 95%% HPD = % g - % g" \
-            % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1])
+      print("Parameter %5s, mean = % g, median = % g, std = % g, 95%% HPD = % g - % g" \
+            % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1]))
 
     ######## Fourth example
-    
+
     from PyAstronomy import funcFit as fuf
     
     # Create an instance of TraceAnalysis
@@ -1286,8 +1286,8 @@ class MCMCExampleSanity(unittest.TestCase):
     ta.correlationTable()
     
     # Calculate Pearson's and Spearman's r-coefficients
-    print "Pearson: ", ta.pearsonr("ad", "al")
-    print "Spearman: ", ta.spearmanr("ad", "al")
+    print("Pearson: ", ta.pearsonr("ad", "al"))
+    print("Spearman: ", ta.spearmanr("ad", "al"))
     
     # Show a plot of the correlation
     # Note that the plotCorrEnh method can also
@@ -1295,10 +1295,10 @@ class MCMCExampleSanity(unittest.TestCase):
     # chains.
     ta.plotCorr(parsList=["ad", "al"])
     # ta.plotCorrEnh(parsList=["ad", "al"])
-#    ta.show()
-
-    ######## Fifth example
+#     ta.show()
     
+    ######## Fifth example
+
     from PyAstronomy import funcFit as fuf
     import matplotlib.pylab as plt
     import numpy as np
@@ -1313,12 +1313,12 @@ class MCMCExampleSanity(unittest.TestCase):
     # Find sets of parameters
     # First, the lowest deviance set
     lds, index = ta.parameterSet(prescription="lowestDev")
-    print "Lowest deviance set: ", lds
-    print "  at chain index: ", index
+    print("Lowest deviance set: ", lds)
+    print("  at chain index: ", index)
     means = ta.parameterSet(prescription="mean")
-    print "Set of mean values: ", means
+    print("Set of mean values: ", means)
     medians = ta.parameterSet(prescription="median")
-    print "Set of median values: ", means
+    print("Set of median values: ", means)
     
     # Create Voigt model and plot the models belonging
     # to the lowest deviance, mean, and median parameter
@@ -1333,8 +1333,7 @@ class MCMCExampleSanity(unittest.TestCase):
     plt.plot(x, vp.evaluate(x), 'r.-')
     vp.assignValues(medians)
     plt.plot(x, vp.evaluate(x), 'g.-')
-#    plt.show()
-
+#     plt.show()
     
     ######## Sixth example
     
