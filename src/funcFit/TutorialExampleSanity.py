@@ -330,7 +330,7 @@ class ExampleSanity(unittest.TestCase):
     edf.parameterSummary()
     plt.errorbar(x,y,yerr)
     plt.plot(x, edf.model, 'r-')
-    plt.show()
+#     plt.show()
 
   def sanity_Overbinning(self):
     # Import numpy and matplotlib
