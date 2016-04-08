@@ -1533,4 +1533,4 @@ class MCMCExampleSanity(unittest.TestCase):
     cvals = {"a":1.4, "b":0.86, "c":1.1}
     
     # Get log(prior) for parameter "b"
-    print gp(cvals, "b")
+    print(gp(cvals, "b"))
