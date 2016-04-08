@@ -622,7 +622,7 @@ class ExampleSanity(unittest.TestCase):
     # needed for nD fitting.
     g = fuf.coordinateGrid(x, y)
     
-    print "(x, y) coordinates at index (11, 28): ", g[11,28]
+    print("(x, y) coordinates at index (11, 28): ", g[11,28])
 
   def sanity_CashStatisticsExample(self):
     import numpy as np

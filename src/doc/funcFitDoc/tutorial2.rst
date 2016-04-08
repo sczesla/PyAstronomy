@@ -87,19 +87,21 @@ gives the physical coordinates for every array index.
 
 ::
 
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  
-  # Constructing the two individual coordinate axes
-  x = np.linspace(-2.,2.,50)
-  y = np.linspace(-2.,2.,50)
-  
-  # Applying funcFit's "coordinateGrid" helper function
-  # to built appropriate array-index -> coordinate mapping
-  # needed for nD fitting.
-  g = fuf.coordinateGrid(x, y)
-  
-  print "(x, y) coordinates at index (11, 28): ", g[11,28]
+    from __future__ import print_function, division
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    
+    # Constructing the two individual coordinate axes
+    x = np.linspace(-2.,2.,50)
+    y = np.linspace(-2.,2.,50)
+    
+    # Applying funcFit's "coordinateGrid" helper function
+    # to built appropriate array-index -> coordinate mapping
+    # needed for nD fitting.
+    g = fuf.coordinateGrid(x, y)
+    
+    print("(x, y) coordinates at index (11, 28): ", g[11,28])
+
 
 
 .. _gauss2dExample:
