@@ -4,7 +4,7 @@ import numpy as np
 from .params import Params
 import re
 import copy
-from new import instancemethod
+import types
 from PyAstronomy.pyaC import pyaErrors as PE
 from .nameIdentBase import ModelNameIdentBase
 from PyAstronomy import pyaC 
@@ -128,7 +128,7 @@ class _PyMCSampler:
   def _basicStatMCMCOutput(self, bs):
     print("Basic statistics of MCMC analysis: ")
     print("-----------------------------------------------------")
-    for k in six-iterkeys(bs):
+    for k in six.iterkeys(bs):
       print("Parameter: ", k)
       if bs[k] is None:
         print("  No output available!")
@@ -1065,35 +1065,37 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
   def __add__(self, right):
     result = self.__combineFittingObjects(right)
-    result.evaluate = instancemethod(addEval, result, OneDFit)
+    # For a discussion about bound instance methods see
+    # https://stackoverflow.com/questions/972/adding-a-method-to-an-existing-object-instance
+    result.evaluate = types.MethodType(addEval, result)
     # Save the 'operator' relating left and right component
     result._operator = '+'
     return result
 
   def __sub__(self, right):
     result = self.__combineFittingObjects(right)
-    result.evaluate = instancemethod(subEval, result, OneDFit)
+    result.evaluate = types.MethodType(subEval, result)
     # Save the 'operator' relating left and right component
     result._operator = '-'
     return result
   
   def __mul__(self, right):
     result = self.__combineFittingObjects(right)
-    result.evaluate = instancemethod(mulEval, result, OneDFit)
+    result.evaluate = types.MethodType(mulEval, result)
     # Save the 'operator' relating left and right component
     result._operator = '*'    
     return result
 
   def __div__(self, right):
     result = self.__combineFittingObjects(right)
-    result.evaluate = instancemethod(divEval, result, OneDFit)
+    result.evaluate = types.MethodType(divEval, result)
     # Save the 'operator' relating left and right component
     result._operator = '/'    
     return result
 
   def __pow__(self, right):
     result = self.__combineFittingObjects(right)
-    result.evaluate = instancemethod(powEval, result, OneDFit)
+    result.evaluate = types.MethodType(powEval, result)
     # Save the 'operator' relating left and right component
     result._operator = '**'
     return result
