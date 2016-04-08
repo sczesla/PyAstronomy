@@ -9,9 +9,10 @@ making fitting in Python a much more enjoyable experience.
 .. seealso:: PyAstronomy's *modelSuite*. The funcFit package itself comes with only a few basic fitting models such as
           a Gaussian. More complex models are provided in the frame of the *model suite*.
 
-.. warning:: funcFit relies on **Python 2.7.x**. The 2.6.x series (and prior) has a bug affecting the copying of
-             dynamically created class methods, which has not been (and will not be) corrected. This interferes with many of
-             funcFit's algorithms.
+.. note:: If you use the 2.x series of Python, funcFit requires Python 2.7.x.
+          The 2.6.x series (and prior) has a bug affecting the copying of
+          dynamically created class methods, which has not been (and will not be) corrected.
+          This interferes with many of funcFit's algorithms.
 
 The tutorial
 -----------------
