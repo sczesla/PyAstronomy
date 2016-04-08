@@ -680,7 +680,7 @@ class FuFNM(IFitterBase):
 FuFNM.__doc__ = NelderMead.__doc__
 
 
-class FuFPrior:
+class FuFPrior(object):
   """
     A number of priors.
     
@@ -734,16 +734,23 @@ class FuFPrior:
       return r - (ps[n] - kwargs["mu"])**2 / (2.0*kwargs["sig"]**2)
     return gaussianPrior
   
+  def _callDelegator(self, *args, **kwargs):
+    """ Overwritten by the method to represent __call__ """
+    raise(PE.PyANotImplemented("_callDelegator is not implemented."))
+  
+  def __call__(self, *args, **kwargs):
+    return self._callDelegator(*args, **kwargs)
+  
   def __init__(self, lnp, **kwargs):
     if isinstance(lnp, six.string_types):
       if lnp == "uniform":
-        self.__call__ = self._uniform(**kwargs)
+        self._callDelegator = self._uniform(**kwargs)
       elif lnp == "limuniform":
-        self.__call__ = self._uniformLimit(**kwargs)
+        self._callDelegator = self._uniformLimit(**kwargs)
       elif lnp == "jeffreyPS":
-        self.__call__ = self._jeffreyPoissonScale(**kwargs)
+        self._callDelegator = self._jeffreyPoissonScale(**kwargs)
       elif lnp == "gaussian":
-        self.__call__ = self._gaussian(**kwargs)
+        self._callDelegator = self._gaussian(**kwargs)
       else:
         raise(PE.PyAValError("No prior defined for " + str(lnp), \
                              where="FuFPrior", \
