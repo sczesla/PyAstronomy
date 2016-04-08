@@ -1467,9 +1467,9 @@ class MCMCExampleSanity(unittest.TestCase):
     # 2500 further iterations (per walker).
     sampleArgs = {"iters":2500, "burn":200}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
-    print
+    print()
     
     # Plot the distributions of the chains
     # NOTE: the order of the parameters in the chain object is the same
@@ -1482,26 +1482,26 @@ class MCMCExampleSanity(unittest.TestCase):
     # Fit the histogram using a Gaussian
     gf = fuf.GaussFit1d()
     gf.assignValues({"A":1.0, "mu":c, "sig":1.0/snr/np.sqrt(npoint)})
-    # First fitting only "mu" is simply quite stable
+    # First fitting only "mu" is simply quite stable 
     gf.thaw("mu")
     gf.fit(xhist, yhist)
     gf.thaw(["A", "sig"])
     gf.fit(xhist, yhist)
     
-    print
-    print "  --- Sampling results ---"
-    print "Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0])
-    print "Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint)
-    print "Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]),
-    print " and from Gaussian fit to distribution: ", gf["sig"]
+    print()
+    print("  --- Sampling results ---")
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]))
+    print("Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint))
+    print("Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print(" and from Gaussian fit to distribution: ", gf["sig"])
     
     # Evaluate best-fit model ...
     xmodel = np.linspace(c - 10.0/snr, c + 10.0/snr, 250)
     ymodel = gf.evaluate(xmodel)
     # ... and plot
-#     plt.plot(xhist, yhist, 'rp')
-#     plt.plot(xmodel, ymodel, 'r--')
-#     plt.legend()
+    plt.plot(xhist, yhist, 'rp')
+    plt.plot(xmodel, ymodel, 'r--')
+    plt.legend()
 #     plt.show()
     
     
@@ -1512,16 +1512,17 @@ class MCMCExampleSanity(unittest.TestCase):
     # information contained in the likelihood function.
     priors = {"c0":fuf.FuFPrior("gaussian", sig=1.0/snr/np.sqrt(npoint), mu=7.0)}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs, priors=priors)
     
-    print
-    print "  --- Sampling results with strong prior information ---"
-    print "Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]),
-    print " +/-", np.std(pf.emceeSampler.flatchain[::,0])
+    print()
+    print("  --- Sampling results with strong prior information ---")
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print(" +/-", np.std(pf.emceeSampler.flatchain[::,0]))
     
     plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
 #     plt.show()
+
 
   def sanity_InstatiatePrior(self):
     from PyAstronomy import funcFit as fuf

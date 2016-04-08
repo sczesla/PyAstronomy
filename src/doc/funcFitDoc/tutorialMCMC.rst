@@ -400,6 +400,7 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     
 ::    
 
+    from __future__ import print_function, division
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -437,7 +438,7 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     
     # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
-    print
+    print()
     
     # Plot the distributions of the chains
     # NOTE: the order of the parameters in the chain object is the same
@@ -456,12 +457,12 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     gf.thaw(["A", "sig"])
     gf.fit(xhist, yhist)
     
-    print
-    print "  --- Sampling results ---"
-    print "Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0])
-    print "Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint)
-    print "Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]),
-    print " and from Gaussian fit to distribution: ", gf["sig"]
+    print()
+    print("  --- Sampling results ---")
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]))
+    print("Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint))
+    print("Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print(" and from Gaussian fit to distribution: ", gf["sig"])
     
     # Evaluate best-fit model ...
     xmodel = np.linspace(c - 10.0/snr, c + 10.0/snr, 250)
@@ -483,11 +484,11 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs, priors=priors)
     
-    print
-    print "  --- Sampling results with strong prior information ---"
-    print "Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]),
-    print " +/-", np.std(pf.emceeSampler.flatchain[::,0])
+    print()
+    print("  --- Sampling results with strong prior information ---")
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print(" +/-", np.std(pf.emceeSampler.flatchain[::,0]))
     
     plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
     plt.show()
- 
+    
