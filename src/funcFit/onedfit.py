@@ -1767,7 +1767,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     
     # Save the chain to a file
     if not dbfile is None:
-      np.savez_compressed(open(dbfile, 'w'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
+      np.savez_compressed(open(dbfile, 'wb'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
                              pnames=np.array(fpns, dtype=np.string_))
     
     if toMD:
