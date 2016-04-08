@@ -6,8 +6,8 @@ import sys
 
 # Check Python version
 _majV, _minV = sys.version_info[0:2]
-if _minV < 7:
-  PE.warn("funcFit needs 2.7.x or greater (but not Python 3.x). See documentation (Prerequisites) for explanation.")
+if (_minV < 7) and (_majV == 2):
+  PE.warn("funcFit needs 2.7.x or greater. See documentation (Prerequisites) for explanation.")
   
 ic = ImportCheck(["numpy", "scipy", "pymc", "matplotlib", "matplotlib.pylab", "pyfits", "emcee", "progressbar"])
 
@@ -30,7 +30,7 @@ from .params import *
 from .sinexp1d import *
 from .polyModel import *
 from .cauchyLorentz1d import *
-from .anneal import *
+# from .anneal import *
 from .syncFit import SyncFitContainer
 from .coordinateGrid import *
 from .circle2d import *
