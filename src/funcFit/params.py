@@ -757,7 +757,7 @@ class Params:
       if os.path.isfile(fn) and (not clobber):
         raise(PE.PyANameClash("The file '"+fn+"' exists.", where="saveState", \
                               solution="Change filename or set clobber to True."))
-      pickle.dump(dat, open(fn, 'w'))
+      pickle.dump(dat, open(fn, 'wb'))
     return dat
   
   def restoreState(self, resource):
@@ -772,7 +772,7 @@ class Params:
           a valid data dictionary is returned by `saveState`.
     """
     if isinstance(resource, six.string_types):
-      pd = pickle.load(open(resource))
+      pd = pickle.load(open(resource, 'rb'))
     else:
       pd = resource
     # Free ALL values
