@@ -50,7 +50,8 @@ For a deeper understanding of the working, adaptability, and logic implemented b
 pymc, we refer the reader to their web page (PyMC_).
 
 ::
-
+    
+    from __future__ import print_function, division
     # Import some required modules
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -72,14 +73,14 @@ pymc, we refer the reader to their web page (PyMC_).
     # First, we create the Gauss1d fit object
     gf = fuf.GaussFit1d()
     # See what parameters are available
-    print "List of available parameters: ", gf.availableParameters()
+    print("List of available parameters: ", gf.availableParameters())
     # Set guess values for the parameters
     gf["A"] = -10.0
     gf["sig"] = 15.77
     gf["off"] = 0.87
     gf["mu"] = 7.5
     # Let us see whether the assignment worked
-    print "Parameters and guess values: ", gf.parameters()
+    print("Parameters and guess values: ", gf.parameters())
     
     # Which parameters shall be variable during the fit?
     # 'Thaw' those (the order is irrelevant)
@@ -159,47 +160,48 @@ cut. However, be warned:
              results. You need to check that.
              
 ::
-
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  import matplotlib.pylab as plt
-  
-  x = np.linspace(0,30,1000)
-  gauss = fuf.GaussFit1d()
-  gauss["A"] = 1
-  gauss["mu"] = 23.
-  gauss["sig"] = 0.5
-  # Generate some "data" to fit
-  yerr = np.random.normal(0., 0.05, len(x))
-  y = gauss.evaluate(x) + yerr
-  # Thaw the parameters A, mu, and sig
-  gauss.thaw(["A","mu","sig"])
-  
-  # Define the ranges, which are used to construct the
-  # uniform priors and step sizes.
-  # Note that for "sig", we give only a single value.
-  # In this case, the limits for the uniform prior will
-  # be constructed as [m0-1.5, m0+1.5], where m0 is the
-  # starting value interpreted as the current value of
-  # mu (23. in this case).
-  ranges = {"A":[0,10],"mu":3, "sig":[0.1,1.0]}
-  # Generate default input for X0, lims, and steps
-  X0, lims, steps = gauss.MCMCautoParameters(ranges)
-  
-  # Show what happened...
-  print
-  print "Auto-generated input parameters:"
-  print "X0: ", X0
-  print "lims: ", lims
-  print "steps: ", steps
-  print
-  # Call the usual sampler
-  gauss.fitMCMC(x, y, X0, lims, steps, yerr=yerr, iter=1000)
-  
-  # and plot the results
-  plt.plot(x, y, 'k+')
-  plt.plot(x, gauss.evaluate(x), 'r--')
-  plt.show()
+    
+    from __future__ import print_function, division
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    x = np.linspace(0,30,1000)
+    gauss = fuf.GaussFit1d()
+    gauss["A"] = 1
+    gauss["mu"] = 23.
+    gauss["sig"] = 0.5
+    # Generate some "data" to fit
+    yerr = np.random.normal(0., 0.05, len(x))
+    y = gauss.evaluate(x) + yerr
+    # Thaw the parameters A, mu, and sig
+    gauss.thaw(["A","mu","sig"])
+    
+    # Define the ranges, which are used to construct the
+    # uniform priors and step sizes.
+    # Note that for "sig", we give only a single value.
+    # In this case, the limits for the uniform prior will
+    # be constructed as [m0-1.5, m0+1.5], where m0 is the
+    # starting value interpreted as the current value of
+    # mu (23. in this case).
+    ranges = {"A":[0,10],"mu":3, "sig":[0.1,1.0]}
+    # Generate default input for X0, lims, and steps
+    X0, lims, steps = gauss.MCMCautoParameters(ranges)
+    
+    # Show what happened...
+    print()
+    print("Auto-generated input parameters:")
+    print("X0: ", X0)
+    print("lims: ", lims)
+    print("steps: ", steps)
+    print()
+    # Call the usual sampler
+    gauss.fitMCMC(x, y, X0, lims, steps, yerr=yerr, iter=1000)
+    
+    # and plot the results
+    plt.plot(x, y, 'k+')
+    plt.plot(x, gauss.evaluate(x), 'r--')
+    plt.show()
 
 
 You may even shorten the short-cut by using the `autoFitMCMC` method.

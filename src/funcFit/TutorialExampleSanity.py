@@ -918,26 +918,26 @@ class MCMCExampleSanity(unittest.TestCase):
     try:
       os.remove("mcmcExample.tmp")
     except:
-      print "Could not remove file: mcmcExample.tmp"
+      print("Could not remove file: mcmcExample.tmp")
     try:
       os.remove("mcmcTA.tmp")
     except:
-      print "Could not remove file: mcmcTA.tmp"
+      print("Could not remove file: mcmcTA.tmp")
     try:
       os.remove("mcmcSample.tmp")
     except:
-      print "Could not remove file: mcmcSample.tmp"
+      print("Could not remove file: mcmcSample.tmp")
     try:
       os.remove("chain.emcee")
     except:
       pass
 
-  def sanity_MCMCSampler(self):
+  def sanity_MCMCSampler(self):    
     # Import some required modules
     from numpy import arange, sqrt, exp, pi, random, ones
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     import pymc
-    # ... and now the funcFit module
+    # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
     # Creating a Gaussian with some noise
@@ -954,22 +954,18 @@ class MCMCExampleSanity(unittest.TestCase):
     # First, we create the Gauss1d fit object
     gf = fuf.GaussFit1d()
     # See what parameters are available
-    print "List of available parameters: ", gf.availableParameters()
+    print("List of available parameters: ", gf.availableParameters())
     # Set guess values for the parameters
     gf["A"] = -10.0
     gf["sig"] = 15.77
     gf["off"] = 0.87
     gf["mu"] = 7.5
     # Let us see whether the assignment worked
-    print "Parameters and guess values: ", gf.parameters()
+    print("Parameters and guess values: ", gf.parameters())
     
     # Which parameters shall be variable during the fit?
     # 'Thaw' those (the order is irrelevant)
     gf.thaw(["A", "sig", "off", "mu"])
-    
-    # Let us assume that we know that the amplitude is negative, i.e.,
-    # no lower boundary (None) and 0.0 as upper limit.
-    gf.setRestriction({"A":[None,0.0]})
     
     # Now start a simplex fit
     gf.fit(x,y,yerr=ones(x.size)*0.01)
@@ -997,17 +993,22 @@ class MCMCExampleSanity(unittest.TestCase):
                             upper=10.0, doc="Amplitude")
     
     # Start the sampling. The resulting Marchov-Chain will be written
-    # to the file 'mcmcExample.tmp'.
+    # to the file 'mcmcExample.tmp'. In default configuration, pickle
+    # is used to write that file.
+    # To save the chain to a compressed 'hdf5'
+    # file, you have to specify the dbArgs keyword; e.g., use:
+    #   dbArgs = {"db":"hdf5", "dbname":"mcmcExample.hdf5"}
     gf.fitMCMC(x, y, X0, Lims, steps, yerr=ones(x.size)*0.01, \
-               pymcPars=ppa, iter=2500, burn=0, thin=1, \
-               dbfile="mcmcExample.tmp")
+                pymcPars=ppa, iter=2500, burn=0, thin=1, \
+                dbfile="mcmcExample.tmp")
     
     # Reload the database (here, this is actually not required, but it is
     # if the Marchov chain is to be analyzed later).
     db = pymc.database.pickle.load('mcmcExample.tmp')
     # Plot the trace of the amplitude, 'A'.
-    mpl.hist(db.trace("A", 0)[:])
-    # mpl.show()
+    plt.hist(db.trace("A", 0)[:])
+#     plt.show()
+
 
 
   def sanity_MCMCPriorExample(self):
@@ -1106,19 +1107,20 @@ class MCMCExampleSanity(unittest.TestCase):
     X0, lims, steps = gauss.MCMCautoParameters(ranges)
     
     # Show what happened...
-    print
-    print "Auto-generated input parameters:"
-    print "X0: ", X0
-    print "lims: ", lims
-    print "steps: ", steps
-    print
+    print()
+    print("Auto-generated input parameters:")
+    print("X0: ", X0)
+    print("lims: ", lims)
+    print("steps: ", steps)
+    print()
     # Call the usual sampler
     gauss.fitMCMC(x, y, X0, lims, steps, yerr=yerr, iter=1000)
     
     # and plot the results
     plt.plot(x, y, 'k+')
     plt.plot(x, gauss.evaluate(x), 'r--')
-#    plt.show() 
+#     plt.show()
+
 
   def sanity_autoMCMCExample2(self):
     from PyAstronomy import funcFit as fuf
