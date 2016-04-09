@@ -264,7 +264,13 @@ class KuruczModels:
         
     else:
       # File does already exist
-      self.grids = pickle.load(self._fs.requestFile(gridFile, 'r', openMethod=gzip.open))
+      try:
+        self.grids = pickle.load(self._fs.requestFile(gridFile, 'r', openMethod=gzip.open))
+      except ValueError as ve:
+        ffn = self._fs.composeFilename(gridFile)
+        per = PE.PyAValError("Reading the pickle file: " + str(ffn) + ", the error: '" + str(ve) + "' occurred.", \
+                             solution="Likely, the file was written using Python 3 and you try to read it using Python 2.x. Try to delete the file.")
+        raise(per)
   
   def _abundToStr(self, met):
     """
