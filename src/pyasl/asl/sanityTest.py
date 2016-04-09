@@ -768,9 +768,9 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
     
     # Check that the area of the line did not change
     # in response to the broadening
-    print "Initional EW [A]: ", 4. - sci.trapz(flux, wvl)
-    print "After broadening without LD: ", 4. - sci.trapz(rflux, wvl)
-    print "After broadening with LD: ", 4. - sci.trapz(lflux, wvl)
+    print("Initial EW [A]: ", 4. - sci.trapz(flux, wvl))
+    print("After broadening without LD: ", 4. - sci.trapz(rflux, wvl))
+    print("After broadening with LD: ", 4. - sci.trapz(lflux, wvl))
     
     # Plot the results
     plt.title("Rotational broadening")
@@ -779,7 +779,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
     plt.plot(wvl, flux, 'b-')
     plt.plot(wvl, rflux, 'r-')
     plt.plot(wvl, lflux, 'g-')
-#    plt.show()
+    plt.show()
 
   def sanity_rotBroadEW(self):
     """
@@ -840,6 +840,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
    
     indi = numpy.where(numpy.logical_and(wvl > 5000., wvl < 5010.))[0]
     self.assertAlmostEqual(numpy.max(numpy.abs( bfast[indi] - bslow[indi] )), 0.0, delta=1e-5)
+
 
 class SanityOfBaryvel(unittest.TestCase, SaniBase):
   
