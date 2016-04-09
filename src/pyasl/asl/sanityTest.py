@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 from airtovac import airtovac, vactoair, vactoair2, airtovac2
 import numpy
 import unittest
@@ -1920,8 +1921,8 @@ class SanityOfBroad(unittest.TestCase):
     # deviations.
     r2, fwhm = pyasl.instrBroadGaussFast(x, y, 10000,
               edgeHandling="firstlast", fullout=True, maxsig=5.0)
-              
-    print "FWHM used for the Gaussian kernel: ", fwhm, " A"
+    
+    print("FWHM used for the Gaussian kernel: ", fwhm, " A")
     
     # Plot the output
     plt.plot(x,r, 'r--p', label="Broadened curve (full)")
@@ -1974,10 +1975,10 @@ class SanityOfBroad(unittest.TestCase):
     
     y2 = pyasl.broadGaussFast(x, y, 1.5-gf["sig"], edgeHandling="firstlast")
     
-    print np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2)
-    print np.sqrt(np.sum( x**2*y)/np.sum(y))
-    print np.sqrt(np.sum( x**2*y2)/np.sum(y2))
-    print np.sum(y), np.sum(y2)
+    print(np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2))
+    print(np.sqrt(np.sum( x**2*y)/np.sum(y)))
+    print(np.sqrt(np.sum( x**2*y2)/np.sum(y2)))
+    print(np.sum(y), np.sum(y2))
     
     mean2 = np.mean(x*y2)/np.sum(y2)
     self.assertAlmostEqual(mean2, 0.0, delta=1e-9, \
@@ -2008,10 +2009,10 @@ class SanityOfBroad(unittest.TestCase):
     
     self.assertAlmostEqual(np.max(np.abs(y2-y3)), 0.0, delta=2e-7, msg="Deviation in profiles using maxsig (broadGaussFast)")
     
-    print np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2)
-    print np.sqrt(np.sum( x**2*y)/np.sum(y))
-    print np.sqrt(np.sum( x**2*y2)/np.sum(y2))
-    print np.sum(y), np.sum(y2)
+    print(np.mean(x*y)/np.sum(y), np.mean(x*y2)/np.sum(y2))
+    print(np.sqrt(np.sum( x**2*y)/np.sum(y)))
+    print(np.sqrt(np.sum( x**2*y2)/np.sum(y2)))
+    print(np.sum(y), np.sum(y2))
     
     mean2 = np.mean(x*y2)/np.sum(y2)
     self.assertAlmostEqual(mean2, 0.0, delta=1e-9, \
@@ -2035,6 +2036,7 @@ class SanityOfBroad(unittest.TestCase):
                            msg="FWHM of thermal broadening (" + str(fwhm) + ") is incorrect")
     self.assertAlmostEqual(fwhm, sig*2*np.sqrt(2.*np.log(2.0)), delta=1e-9, \
                            msg="FWHM and std differ.")
+
 
 class SanityOfCrosscor(unittest.TestCase):
   
