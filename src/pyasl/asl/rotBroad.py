@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class _Gdl:
   
@@ -136,7 +138,7 @@ def rotBroad(wvl, flux, epsilon, vsini, edgeHandling="firstlast"):
   result = np.zeros(len(flux))
   gdl = _Gdl(vsini, epsilon)
   
-  for i in xrange(len(flux)):
+  for i in smo.range(len(flux)):
     dl = wvl[i] - wvl
     g = gdl.gdl(dl, wvl[i], dwl)
     result[i] = np.sum(flux * g)
