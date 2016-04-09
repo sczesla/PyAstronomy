@@ -1,9 +1,11 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import ImportCheck as _ImportCheck
 from PyAstronomy.pyaC import pyaErrors as _PE
 import PyAstronomy as _PyA
 import os, sys
-import ConfigParser as _ConfigParser
+from six.moves import configparser as _ConfigParser
 import numpy
+import six
 
 _ic = _ImportCheck(["quantities"], ["quantities"])
 
@@ -13,7 +15,7 @@ _systems = ["SI", "cgs"]
 _unitSystem = "cgs"
 inventory = {}
 
-from itc import PyAConstants, _displaySummary
+from .itc import PyAConstants, _displaySummary
 
 
 
@@ -42,11 +44,11 @@ def constantDetails(const):
   if not const in inventory:
     raise(_PE.PyAValError("No such constant: '" + str(const) + "'."))
   cmod = sys.modules[__name__]
-  print "Constant              : '" + const + "'"
-  print "Description           : " + inventory[const]["descr"]
-  print "Current value and unit: " + str(getattr(cmod, "f_"+const))
-  print "Uncertainty           : " + str(getattr(cmod, "f_"+const+"_err"))
-  print "Source                : " + inventory[const]["source"]
+  print("Constant              : '" + const + "'")
+  print("Description           : " + inventory[const]["descr"])
+  print("Current value and unit: " + str(getattr(cmod, "f_"+const)))
+  print("Uncertainty           : " + str(getattr(cmod, "f_"+const+"_err")))
+  print("Source                : " + inventory[const]["source"])
   return inventory[const]
 
 def inUnitsOf(const, units):
@@ -69,7 +71,7 @@ def _inventoryToModule():
     Translate information in `inventory` into module attributes.
   """
   cmod = sys.modules[__name__]
-  for k, u in inventory.iteritems():
+  for k, u in six.iteritems(inventory):
     val = _pq.Quantity(numpy.float64(u["valueSI"]), u["units"]["SI"])
     value = val.rescale(u["units"][_unitSystem])
     setattr(cmod, u["symbol"], value.magnitude)
@@ -87,7 +89,7 @@ def cleanUp():
   """
   global inventory
   cmod = sys.modules[__name__]
-  for k, u in inventory.iteritems():
+  for k, u in six.iteritems(inventory):
     delattr(cmod, u["symbol"])
     delattr(cmod, "f_" + u["symbol"])
     delattr(cmod, "f_" + u["symbol"] + "_err")
