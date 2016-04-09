@@ -1,6 +1,8 @@
 Instrumental (Gaussian kernel) broadening
 ===========================================
 
+.. p23ready
+
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: broadGaussFast
 .. autofunction:: instrBroadGaussFast
@@ -9,7 +11,8 @@ Example of usage
 -----------------
 
 ::
-
+    
+    from __future__ import print_function, division
     from PyAstronomy import pyasl
     import matplotlib.pylab as plt
     import numpy as np
@@ -34,8 +37,8 @@ Example of usage
     # deviations.
     r2, fwhm = pyasl.instrBroadGaussFast(x, y, 10000,
               edgeHandling="firstlast", fullout=True, maxsig=5.0)
-              
-    print "FWHM used for the Gaussian kernel: ", fwhm, " A"
+    
+    print("FWHM used for the Gaussian kernel: ", fwhm, " A")
     
     # Plot the output
     plt.plot(x,r, 'r--p', label="Broadened curve (full)")
