@@ -331,7 +331,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         self.assertAlmostEqual(dms[j], hddmss[i][j], delta=1e-5, msg="degToDMS: Incorrect conversion")
       
       rat, dect = coordsDegToSexa(r, d, asString=False)
-      print rat, dect, r, d
+      print(rat, dect, r, d)
       for j in range(3):
         self.assertAlmostEqual(rat[j], hdhmss[i][j], delta=1e-5, msg="degToHMS: Incorrect conversion")
       for j in range(3):
@@ -346,15 +346,16 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     # Coordinates of HD 1 from SIMBAD
     hd1 = "00 05 08.83239 +67 50 24.0135"
     
-    print "Coordinates of HD 1 (SIMBAD): ", hd1
+    print("Coordinates of HD 1 (SIMBAD): ", hd1)
     
     # Obtain decimal representation
     ra, dec = pyasl.coordsSexaToDeg(hd1)
-    print "Coordinates of HD 1 [deg]: %010.6f  %+09.6f" % (ra, dec)
+    print("Coordinates of HD 1 [deg]: %010.6f  %+09.6f" % (ra, dec))
     
     # Convert back into sexagesimal representation
     sexa = pyasl.coordsDegToSexa(ra, dec)
-    print "Coordinates of HD 1 [sexa]: ", sexa
+    print("Coordinates of HD 1 [sexa]: ", sexa)
+
 
 class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
   
