@@ -189,14 +189,41 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     
     # Convert JD to calendar date
     jd = 2440000.0 + 18614./(24.*3600.)
-    print "year = %4d, month = %2d, day = %2d, hour = %5.3f" \
-          % tuple(pyasl.daycnv(jd))
-    print
-    print "year = %4d, month = %2d, day = %2d, hour = %2d, minute = %2d, seconds = %2d, microseconds = %6d" \
-          % tuple(pyasl.daycnv(jd, mode='dtlist'))
-    print
+    print("year = %4d, month = %2d, day = %2d, hour = %5.3f" \
+          % tuple(pyasl.daycnv(jd)))
+    print()
+    print("year = %4d, month = %2d, day = %2d, hour = %2d, minute = %2d, seconds = %2d, microseconds = %6d" \
+          % tuple(pyasl.daycnv(jd, mode='dtlist')))
+    print()
     dt = pyasl.daycnv(jd, mode='dt')
-    print "Datetime object: ", dt
+    print("Datetime object: ", dt)
+  
+  def sanity_daycnv_etc(self):
+    """
+      Checking example of daycnv etc...
+    """
+    from PyAstronomy import pyasl
+    import datetime
+    
+    # Convert JD to calendar date
+    jd = 2440000.0
+    print("year = %4d, month = %2d, day = %2d, hour = %5.3f" \
+          % tuple(pyasl.daycnv(jd)))
+    print()
+    
+    # Convert calendar date to JD
+    dt = datetime.datetime(1968, 5, 23, 12)
+    print("Input date: ", dt)
+    print("Corresponding Julian date: ", pyasl.jdcnv(dt))
+    print("Corresponding reduced Julian date: ", pyasl.juldate(dt))
+    print()
+    
+    # Get current Julian date and convert to heliocentric date
+    cjd = pyasl.get_juldate()
+    print("Current Julian date: ", cjd)
+    print("Current (reduced) heliocentric Julian date (ra=100 deg, dec=37 deg): ", \
+          pyasl.helio_jd(cjd-2.4e6, 100.0, 37.0))
+
   
   def sanity_juldate(self):
     """
