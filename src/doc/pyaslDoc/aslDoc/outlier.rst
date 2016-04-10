@@ -1,6 +1,8 @@
 Outlier detection
 ===================
 
+.. p23ready
+
 Accounting for "outliers" can be an integral part in any kind of
 data analysis, yet, it remains basically unclear what such an
 outlier actually is. Citing Hawkins "an outlier is an observation
@@ -29,36 +31,37 @@ Example
 ^^^^^^^^^
 
 ::
-
-  import numpy as np
-  import matplotlib.pylab as plt
-  from PyAstronomy import pyasl
-  
-  # Convert data given at:
-  # http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
-  # to array.
-  x = np.array(map(lambda x: float(x), 
-          "-0.25 0.68 0.94 1.15 1.20 1.26 1.26 1.34 1.38 1.43 1.49 1.49 \
-            1.55 1.56 1.58 1.65 1.69 1.70 1.76 1.77 1.81 1.91 1.94 1.96 \
-            1.99 2.06 2.09 2.10 2.14 2.15 2.23 2.24 2.26 2.35 2.37 2.40 \
-            2.47 2.54 2.62 2.64 2.90 2.92 2.92 2.93 3.21 3.26 3.30 3.59 \
-            3.68 4.30 4.64 5.34 5.42 6.01".split()))
-  
-  # Apply the generalized ESD
-  r = pyasl.generalizedESD(x, 10, 0.05, fullOutput=True)
-  
-  print "Number of outliers: ", r[0]
-  print "Indices of outliers: ", r[1]
-  print "        R      Lambda"
-  for i in range(len(r[2])):
-    print "%2d  %8.5f  %8.5f" % ((i+1), r[2][i], r[3][i])
-  
-  # Plot the "data"
-  plt.plot(x, 'b.')
-  # and mark the outliers.
-  for i in range(r[0]):
-    plt.plot(r[1][i], x[r[1][i]], 'rp')
-  plt.show()
+    
+    from __future__ import print_function, division
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import pyasl
+    
+    # Convert data given at:
+    # http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
+    # to array.
+    x = np.array([float(x) for x in "-0.25 0.68 0.94 1.15 1.20 1.26 1.26 1.34 1.38 1.43 1.49 1.49 \
+              1.55 1.56 1.58 1.65 1.69 1.70 1.76 1.77 1.81 1.91 1.94 1.96 \
+              1.99 2.06 2.09 2.10 2.14 2.15 2.23 2.24 2.26 2.35 2.37 2.40 \
+              2.47 2.54 2.62 2.64 2.90 2.92 2.92 2.93 3.21 3.26 3.30 3.59 \
+              3.68 4.30 4.64 5.34 5.42 6.01".split()])
+    
+    # Apply the generalized ESD
+    r = pyasl.generalizedESD(x, 10, 0.05, fullOutput=True)
+    
+    print("Number of outliers: ", r[0])
+    print("Indices of outliers: ", r[1])
+    print("        R      Lambda")
+    for i in range(len(r[2])):
+      print("%2d  %8.5f  %8.5f" % ((i+1), r[2][i], r[3][i]))
+    
+    # Plot the "data"
+    plt.plot(x, 'b.')
+    # and mark the outliers.
+    for i in range(r[0]):
+      plt.plot(r[1][i], x[r[1][i]], 'rp')
+    plt.show()
+    
 
 
 Distance-based outlier detection (e.g., for spectra)
@@ -81,28 +84,29 @@ Example
 ^^^^^^^^^^^
 
 ::
-
-  import numpy as np
-  import matplotlib.pylab as plt
-  from PyAstronomy import pyasl
-  
-  # Get some data
-  x = np.random.normal(0.,0.1,50)
-  
-  # Introduce outliers
-  x[27] = 1.0
-  x[43] = -0.66
-  
-  # Run distance based outlier detection
-  r = pyasl.pointDistGESD(x, 5)
-  
-  print "Number of outliers detected: ", r[0]
-  print "Indices of these outliers: ", r[1]
-  
-  plt.plot(x, 'b.')
-  for i in range(len(r[1])):
-    plt.plot(r[1][i], x[r[1][i]], 'rp')
-  plt.show()
+    
+    from __future__ import print_function, division
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import pyasl
+    
+    # Get some data
+    x = np.random.normal(0.,0.1,50)
+    
+    # Introduce outliers
+    x[27] = 1.0
+    x[43] = -0.66
+    
+    # Run distance based outlier detection
+    r = pyasl.pointDistGESD(x, 5)
+    
+    print("Number of outliers detected: ", r[0])
+    print("Indices of these outliers: ", r[1])
+    
+    plt.plot(x, 'b.')
+    for i in range(len(r[1])):
+      plt.plot(r[1][i], x[r[1][i]], 'rp')
+    plt.show()
 
 
 Outlier detection based on polynomial fit
@@ -125,35 +129,36 @@ The `polyResOutlier` method relies on a single polynomial fit.
 
 ::
 
-  from PyAstronomy import pyasl
-  import numpy as np
-  import matplotlib.pylab as plt
-  
-  # Generate some "data"
-  x = np.arange(100)
-  y = np.random.normal(x*0.067, 1.0, len(x))
-  
-  # Introduce an outliers
-  y[14] = -5.0
-  y[67] = +9.8
-  
-  # Find outliers based on a linear (deg = 1) fit.
-  # Assign outlier status to all points deviating by
-  # more than 3.0 standard deviations from the fit,
-  # and show a control plot.
-  iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=True)
-  
-  # What about the outliers
-  print "Number of outliers: ", len(iout)
-  print "Indices of outliers: ", iout
-  
-  # Remove outliers
-  xnew, ynew = x[iin], y[iin]
-  
-  # Plot result (outlier in red)
-  plt.plot(x, y, 'r.')
-  plt.plot(xnew, ynew, 'bp')
-  plt.show()
+    from __future__ import print_function, division
+    from PyAstronomy import pyasl
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    # Generate some "data"
+    x = np.arange(100)
+    y = np.random.normal(x*0.067, 1.0, len(x))
+    
+    # Introduce an outliers
+    y[14] = -5.0
+    y[67] = +9.8
+    
+    # Find outliers based on a linear (deg = 1) fit.
+    # Assign outlier status to all points deviating by
+    # more than 3.0 standard deviations from the fit,
+    # and show a control plot.
+    iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=True)
+    
+    # What about the outliers
+    print("Number of outliers: ", len(iout))
+    print("Indices of outliers: ", iout)
+    
+    # Remove outliers
+    xnew, ynew = x[iin], y[iin]
+    
+    # Plot result (outlier in red)
+    plt.plot(x, y, 'r.')
+    plt.plot(xnew, ynew, 'bp')
+    plt.show()
 
 
 Example: slidingPolyResOutlier
@@ -164,6 +169,7 @@ to detect outliers.
 
 ::
 
+    from __future__ import print_function, division
     from PyAstronomy import pyasl
     import numpy as np
     import matplotlib.pylab as plt
@@ -183,8 +189,8 @@ to detect outliers.
     iin, iout = pyasl.slidingPolyResOutlier(x, y, 20, deg=1, stdlim=3.0, controlPlot=True)
     
     # What about the outliers
-    print "Number of outliers: ", len(iout)
-    print "Indices of outliers: ", iout
+    print("Number of outliers: ", len(iout))
+    print("Indices of outliers: ", iout)
     
     # Remove outliers
     xnew, ynew = x[iin], y[iin]

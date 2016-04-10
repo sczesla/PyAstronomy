@@ -1161,28 +1161,27 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     # Convert data given at:
     # http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
     # to array.
-    x = np.array(map(lambda x: float(x),
-            "-0.25 0.68 0.94 1.15 1.20 1.26 1.26 1.34 1.38 1.43 1.49 1.49 \
+    x = np.array([float(x) for x in "-0.25 0.68 0.94 1.15 1.20 1.26 1.26 1.34 1.38 1.43 1.49 1.49 \
               1.55 1.56 1.58 1.65 1.69 1.70 1.76 1.77 1.81 1.91 1.94 1.96 \
               1.99 2.06 2.09 2.10 2.14 2.15 2.23 2.24 2.26 2.35 2.37 2.40 \
               2.47 2.54 2.62 2.64 2.90 2.92 2.92 2.93 3.21 3.26 3.30 3.59 \
-              3.68 4.30 4.64 5.34 5.42 6.01".split()))
+              3.68 4.30 4.64 5.34 5.42 6.01".split()])
     
     # Apply the generalized ESD
     r = pyasl.generalizedESD(x, 10, 0.05, fullOutput=True)
     
-    print "Number of outliers: ", r[0]
-    print "Indices of outliers: ", r[1]
-    print "        R      Lambda"
+    print("Number of outliers: ", r[0])
+    print("Indices of outliers: ", r[1])
+    print("        R      Lambda")
     for i in range(len(r[2])):
-      print "%2d  %8.5f  %8.5f" % ((i+1), r[2][i], r[3][i])
+      print("%2d  %8.5f  %8.5f" % ((i+1), r[2][i], r[3][i]))
     
     # Plot the "data"
     plt.plot(x, 'b.')
     # and mark the outliers.
     for i in range(r[0]):
       plt.plot(r[1][i], x[r[1][i]], 'rp')
-#    plt.show()
+#     plt.show()
 
   def sanity_pointDistGESDExample(self):
     """
@@ -1202,13 +1201,13 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     # Run distance based outlier detection
     r = pyasl.pointDistGESD(x, 5)
     
-    print "Number of outliers detected: ", r[0]
-    print "Indices of these outliers: ", r[1]
+    print("Number of outliers detected: ", r[0])
+    print("Indices of these outliers: ", r[1])
     
     plt.plot(x, 'b.')
     for i in range(len(r[1])):
       plt.plot(r[1][i], x[r[1][i]], 'rp')
-#    plt.show()
+#     plt.show()
 
   def sanity_polyResOutlierExample(self):
     """
@@ -1230,11 +1229,11 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     # Assign outlier status to all points deviating by
     # more than 3.0 standard deviations from the fit,
     # and show a control plot.
-    iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=False)
+    iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=True)
     
     # What about the outliers
-    print "Number of outliers: ", len(iout)
-    print "Indices of outliers: ", iout
+    print("Number of outliers: ", len(iout))
+    print("Indices of outliers: ", iout)
     
     # Remove outliers
     xnew, ynew = x[iin], y[iin]
@@ -1265,6 +1264,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
 
   def sanity_slidingPolyResOutlierExample(self):
     """
+      Checking sliding PolyResOutlierExample
     """
     from PyAstronomy import pyasl
     import numpy as np
@@ -1282,11 +1282,11 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     # Assign outlier status to all points deviating by
     # more than 3.0 standard deviations from the fit,
     # and show a control plot.
-    iin, iout = pyasl.slidingPolyResOutlier(x, y, 20, deg=1, stdlim=3.0, controlPlot=False)
+    iin, iout = pyasl.slidingPolyResOutlier(x, y, 20, deg=1, stdlim=3.0, controlPlot=True)
     
     # What about the outliers
-    print "Number of outliers: ", len(iout)
-    print "Indices of outliers: ", iout
+    print("Number of outliers: ", len(iout))
+    print("Indices of outliers: ", iout)
     
     # Remove outliers
     xnew, ynew = x[iin], y[iin]
