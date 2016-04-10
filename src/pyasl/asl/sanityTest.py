@@ -1065,7 +1065,7 @@ class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
     """
     from PyAstronomy import pyasl
     import numpy as np
-  
+    
     # Number of data points
     N = 10000
     # Signal to noise ratio
@@ -1081,13 +1081,13 @@ class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
     # estimate fits the input...
     # Use a chunk length of 20 data points, a polynomial of degree
     # one, and produce a "control plot".
-    snrEsti = pyasl.estimateSNR(x, y, 20, deg=1, controlPlot=False)
-    print "Estimate of the SNR: ", snrEsti["SNR-Estimate"]
+    snrEsti = pyasl.estimateSNR(x, y, 20, deg=1, controlPlot=True)
+    print("Estimate of the SNR: ", snrEsti["SNR-Estimate"])
     
     # Use a chunks with a length of 27, a polynomial of degree
     # two, and produce a "control plot".
     snrEsti = pyasl.estimateSNR(x, y, 27, deg=2, controlPlot=False, xlenMode="excerpt")
-    print "Estimate of the SNR: ", snrEsti["SNR-Estimate"]
+    print("Estimate of the SNR: ", snrEsti["SNR-Estimate"])
 
     
 class SanityOfOutlier(unittest.TestCase, SaniBase):
