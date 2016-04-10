@@ -1,6 +1,8 @@
 Folding time series
 ======================
 
+.. p23ready
+
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: foldAt
 
