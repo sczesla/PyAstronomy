@@ -860,16 +860,16 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
     
     heli, bary = pyasl.baryvel(jd, deq=2000.0)
     
-    print "Earth's velocity at JD: ", jd
-    print "Heliocentric velocity [km/s]: ", heli
-    print "Barycentric velocity [km/s] : ", bary
+    print("Earth's velocity at JD: ", jd)
+    print("Heliocentric velocity [km/s]: ", heli)
+    print("Barycentric velocity [km/s] : ", bary)
     
     # Coordinates of Sirius
     ra  = 101.28715535
     dec = -16.71611587
     
     vh, vb = pyasl.baryCorr(jd, ra, dec, deq=2000.0)
-    print "Barycentric velocity of Earth toward Sirius: ", vb
+    print("Barycentric velocity of Earth toward Sirius: ", vb)
 
   def sanity_baryCorrAltair(self):
     """
@@ -884,7 +884,7 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
       Checking sanity of helcorr example.
     """
     from PyAstronomy import pyasl
-  
+    
     # Coordinates of European Southern Observatory
     # (Coordinates of UT1)
     longitude = 289.5967661
@@ -903,9 +903,8 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
     corr, hjd = pyasl.helcorr(longitude, latitude, altitude, \
                 ra2000, dec2000, jd, debug=True)
     
-    print "Barycentric correction [km/s]: ", corr
-    print "Heliocentric Julian day: ", hjd
-    
+    print("Barycentric correction [km/s]: ", corr)
+    print("Heliocentric Julian day: ", hjd)   
     
 
 class SanityOfSVD(unittest.TestCase, SaniBase):
