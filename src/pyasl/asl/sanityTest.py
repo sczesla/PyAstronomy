@@ -1616,7 +1616,7 @@ class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
     azimuths = np.random.random(10) * 360.
     for azimuth in azimuths:
       cp = pyasl.getCardinalPoint(azimuth)
-      print "Azimuth: {0:6.2f} deg, Cardinal point: {1:1s}".format(azimuth, cp)
+      print("Azimuth: {0:6.2f} deg, Cardinal point: {1:1s}".format(azimuth, cp))
 
 
 class SanityOfTwilight(unittest.TestCase, SaniBase):
