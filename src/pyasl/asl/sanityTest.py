@@ -726,7 +726,7 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
     
     # Create a "spectrum" with 0.01 A binning ...
     wvl = np.linspace(6000., 6100., 10000)
-    # ... a gradiant in the continuum ...
+    # ... a gradient in the continuum ...
     flux = np.ones(len(wvl)) + (wvl/wvl.min())*0.05
     # ... and a Gaussian absoption line
     flux -= np.exp( -(wvl-6050.)**2/(2.*0.5**2) )*0.05
@@ -742,15 +742,15 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
     
     # Check the maximum difference in the central part
     indi = np.arange(len(flux)-200) + 100
-    print "Maximal difference (without outer 100 bins): ", \
-                    max(np.abs(flux[indi]-nflux2[indi]))
+    print("Maximal difference (without outer 100 bins): ", \
+                    max(np.abs(flux[indi]-nflux2[indi])))
     
     # Plot the outcome
     plt.title("Initial (blue), shifted (red), and back-shifted (green) spectrum")
     plt.plot(wvl, flux, 'b.-')
     plt.plot(wvl, nflux1, 'r.-')
     plt.plot(wvl, nflux2, 'g.-')
-#    plt.show()
+#     plt.show()
 
 
 class SanityOfrotBroad(unittest.TestCase, SaniBase):
