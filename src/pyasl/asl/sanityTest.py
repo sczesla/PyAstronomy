@@ -1886,13 +1886,13 @@ class SanityOfDecimalYear(unittest.TestCase):
     
     # Obtain float representation of decimal year
     decy = pyasl.decimalYear(d)
-    print "Decimal representation: ", decy
+    print("Decimal representation: ", decy)
     
     # Convert back into gregorian date first
-    print "The decimal year %10.5f correspond to " % decy + \
-          pyasl.decimalYearGregorianDate(decy, "yyyy-mm-dd hh:mm:ss")
-    print " ... or equivalently (y, m, d, h, m, s, ms): ", \
-          pyasl.decimalYearGregorianDate(decy, "tuple")
+    print("The decimal year %10.5f correspond to " % decy + \
+          pyasl.decimalYearGregorianDate(decy, "yyyy-mm-dd hh:mm:ss"))
+    print(" ... or equivalently (y, m, d, h, m, s, ms): ", \
+          pyasl.decimalYearGregorianDate(decy, "tuple"))
   
   def sanity_decimalYear(self):
     """
