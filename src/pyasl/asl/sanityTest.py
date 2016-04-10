@@ -624,7 +624,7 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
       Checking sanity of flux conversion example.
     """
     from PyAstronomy import pyasl
-  
+    
     # Wavelength in Angstrom
     wvl = 4000.
     # Flux in erg/s
@@ -634,15 +634,14 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
     photons = pyasl.flux2photons(wvl, flux)
     
     # How many photons is this?
-    print "%g erg/s at %g A correspond to %g photons/s" \
-            % (flux, wvl, photons)
+    print("%g erg/s at %g A correspond to %g photons/s" \
+            % (flux, wvl, photons))
     
     # Converting back
     flux2 = pyasl.photons2flux(wvl, photons)
     
-    print "%g photons/s at %g A correspond to %g erg/s" \
-            % (photons, wvl, flux2)
-
+    print("%g photons/s at %g A correspond to %g erg/s" \
+            % (photons, wvl, flux2))
 
 
 class SanityOfFolding(unittest.TestCase, SaniBase):
