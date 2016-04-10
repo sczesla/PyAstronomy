@@ -1,6 +1,8 @@
 INTEP interpolation algorithm
 ===============================
 
+.. p23ready
+
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: intep
 
