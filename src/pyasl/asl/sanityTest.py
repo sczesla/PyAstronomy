@@ -1745,19 +1745,19 @@ class SanityOfAirmass(unittest.TestCase):
     obsAlt = 2400.0
     
     for za in range(0,90,10):
-      print "Zenith angle: %2d, airmass = %7.2f" % \
-        (za, pyasl.airmassSpherical(za, obsAlt))
+      print("Zenith angle: %2d, airmass = %7.2f" % \
+        (za, pyasl.airmassSpherical(za, obsAlt)))
   
   def sanity_airmassPPExample(self):
     """
       Example for plane-parallel airmass
     """
     from PyAstronomy import pyasl
-
-    print "Airmass for plane-parallel atmosphere"
+    
+    print("Airmass for plane-parallel atmosphere")
     for za in range(0,70,10):
-      print "Zenith angle: %2d deg, airmass = %7.2f" % \
-        (za, pyasl.airmassPP(za))
+      print("Zenith angle: %2d deg, airmass = %7.2f" % \
+        (za, pyasl.airmassPP(za)))
   
   def sanity_compAirmasses(self):
     """
