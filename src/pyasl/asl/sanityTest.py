@@ -2356,18 +2356,18 @@ class SanityOfAtomicNo(unittest.TestCase):
       Check example of atomic number (AtomicNo)
     """
     from PyAstronomy import pyasl
-
+    
     an = pyasl.AtomicNo()
     
     # Show table with all atomic numbers, elemental
     # symbols, and the names of the elements
     an.showAll()
     
-    print an.getElSymbol(26)
+    print(an.getElSymbol(26))
     
-    print an.getAtomicNo("He")
+    print(an.getAtomicNo("He"))
     
-    print an.getElementName(25)
+    print(an.getElementName(25))
     
   def sanity_AtomicNo(self):
     """
@@ -2388,7 +2388,7 @@ class SanityOfAtomicNo(unittest.TestCase):
     
     self.assertEqual(an.getElementName(3), "Lithium")
     
-    print an.getElementName(25)
+    print(an.getElementName(25))
     
 
 class SanityOfFitsSpec(unittest.TestCase):
