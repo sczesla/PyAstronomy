@@ -33,17 +33,17 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     
     # Define wavelength array
     wvl = np.arange(10) + 5000.0
-    print "Input wavelengths: ", wvl
+    print("Input wavelengths: ", wvl)
     
     # Convert wavelength in air to wavelength
     # in vacuum. By default, the conversion
-    # specified by Ciddor 1996 rae used.
+    # specified by Ciddor 1996 are used.
     wvlVac = pyasl.airtovac2(wvl)
-    print "Wavelength in vacuum: ", wvlVac
+    print("Wavelength in vacuum: ", wvlVac)
     
     # Convert wavelength from vacuum to air
     wvlAir = pyasl.vactoair2(wvlVac)
-    print "Wavelength in air: ", wvlAir
+    print("Wavelength in air: ", wvlAir)
   
   def sanity_airtovacExample2(self):
     """
@@ -127,9 +127,9 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     ri = pyasl.RefractiveIndexAV(mode="ciddor")
     n = ri.refractiveIndex(wvl)
     
-    print "Wavelength and 1.0 - Refractive index of 'standard air':"
+    print("Wavelength and 1.0 - Refractive index of 'standard air':")
     for w, nc in zip(wvl, n):
-      print "{0:5.1f}  {1:10.8e}".format(w, nc-1.0)
+      print("{0:5.1f}  {1:10.8e}".format(w, nc-1.0))
   
   def sanity_aitoff(self):
     """
