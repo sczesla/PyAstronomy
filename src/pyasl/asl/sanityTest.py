@@ -1931,7 +1931,7 @@ class SanityOfTransitTimes(unittest.TestCase):
     
     # Choose first transit
     d = dat[2]
-    print d
+    print(d)
     mt = d["Obs cal"][1]
     self.assertEqual(mt[0], 2018, "Year does not match")
     self.assertEqual(mt[1], 10, "Month does not match")
