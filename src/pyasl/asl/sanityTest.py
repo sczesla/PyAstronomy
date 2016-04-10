@@ -240,7 +240,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     time = numpy.linspace(0, 6.78, 200)
     ke = KeplerEllipse(4.5, 3.14159, 0.314)
     pos = ke.xyzPos(time)
-    for i in xrange(len(time)):
+    for i in smo.range(len(time)):
       pos1 = ke.xyzPos(time[i])
       self.assertEqual( numpy.sum(numpy.abs((pos[i,::]-pos1))), 0.0)
   
@@ -288,12 +288,12 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
       self.assertAlmostEqual(md, 0.0, delta=1e-15, msg="Nodes are not exchanged when LOS is reversed.")
     
     # None of this should have an impact on the node
-    for w in xrange(0, 360, 80):
-      for tau in xrange(0, 100, 25):
-        for i in xrange(5, 85, 20):
+    for w in smo.range(0, 360, 80):
+      for tau in smo.range(0, 100, 25):
+        for i in smo.range(5, 85, 20):
           ke2 = KeplerEllipse(1 , 1, e=0.0, i=i, Omega=0., w=w, tau=tau)
           n3 = ke2.xyzNodes_LOSZ(los='+z')
-          for j in xrange(2):
+          for j in smo.range(2):
             md = np.max(np.abs(n1[j]-n3[j]))
             self.assertAlmostEqual(md, 0.0, delta=1e-12, \
                                    msg="Unexpected impact on position of node.")
@@ -397,6 +397,7 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
       Checking Markley solver example.
     """
     from PyAstronomy import pyasl
+    
     # Instantiate the solver
     ks = pyasl.MarkleyKESolver()
     
@@ -406,7 +407,7 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
     # Markley 1995.
     M = 0.75
     e = 0.3
-    print "Eccentric anomaly: ", ks.getE(M, e)
+    print("Eccentric anomaly: ", ks.getE(M, e))
   
   def sanity_example2(self):
     """
@@ -429,10 +430,10 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
     # Calculate the orbit position at the given points
     # in a Cartesian coordinate system.
     pos = ke.xyzPos(t)
-    print "Shape of output array: ", pos.shape
+    print("Shape of output array: ", pos.shape)
     
     # x, y, and z coordinates for 50th time point
-    print "x, y, z for 50th point: ", pos[50, ::]
+    print("x, y, z for 50th point: ", pos[50, ::])
     
     # Calculate orbit radius as a function of the
     radius = ke.radius(t)
@@ -460,9 +461,7 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
     plt.xlabel("Time")
     plt.ylabel("Radial velocity [length/time]")
     plt.plot(t, vel[::,2], 'r.-')
-#    plt.show()
-
-
+#     plt.show()
 
 class SanityOfBinnin(unittest.TestCase, SaniBase):
   
