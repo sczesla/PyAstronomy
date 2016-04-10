@@ -1,18 +1,20 @@
 from __future__ import print_function, division
-from airtovac import airtovac, vactoair, vactoair2, airtovac2
+from .airtovac import airtovac, vactoair, vactoair2, airtovac2
 import numpy
 import unittest
 from PyAstronomy.pyaC import SaniBase
-from aitoffLegacy import inverseAitoff, aitoff
-from astroTimeLegacy import daycnv, juldate
-from keplerOrbit import KeplerEllipse, MarkleyKESolver
+from .aitoffLegacy import inverseAitoff, aitoff
+from .astroTimeLegacy import daycnv, juldate
+from .keplerOrbit import KeplerEllipse, MarkleyKESolver
 import datetime
-from dopplerShift import dopplerShift
-from fluxConversion import flux2photons, photons2flux
-from rotBroad import rotBroad, fastRotBroad
-from cardinalPoint import getCardinalPoint
-from posAngle import positionAngle
-from coordinates import hmsToDeg, degToHMS, degToDMS, dmsToDeg, coordsSexaToDeg, coordsDegToSexa
+from .dopplerShift import dopplerShift
+from .fluxConversion import flux2photons, photons2flux
+from .rotBroad import rotBroad, fastRotBroad
+from .cardinalPoint import getCardinalPoint
+from .posAngle import positionAngle
+from .coordinates import hmsToDeg, degToHMS, degToDMS, dmsToDeg, coordsSexaToDeg, coordsDegToSexa
+import six
+import six.moves as smo
 
 class SanityOfPyasl(unittest.TestCase, SaniBase):
   
@@ -1605,12 +1607,13 @@ class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
       Checking example for converting damping constant into line width.
     """
     from PyAstronomy import pyasl
-
+    
     # Einstein coefficient relevant for hydrogen LyA
     gLya = 6.258085e8
     
-    print "Width of H LyA line at 1215.67 A = %e cm" % \
-          pyasl.convertDampingConstant(gLya, 1215.67)
+    print("Width of H LyA line at 1215.67 A = %e cm" % \
+          pyasl.convertDampingConstant(gLya, 1215.67))
+
 
 
 class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
