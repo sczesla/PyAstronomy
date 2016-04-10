@@ -1717,7 +1717,7 @@ class SanityOfTransit:
       inTransit---individual point in time
     """
     from PyAstronomy import pyasl
-
+    
     # Time of interest
     time = 2476357.756234
     # Define some (arbitrary) transit parameters
@@ -1726,16 +1726,17 @@ class SanityOfTransit:
     duration = 2.2/24.0
     
     # Check whether the time is in-transit
-    print "Time is within transit? ",
+    print("Time is within transit? ", end=' ')
     if not pyasl.isInTransit(time, T0, period, duration/2.0):
-      print "No"
+      print("No")
     else:
-      print "Yes"
+      print("Yes")
   
   def sanity_inTransitExample_2(self):
     """
       inTransit---Series of points in time
     """
+    from __future__ import print_function, division
     from PyAstronomy import pyasl
     import numpy as np
     
@@ -1747,13 +1748,13 @@ class SanityOfTransit:
     duration = 2.2/24.0
     
     # Check whether the time is in-transit
-    print "Indices if time points within transit: ",
-    print pyasl.isInTransit(times, T0, period, duration/2.0)
+    print("Indices if time points within transit: ", end=' ')
+    print(pyasl.isInTransit(times, T0, period, duration/2.0))
     
-    print
-    print "For each time point, a flag indicating whether it"
-    print "is in- or off-transit:"
-    print pyasl.isInTransit(times, T0, period, duration/2.0, boolOutput=True)
+    print()
+    print("For each time point, a flag indicating whether it")
+    print("is in- or off-transit:")
+    print(pyasl.isInTransit(times, T0, period, duration/2.0, boolOutput=True))
 
 
 class SanityOfAirmass(unittest.TestCase):
