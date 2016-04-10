@@ -346,8 +346,9 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
   
     if hjd:
       # Convert input times into heliocentric frame
-      tmin = helio_jd(tmin, ra, dec)
-      tmax = helio_jd(tmax, ra, dec)
+      # Using 'reduced' JD in calculation
+      tmin = helio_jd(tmin-2.4e6, ra, dec) + 2.4e6
+      tmax = helio_jd(tmax-2.4e6, ra, dec) + 2.4e6
   
     print("Specified time span")
     print("Start date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmin)))
