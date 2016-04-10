@@ -2311,8 +2311,6 @@ class SanityOfQuadExtreme(unittest.TestCase):
         self.assertAlmostEqual(p[0] - delta, 0.0, delta=1e-8)
         self.assertAlmostEqual(p[1], c, delta=1e-8)
 
-
-
   def sanity_quadextremeExample(self):
     """
       Checking example for quadExtreme.
@@ -2327,20 +2325,20 @@ class SanityOfQuadExtreme(unittest.TestCase):
     
     # Find the maximum
     epos, mi = pyasl.quadExtreme(x, y, mode="max")
-    print "Maximum found at index: ", mi, ", value at maximum: ", y[mi]
-    print "Maximum found by parabolic fit: ", epos
-    print
+    print("Maximum found at index: ", mi, ", value at maximum: ", y[mi])
+    print("Maximum found by parabolic fit: ", epos)
+    print()
     
     # Find the maximum, use a wider range for the
     # parabolic fit.
-    print "Using 5 points to each side of the maximum"
+    print("Using 5 points to each side of the maximum")
     epos, mi = pyasl.quadExtreme(x, y, mode="max", dp=(5,5))
-    print "Maximum found at index: ", mi, ", value at maximum: ", y[mi]
-    print "Maximum found by parabolic fit: ", epos
-    print
+    print("Maximum found at index: ", mi, ", value at maximum: ", y[mi])
+    print("Maximum found by parabolic fit: ", epos)
+    print()
     
     # Do as above, but get the full output
-    print "Using 2 points to each side of the maximum"
+    print("Using 2 points to each side of the maximum")
     epos, mi, xb, yb, p = pyasl.quadExtreme(x, y, mode="max", dp=(2,2), fullOutput=True)
     # Evaluate polynomial at a number of points.
     # Note that, internally, the x-value of the extreme point has
@@ -2355,7 +2353,7 @@ class SanityOfQuadExtreme(unittest.TestCase):
     plt.plot(xb+x[mi], yb, 'rp')
     # Overplot the model (shifted, because xb is shifted)
     plt.plot(newx+x[mi], model, 'r--')
-#    plt.show()
+#     plt.show()
 
 
 class SanityOfPositionAngle(unittest.TestCase):
