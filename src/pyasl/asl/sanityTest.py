@@ -2359,7 +2359,7 @@ class SanityOfPositionAngle(unittest.TestCase):
     # Calculate position angle
     r = pyasl.positionAngle(200.98141867, +54.92535197, 201.30640764,+54.98795966)
     
-    print "Position angle of Alcor (from Mizar): %4.2f deg" % r
+    print("Position angle of Alcor (from Mizar): %4.2f deg" % r)
   
   def sanity_positionAngle(self):
     """
