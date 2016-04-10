@@ -1739,8 +1739,10 @@ class SanityOfTwilight(unittest.TestCase, SaniBase):
     import numpy as np
     
     for alt in np.linspace(-20., 5., 15):
-      print "Altitude = {0:6.2f}, Twilight is called: ".format(alt), \
-            pyasl.twilightName(alt)
+      print("Altitude = {0:6.2f}, Twilight is called: ".format(alt), \
+            pyasl.twilightName(alt))
+    
+
 
 
 class SanityOfAngDist(unittest.TestCase, SaniBase):
