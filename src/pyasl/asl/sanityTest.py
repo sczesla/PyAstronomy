@@ -2405,19 +2405,19 @@ class SanityOfSMW_RHK(unittest.TestCase):
       Check the S-index -> RHK conversion example
     """
     from PyAstronomy import pyasl
-
+    
     ss = pyasl.SMW_RHK()
     
     bv = 0.8
     teff = 5100.0
     s = 0.4
     
-    print "Convert S-index to RHK assuming a giant"
+    print("Convert S-index to RHK assuming a giant")
     ss.SMWtoRHK(s, teff, bv, lc="g", verbose=True)
     
-    print
-    print
-    print "Convert S-index to RHK assuming a main-sequence star"
+    print()
+    print()
+    print("Convert S-index to RHK assuming a main-sequence star")
     ss.SMWtoRHK(s, teff, bv, lc="ms", verbose=True)
     
   def sanity_ExampleShowCCF(self):
@@ -2435,7 +2435,7 @@ class SanityOfSMW_RHK(unittest.TestCase):
     ccfr = bv * 0.0
     ccfrg = bv * 0.0
     
-    for i in xrange(len(bv)):
+    for i in range(len(bv)):
       ccfn[i] = ss.log10ccfNoyes(bv[i])
       ccfr[i] = ss.log10ccfRutten(bv[i])
       ccfrg[i] = ss.log10ccfRutten(bv[i], lc="g")
@@ -2447,6 +2447,7 @@ class SanityOfSMW_RHK(unittest.TestCase):
 #     plt.ylabel("Ccf")
 #     plt.legend()
 #     plt.show()
+
 
 
 class SanityOfKuruczModel(unittest.TestCase):
