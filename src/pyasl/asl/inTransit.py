@@ -831,7 +831,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
   ax.yaxis.grid(color='gray', which="minor", linestyle='dotted')
   ax2.xaxis.grid(color='gray', linestyle='dotted')
 
-  plt.text(0.5,0.95,"Transit visibility of "+allData[n]["Planet name"], \
+  plt.text(0.5,0.95,"Transit visibility of "+allData[n]["Planet name"].decode("utf8"), \
            transform=fig.transFigure, ha='center', va='bottom', fontsize=20)
 
   if plotLegend:
