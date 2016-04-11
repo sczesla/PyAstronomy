@@ -1,7 +1,9 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyaC
 import numpy as np
 from PyAstronomy.pyaC import ImportCheck
+import six.moves as smo
 
 
 def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
@@ -54,7 +56,7 @@ def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
   R = []
   L = []
   minds = []
-  for i in xrange(maxOLs + 1):
+  for i in smo.range(maxOLs + 1):
     # Compute mean and std of x
     xmean = xm.mean()
     xstd = xm.std()
@@ -73,7 +75,7 @@ def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
   R.pop(-1)
   # Find the number of outliers
   ofound = False
-  for i in xrange(maxOLs-1, -1, -1):
+  for i in smo.range(maxOLs-1, -1, -1):
     if R[i] > L[i]:
       ofound = True
       break
