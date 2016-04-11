@@ -71,7 +71,8 @@ class AtomicNo:
     """
       Print atomic number, elemental symbol, and element name.
     """
-    for k in sorted(self._data.keys()):
+    nos = [k for k in self._data.keys() if type(k) == int]
+    for k in sorted(nos):
       if not type(k) == int:
         continue
       print("%3d | %3s | " % (k, self._data[k]) + self._elNames[k])
