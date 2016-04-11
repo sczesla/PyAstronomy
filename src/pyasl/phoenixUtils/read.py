@@ -1,8 +1,10 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
 import gzip
 import re
 import os
 import numpy as np
+import six.moves as smo
 
 def readUnit7(fn, minwl=None, maxwl=None):
   """
@@ -41,7 +43,7 @@ def readUnit7(fn, minwl=None, maxwl=None):
   lines = f.readlines()
   f.close()
   result = np.zeros((len(lines), 4))
-  for i in xrange(len(lines)):
+  for i in smo.range(len(lines)):
     result[i,::] = np.array(lines[i].replace('D','E').split()[0:4], dtype=np.float)
   # Remove entries using min and max wavelength
   if minwl is not None:
@@ -88,7 +90,7 @@ def readDTable(fn, sort=None):
   # Find number of columns
   ncol = len(lines[0].split())
   result = np.zeros((len(lines), ncol))
-  for i in xrange(len(lines)):
+  for i in smo.range(len(lines)):
     result[i,::] = np.array(lines[i].replace('D','E').split(), dtype=np.float)
   if sort is not None:
     # Sort with respect to column
