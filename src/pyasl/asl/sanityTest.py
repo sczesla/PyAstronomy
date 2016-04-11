@@ -1600,8 +1600,6 @@ class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
     """
       Sanity of example for `eq2hor`
     """
-    
-    from __future__ import print_function, division
     from PyAstronomy import pyasl
     import matplotlib.pylab as plt
     import datetime
@@ -1814,7 +1812,6 @@ class SanityOfTransit:
     """
       inTransit---Series of points in time
     """
-    from __future__ import print_function, division
     from PyAstronomy import pyasl
     import numpy as np
     
