@@ -135,7 +135,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     """
       Checking Aitoff projection.
     """
-    for i in xrange(100):
+    for i in smo.range(100):
       l = numpy.random.random() * 360.0
       b = numpy.random.random() * 180.0 - 90.0
       x, y = aitoff(l, b)
