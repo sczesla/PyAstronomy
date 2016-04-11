@@ -1,6 +1,8 @@
+from __future__ import print_function, division
 import numpy as np
 import os
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class Ramirez2005:
   """
@@ -131,7 +133,8 @@ class Ramirez2005:
           Filename.
     """
     # Read data and remove newlines
-    lines = map(lambda s:s.rstrip("\n"), open(fn).readlines())
+    lines = [s.rstrip("\n") for s in open(fn).readlines()]
+
     # Tables 2 and 3 have the same structure
     self._bands, self._tab2 = self._readTab23(lines, 2)
     _, self._tab3 = self._readTab23(lines, 3)
@@ -207,10 +210,10 @@ class Ramirez2005:
     
     # Calculate according to Eq. 1
     result = 0.0
-    for i in xrange(3):
+    for i in smo.range(3):
       result += dat[j, i] * X**i
     result += dat[j, 3]*X*feH
-    for i in xrange(4,6):
+    for i in smo.range(4,6):
       result += dat[j, i] * feH**i
     
     teff = 5040./result
@@ -271,16 +274,16 @@ class Ramirez2005:
     
     # Calculate according to Eq. 1
     result = 0.0
-    for i in xrange(3):
+    for i in smo.range(3):
       result += dat[j, i] * X**i
     result += dat[j, 3]*X*feH
-    for i in xrange(4,6):
+    for i in smo.range(4,6):
       result += dat[j, i] * feH**(i-3)
     
     teff = 5040./result
     
     # Polynomial correction
-    for i in xrange(7):
+    for i in smo.range(7):
       teff += (datp[mj, 3+i] * X**i)
     
     return teff
@@ -405,7 +408,7 @@ class Ramirez2005:
     xmin = datp[mj,1]
     xmax = datp[mj,2]
     xin = [False]*2
-    for i in xrange(2):
+    for i in smo.range(2):
       if X[i] >= xmin and X[i] <= xmax:
         xin[i] = True
     if sum(xin) == 2:

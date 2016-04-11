@@ -119,12 +119,12 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Check sanity of Ramirez/Melendez 2005 example
     """
     from PyAstronomy import pyasl
-  
+    
     # Create class instance
     r = pyasl.Ramirez2005()
-  
+    
     # Which color bands are available
-    print "Available color bands: ", r.availableBands()
+    print("Available color bands: ", r.availableBands())
     
     # Convert B-V to effective temperature and back
     bv = 0.75
@@ -132,7 +132,24 @@ class SanityOfPyaslExt1(unittest.TestCase):
     teff = r.colorToTeff("B-V", bv, feh)
     bv1 = r.teffToColor("B-V", teff, feh)
     # Watch out for differences between input bv and the output bv1
-    print "B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1
+    print("B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1)
+
+  def sanity_ramirez2005Example2(self):
+    """
+      Checking Ramirez, Ballesteros example
+    """
+    from PyAstronomy import pyasl
+    
+    b = pyasl.BallesterosBV_T()
+    r = pyasl.Ramirez2005()
+    
+    # Convert B-V to effective temperature and back
+    for bv in [0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15, 1.25, 1.35, 1.45]:
+      tr = r.colorToTeff("B-V", bv, 0.0)
+      tb = b.bv2T(bv)
+    
+      print(("B-V [mag] = {3:4.2f} : Teff (R05) = {0:4.0f} K, " + \
+              "Teff (B12) = {1:4.0f} K, dTeff = {2: 4.0f} K").format(tr, tb, tr - tb, bv))
 
   def sanity_ramirez2005(self):
     """
@@ -175,19 +192,19 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Checking example for Ballesteros
     """
     from PyAstronomy import pyasl
-  
+    
     b = pyasl.BallesterosBV_T()
     
     bv = 0.65
     
     # Convert B-V into effective temperature
     teff = b.bv2T(0.65)
-    print "B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff)
+    print("B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff))
     
     # Convert effective temperature into B-V color
     teff = 4568.0
     bv = b.t2bv(teff)
-    print "Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv)
+    print("Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv))
   
   def sanity_gyroAgeBarnes(self):
     """
