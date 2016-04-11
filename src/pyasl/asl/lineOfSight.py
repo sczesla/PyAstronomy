@@ -1,6 +1,8 @@
+from __future__ import print_function, division
 import re
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six
 
 class LineOfSight:
   """
@@ -21,7 +23,7 @@ class LineOfSight:
   
   def __init__(self, los='-z'):
 
-    if isinstance(los, basestring):
+    if isinstance(los, six.string_types):
       # The input is a string. Check the content.
       r = re.match("^([-+])([xyz])$", los)
       if r is None:
