@@ -1248,7 +1248,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     # Assign outlier status to all points deviating by
     # more than 3.0 standard deviations from the fit,
     # and show a control plot.
-    iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=True)
+    iin, iout = pyasl.polyResOutlier(x, y, deg=1, stdlim=3.0, controlPlot=False)
     
     # What about the outliers
     print("Number of outliers: ", len(iout))
@@ -1301,7 +1301,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     # Assign outlier status to all points deviating by
     # more than 3.0 standard deviations from the fit,
     # and show a control plot.
-    iin, iout = pyasl.slidingPolyResOutlier(x, y, 20, deg=1, stdlim=3.0, controlPlot=True)
+    iin, iout = pyasl.slidingPolyResOutlier(x, y, 20, deg=1, stdlim=3.0, controlPlot=False)
     
     # What about the outliers
     print("Number of outliers: ", len(iout))
@@ -1431,7 +1431,7 @@ class SanityOfNutation(unittest.TestCase, SaniBase):
     jds = np.arange(startjd, endjd, .5)
     print()
     print("Plot the results")
-    res = pyasl.nutate(jds, plot=True)
+    res = pyasl.nutate(jds, plot=False)
     
     print("Longitude: ", res[0])
     print("Obliquity: ", res[1])
