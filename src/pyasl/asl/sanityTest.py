@@ -878,7 +878,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
     plt.plot(wvl, flux, 'b-')
     plt.plot(wvl, rflux, 'r-')
     plt.plot(wvl, lflux, 'g-')
-    plt.show()
+#     plt.show()
 
   def sanity_rotBroadEW(self):
     """
@@ -1152,7 +1152,7 @@ class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
     # estimate fits the input...
     # Use a chunk length of 20 data points, a polynomial of degree
     # one, and produce a "control plot".
-    snrEsti = pyasl.estimateSNR(x, y, 20, deg=1, controlPlot=True)
+    snrEsti = pyasl.estimateSNR(x, y, 20, deg=1, controlPlot=False)
     print("Estimate of the SNR: ", snrEsti["SNR-Estimate"])
     
     # Use a chunks with a length of 27, a polynomial of degree
