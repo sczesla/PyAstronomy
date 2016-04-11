@@ -51,6 +51,9 @@ class SanityOfNasaExoplanetArchive(unittest.TestCase):
     pass
   
   def sanity_example(self):
+    """
+      Checking sanity of exoplanet archive
+    """
     from PyAstronomy import pyasl
     import matplotlib.pylab as plt
     
@@ -58,18 +61,18 @@ class SanityOfNasaExoplanetArchive(unittest.TestCase):
     
     # See what information is available
     cols = nexa.availableColumns()
-    print
+    print()
     
     # Get all information for planet 'wasp-12 b'
     # By default, the search is case-insensitive
-    print "Entry of Wasp-12 b"
-    print nexa.selectByPlanetName("Wasp-12 b")
+    print("Entry of Wasp-12 b")
+    print(nexa.selectByPlanetName("Wasp-12 b"))
     
-    print
+    print()
     # Get all data and plot ra vs. dec
     dat = nexa.getAllData()
     plt.plot(dat.ra, dat.dec, 'b.')
-#    plt.show()
+#     plt.show()
 
 
 class SanityOfNasaExoplanetEU(unittest.TestCase):
