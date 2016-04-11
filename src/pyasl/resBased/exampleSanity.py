@@ -185,19 +185,20 @@ class SanityOfFIP(unittest.TestCase):
       Checking example of FIP.
     """
     from PyAstronomy import pyasl
-  
+    
     fip = pyasl.FirstIonizationPot()
     
-    print "First ionization energy of Li = %4.2e +/- %4.2e eV" % fip.getFIP(3)
-    print "First ionization energy of Protactinium = %4.2e +/- %4.2e eV" % fip.getFIP(91)
+    print("First ionization energy of Li = %4.2e +/- %4.2e eV" % fip.getFIP(3))
+    print("First ionization energy of Protactinium = %4.2e +/- %4.2e eV" % fip.getFIP(91))
     
     # And the same using elemental symbols
-    print
-    print "First ionization energy of Li = %4.2e +/- %4.2e eV" % fip.getFIP("Li")
-    print "First ionization energy of Protactinium = %4.2e +/- %4.2e eV" % fip.getFIP("Pa")
+    print()
+    print("First ionization energy of Li = %4.2e +/- %4.2e eV" % fip.getFIP("Li"))
+    print("First ionization energy of Protactinium = %4.2e +/- %4.2e eV" % fip.getFIP("Pa"))
     
     # Plot the first ionization energy as a function of atomic number
-#    pyasl.plotFIP()
+#     pyasl.plotFIP()
+
 
   def sanity_FIP(self):
     """
@@ -213,3 +214,38 @@ class SanityOfFIP(unittest.TestCase):
     self.assertAlmostEqual(25e-6, fip.getFIP("I")[1], 6, msg="FIP for iodine does not match (sym).")
     
     
+class SanityOfKurucz(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass   
+   
+  def sanity_exmaple(self):
+    """
+      Sanity of Kurucz example
+    """
+    from PyAstronomy import pyasl
+    
+    km = pyasl.KuruczModels()
+    # See what model grids are available
+    print(km.availableGrids())
+    
+    # See whether model grid for log(metallicity) = 0.0
+    # is available
+    print(km.gridAvailable(0.0))
+    
+    # Obtain the model grid for solar metallicity
+    mg = km.requestModelGrid(0.0)
+    
+    # See what Teffs and logg are available
+    print("Teffs: ", mg.availableTeffs())
+    print("Loggs: ", mg.availableLoggs())
+    
+    print()
+    print()
+    
+    # Use simple access method to obtain a model.
+    # The input is: Teff, logg, and log10(metallicity)
+    model = pyasl.getKuruczModel(4250, 4.5, 0.1)
