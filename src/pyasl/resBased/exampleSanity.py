@@ -91,16 +91,17 @@ class SanityOfNasaExoplanetEU(unittest.TestCase):
     
     # See what information is available
     cols = eu.availableColumns()
-    print cols
+    print(cols)
     
-    print
+    print()
     # Get all data and plot planet Mass vs.
     # semi-major axis in log-log plot
     dat = eu.getAllData()
     plt.xlabel("Planet Mass [RJ]")
     plt.ylabel("Semi-major axis [AU]")
     plt.loglog(dat.plMass, dat.sma, 'b.')
-#    plt.show()
+#     plt.show()
+
 
   def sanity_exampleExoplanetEU2(self):
     """
@@ -114,16 +115,16 @@ class SanityOfNasaExoplanetEU(unittest.TestCase):
     
     # Show the available data
     v.showAvailableData()
-    print
+    print()
     
     # Get a list of all available column names
     acs = v.getColnames()
-    print "Available column names: " + ", ".join(acs)
-    print
+    print("Available column names: " + ", ".join(acs))
+    print()
     
     # Select data by planet name (returns a dictionary)
-    print v.selectByPlanetName("CoRoT-2 b")
-    print
+    print(v.selectByPlanetName("CoRoT-2 b"))
+    print()
     
     # Get all data as an astropy table
     at = v.getAllDataAPT()
@@ -137,6 +138,8 @@ class SanityOfNasaExoplanetEU(unittest.TestCase):
     plt.ylabel("[" + v.getUnitOf("semi_major_axis") + "]")
     plt.loglog(at["mass"], at["semi_major_axis"], 'b.')
 #     plt.show()
+    
+
 
 class SanityOfNasaExoplanetsOrg(unittest.TestCase):
   

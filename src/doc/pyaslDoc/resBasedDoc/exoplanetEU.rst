@@ -1,6 +1,8 @@
 Access the exoplanet.eu data base
 ==================================
 
+.. p23ready
+
 .. currentmodule:: PyAstronomy.pyasl
 
 PyA provides the :py:func:`ExoplanetEU2` to access the data provided by
@@ -19,7 +21,8 @@ Example: Usage of ExoplanetEU2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
-
+    
+    from __future__ import print_function, division
     from PyAstronomy import pyasl
     import matplotlib.pylab as plt
     
@@ -28,16 +31,16 @@ Example: Usage of ExoplanetEU2
     
     # Show the available data
     v.showAvailableData()
-    print
+    print()
     
     # Get a list of all available column names
     acs = v.getColnames()
-    print "Available column names: " + ", ".join(acs)
-    print
+    print("Available column names: " + ", ".join(acs))
+    print()
     
     # Select data by planet name (returns a dictionary)
-    print v.selectByPlanetName("CoRoT-2 b")
-    print
+    print(v.selectByPlanetName("CoRoT-2 b"))
+    print()
     
     # Get all data as an astropy table
     at = v.getAllDataAPT()
@@ -51,6 +54,7 @@ Example: Usage of ExoplanetEU2
     plt.ylabel("[" + v.getUnitOf("semi_major_axis") + "]")
     plt.loglog(at["mass"], at["semi_major_axis"], 'b.')
     plt.show()
+    
 
 
 API documentation (ExoplanetEU2)
@@ -70,25 +74,26 @@ Example: Using ExoplanetEU
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
+    
+    from __future__ import print_function, division
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    
+    eu = pyasl.ExoplanetEU()
+    
+    # See what information is available
+    cols = eu.availableColumns()
+    print(cols)
+    
+    print()
+    # Get all data and plot planet Mass vs.
+    # semi-major axis in log-log plot
+    dat = eu.getAllData()
+    plt.xlabel("Planet Mass [RJ]")
+    plt.ylabel("Semi-major axis [AU]")
+    plt.loglog(dat.plMass, dat.sma, 'b.')
+    plt.show()
 
-  from PyAstronomy import pyasl
-  import matplotlib.pylab as plt
-  
-  eu = pyasl.ExoplanetEU()
-  
-  # See what information is available
-  cols = eu.availableColumns()
-  print cols
-  
-  print
-  # Get all data and plot planet Mass vs.
-  # semi-major axis in log-log plot
-  dat = eu.getAllData()
-  plt.xlabel("Planet Mass [RJ]")
-  plt.ylabel("Semi-major axis [AU]")
-  plt.loglog(dat.plMass, dat.sma, 'b.')
-  plt.show()
-  
 
 API documentation (ExoplanetEU)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
