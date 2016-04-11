@@ -222,7 +222,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Example gyro age (Barnes 2007)
     """
     from PyAstronomy import pyasl
-  
+    
     # Parameters of the Sun (Barnes 2007, p 1174)
     bv = 0.642
     p = 26.09
@@ -230,9 +230,8 @@ class SanityOfPyaslExt1(unittest.TestCase):
     # Obtain solar age ...
     age = pyasl.gyroAgeBarnes(p, bv)
     # ... and print it
-    print "Solar age: {0:4.2f} +/- {1:4.2f} Ga".format(*age)
-  
-  
+    print("Solar age: {0:4.2f} +/- {1:4.2f} Ga".format(*age))
+
   def sanity_chromoAgeRHK(self):
     """
       Checking sanity of chromospheric age (Donahue)
@@ -242,7 +241,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
     dat = [[-4.25, 7.], [-4.6, 9.1], [-5.0, 9.7]]
     for d in dat:
       a = np.log10(pyasl.chromoAgeRHK(d[0])*1e9)
-      print a, d[1]
+      print(a, d[1])
       self.assertAlmostEqual(a, d[1], delta=0.3,
                              msg="Cannot reproduce age estimate from Donahue fig 1.")
   
@@ -251,9 +250,9 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Example chromospheric age (Donahue)
     """
     from PyAstronomy import pyasl
-  
+    
     # Approximate chromospheric age of the Sun
-    print "Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95))
+    print("Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95)))
   
   def sanity_abundancepatternsExample(self):
     """
