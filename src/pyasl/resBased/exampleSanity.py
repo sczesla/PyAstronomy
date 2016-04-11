@@ -165,11 +165,12 @@ class SanityOfNasaExoplanetsOrg(unittest.TestCase):
     d = epl.selectByPlanetName("kepler-5 b")
     
     # Print whatever information has been received
-    print
-    print "Information on Kepler-5 b"
-    print
-    for k, v in d.items():
-      print "%12s  %12s" % (k,str(v))
+    print()
+    print("Information on Kepler-5 b")
+    print()
+    for k, v in list(d.items()):
+      print("%12s  %12s" % (k,str(v)))
+ 
       
 class SanityOfFIP(unittest.TestCase):
   
