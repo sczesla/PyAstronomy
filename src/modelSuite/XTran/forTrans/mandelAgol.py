@@ -5,7 +5,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.modelSuite.XTran import _ZList
 
 try:
-  import occultquad
+  from . import occultquad
   _importOccultquad = True
 except ImportError:
   _importOccultquad = False
