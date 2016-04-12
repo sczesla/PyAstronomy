@@ -1,4 +1,4 @@
-from voigtAstro import VoigtAstroP
+from .voigtAstro import VoigtAstroP
 from PyAstronomy import funcFit as fuf
 from PyAstronomy.pyasl import convertDampingConstant
 import numpy as np
