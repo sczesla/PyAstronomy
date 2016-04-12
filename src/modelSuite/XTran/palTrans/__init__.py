@@ -1,2 +1,2 @@
-from pal import *
-from seconPal import *
+from .pal import *
+from .seconPal import *

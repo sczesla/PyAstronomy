@@ -1,6 +1,8 @@
-import pal
+from __future__ import division
+from . import pal
 import PyAstronomy.funcFit as fuf
 from PyAstronomy.pyaC import pyaErrors as PE
+import six
 
 class SecPalLC(fuf.OneDFit):
   """
@@ -61,7 +63,7 @@ class SecPalLC(fuf.OneDFit):
          The analytical light curve.
     """
     # Assign all variables
-    for k in self.propMap.keys():
+    for k in six.iterkeys(self.propMap):
       if k == "brat" or k == "b":
         continue
       self.pal[k] = self[self.propMap[k]]
