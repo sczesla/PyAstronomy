@@ -11,7 +11,7 @@ except ImportError:
   _importOccultquad = False
 
 try:
-  import occultnl
+  from . import occultnl
   _importOccultnl = True
 except ImportError:
   _importOccultnl = False
