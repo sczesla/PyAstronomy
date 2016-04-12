@@ -1,9 +1,11 @@
+from __future__ import print_function, division
 from PyAstronomy import funcFit as fuf
 from PyAstronomy import pyasl
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
 import scipy.interpolate as sci
 from PyAstronomy.modelSuite import ic
+import six.moves as smo
 
 class LLGauss(fuf.OneDFit):
   """
@@ -91,7 +93,7 @@ class LLGauss(fuf.OneDFit):
     # A MultiGaussFit object
     self._mg = fuf.MultiGauss1d(self._nl)
     # Store all parameter names from GaussFit
-    pars = self._mg.parameters().keys()
+    pars = list(self._mg.parameters().keys())
     # Remove lin and off from multiGauss keys
     pars.remove("lin")
     pars.remove("off")
@@ -155,7 +157,7 @@ class LLGauss(fuf.OneDFit):
           A list of thawed parameter names.
     """
     freeAs = []
-    for i in xrange(self._nl):
+    for i in smo.range(self._nl):
       p = str(i+1)
       mu = self["mu"+p]
       if wlmin is not None:
@@ -192,7 +194,7 @@ class LLGauss(fuf.OneDFit):
           A list of thawed parameter names.
     """
     freeSigs = []
-    for i in xrange(self._nl):
+    for i in smo.range(self._nl):
       p = str(i+1)
       mu = self["mu"+p]
       if wlmin is not None:
@@ -238,7 +240,7 @@ class LLGauss(fuf.OneDFit):
           The model evaluated at the specified positions.
     """
     if self._verbose:
-      print "Evaluating with parameters: ", self.parameters()
+      print("Evaluating with parameters: ", self.parameters())
     # Calculate how much longer the model wavelength axis should
     # be to ensure that Doppler shift and rotational broadening
     # to not "violate" its edges. 
@@ -251,7 +253,7 @@ class LLGauss(fuf.OneDFit):
     
     mflux = np.ones(len(mwvl))
     # Set parameters of multiGauss
-    for i in xrange(self._nl):
+    for i in smo.range(self._nl):
       p = str(i+1)
       # Apply global scaling of amplitudes
       self._mg["A"+p] = -self["A"+p] * self["lineScale"]
