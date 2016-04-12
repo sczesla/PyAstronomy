@@ -15,7 +15,7 @@ class ModSuiteSanity(unittest.TestCase):
   def sanity_rmcl_model(self):
     # Import some unrelated modules
     from numpy import arange, pi
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # ... and the model suite
     from PyAstronomy import modelSuite as ms
     
@@ -30,15 +30,15 @@ class ModSuiteSanity(unittest.TestCase):
     rv = rmcl.evaluate(time)
     
     # Let's see what happened...
-    mpl.ylabel("Radial velocity [stellar-radii/s]")
-    mpl.xlabel("Time [d]")
-    mpl.plot(time, rv, '.')
-    # mpl.show()
+    plt.ylabel("Radial velocity [stellar-radii/s]")
+    plt.xlabel("Time [d]")
+    plt.plot(time, rv, '.')
+#     plt.show()
   
   def sanity_rmcl_fit(self):
     # Import some unrelated modules
     from numpy import arange, pi, random
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # ... and the model suite
     from PyAstronomy import modelSuite as ms
     
@@ -68,12 +68,12 @@ class ModSuiteSanity(unittest.TestCase):
     rmcl.parameterSummary()
     
     # Let's see what happened...
-    mpl.ylabel("Radial velocity [stellar-radii/s]")
-    mpl.xlabel("Time [d]")
-    mpl.plot(time, rv, '.')
-    mpl.plot(time, rmcl.model, 'r--')
-    mpl.legend(["Observation", "Model"])
-    # mpl.show()
+    plt.ylabel("Radial velocity [stellar-radii/s]")
+    plt.xlabel("Time [d]")
+    plt.plot(time, rv, '.')
+    plt.plot(time, rmcl.model, 'r--')
+    plt.legend(["Observation", "Model"])
+#     plt.show()
 
   def sanity_SinRadVel(self):
     # Import some unrelated modules
@@ -390,7 +390,8 @@ class ModSuiteSanity(unittest.TestCase):
 
       d = x.evaluate(vv)
       a = sci.trapz(d, vv)
-      self.assertAlmostEqual(x["A"], a, delta=1.0/200., msg="Incorrect profile normalization")
+      self.assertAlmostEqual(x["A"], a, delta=1.0/200., msg="Incorrect profile normalization (" + \
+                             "%g vs %g)" % (x["A"], a))
   
     x["eps"] = 0.0
     x["xmax"] = 50.0

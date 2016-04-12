@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 
 class PalTransExampleSanity(unittest.TestCase):
@@ -73,7 +74,7 @@ class PalTransExampleSanity(unittest.TestCase):
     plc["b"] = 0.0
     
     # Check the parameters
-    print "Input parameters: "
+    print("Input parameters: ")
     plc.parameterSummary()
     
     # Create a time axis
@@ -106,18 +107,18 @@ class PalTransExampleSanity(unittest.TestCase):
     
     # Before we start fitting, check how the elliptical integrals
     # are evaluated (mpmath or Boost)
-    print "Which elliptical integrals are used?: ", plc.whichEllInts()
+    print("Which elliptical integrals are used?: ", plc.whichEllInts())
     
     # Carry out the fit
     plc.fit(time, flux, yerr=np.ones(time.size)*0.002)
     
-    print "Fit parameters: "
+    print("Fit parameters: ")
     plc.parameterSummary()
     
     # Plot the result
     plt.plot(time, flux, 'bp')
     plt.plot(time, plc.model, 'r-')
-    #plt.show()
+#     plt.show()
   
   def sanity_RebinModel(self):
     """

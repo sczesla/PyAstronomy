@@ -1,5 +1,7 @@
+from __future__ import division
 import unittest
 import numpy as np
+import six.moves as smo
 
 
 class PalTransExampleSanity(unittest.TestCase):
@@ -23,7 +25,7 @@ class PalTransExampleSanity(unittest.TestCase):
 
     # A time axis
     x = np.linspace(-5., 5., 300)
-    for counter in xrange(5):
+    for counter in smo.range(5):
       # Get some random parameters
       # p, a, i, linLimb, quadLimb, T0, per, b
       linLimb = self._rr(0.,1.)
