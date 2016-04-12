@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import numpy
 from numpy import sqrt, sin, cos, pi, exp
 from numpy import arcsin as asin

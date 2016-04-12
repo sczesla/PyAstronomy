@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyasl
