@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 
 class PyPDMExSanity(unittest.TestCase):
@@ -15,13 +16,13 @@ class PyPDMExSanity(unittest.TestCase):
     # Get Scanner instance
     scanner = pyPDM.Scanner(minVal=0.5, maxVal=1.0, dVal=0.05, mode="period")
     # Print the periods covered by the scanner
-    print "Periods: ",
+    print("Periods: ", end=' ')
     for period in scanner:
-      print period,
+      print(period, end=' ')
   
   def sanity_PDMAna(self):
     import numpy
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     from PyAstronomy.pyTiming import pyPDM
     
     # Create artificial data with frequency = 3,
@@ -45,12 +46,12 @@ class PyPDMExSanity(unittest.TestCase):
     
     
     # Show the result
-    mpl.figure(facecolor='white')
-    mpl.title("Result of PDM analysis")
-    mpl.xlabel("Frequency")
-    mpl.ylabel("Theta")
-    mpl.plot(f1, t1, 'bp-')
-    mpl.plot(f2, t2, 'gp-')
-    mpl.legend(["pdmEquiBinCover", "pdmEquiBin"])
-    # mpl.show()
+#     plt.figure(facecolor='white')
+#     plt.title("Result of PDM analysis")
+#     plt.xlabel("Frequency")
+#     plt.ylabel("Theta")
+#     plt.plot(f1, t1, 'bp-')
+#     plt.plot(f2, t2, 'gp-')
+#     plt.legend(["pdmEquiBinCover", "pdmEquiBin"])
+#     plt.show()
 
