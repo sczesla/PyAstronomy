@@ -1,6 +1,8 @@
 Interactive data normalization and continuum finder
 ====================================================
 
+.. p23ready
+
 The `ContinuumInteractive` class provides a GUI, which helps to
 interactively normalize data, e.g., for continuum normalization.
 

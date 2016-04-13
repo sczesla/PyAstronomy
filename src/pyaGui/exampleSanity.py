@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 
 class ExampleSanity(unittest.TestCase):
@@ -8,6 +9,27 @@ class ExampleSanity(unittest.TestCase):
   def tearDown(self):
     pass
   
+  def sanity_pyaPickerExample(self):
+    from PyAstronomy import pyaGui
+    import numpy as np
+    
+    # Data for the plot
+    x = np.linspace(0., 10., 100.)
+    y = np.exp(-x/10.)
+    
+    # Create Picker instance
+    pp = pyaGui.Picker()
+    
+#     # Create the plot in which points
+#     # are to be selected
+#     pp.a.plot(x, y, 'b.-')
+#     
+#     points = pp.pick()
+#     
+#     print("Number of selected points: ", len(points))
+#     print("Selected points (x, y):")
+#     for p in points:
+#       print("%g, %g" % p) 
   
   def sanity_modelExplorer(self):
     """
@@ -206,10 +228,9 @@ class ExampleSanity(unittest.TestCase):
     
     # Create interactive fitter
     igv = pyaGui.IAGVFit(x, y, yerr=yerr, mode="gauss")
-#   
-#   r = igv.interactiveFit()
-#   
-#   print "Parameters of the fit: ", r[0]
-#   print "Parameters of active component: ", r[1]
-#   print "No. of components: ", r[2]
-
+    
+#     r = igv.interactiveFit()
+    
+#     print("Parameters of the fit: ", r[0])
+#     print("Parameters of active component: ", r[1])
+#     print("No. of components: ", r[2])

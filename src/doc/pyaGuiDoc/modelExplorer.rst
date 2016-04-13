@@ -1,6 +1,8 @@
 Interactive model explorer
 =================================
 
+.. p23ready
+
 The "FuncFit model explorer" is a GUI tool, which can be used
 to manipulate and plot `funcFit` models interactively.
 Individual model parameters can be selected and their values can
