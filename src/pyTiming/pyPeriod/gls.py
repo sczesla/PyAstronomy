@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import periodBase
+from __future__ import print_function, division
+from . import periodBase
 from numpy import sum, cos, sin, arange, min, max, pi, \
                   exp, log, zeros, argmax, sqrt, arctan2
 from PyAstronomy.pyaC import pyaErrors as PE 
@@ -118,27 +119,27 @@ class Gls(periodBase.PeriodBase):
     offset = self._off[bbin] + self._Y
     
     # Statistics
-    print "Generalized LS - statistical output"
-    print "-----------------------------------"
-    print "Number of input points:     %6d" % (nt)
-    print "Weighted mean of dataset:   % e" % (self._Y)
-    print "Weighted rms of dataset:    % e" % (sqrt(self._YY))
-    print "Time base:                  % e" % (max(self.th) - min(self.th))
-    print "Number of frequency points: %6d" % (len(self.freq))
-    print
-    print "Maximum power, p :    % e " % (self.power[bbin])
-    print "Maximum power (without normalization):   %e" % (pmax)
-    print "Normalization    : ", self.norm
-    print "RMS of residuals :    % e " % (rms)
+    print("Generalized LS - statistical output")
+    print("-----------------------------------")
+    print("Number of input points:     %6d" % (nt))
+    print("Weighted mean of dataset:   % e" % (self._Y))
+    print("Weighted rms of dataset:    % e" % (sqrt(self._YY)))
+    print("Time base:                  % e" % (max(self.th) - min(self.th)))
+    print("Number of frequency points: %6d" % (len(self.freq)))
+    print()
+    print("Maximum power, p :    % e " % (self.power[bbin]))
+    print("Maximum power (without normalization):   %e" % (pmax))
+    print("Normalization    : ", self.norm)
+    print("RMS of residuals :    % e " % (rms))
     if self.error is not None:
-      print "  Mean weighted internal error:  % e" %(sqrt(nt/sum(1./self.error**2)))
-    print "Best sine frequency : % e +/- % e" % (fbest, f_err)
-    print "Best sine period    : % e +/- % e" % (1./fbest, Psin_err)
-    print "Amplitude:          : % e +/- % e" % (amp, sqrt(2./nt)*rms)
-    print "Phase (ph) : % e +/- % e" % (ph, sqrt(2./nt)*rms/amp/(2.*pi))
-    print "Phase (T0) : % e +/- % e" % (T0, sqrt(2./nt)*rms/amp/(2.*pi)/fbest)
-    print "Offset     : % e +/- % e" % (offset, sqrt(1./nt)*rms)
-    print "-----------------------------------"
+      print("  Mean weighted internal error:  % e" %(sqrt(nt/sum(1./self.error**2))))
+    print("Best sine frequency : % e +/- % e" % (fbest, f_err))
+    print("Best sine period    : % e +/- % e" % (1./fbest, Psin_err))
+    print("Amplitude:          : % e +/- % e" % (amp, sqrt(2./nt)*rms))
+    print("Phase (ph) : % e +/- % e" % (ph, sqrt(2./nt)*rms/amp/(2.*pi)))
+    print("Phase (T0) : % e +/- % e" % (T0, sqrt(2./nt)*rms/amp/(2.*pi)/fbest))
+    print("Offset     : % e +/- % e" % (offset, sqrt(1./nt)*rms))
+    print("-----------------------------------")
 
   def __calcPeriodogram(self):
 
@@ -192,7 +193,7 @@ class Gls(periodBase.PeriodBase):
 
     # Normalization:
     if self.norm == "Scargle":
-      popvar=raw_input('pyTiming::gls - Input a priori known population variance:')
+      popvar=input('pyTiming::gls - Input a priori known population variance:')
       self.power = self._upow/float(popvar)
     if self.norm == "HorneBaliunas":
       self.power = (self.N-1.)/2.*self._upow
