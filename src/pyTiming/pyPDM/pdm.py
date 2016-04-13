@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 import numpy
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class Scanner:
   
@@ -70,7 +72,7 @@ class PyPDM:
     blockBegin = (numpy.arange(nbins) / float(nbins)).tolist()
     blockEnd   = ((numpy.arange(nbins) + 1.0) / float(nbins)).tolist()
     Ns = []
-    for i in xrange(nbins):
+    for i in smo.range(nbins):
       indi = numpy.where(numpy.logical_and(phases >= blockBegin[i], phases < blockEnd[i]))[0]
       Ns.append(len(indi))
     
@@ -128,7 +130,7 @@ class PyPDM:
     blockEndOrig = blockEnd.copy()
     
     offset = 0
-    for i in xrange(1,covers):
+    for i in smo.range(1,covers):
       offset = float(i)/float(nbins * covers)
       blockBegin = numpy.append(blockBegin, blockBeginOrig + offset)
       blockEnd   = numpy.append(blockEnd, blockEndOrig + offset)
@@ -167,7 +169,7 @@ class PyPDM:
     sigmaSqr = ((mag - meanMag)**2).sum() / float(N - 1)
 
     sSqrUp = 0.0; sSqrDown = 0.0
-    for i in xrange(len(bbegin)):
+    for i in smo.range(len(bbegin)):
       # Points belonging to a chunk
       indi = numpy.where(numpy.logical_and(phase >= bbegin[i], phase < bend[i]))[0]
       nj = float(len(indi))
