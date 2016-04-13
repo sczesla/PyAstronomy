@@ -11,9 +11,10 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyasl
 from bisect import bisect
 
-import Tkinter as tk
+import six.moves.tkinter as tk
+import six
 
-from pyaPicker import Point
+from .pyaPicker import Point
 
 
 class ContinuumInteractive:
@@ -75,7 +76,7 @@ class ContinuumInteractive:
               "usegzip":True,
               "windowTitle":"PyA Continuum Interactive"}
     if config is not None:
-      for k in dconfig.keys():
+      for k in six.iterkeys(dconfig):
         if k in config:
           dconfig[k] = config[k]
 
@@ -218,7 +219,7 @@ class ContinuumInteractive:
     pfe = self._pickleFileExtension()
     if fn is None:
       # Request a filename
-      import tkFileDialog
+      import six.moves.tkinter_tkfiledialog as tkFileDialog
       fn = tkFileDialog.asksaveasfilename(defaultextension=pfe, title="Save as pickle file", \
                                           filetypes=[("pickle files", "*"+pfe)])
     pickle.dump(self._getState(), self._fileOpenMethod()(fn, 'w'))
@@ -239,7 +240,7 @@ class ContinuumInteractive:
       Load state from a pickle file.
     """
     import pickle
-    import tkFileDialog
+    import six.moves.tkinter_tkfiledialog as tkFileDialog
     pfe = self._pickleFileExtension()
     fn = tkFileDialog.askopenfilename(defaultextension=pfe, title="Load from pickle file", \
                                       filetypes=[("pickle files", "*"+pfe)])
@@ -528,7 +529,7 @@ class ContinuumInteractive:
       Remove all previously selected points.
     """
     np = self.lb.size()
-    for _ in xrange(np):
+    for _ in six.moves.range(np):
       self.lb.select_clear(0, self.lb.size())
       self.lb.select_set(0)
       self._removeButtonClicked()

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import matplotlib
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy
-import Tkinter as tk
-import tkMessageBox
+import six.moves.tkinter as tk
+import six.moves.tkinter_messagebox as tkMessageBox
 import platform
 
 class FFModelPlotFit:
@@ -138,11 +139,11 @@ class FFModelPlotFit:
             self.fitLims = lims
             self.fitIdx = numpy.where(numpy.logical_and(self.x >= self.fitLims[0], self.x <= self.fitLims[1]))[0]
             if verbose > 1:
-              print "fit index: ",self.fitIdx
-              print "         x ",self.x[self.fitIdx]
-              print "         y ", self.y[self.fitIdx]
-              if self.yerr: print "    yerr ",self.yerr[self.fitIdx]
-              print "     model ",odf.evaluate(self.x[self.fitIdx])
+              print("fit index: ",self.fitIdx)
+              print("         x ",self.x[self.fitIdx])
+              print("         y ", self.y[self.fitIdx])
+              if self.yerr: print("    yerr ",self.yerr[self.fitIdx])
+              print("     model ",odf.evaluate(self.x[self.fitIdx]))
             if self.yerr is not None:
               odf.fit(self.x[self.fitIdx], self.y[self.fitIdx], yerr=self.yerr[self.fitIdx])
             else:
@@ -232,9 +233,10 @@ class ShowParameterSummary(tk.Toplevel):
       # Ignore the absence of text 
       pass
     lines = odf.parameterSummary(toScreen=False)
-    self.showText.config(width=max(map(lambda x: len(x), lines)), \
-                         height=len(lines)+1)
-    t = "".join(map(lambda x: x + "\n", lines))
+    self.showText.config(width=max([len(x) for x in lines]), \
+                          height=len(lines)+1)
+
+    t = "".join([x + "\n" for x in lines])
     self.showText.insert(tk.END, t)
     self.showText.config(state=tk.DISABLED)
 
@@ -299,9 +301,9 @@ class ValueSetSummary(tk.Toplevel):
     for p in odf.availableParameters():
         lines.append(self.modelName.get()+"[\""+p+"\"] = "+str(odf[p]))
     
-    self.showText.config(width=max(map(lambda x: len(x), lines)), \
-                         height=len(lines)+1)
-    t = "".join(map(lambda x: x + "\n", lines))
+    self.showText.config(width=max([len(x) for x in lines]), \
+                          height=len(lines)+1)
+    t = "".join([x + "\n" for x in lines])
     self.showText.insert(tk.END, t)
     self.showText.config(state=tk.DISABLED)
 
@@ -367,7 +369,7 @@ class FFModelExplorerList:
     self.selectedPar = tk.StringVar(self.controlFrame)
 
     # Get parameters of model
-    ps = self.odf.parameters().keys()
+    ps = list(self.odf.parameters().keys())
     # Set default modification properties
     # Saves these properties for all parameters
     self.modProps = {}
@@ -573,7 +575,7 @@ class FFModelExplorerList:
 
    
   def _parameterActivated(self, *args):
-      print args
+      print(args)
 
   def _mouseButtonClicked(self, event):
     #print "mouse Button Clicked: ",event
