@@ -130,7 +130,8 @@ package_data = {"PyAstronomy":["setup.cfg"],
                 "PyAstronomy.pyasl.resBased":["*.dat"], \
                 "PyAstronomy.pyasl.asl.aslExt_1":["*.dat"], \
                 "PyAstronomy.constants":["*.dat"], \
-                "PyAstronomy.pyaC":["*.dat"]
+                "PyAstronomy.pyaC":["*.dat"], \
+                "PyAstronomy.pyaC.mtools":["*.dat"]
                 }
 
 extOccultnl = Extension('PyAstronomy.modelSuite.XTran.forTrans.occultnl',
