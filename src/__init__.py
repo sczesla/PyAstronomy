@@ -56,8 +56,7 @@ except ImportError:
   
   Please install 'six' to use PyAstronomy. The package
   helps a great deal in providing Python 2/3 (2*3=six) compatible
-  code. It is employed to allow PyA to get ready for Python 3
-  on the long run.  
+  code.
   
   """))
 
