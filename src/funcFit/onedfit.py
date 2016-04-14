@@ -15,7 +15,7 @@ import six
 import six.moves as smo
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
-from astropy.extern.bundled.six import iterkeys
+
 if _pymcImport:
   import pymc
 if _scoImport:
