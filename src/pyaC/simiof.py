@@ -39,11 +39,11 @@ class SimIOF:
   def __init__(self, origin, *args, **kwargs):
     self.origin = origin
     self.file = open(*args, **kwargs)
-    if self.file.mode == 'w':
+    if self.file.mode in ['w', 'wt']:
       self.write("# File created by " + str(origin) + "\n")
       self.write("# Date: " + str(datetime.datetime.now()).split('.')[0] + "\n")
       self.write("#\n")
-    elif self.file.mode == 'r':
+    elif self.file.mode in ['r', 'rt']:
       self._readProps()
 
   def __del__(self):
