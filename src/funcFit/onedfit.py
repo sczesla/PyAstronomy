@@ -1102,6 +1102,14 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       chi = np.sum((self._fufDS.y - self.model)**2)
       return chi
     return miniSqrDiff   
+
+  def __sqrDiffRobust(self):
+    @MiniFunc(self)
+    def miniSqrDiff(odf, P):
+      # Calculate squared difference
+      chi = np.nansum((self._fufDS.y - self.model)**2)
+      return chi
+    return miniSqrDiff 
   
   def __chiSqr(self):
     @MiniFunc(self)
@@ -1110,12 +1118,28 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       chi = np.sum(((self._fufDS.y - self.model)/self._fufDS.yerr)**2)
       return chi
     return miniChiSqr
+  
+  def __chiSqrRobust(self):
+    @MiniFunc(self)
+    def miniChiSqr(odf, P):
+      # Calculate chi^2 and apply penalty if boundaries are violated.
+      chi = np.nansum(((self._fufDS.y - self.model)/self._fufDS.yerr)**2)
+      return chi
+    return miniChiSqr
 
   def __cash79(self):
     @MiniFunc(self)
     def miniCash79(odf, P):
       # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
       c = -2.0 * np.sum(self._fufDS.y * np.log(self.model) - self.model)
+      return c
+    return miniCash79
+
+  def __cash79Robust(self):
+    @MiniFunc(self)
+    def miniCash79(odf, P):
+      # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
+      c = -2.0 * np.nansum(self._fufDS.y * np.log(self.model) - self.model)
       return c
     return miniCash79
 
@@ -1331,12 +1355,21 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if miniFunc == "chisqr":
       self.miniFunc = self.__chiSqr()
       return
+    if miniFunc == "chisqrRobust":
+      self.miniFunc = self.__chiSqrRobust()
+      return  
     elif miniFunc == "cash79":
       self.miniFunc = self.__cash79()
+      return
+    elif miniFunc == "cash79Robust":
+      self.miniFunc = self.__cash79Robust()
       return
     elif miniFunc == "sqrdiff":
       self.miniFunc = self.__sqrDiff()
       return
+    elif miniFunc == "sqrdiffRobust":
+      self.miniFunc = self.__sqrDiffRobust()
+      return  
     else:
       if not hasattr(miniFunc, '__call__'):
         raise(PE.PyAValError("`miniFunc` is neither None, a valid string, or a function.",
