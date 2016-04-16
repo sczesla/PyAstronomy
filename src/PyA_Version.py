@@ -1,3 +1,3 @@
 
 def PyA_Version():
-  return "0.10.0"
+  return "0.11.0beta"
