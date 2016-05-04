@@ -20,13 +20,13 @@ class FufDS:
   
   def __init__(self, x, y, yerr=None):
     if not isinstance(y, np.ndarray):
-      raise(PE.PyAValError("`y` must be a numpy.ndarray. Current type is '" + str(type(y) + "'.", \
-            solution="Make `y` a numpy array.")))
+      raise(PE.PyAValError("`y` must be a numpy.ndarray. Current type is '" + str(type(y)) + "'.", \
+            solution="Make `y` a numpy array."))
     self.y = y.copy()
     if yerr is not None:
       if not isinstance(yerr, np.ndarray):
-        raise(PE.PyAValError("`yerr` must be a numpy.ndarray. Current type is '" + str(type(y) + "'.", \
-              solution="Make `yerr` a numpy array.")))
+        raise(PE.PyAValError("`yerr` must be a numpy.ndarray. Current type is '" + str(type(y)) + "'.", \
+              solution="Make `yerr` a numpy array."))
         if y.shape != yerr.shape:
           raise(PE.PyAValError("`y` and `yerr` must have the same shape.", \
                 solution="Check and adapt shapes of arrays."))
