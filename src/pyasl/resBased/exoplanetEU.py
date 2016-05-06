@@ -328,12 +328,13 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
   
   def forceUpdate(self):
     """
-      Force a fresh download of the data.
+      Force a fresh download of the data and read the data.
       
       By default, the data will be updated every
       7 days. 
     """
     self._update(self._download)
+    self._readData()
   
   def showAvailableData(self):
     """
@@ -543,7 +544,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
   def _download(self):
     """
       Download data.
-    """    
+    """   
     self._fs.downloadToFile("http://exoplanet.eu/catalog/votable", self.dataFileName, clobber=True,
                             verbose=False, openMethod=gzip.open)
   
