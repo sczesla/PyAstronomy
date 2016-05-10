@@ -233,8 +233,11 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     ==========================  =======  =======  ============================================================================================  
                           name   object           Name of a planet                                                                              
                           mass  float64  jovMass  Planetary Mass                                                                                
-                mass_error_min  float64  jovMass  Planetary Mass error                                                                          
-                mass_error_max  float64  jovMass  Planetary Mass error                                                                          
+                  mass_err_min  float64  jovMass  Planetary Mass error                                                                          
+                  mass_err_max  float64  jovMass  Planetary Mass error                                                                          
+                     mass_sini  float64  jovMass  Planetary Mass*sin(i)                                                                         
+           mass_sini_error_min  float64  jovMass  Planetary Mass*sin(i) error                                                                   
+           mass_sini_error_max  float64  jovMass  Planetary Mass*sin(i) error                                                                   
                         radius  float64     Rjup  Planetary Radius                                                                              
               radius_error_min  float64     Rjup  Planetary Radius error                                                                        
               radius_error_max  float64     Rjup  Planetary Radius error                                                                        
@@ -302,16 +305,37 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
                          mag_h  float64      mag  H magnitude of a host star                                                                    
                          mag_k  float64      mag  K magnitude of a host star                                                                    
                  star_distance  float64       pc  Distance to a host star                                                                       
+       star_distance_error_min  float64       pc  Distance to a host star error                                                                 
+       star_distance_error_max  float64       pc  Distance to a host star error                                                                 
               star_metallicity  float64           Metallicity of a host star                                                                    
+    star_metallicity_error_min  float64           Metallicity of a host star error                                                              
+    star_metallicity_error_max  float64           Metallicity of a host star error                                                              
                      star_mass  float64     Msun  Mass of a host star                                                                           
+           star_mass_error_min  float64     Msun  Mass of a host star error                                                                     
+           star_mass_error_max  float64     Msun  Mass of a host star error                                                                     
                    star_radius  float64     Rsun  Radius of a host star                                                                         
+         star_radius_error_min  float64     Rsun  Radius of a host star error                                                                   
+         star_radius_error_max  float64     Rsun  Radius of a host star error                                                                   
                   star_sp_type   object           Spectral type of a host star                                                                  
                       star_age  float64      Gyr  Age of a host star                                                                            
+            star_age_error_min  float64      Gyr  Age of a host star error                                                                      
+            star_age_error_max  float64      Gyr  Age of a host star error                                                                      
                      star_teff  float64        K  Effective temperature of a host star                                                          
+           star_teff_error_min  float64        K  Effective temperature of a host star error                                                    
+           star_teff_error_max  float64        K  Effective temperature of a host star error                                                    
             star_detected_disc   object           Star Detected Disc                                                                            
            star_magnetic_field     bool           Star magnetic field                                                                           
-    ==========================  =======  =======  ============================================================================================ 
+          star_alternate_names   object           List of star alternative names                                                                
+    ==========================  =======  =======  ============================================================================================  
     
+    
+    Parameters
+    ----------
+    skipUpdate : Boolean, optional
+        If True, update of data will be skipped (default is False).
+    forceUpdate : Boolean, optional
+        If True, udpate of data will be forced (independent of value
+        if `skipUpdate`, default is False)
   """
   
   
