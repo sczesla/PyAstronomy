@@ -524,7 +524,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
                                  solution="Install 'pandas' package."))
     return self.vot.to_pandas()
   
-  def __init__(self, skipUpdate=False):
+  def __init__(self, skipUpdate=False, forceUpdate=False):
     
     if not _ic.check["astropy"]:
       raise(PE.PyARequiredImport("The 'astropy' package is not installed. astropy is required to read VO tables.", \
@@ -535,7 +535,9 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     pp.PyAUpdateCycle.__init__(self, configFilename, "ExoUpdate")
     self.dataFileName = os.path.join("pyasl", "resBased", "epeu.vo.gz")
     self._fs = pp.PyAFS()
-    if (self.needsUpdate() or (not self._fs.fileExists(self.dataFileName))) and (not skipUpdate):
+    if forceUpdate:
+      self._update(self._download)
+    elif (self.needsUpdate() or (not self._fs.fileExists(self.dataFileName))) and (not skipUpdate):
       # Download data if data file does not exist or
       # regular update is indicated
       self._update(self._download)
