@@ -466,13 +466,19 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
       if (k.find("_error") != -1) or (k.find("_err_") != -1):
         # Ignore keys containing the '_error' phrase
         continue
-      ep = "_error_"
-      if k.find("orbital_period") != -1:
-        ep = "_err_"
       if k in kwoe:
         lines.append( ("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]))
       else:
-        lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+        try:
+          # Try _error_ to locate errors
+          ep = "_error_"
+          lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+        except KeyError:
+          # Try _err_ to locate errors
+          ep = "_err_"
+          lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+        except:
+          raise
     
     # Maximum length of output line
     mll = max(list(smo.map(lambda x:len(x), lines)))
