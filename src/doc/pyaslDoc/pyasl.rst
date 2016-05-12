@@ -35,6 +35,7 @@ Uncategorized algorithms
    aslDoc/aslExt_1Doc/pizzolato2003Doc.rst
    aslDoc/aslExt_1Doc/ramirez2005.rst
    aslDoc/aslExt_1Doc/stellarAge.rst
+   aslDoc/aslExt_1Doc/spectralClass.rst
 
 General data analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
