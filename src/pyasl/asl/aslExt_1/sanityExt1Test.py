@@ -389,3 +389,28 @@ class SanityOfPyaslExt1(unittest.TestCase):
     self.assertTrue(llum1 > llum2 > llum3, msg="Float subtype, wrong order of luminosities")
     self.assertTrue(lteff1 >  lteff2 > lteff3, msg="Float subtype, wrong order of luminosities")
     
+  def sanity_MMSCETSTableExample(self):
+    """
+      Sanity of example for MMSCETS table
+    """
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    
+    # Instantiate class
+    m = pyasl.MMSCETSTable()
+    
+    # Print the entire data file
+    for l in m.getContent():
+      print(l, end='')
+    
+    print()
+    print("Available columns: ", ", ".join(m.availableColumns()))
+    
+    # Get the tabulated data as an ASCII table
+    td = m.getTable()
+    
+    # Plot absolute visual brightness vs. effective temperature
+    plt.plot(td["Teff"], td["Mv"], 'b.-')
+    plt.xlabel("Teff [K]")
+    plt.ylabel("Mv [mag]")
+#     plt.show()

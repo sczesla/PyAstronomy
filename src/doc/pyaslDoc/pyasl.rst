@@ -127,6 +127,7 @@ Resource based helpers
    resBasedDoc/sweet_cat.rst
    resBasedDoc/kuruczModels.rst
    resBasedDoc/fip.rst
+   aslDoc/aslExt_1Doc/mmscetsTable.rst
    
 
    
