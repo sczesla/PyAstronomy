@@ -17,7 +17,7 @@ from . import localtime
 import six
 import six.moves as smo
 
-def isInTransit(time, T0, period, halfDuration, boolOutput=False):
+def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
   """
     Check whether time is inclosed by transit interval.
     
@@ -41,6 +41,10 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False):
         If set True and `time` is an array, the function will
         return a bool array holding True for time points in-
         and False for time points out-of-transit.
+    secin : boolean, optional
+        If True, also points associated with the secondary
+        transit (around phase 0.5) will be counted as falling
+        into the transit window. Default is False.
     
     Returns
     -------
@@ -65,6 +69,8 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False):
   absPhase -= np.floor(absPhase)
   dPhase = halfDuration/period
   isIn = np.logical_or(absPhase <= dPhase, absPhase >= (1.-dPhase))
+  if secin:
+    isIn = isIn | (np.abs(absPhase - 0.5) < dPhase)
   indi = np.where(isIn)[0]
   if isinstance(time, float):
     return (len(indi) == 1)
