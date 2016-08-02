@@ -26,6 +26,7 @@ from .modelRebin import turnIntoRebin, _ModelRebinDocu
 from .onedfit import *
 from .gauss1d import *
 from .gauss2d import *
+from .respModel import *
 from .params import *
 from .sinexp1d import *
 from .polyModel import *
