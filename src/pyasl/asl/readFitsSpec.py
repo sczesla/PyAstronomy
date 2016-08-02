@@ -3,7 +3,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import _ic
 import os
 
-def read1dFitsSpec(fn, hdu=0, fullout=False, CRPIX1=None):
+def read1dFitsSpec(fn, hdu=0, fullout=False, CRPIX1=None, keymap={}):
   """
     Read a simple 1d spectrum from fits file.
     
@@ -26,6 +26,8 @@ def read1dFitsSpec(fn, hdu=0, fullout=False, CRPIX1=None):
         is False.
     CRPIX1 : int, optional
         Can be used to circumvent missing CRPIX1 entry.
+    keymap : dict, optional
+        Can be used to map header keywords
     
     Returns
     -------
@@ -61,27 +63,37 @@ def read1dFitsSpec(fn, hdu=0, fullout=False, CRPIX1=None):
   hl = pyfits.open(fn)
   
   naxis = hl[hdu].header["NAXIS"]
-  if hl[hdu].header["NAXIS"] != 1:
-    raise(PE.PyAValError("There is more than one axis (NAXIS = " + str(naxis) + ").", \
+  if hl[hdu].header["NAXIS"]  !=1:
+    if hl[hdu].header["NAXIS"] == 2 and hl[hdu].header["NAXIS2"] == 1:
+      pass
+    else:
+      raise(PE.PyAValError("There is more than one axis (NAXIS = " + str(naxis) + ", actual value is " + str(hl[hdu].header["NAXIS"]) +").", \
                          where="read1dFitsSpec", \
                          solution="Check file and HDU."))
 
   hkeys = {"CRVAL1":None, "CRPIX1":CRPIX1, "CDELT1":None}
   for k in hkeys.keys():
+    if k not in keymap:
+      keymap[k] = k
+      
+  for k in hkeys.keys():
     if hkeys[k] is not None:
       continue
-    if not k in hl[hdu].header:
-      raise(PE.PyAValError("Header does not contain required keyword '" + str(k) + "'", \
+    if not keymap[k] in hl[hdu].header:
+      raise(PE.PyAValError("Header does not contain required keyword '" + str(keymap[k]) + "'", \
                          where="read1dFitsSpec", \
                          solution="Check file and HDU."))
-    hkeys[k] = hl[hdu].header[k]
+    hkeys[k] = hl[hdu].header[keymap[k]]
   
   N = int(hl[hdu].header["NAXIS1"])
   
   # Construct wvl axis
   wvl = ((np.arange(N) + 1.0) - hkeys["CRPIX1"]) * hkeys["CDELT1"] + hkeys["CRVAL1"]
   # Get flux
-  flx = np.array(hl[hdu].data)
+  if naxis == 1:
+    flx = np.array(hl[hdu].data)
+  elif naxis == 2:
+    flx = np.array(hl[hdu].data[0])
   
   if fullout:
     # Full output
