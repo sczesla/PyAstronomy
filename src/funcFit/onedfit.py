@@ -943,8 +943,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       Returns True if model is composed and False otherwise.
     """
     return ((self.leftCompo is not None) and (self.rightCompo is not None))
-  
-  def __combineRemapping(self, left, right):
+
+  @staticmethod
+  def combineRemapping(left, right):
     """
       This member is essentially a renaming machine. When combining models
       it can easily happen that two variables share the same name. If the
@@ -1050,7 +1051,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     right = copy.deepcopy(right)
     # Find new parameter names to avoid parameter clashes
     # (parameter names must be unique)
-    self.__combineRemapping(left, right)
+    self.combineRemapping(left, right)
     # Combine the Param instances
     npars = left.pars + right.pars
     # Obtain a new Fitting object
@@ -2296,5 +2297,3 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 #    self.pars.setFreeParams(self.fitResult[0])
 #    # Calculate the best-fit model
 #    self.updateModel()
-
-
