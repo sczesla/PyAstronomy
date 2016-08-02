@@ -4,6 +4,7 @@
 # The content of this file is based on scipy.optimize's anneal.py file,
 # which is distributed under the BSD license. 
 
+from __future__ import print_function, division
 import numpy
 from numpy import asarray, tan, exp, ones, squeeze, sign, \
      all, log, sqrt, pi, shape, array, minimum, where
@@ -239,7 +240,7 @@ class BoltzmannSAS(PyASASBase):
     """
     x0 = self._fo.freeParameters()
     y0 = x0.copy()
-    for p in x0.iterkeys():
+    for p in x0.keys():
       y0[p] += (np.random.normal(0., 1.) * self.pdscale[p] * np.sqrt(self.T/self.T0))
     self.guessCounter += 1
     return y0
@@ -327,7 +328,7 @@ class PyAAnneal:
     """
     
     self.scheduler = scheduler
-    print "miniFunc: ", miniFunc
+    print("miniFunc: ", miniFunc)
     self.states["last"]["pars"] = self._fo.freeParameters()
     self.states["last"]["cost"] = miniFunc(self._fo.pars.getFreeParams())
     # At this moment, the best state IS the last state
@@ -382,15 +383,15 @@ class PyAAnneal:
 
       if self.verbose:
         if (iterations % self.statsPeriod == 0) and (iterations != 0):
-          print "After " + str(iterations) + " iterations:"
-          print "  Best solution: "
-          print "    Parameters: ", self.states["best"]["pars"]
-          print "    Objective function value: ", self.states["best"]["cost"]
-          print "  Current temperature: ", self.scheduler.T
-          print "  Average objective function in last period: ", np.mean(costDeque)
-          print "  Acceptance rate in last period: ", \
+          print("After " + str(iterations) + " iterations:")
+          print("  Best solution: ")
+          print("    Parameters: ", self.states["best"]["pars"])
+          print("    Objective function value: ", self.states["best"]["cost"])
+          print("  Current temperature: ", self.scheduler.T)
+          print("  Average objective function in last period: ", np.mean(costDeque))
+          print("  Acceptance rate in last period: ", \
                 float(self.scheduler.accepted-lastAccept) / \
-                (self.scheduler.accepted + self.scheduler.rejected - lastAccept - lastReject)
+                (self.scheduler.accepted + self.scheduler.rejected - lastAccept - lastReject))
           lastAccept = self.scheduler.accepted
           lastReject = self.scheduler.rejected
               
@@ -517,9 +518,9 @@ def anneal(func, x0, args=(), schedule='fast', full_output=0,
             retval = 0
             if abs(af[-1]-best_state.cost) > feps*10:
                 retval = 5
-                print "Warning: Cooled to %f at %s but this is not" \
+                print("Warning: Cooled to %f at %s but this is not" \
                       % (squeeze(last_state.cost), str(squeeze(last_state.x))) \
-                      + " the smallest point found."
+                      + " the smallest point found.")
             break
         if (Tf is not None) and (schedule.T < Tf):
             retval = 1
@@ -528,7 +529,7 @@ def anneal(func, x0, args=(), schedule='fast', full_output=0,
             retval = 2
             break
         if (iters > maxiter):
-            print "Warning: Maximum number of iterations exceeded."
+            print("Warning: Maximum number of iterations exceeded.")
             retval = 3
             break
         if (maxaccept is not None) and (schedule.accepted > maxaccept):
@@ -547,12 +548,12 @@ if __name__ == "__main__":
     from numpy import cos
     # minimum expected at ~-0.195
     func = lambda x: cos(14.5*x-0.3) + (x+0.2)*x
-    print anneal(func,1.0,full_output=1,upper=3.0,lower=-3.0,feps=1e-4,maxiter=2000,schedule='cauchy')
-    print anneal(func,1.0,full_output=1,upper=3.0,lower=-3.0,feps=1e-4,maxiter=2000,schedule='fast')
-    print anneal(func,1.0,full_output=1,upper=3.0,lower=-3.0,feps=1e-4,maxiter=2000,schedule='boltzmann')
+    print(anneal(func,1.0,full_output=1,upper=3.0,lower=-3.0,feps=1e-4,maxiter=2000,schedule='cauchy'))
+    print(anneal(func,1.0,full_output=1,upper=3.0,lower=-3.0,feps=1e-4,maxiter=2000,schedule='fast'))
+    print(anneal(func,1.0,full_output=1,upper=3.0,lower=-3.0,feps=1e-4,maxiter=2000,schedule='boltzmann'))
 
     # minimum expected at ~[-0.195, -0.1]
     func = lambda x: cos(14.5*x[0]-0.3) + (x[1]+0.2)*x[1] + (x[0]+0.2)*x[0]
-    print anneal(func,[1.0, 1.0],full_output=1,upper=[3.0, 3.0],lower=[-3.0, -3.0],feps=1e-4,maxiter=2000,schedule='cauchy')
-    print anneal(func,[1.0, 1.0],full_output=1,upper=[3.0, 3.0],lower=[-3.0, -3.0],feps=1e-4,maxiter=2000,schedule='fast')
-    print anneal(func,[1.0, 1.0],full_output=1,upper=[3.0, 3.0],lower=[-3.0, -3.0],feps=1e-4,maxiter=2000,schedule='boltzmann')
+    print(anneal(func,[1.0, 1.0],full_output=1,upper=[3.0, 3.0],lower=[-3.0, -3.0],feps=1e-4,maxiter=2000,schedule='cauchy'))
+    print(anneal(func,[1.0, 1.0],full_output=1,upper=[3.0, 3.0],lower=[-3.0, -3.0],feps=1e-4,maxiter=2000,schedule='fast'))
+    print(anneal(func,[1.0, 1.0],full_output=1,upper=[3.0, 3.0],lower=[-3.0, -3.0],feps=1e-4,maxiter=2000,schedule='boltzmann'))

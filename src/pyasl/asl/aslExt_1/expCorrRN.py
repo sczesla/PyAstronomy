@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 def expCorrRN(n, tau, mean=0.0, std=1.0, rnos=None, fullOut=False):
   """
@@ -65,7 +67,7 @@ def expCorrRN(n, tau, mean=0.0, std=1.0, rnos=None, fullOut=False):
   
   # Obtain correlated numbers
   somf = np.sqrt(1.0 - f**2)
-  for i in xrange(1,n):
+  for i in smo.range(1,n):
     result[i] = f*result[i-1] + somf*g[i]
   result = mean + std*result
   

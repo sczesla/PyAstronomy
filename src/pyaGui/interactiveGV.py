@@ -7,7 +7,9 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import funcFit as fuf
 import numpy as np
 
-import Tkinter as tk
+import six.moves.tkinter as tk
+import six.moves as smo
+import six
 
 
 class Point():
@@ -119,7 +121,7 @@ class IAGVFit:
     
     # Modify configuration according to input
     if config is not None:
-      for k in self._config.keys():
+      for k in six.iterkeys(self._config):
         if k in config:
           # Value has been modified
           self._config[k] = config[k]
@@ -293,7 +295,7 @@ class IAGVFit:
       return
     if self._commonSig.get() == 1:
       # Relate the widths
-      for i in xrange(1, self._compoCount+1):
+      for i in smo.range(1, self._compoCount+1):
         if i == 1:
           continue
         self._model.thaw("sig"+str(i))
@@ -301,11 +303,10 @@ class IAGVFit:
     else:
       # Untie the widths
       after = "sig1" in self._model.freeParamNames()
-      for i in xrange(1, self._compoCount+1):
+      for i in smo.range(1, self._compoCount+1):
         if i == 1:
           continue
         self._model.untie("sig"+str(i), forceFree=after)
-      print self._model.freeParamNames()
 
   def _mouseWheel(self, event):
     """
@@ -390,7 +391,7 @@ class IAGVFit:
       Transfer GUI information to model
     """
     pars = ["off"]
-    pars.extend(map(lambda x:x+str(self._activeComponent), self._compPars))
+    pars.extend([x+str(self._activeComponent) for x in self._compPars])
     
     if (self._mode == "gauss") and (self._commonSig.get() == 1):
       # If Gaussian widths are coupled, sig1 is the only relevant
@@ -449,11 +450,11 @@ class IAGVFit:
       # Save parameters
       spars = self._model.parameters()
       # Set all areas to 0
-      for i in xrange(self._compoCount):
+      for i in smo.range(self._compoCount):
         n = str(i+1)
         self._model["A"+n] = 0.0
       # Add individual lines
-      for i in xrange(self._compoCount):
+      for i in smo.range(self._compoCount):
         n = str(i+1)
         self._model["A"+n] = spars["A"+n]
         imod = self._model.evaluate(self._x)
@@ -545,14 +546,14 @@ class IAGVFit:
       self._model["ad"+n] = fg/(2.*(2.*np.log(2.0)))
       self._model["mu"+n] = self._pointCache[1][0].xdata
       # Thaw default parameters
-      self._model.thaw(map(lambda x:x+n, self._config["defaultFreeVoigt"]))
+      self._model.thaw([x+n for x in self._config["defaultFreeVoigt"]])
     elif self._mode == "gauss":
       n = str(self._compoCount)
       self._model["A"+n] = -agauss
       self._model["sig"+n] = sigma
       self._model["mu"+n] = self._pointCache[1][0].xdata
       # Thaw default parameters
-      self._model.thaw(map(lambda x:x+n, self._config["defaultFreeGauss"]))
+      self._model.thaw([x+n for x in self._config["defaultFreeGauss"]])
       if (self._commonSig.get() == 1) and (self._compoCount > 1):
         # Common widths for Gaussians requested
         self._model.thaw("sig"+n)
@@ -577,7 +578,6 @@ class IAGVFit:
     
     # There are two points. Therefore, the range can be set.
     self._range = [self._rangeCache[0][0].xdata, self._rangeCache[1][0].xdata]
-    print self._range
     self._rangeIndices = np.where((self._x >= self._range[0]) & (self._x <= self._range[1]))[0]
     # Reset mode
     self._inputMode = "newComp"
@@ -616,7 +616,7 @@ class IAGVFit:
     
     # t counts the "target" component
     t = 0
-    for i in xrange(1, self._compoCount+1):
+    for i in smo.range(1, self._compoCount+1):
       if i == self._activeComponent:
         # Disregard the currently active component
         continue

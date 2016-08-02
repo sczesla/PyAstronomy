@@ -22,7 +22,12 @@ Further information on photometric bands:
   Spitzer IRAC        `Transmission curves for Spitzer IRAC instrument
                       <http://irsa.ipac.caltech.edu/data/SPITZER/docs/irac/calibrationfiles/spectralresponse/>`_
                       
-                      Call **addSpitzerIRACPassbands** to add to passband inventory.                     
+                      Call **addSpitzerIRACPassbands** to add to passband inventory.
+                      
+  Kepler              `Kepler passband (high resolution)
+                      <http://keplergo.arc.nasa.gov/kepler_response_hires1.txt>`_
+                      
+                      Call **addKeplerPassband** to add passband to inventory.         
   ==================  ===========================================================================================
 
 

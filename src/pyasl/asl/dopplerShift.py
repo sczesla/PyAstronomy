@@ -1,6 +1,8 @@
+from __future__ import print_function, division
 import scipy.interpolate as sci
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None):
   """
@@ -75,7 +77,7 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None):
     firsts = []
     # Search for first non-NaN value save indices of
     # leading NaN values
-    for i in xrange(len(nflux)):
+    for i in smo.range(len(nflux)):
       if np.isnan(nflux[i]):
         firsts.append(i)
       else:
@@ -83,7 +85,7 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None):
         break
     # Do the same for trailing NaNs
     lasts = []
-    for i in xrange(len(nflux)-1,0,-1):
+    for i in smo.range(len(nflux)-1,0,-1):
       if np.isnan(nflux[i]):
         lasts.append(i)
       else:

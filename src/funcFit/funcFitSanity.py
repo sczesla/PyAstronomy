@@ -1,6 +1,8 @@
+from __future__ import print_function, division
 import unittest
 import numpy
 from PyAstronomy import funcFit as fuf
+import six
 
 class FuncFitSanity(unittest.TestCase):
   
@@ -19,12 +21,12 @@ class FuncFitSanity(unittest.TestCase):
     for k, v in zip(origVars, vals):
       self.assertEquals(v, gf[k])
     gf.assignValue(dict(zip(origVars, numpy.zeros(len(origVars)))))
-    self.assertEquals(numpy.sum(gf.parameters().values()), 0.0)
+    self.assertEquals(numpy.sum(list(gf.parameters().values())), 0.0)
   
   def combine1_sanity(self):
     gf = fuf.GaussFit1d()
     gff = gf + gf + gf
-    for p in gff.parameters().keys():
+    for p in six.iterkeys(gff.parameters()):
       gff[p] = numpy.random.random()
       gff.thaw(p); gff.thaw([p,p])
       gff.freeze(p); gff.freeze([p,p])

@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import os
 from PyAstronomy.pyaC import pyaErrors as PE
 from .pyaConfig import *
-import six.moves.urllib.request as UR
+import six.moves.urllib as urllib
 
 class PyAFS:
   """
@@ -111,8 +111,66 @@ class PyAFS:
     """
     ana = self._analyzeFilename(fn, False)
     return os.path.isfile(ana["fullname"])
-    
-  def downloadToFile(self, url, fn, clobber=False, verbose=True):
+  
+  def _checkOnline(self, url="http://www.google.com", raiseNOC=True):
+    """
+      Check whether network can be reached.
+      
+      Parameters
+      ----------
+      url : string, optional
+          The reference URL tried to be reached to check
+          network availability.
+      raiseNOC : boolean, optional
+          If True (default), raise an exception if network
+          cannot be reached.
+      
+      Returns
+      -------
+      Online flag : boolean
+          True if network could be reached.
+    """
+    online = True
+    try:
+      _ = urllib.request.urlopen(url)
+    except Exception as e:
+      # No connection seems to be available
+      online = False
+      if raiseNOC:
+        raise(PE.PyANetworkError("You seem to be offline. Could not reach URL: '" + str(url) + "'.", \
+                                 solution="Get online", \
+                                 tbfe=e))
+    return online
+      
+  def _checkContext(self, url="http://www.google.com", context=None, raiseOther=True):
+    """
+      Check whether `context` parameter is available in urllib.
+      
+      Parameters
+      ----------
+      url : string, optional
+          The reference URL tried to be reached to check
+          network availability.
+      context : context, optional
+          Context used in attempt. Default is None.
+      raiseOther : boolean, optional
+          If True (default), an exception is raised if an error other
+          than the anticipated TypeError is raised.
+    """
+    contextWorks = True
+    try:
+      _ = urllib.request.urlopen(url, context=context)
+    except TypeError as e:
+      # Context appears not to work
+      contextWorks = False
+    except Exception as e:
+      # Another error occurred 
+      if raiseOther:
+        raise(PE.PyANetworkError("Unknown network error occurred.", \
+                                 tbfe=e))
+    return contextWorks
+  
+  def downloadToFile(self, url, fn, clobber=False, verbose=True, openMethod=open, context=None):
     """
       Download content from URL.
       
@@ -128,9 +186,24 @@ class PyAFS:
       verbose : boolean, optional
           If True, information on the download will be
           printed to the screen.
+      openMethod : callable
+          The method used to open the file to write to (default is
+          open, other choices may be gzip.open or io.ipen)
+      context : ssl context
+          SSL context parameter handed to urlopen.
     """
     if self.fileExists(fn) and (clobber == False):
       return
+    
+    def download(url, context, nocontext=False):
+      if not nocontext:
+        # Use context
+        response = urllib.request.urlopen(url, context=context)
+      else:
+        # Disregard context
+        response = urllib.request.urlopen(url)
+      data = response.read()     # a `bytes` object
+      self.requestFile(fn, 'wb', openMethod).write(data)
     
     ana = self._analyzeFilename(fn, True)
     self.touchFile(ana["fullname"])
@@ -138,18 +211,34 @@ class PyAFS:
       if verbose:
         print("PyA download info:")
         print("  - Downloading from URL: " + str(url))
-      filename, header = UR.urlretrieve(url, ana["fullname"])
+      download(url, context)
     except (KeyboardInterrupt, SystemExit):
       self.removeFile(ana["fullname"])
       raise
+    except TypeError as e:
+      # Possibly, context is not supported
+      cs = self._checkContext()
+      if not cs:
+        # Network is all right, but context parameter must
+        # not be specified.
+        if verbose:
+          print("PyA download info:")
+          print("  - Downloading from URL: " + str(url) + ", (no context)")
+        download(url, context, nocontext=True)
     except Exception as e:
       self.removeFile(ana["fullname"])
-      raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n" + \
-            "Error message: " + str(e), \
-            solution="Check whether URL exists and is spelled correctly."))
+      sols = ["Check whether URL exists and is spelled correctly."]
+      # Check whether network can be reached.
+      netreach = self._checkOnline(url, raiseNOC=False)
+      if not netreach:
+        sols.append("Network could not be reached. Check your network status.")
+      raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n", \
+            solution=sols, \
+            tbfe=e, \
+            addInfo="Could network be reached (online)? " + {True:"yes", False:"No"}[netreach]))
     if verbose:
-      print("  - Downloaded " + str(os.path.getsize(filename) / 1000.0) + " kb")
-      print("    to file: " + filename)
+      print("  - Downloaded " + str(os.path.getsize(ana["fullname"]) / 1000.0) + " kb")
+      print("    to file: " + ana["fullname"])
 
   def requestFile(self, relName, mode='r', openMethod=open, *args, **kwargs):
     """

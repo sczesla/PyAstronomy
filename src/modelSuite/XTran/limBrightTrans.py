@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 from PyAstronomy.funcFit import OneDFit
 import numpy
 from PyAstronomy.modelSuite.XTran import _ZList
@@ -85,7 +86,7 @@ class LimBrightTrans(_ZList, OneDFit):
     """
     kc=numpy.sqrt(1.-k**2.); p=n+1.
     if numpy.min(p) < 0.:
-      print 'Negative p'
+      print('Negative p')
     m0=1.;  c=1.;  p=numpy.sqrt(p);  d=1./p;  e=kc
     loop=True
     while loop:

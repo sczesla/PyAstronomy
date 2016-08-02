@@ -49,6 +49,14 @@ def estimateSNR(x, y, xlen, deg=1, controlPlot=False, xlenMode="dataPoints"):
   i = 0
   lastdof = None
   
+  if controlPlot:
+    try:
+      import matplotlib.pylab as plt
+    except ImportError:
+      raise(PE.PyARequiredImport("Cannot import matplotlib.pylab", \
+            where="estimateSNR", \
+            solution=["Install matplotlib.", "Change `controlPlot` to False."]))
+  
   while True:
     if xlenMode == "dataPoints":
       # xlen is given in units of data points
@@ -93,12 +101,6 @@ def estimateSNR(x, y, xlen, deg=1, controlPlot=False, xlenMode="dataPoints"):
     snrs.append(np.mean(model) / stdEstimate)
     
     if controlPlot:
-      try:
-        import matplotlib.pylab as plt
-      except ImportError:
-        raise(PE.PyARequiredImport("Cannot import matplotlib.pylab", \
-              where="estimateSNR", \
-              solution=["Install matplotlib.", "Change `controlPlot` to False."]))
       if i == 1:
         # This is the first call
         ax1 = plt.subplot(3,1,1)

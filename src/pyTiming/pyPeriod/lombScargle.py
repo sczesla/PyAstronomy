@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import periodBase
+from __future__ import print_function, division
+from . import periodBase
 from numpy import var,mean,min,max,pi,sin,cos,sum,arange,zeros,arctan
 from PyAstronomy.pyaC import pyaErrors as PE
 

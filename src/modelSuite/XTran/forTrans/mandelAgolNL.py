@@ -5,7 +5,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.modelSuite.XTran import _ZList
 
 try:
-  import occultnl
+  from . import occultnl
   _importOccultnl = True
 except ImportError:
   _importOccultnl = False

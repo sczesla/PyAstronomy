@@ -1,6 +1,8 @@
 X-ray luminosity / rotation period relations
 =============================================
 
+.. p23ready
+
 .. currentmodule:: PyAstronomy.pyasl
 .. autoclass:: Pizzolato2003
    :members:

@@ -1,22 +1,31 @@
 from __future__ import print_function
 import copy
 import six
+import traceback
 
 class PyaErrTemplate(Exception):
   
-  def __init__(self, what, errType, where=None, why=None, solution=None, addInfo=None):
+  def __init__(self, what, errType, where=None, why=None, solution=None, addInfo=None, tbfe=None):
     """
       The PyA error class template.
       
-      Parameters:
-       - `what` - What has happened?
-       - `errType` - Description of the type of error.
-       - `where` - Where did it happen?
-       - `why` - Why did it happen?
-       - `solution` - string or list of strings, How can the problem be solved?
-       - `addInfo` - Whatever additional information may be available.
+      Parameters
+      ----------
+      what : string
+          What has happened?
+      errType : string
+          Description of the type of error.
+      where : string
+          Where did it happen?
+      why : string
+          Why did it happen?
+      solution : string or list of strings
+          How can the problem be solved?
+      addInfo : string
+          Whatever additional information may be available.
+      tbfe : Exception
+          Saves trace back from a previously raised exception.
       
-      All parameters are strings of not stated otherwise.
       Of the parameters, only the first (what) and second (errType) are mandatory; the latter
       should be provided by every more specialized exception class.
       
@@ -35,6 +44,22 @@ class PyaErrTemplate(Exception):
       else:
         self.solution = [solution]    
     self.addInfo = addInfo
+    # Check trace back
+    if not tbfe is None:
+      self.addTB(tbfe)
+    else:
+      self.tbfe = None
+  
+  def addTB(self, e):
+    """
+      Add trace back from another exception.
+      
+      Parameters
+      ----------
+      e : Exception
+          The exception from which to add.
+    """
+    self.tbfe = ["  - " + l for l in traceback.format_exc().splitlines(True)]
   
   def __str__(self, head=True):
     """
@@ -50,6 +75,12 @@ class PyaErrTemplate(Exception):
       e += "---------------------\n"
       e += "A PyA error occurred:\n"
       e += "---------------------\n"
+    if not self.tbfe is None:
+      # Print information from trace back (add indentation)
+      e += "PyA trace back:\n"
+      for l in self.tbfe:
+        e += l
+    if head:
       e += "Type of error: " + self.errorType + "\n"
     e += "What happened?\n"
     e += "    " + self.what + "\n"

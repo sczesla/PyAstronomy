@@ -1,9 +1,11 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy import pyaC
 import os
 import gzip
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE 
+import six
 
 class Baraffe98Tracks:
   """
@@ -47,7 +49,7 @@ class Baraffe98Tracks:
     self.colToName = {0:"Met", 1:"Y", 2:"Lmix", 3:"Mass", 4:"Age", 5:"Teff", 6:"logg", 7:"Mbol", \
                       8:"MV", 9:"MR", 10:"MI", 11:"MJ", 12:"MH", 13:"MK"}
     self.nameToCol = {}
-    for k, v in self.colToName.iteritems():
+    for k, v in six.iteritems(self.colToName):
       self.nameToCol[v] = k
     
   def getUniqueValues(self, colName):
@@ -64,7 +66,7 @@ class Baraffe98Tracks:
       Unique values : array
           All unique values in that column.
     """
-    if not colName in self.nameToCol.keys():
+    if not colName in six.iterkeys(self.nameToCol):
       raise(PE.PyAValError("No column named '" + str(colName) + "'.", \
             solution="Choose one of: " + str(self.nameToCol.keys())))
     
@@ -96,7 +98,7 @@ class Baraffe98Tracks:
       raise(PE.PyAValError("No model with parameters: " + str(model), \
             solution="Use, e.g., `getAvailableValues` to check what is available."))
     if columns is None:
-      columns = self.nameToCol.keys()
+      columns = list(self.nameToCol.keys())
     # Check validity of column names
     for col in columns:
       if not col in self.nameToCol.keys():

@@ -1,7 +1,9 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import AtomicNo
 import os
 from PyAstronomy.pyasl import _ic
+import six
 
 class FirstIonizationPot:
   """
@@ -77,7 +79,7 @@ class FirstIonizationPot:
           Error of the FIP [eV]. May also be None
           if no error is available.
     """
-    if isinstance(atom, basestring):
+    if isinstance(atom, six.string_types):
       an = self._an.getAtomicNo(atom)
     elif isinstance(atom, int):
       an = atom

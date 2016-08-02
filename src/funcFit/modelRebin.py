@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 import numpy
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 def turnIntoRebin(CO):
   """
@@ -80,10 +82,10 @@ def turnIntoRebin(CO):
       
       self.rebinTimes = numpy.zeros(time.size * N)
       self.rebinIdent = {}
-      for i in xrange(time.size):
+      for i in smo.range(time.size):
         self.rebinTimes[i*N:(i+1)*N] = \
               (time[i] - dt/2.0) + (numpy.arange(N)*dt)/float(N) + dt/float(N)/2.0
-        self.rebinIdent[i] = range(i*N,(i+1)*N)
+        self.rebinIdent[i] = list(range(i*N,(i+1)*N))
   
 
     def evaluate(self, x):
@@ -116,7 +118,7 @@ def turnIntoRebin(CO):
       self.unbinnedModel = CO.evaluate(self, self.rebinTimes)
       # Build up rebinned model
       self.binnedModel = numpy.zeros(x.size)
-      for i in xrange(x.size):
+      for i in smo.range(x.size):
         self.binnedModel[i] = numpy.mean(self.unbinnedModel[self.rebinIdent[i]])
       # Return the resulting model
       return self.binnedModel

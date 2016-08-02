@@ -1,6 +1,8 @@
 Converting between effective temperature and stellar color
 ===============================================================
 
+.. p23ready
+
 Conversion between effective temperature and stellar color according
 to :ref:`Ramirez and Melendez <Ramirez2005>` (several bands,
 metallicity dependent) and :ref:`Ballesteros 2012 <Ballesteros2012>`
@@ -21,22 +23,24 @@ Example:
 ~~~~~~~~~~~~~~~~~
 
 ::
+    
+    from __future__ import print_function, division
+    from PyAstronomy import pyasl
+    
+    # Create class instance
+    r = pyasl.Ramirez2005()
+    
+    # Which color bands are available
+    print("Available color bands: ", r.availableBands())
+    
+    # Convert B-V to effective temperature and back
+    bv = 0.75
+    feh = 0.0
+    teff = r.colorToTeff("B-V", bv, feh)
+    bv1 = r.teffToColor("B-V", teff, feh)
+    # Watch out for differences between input bv and the output bv1
+    print("B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1)
 
-  from PyAstronomy import pyasl
-
-  # Create class instance
-  r = pyasl.Ramirez2005()
-
-  # Which color bands are available
-  print "Available color bands: ", r.availableBands()
-  
-  # Convert B-V to effective temperature and back
-  bv = 0.75
-  feh = 0.0
-  teff = r.colorToTeff("B-V", bv, feh)
-  bv1 = r.teffToColor("B-V", teff, feh)
-  # Watch out for differences between input bv and the output bv1
-  print "B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1
 
 
 .. _Ballesteros2012:
@@ -58,7 +62,8 @@ Clearly, the difference reaches about 200 K for hot stars in the 7000 K
 range and becomes smaller for cooler stars.
 
 ::
-
+  
+  from __future__ import print_function, division
   from PyAstronomy import pyasl
   
   b = pyasl.BallesterosBV_T()
@@ -69,8 +74,9 @@ range and becomes smaller for cooler stars.
     tr = r.colorToTeff("B-V", bv, 0.0)
     tb = b.bv2T(bv)
   
-    print ("B-V [mag] = {3:4.2f} : Teff (R05) = {0:4.0f} K, " + \
-           "Teff (B12) = {1:4.0f} K, dTeff = {2: 4.0f} K").format(tr, tb, tr - tb, bv)
+    print(("B-V [mag] = {3:4.2f} : Teff (R05) = {0:4.0f} K, " + \
+            "Teff (B12) = {1:4.0f} K, dTeff = {2: 4.0f} K").format(tr, tb, tr - tb, bv))
+
 
   Output:
   -------
@@ -95,20 +101,21 @@ Example:
 
 ::
 
-  from PyAstronomy import pyasl
-  
-  b = pyasl.BallesterosBV_T()
-  
-  bv = 0.65
-  
-  # Convert B-V into effective temperature
-  teff = b.bv2T(0.65)
-  print "B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff)
-  
-  # Convert effective temperature into B-V color
-  teff = 4568.0
-  bv = b.t2bv(teff)
-  print "Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv)
+    from __future__ import print_function, division
+    from PyAstronomy import pyasl
+    
+    b = pyasl.BallesterosBV_T()
+    
+    bv = 0.65
+    
+    # Convert B-V into effective temperature
+    teff = b.bv2T(0.65)
+    print("B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff))
+    
+    # Convert effective temperature into B-V color
+    teff = 4568.0
+    bv = b.t2bv(teff)
+    print("Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv))
 
   
 API documentation (Ramirez2005)

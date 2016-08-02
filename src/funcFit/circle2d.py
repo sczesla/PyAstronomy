@@ -1,5 +1,6 @@
+from __future__ import print_function, division
 import numpy as np
-from onedfit import OneDFit
+from .onedfit import OneDFit
 
 class Circle2d(OneDFit):
   """

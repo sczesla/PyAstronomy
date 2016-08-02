@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import numpy
-from onedfit import OneDFit
+from .onedfit import OneDFit
 
 class SinusFit1d(OneDFit):
   """

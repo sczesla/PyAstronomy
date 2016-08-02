@@ -1,4 +1,4 @@
-import urllib2
+from __future__ import print_function, division
 import os
 import re
 import pickle
@@ -6,6 +6,7 @@ import gzip
 import numpy as np
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves.urllib as urllib
 
 
 class KuruczMT:
@@ -59,7 +60,7 @@ class KuruczMT:
       fn : string
           Name of the Kurucz model-grid file. 
     """
-    lines = gzip.open(fn, 'r').readlines()
+    lines = gzip.open(fn, 'rt').readlines()
     if len(lines) == 1:
       lines = lines[0].split("\r")
     models = []
@@ -202,57 +203,74 @@ class KuruczModels:
     gridFile = os.path.join("pyasl", "resBased", "kuruczMG.dat.gz")
     if not self._fs.fileExists(gridFile):
       # Grid file has to be created
-      with self._fs.requestFile(gridFile, mode='w', openMethod=gzip.open) as f:
-        try:
-          d = urllib2.urlopen("http://kurucz.harvard.edu/grids.html").read()
-        except urllib2.URLError as e:
-          raise(PE.PyADownloadError("Could not access URL: http://kurucz.harvard.edu/grids.html\n" + \
-                                    "Error: " + str(e), \
-                                    solution="Are you online?"))
-        pattern = '<A HREF=\"(.*)\">(.*)</A>'
-        self.grids = {}
-        for grid in re.findall(pattern, d):
-          if grid[0].find("grids") == -1:
-            continue
-          # Find the grid file
-          print "Checking: ", grid[0]
+      try:
+        with self._fs.requestFile(gridFile, mode='w', openMethod=gzip.open) as f:
           try:
-            gfs = urllib2.urlopen(grid[0]).read()
-          except urllib2.HTTPError:
-            # Ignore dead links
-            continue
-          # <img src="/icons/blank.gif" alt="[   ]" width="20" height="20"> <a href="am40ak2odfnew.dat">am40ak2odfnew.dat</a>          13-Apr-2011 15:07  4.2M  
-          fns = re.findall('<a href=\"(.*)\">', gfs)
-          # First check for .datcd file
-          gfn = None
-          for fn in fns:
-            r = re.match("^a.*k2.*\.datcd$", fn)
-            if r is not None:
-              gfn = fn
-              break
-          if gfn is None:
-            # Check for .dat file (with k2)
+            d = urllib.request.urlopen("http://kurucz.harvard.edu/grids.html").read()
+            d = d.decode("utf8")
+          except urllib.error.URLError as e:
+            raise(PE.PyADownloadError("Could not access URL: http://kurucz.harvard.edu/grids.html\n" + \
+                                      "Error: " + str(e), \
+                                      solution="Are you online?"))
+          pattern = '<A HREF=\"(.*)\">(.*)</A>'
+          self.grids = {}
+          for grid in re.findall(pattern, d):
+            if grid[0].find("grids") == -1:
+              continue
+            # Find the grid file
+            print("Checking: ", grid[0])
+            try:
+              gfs = urllib.request.urlopen(grid[0]).read().decode("utf8")
+            except urllib.error.HTTPError:
+              # Ignore dead links
+              print("  Ignoring: ", grid[0])
+              continue
+            except urllib.error.URLError as e: 
+              print("  Error opening url: ", grid[0], ". Error message: " + str(e) + ".\n Ignoring...")
+              continue
+            # <img src="/icons/blank.gif" alt="[   ]" width="20" height="20"> <a href="am40ak2odfnew.dat">am40ak2odfnew.dat</a>          13-Apr-2011 15:07  4.2M  
+            fns = re.findall('<a href=\"(.*)\">', gfs)
+            # First check for .datcd file
+            gfn = None
             for fn in fns:
-              r = re.match("^a.*k2.*\.dat$", fn)
+              r = re.match("^a.*k2.*\.datcd$", fn)
               if r is not None:
                 gfn = fn
                 break
-          if gfn is None:
-            # Check for .dat file (with any k)
-            for fn in fns:
-              r = re.match("^a.*k?.*\.dat$", fn)
-              if r is not None:
-                gfn = fn
-                break
-          if gfn is None:
-            # Ignore this grid, there is nothing here
-            continue
-          self.grids[grid[1]] = (grid[0]+gfn)
-          
-        pickle.dump(self.grids, f)
+            if gfn is None:
+              # Check for .dat file (with k2)
+              for fn in fns:
+                r = re.match("^a.*k2.*\.dat$", fn)
+                if r is not None:
+                  gfn = fn
+                  break
+            if gfn is None:
+              # Check for .dat file (with any k)
+              for fn in fns:
+                r = re.match("^a.*k?.*\.dat$", fn)
+                if r is not None:
+                  gfn = fn
+                  break
+            if gfn is None:
+              # Ignore this grid, there is nothing here
+              continue
+            self.grids[grid[1]] = (grid[0]+gfn)
+            
+          pickle.dump(self.grids, f)
+      except:
+        # Delete the half-completed file...
+        self._fs.removeFile(gridFile)
+        raise
+        
     else:
       # File does already exist
-      self.grids = pickle.load(self._fs.requestFile(gridFile, 'r', openMethod=gzip.open))
+      try:
+        self.grids = pickle.load(self._fs.requestFile(gridFile, 'r', openMethod=gzip.open))
+      except ValueError as ve:
+        ffn = self._fs.composeFilename(gridFile)
+        per = PE.PyAValError("Reading the pickle file: " + str(ffn) + ", the error: '" + str(ve) + "' occurred.", \
+                             solution="Likely, the file was written using Python 3 and you try to read it using Python 2.x. Try to delete the file.")
+        raise(per)
   
   def _abundToStr(self, met):
     """
@@ -300,10 +318,10 @@ class KuruczModels:
     gfn = os.path.join("pyasl", "resBased", name + ".dat.gz")
     if self._fs.fileExists(gfn):
       return gfn
-    print "Downloading model data..."
-    print "  Writing data to file: ", gfn, " in PyA data path."
-    with self._fs.requestFile(gfn, 'w', openMethod=gzip.open) as f:
-      f.write(urllib2.urlopen(self.grids[name]).read())
+    print("Downloading model data...")
+    print("  Writing data to file: ", gfn, " in PyA data path.")
+    self._fs.downloadToFile(self.grids[name], gfn, clobber=True, verbose=False, \
+                            openMethod=gzip.open)
     return gfn
     
   def requestModelGrid(self, met, add=""):
@@ -366,7 +384,7 @@ class KuruczModels:
       Available grids : list of strings
           The names of all available model grids.
     """
-    return self.grids.keys()
+    return list(self.grids.keys())
   
   def __init__(self):
     self._fs = pp.PyAFS()

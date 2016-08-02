@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 from PyAstronomy import funcFit as fuf
 import numpy as np
 

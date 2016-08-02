@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 import re
 from PyAstronomy.pyaC import pyaErrors as PE
 import pickle
 import os
 import uuid
+import six
+import six.moves as smo
 
 
 def equal(dependsOn):
@@ -117,7 +120,7 @@ class Params:
     # Combine properties
     result.paramNum = self.paramNum.copy()
     pn = len(result.paramNum)
-    for i in xrange(len(right.paramNum)):
+    for i in smo.range(len(right.paramNum)):
       result.paramNum[pn + i] = right.paramNum[i]
     result.isFree = self.isFree.copy(); result.isFree.update(right.isFree)
     result.isRestricted = self.isRestricted.copy(); result.isRestricted.update(right.isRestricted)
@@ -144,7 +147,7 @@ class Params:
     if new in self.__params:
       raise(PE.PyAValError("Parameter already exists: "+new, where="Params::renameParameter"))
     self.__params[new] = self.__params[old]; del self.__params[old]
-    for i in xrange(len(self.paramNum)):
+    for i in smo.range(len(self.paramNum)):
       if self.paramNum[i] == old:
         self.paramNum[i] = new
         break
@@ -153,19 +156,19 @@ class Params:
     self.restrictions[new] = self.restrictions[old]; del self.restrictions[old]
     self.relations[new] = self.relations[old]; del self.relations[old]
     # Loop through relations, search, and replace occurrences of the old name.
-    for p in self.__params.keys():
+    for p in six.iterkeys(self.__params):
       relations = self.relations[p]
       if relations == []: continue
-      for k in xrange(len(relations)):
+      for k in smo.range(len(relations)):
         relat = relations[k]
         if relat[0] == old:
           relat[0] = new
-        for i in xrange(len(relat[2])):
+        for i in smo.range(len(relat[2])):
           if relat[2][i] == old:
             relat[2][i] = new
         self.relations[p][k] = relat
     # Loop over conditional restrictions and replace occurrences of the old names
-    for name, v in self.conditionalRestrictions.iteritems():
+    for name, v in six.iteritems(self.conditionalRestrictions):
       for i, p in enumerate(v[0]):
         # Loop over input-parameter names and replace if necessary
         if p == old:
@@ -261,14 +264,14 @@ class Params:
     ll.append("-" * nc)
     ll.append("    Conditional restrictions")
     ll.append("-" * nc)
-    for name, v in self.conditionalRestrictions.iteritems():
+    for name, v in six.iteritems(self.conditionalRestrictions):
       s = "ID: " + str(name) + ", parameters: "
       s += ', '.join(v[0])
       ll.append(s)
     ll.append("-" * nc)
     if toScreen:
       for l in ll:
-        print l
+        print(l)
     return ll
       
   
@@ -295,7 +298,7 @@ class Params:
     result = 0.0
     if fullout:
       fo = {}
-    for name, v in self.conditionalRestrictions.iteritems():
+    for name, v in six.iteritems(self.conditionalRestrictions):
       vs = ()
       for p in v[0]:
         vs += (self[p],)
@@ -315,7 +318,7 @@ class Params:
     """
       Return a list of x is a string and do nothing of x is already a list.
     """
-    if isinstance(x, basestring):
+    if isinstance(x, six.string_types):
       return [x]
     return x
   
@@ -325,7 +328,7 @@ class Params:
       No return value.
     """
     if not self.hasParam(name):
-      raise(PE.PyAValError("No such parameter: \""+name+"\".\n  Available parameters: "+', '.join(self.parameters().keys()) , where="Params::__checkForParam"))
+      raise(PE.PyAValError("No such parameter: \""+name+"\".\n  Available parameters: "+', '.join(list(self.parameters().keys())) , where="Params::__checkForParam"))
   
   def hasParam(self, name):
     """
@@ -354,7 +357,7 @@ class Params:
       Parameters : list of strings 
           A list with the names of available parameters.
     """
-    return self.__params.keys()
+    return list(self.__params.keys())
 
   def parameters(self):
     """
@@ -394,7 +397,7 @@ class Params:
       namval : dict
           A dictionary containing ['name':'value'] pairs.
     """
-    for n, v in namval.iteritems():
+    for n, v in six.iteritems(namval):
       self.__checkForParam(n)
       self.__params[n] = v
       # Check for relations
@@ -426,7 +429,7 @@ class Params:
     for n in names:
       # Check whether the parameter is a dependent variable in
       # a relation
-      for pn, rels in self.relations.iteritems():
+      for pn, rels in six.iteritems(self.relations):
         for rel in rels:
           if rel[0] == n:
             raise(PE.PyAParameterConflict("You tried to free the parameter '" + n + \
@@ -460,7 +463,7 @@ class Params:
            of all free parameters ({"parName":value, ...}).
     """
     tuplist = []
-    for i in xrange(len(self.paramNum)):
+    for i in smo.range(len(self.paramNum)):
       name = self.paramNum[i]
       if self.isFree[name]:
         tuplist.append((name,self.__params[name]))
@@ -478,7 +481,7 @@ class Params:
            of all frozen parameters ({"parName":value, ...}).
     """
     tuplist = []
-    for i in xrange(len(self.paramNum)):
+    for i in smo.range(len(self.paramNum)):
       name = self.paramNum[i]
       if not self.isFree[name]:
         tuplist.append((name,self.__params[name]))
@@ -495,7 +498,7 @@ class Params:
           The number of free parameters (determined by `isFree`).
     """
     c = 0
-    for v in self.isFree.itervalues():
+    for v in six.itervalues(self.isFree):
       if v: c += 1
     return c
 
@@ -511,7 +514,7 @@ class Params:
           `paramNum` attribute.
     """
     result = []
-    for i in xrange(len(self.paramNum)):
+    for i in smo.range(len(self.paramNum)):
       name = self.paramNum[i]
       if self.isFree[name]: result.append(name)
     return result
@@ -533,7 +536,7 @@ class Params:
     if len(X) != self.numberOfFreeParams():
       raise(PE.PyAValError("Number of supplied parameters does not match number of free parameters.", where="Params::setFreeParams"))
     c = 0
-    for i in xrange(len(self.__params)):
+    for i in smo.range(len(self.__params)):
       name = self.paramNum[i]
       if self.isFree[name]:
         self.assignValue({name:X[c]})
@@ -550,7 +553,7 @@ class Params:
           determined by the `paramNum` attribute.
     """
     result = []
-    for i in xrange(len(self.__params)):
+    for i in smo.range(len(self.__params)):
       name = self.paramNum[i]
       if self.isFree[name]: result.append(self.__params[name])
     return result
@@ -565,7 +568,7 @@ class Params:
           A dictionary associating name and [lower-bound, upper-bound].
           If no boundary shall exist on one side, use 'None'.
     """
-    for name,v in restricts.iteritems():
+    for name,v in six.iteritems(restricts):
       self.__checkForParam(name)
       if (v[0] is not None) and (v[1] is not None):
         if v[0] >= v[1]:
@@ -614,7 +617,7 @@ class Params:
       forceFree : boolean
           Set parName to "free" instead of "frozen" if set to True.
     """      
-    for p in self.relations.keys():
+    for p in six.iterkeys(self.relations):
         self.relations[p] = [r for r in self.relations[p] if r[0] != parName]           
     self.isFree[parName] = forceFree
 
@@ -641,7 +644,7 @@ class Params:
     self.__checkForParam(parName1)
     if not self.isFree[parName1] and not force:
       raise(PE.PyAValError(parName1+" is not free.", where="Params::relate", solution="Use 'thaw' to free parameter."))
-    if isinstance(pars, basestring): pars = [pars]
+    if isinstance(pars, six.string_types): pars = [pars]
     for p in pars:
       self.__checkForParam(p)
     # Check whether the dependent variable is in the list of independent ones
@@ -681,7 +684,7 @@ class Params:
     """
     result = {}
     totval = 0.0
-    for name, r in self.isRestricted.iteritems():
+    for name, r in six.iteritems(self.isRestricted):
       if r[0]:
         # There is a lower bound
         if self.__params[name] < self.restrictions[name][0]:
@@ -714,7 +717,7 @@ class Params:
     """
     self.__checkForParam(parName)
     result = []
-    for k in self.__params.iterkeys():
+    for k in six.iterkeys(self.__params):
       for r in self.relations[k]:
         if r[0] == parName:
           if not r in result:
@@ -750,11 +753,11 @@ class Params:
     dat["parameters"] = self.parameters()
     dat["restrictions"] = self.getRestrictions()
     dat["frozenParameters"] = self.frozenParameters()
-    if isinstance(fn, basestring):
+    if isinstance(fn, six.string_types):
       if os.path.isfile(fn) and (not clobber):
         raise(PE.PyANameClash("The file '"+fn+"' exists.", where="saveState", \
                               solution="Change filename or set clobber to True."))
-      pickle.dump(dat, open(fn, 'w'))
+      pickle.dump(dat, open(fn, 'wb'))
     return dat
   
   def restoreState(self, resource):
@@ -768,12 +771,12 @@ class Params:
           data dictionary. If dictionary, it uses the data saved in it; note that
           a valid data dictionary is returned by `saveState`.
     """
-    if isinstance(resource, basestring):
-      pd = pickle.load(open(resource))
+    if isinstance(resource, six.string_types):
+      pd = pickle.load(open(resource, 'rb'))
     else:
       pd = resource
     # Free ALL values
-    for k in self.parameters().keys():
+    for k in six.iterkeys(self.parameters()):
       rels = self.getRelationsOf(k)
       if len(rels) == 0:
         self.thaw([k])
@@ -813,23 +816,23 @@ class Params:
     
     # Find maximal length of parameter name
     plen = 0
-    for k,v in self.__params.iteritems():
+    for k,v in six.iteritems(self.__params):
       if len(k) > plen: plen = len(k)
     
     # Comppars - dictionary mapping Component number -> list of variables
     compPars = {}
-    for name in self.__params.keys():
+    for name in six.iterkeys(self.__params):
       r = re.match(".*_([0-9]+)", name)
       if r is not None:
         cn = int(r.group(1))
       else:
         cn = -1
-      if compPars.has_key(cn):
+      if cn in compPars:
         compPars[cn].append(name)
       else:
         compPars[cn] = [name]
 
-    for k, v in compPars.iteritems():
+    for k, v in six.iteritems(compPars):
       compPars[k] = sorted(v)
 
     components = sorted(compPars.keys())
@@ -837,7 +840,7 @@ class Params:
       if com != -1 and not onlyParams:
         lines.append(prefix + "Parameters for component no. "+str(com))
         lines.append(prefix + "-------------------------------------")
-      for i in xrange(len(compPars[com])):
+      for i in smo.range(len(compPars[com])):
   #      name = self.paramNum[i]
         name = compPars[com][i]
         
@@ -866,6 +869,6 @@ class Params:
     
     if toScreen:
       for l in lines:
-        print l
+        print(l)
     
     return lines

@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaErrors as PE
 import re
+import six
 
 class ModelNameIdentBase:
   """
@@ -169,7 +171,7 @@ class ModelNameIdentBase:
     if isinstance(input, dict):
       # Convert all keys to variable names
       result = {}
-      for k, v in input.iteritems():
+      for k, v in six.iteritems(input):
         result[self.convertSpecifier(k)[0]] = v
       return result
     # Assume it is a single specifier

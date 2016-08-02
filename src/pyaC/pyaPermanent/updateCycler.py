@@ -3,6 +3,7 @@ from .pyaFS import PyAFS
 import six.moves.configparser as CP
 import datetime as DT
 from PyAstronomy.pyaC import pyaErrors as PE
+import io
 
 class PyAUpdateCycle:
   """
@@ -35,20 +36,20 @@ class PyAUpdateCycle:
       self._config.add_section(section)
       self._config.set(section, 'DATA_UPDATE_CYCLE_DAYS', updateCycle)
       self._config.set(section, "DATA_DOWNLOAD_DATE", "NEVER")
-      self._config.write(self._fs.requestFile(fn, 'w'))
+      self._config.write(self._fs.requestFile(fn, 'wt'))
     else:
       # File exists
-      self._config.readfp(self._fs.requestFile(self._fn, 'r'))
+      self._config.readfp(self._fs.requestFile(self._fn, 'rt'))
       if not self._config.has_section(section):
         # Only the section does not yet exists
         # Add the content
         self._config.add_section(section)
         self._config.set(section, 'DATA_UPDATE_CYCLE_DAYS', updateCycle)
         self._config.set(section, "DATA_DOWNLOAD_DATE", "NEVER")
-        self._config.write(self._fs.requestFile(fn, 'w'))
+        self._config.write(self._fs.requestFile(fn, 'wt'))
     
     # Read the current data set from file
-    self._config.readfp(self._fs.requestFile(self._fn, 'r'))
+    self._config.readfp(self._fs.requestFile(self._fn, 'rt'))
     self._updateCycle = self._config.getfloat(self._section, "DATA_UPDATE_CYCLE_DAYS")
     self._timeString = self._config.get(self._section, "DATA_DOWNLOAD_DATE")
     
@@ -105,9 +106,9 @@ class PyAUpdateCycle:
     """
     if ddate is None:
       ddate = DT.datetime.now()
-    self._config.set(self._section, "DATA_DOWNLOAD_DATE", \
+    self._config.set(self._section, 'DATA_DOWNLOAD_DATE', \
                      ddate.strftime("%Y-%m-%d %H:%M"))
-    self._config.write(self._fs.requestFile(self._fn, 'w'))
+    self._config.write(self._fs.requestFile(self._fn, 'wt'))
     self._timeString = self._config.get(self._section, "DATA_DOWNLOAD_DATE")
   
   def changeDownloadCycle(self, c):
@@ -131,7 +132,7 @@ class PyAUpdateCycle:
     else:
       self._updateCycle = -1.0
     self._config.set(self._section, "DATA_UPDATE_CYCLE_DAYS", self._updateCycle)
-    self._config.write(self._fs.requestFile(self._fn, 'w'))
+    self._config.write(self._fs.requestFile(self._fn, 'wt'))
 
   def _update(self, func, *args, **kwargs):
     """

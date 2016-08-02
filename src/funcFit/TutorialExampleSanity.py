@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 import os
 
@@ -9,7 +10,6 @@ class ExampleSanity(unittest.TestCase):
   def tearDown(self):
     pass
 
-  
   def sanity_firstExample(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -40,26 +40,26 @@ class ExampleSanity(unittest.TestCase):
     # First, we create the Gauss1d fit object
     gf = fuf.GaussFit1d()
     # See what parameters are available
-    print "List of available parameters: ", gf.availableParameters()
+    print("List of available parameters: ", gf.availableParameters())
     # Set guess values for the parameters
     gf["A"] = -10.0
     gf["sig"] = 15.77
     gf["off"] = 0.87
     gf["mu"] = 7.5
     # Let us see whether the assignment worked
-    print "Parameters and guess values: "
-    print "  A   : ", gf["A"]
-    print "  sig : ", gf["sig"]
-    print "  off : ", gf["off"]
-    print "  mu  : ", gf["mu"]
-    print ""
+    print("Parameters and guess values: ")
+    print("  A   : ", gf["A"])
+    print("  sig : ", gf["sig"])
+    print("  off : ", gf["off"])
+    print("  mu  : ", gf["mu"])
+    print("")
     
     # Now some of the strengths of funcFit are demonstrated; namely, the
     # ability to consider some parameters as free and others as fixed.
     # By default, all parameters of the GaussFit1d are frozen.
     
     # Show values and names of frozen parameters
-    print "Names and values of FROZEN parameters: ", gf.frozenParameters()
+    print("Names and values of FROZEN parameters: ", gf.frozenParameters())
     
     # Which parameters shall be variable during the fit?
     # 'Thaw' those (the order is irrelevant)
@@ -78,6 +78,7 @@ class ExampleSanity(unittest.TestCase):
     
     # Show the data and the best fit model
 #     plt.show()
+
 
   def sanity_CustomModel(self):
     # Import numpy and matplotlib
@@ -244,16 +245,16 @@ class ExampleSanity(unittest.TestCase):
     
     # Show a description of the model depending on the
     # names of the individual components
-    print
-    print "Description of the model: ", twoG.description()
-    print
+    print()
+    print("Description of the model: ", twoG.description())
+    print()
     
     # Note that now the parameter names changed!
     # Each parameter is now named using the "property"
     # (e.g., 'A' or 'sig') as the first part, the component
     # "root name" (in this case 'Gaussian') and a component
-    # number in paranthesis.
-    print "New parameter names and values: "
+    # number in parenthesis.
+    print("New parameter names and values: ")
     twoG.parameterSummary()
     
     # We forgot to thaw the amplitude of the second Gaussian, but
@@ -271,10 +272,10 @@ class ExampleSanity(unittest.TestCase):
     twoG.fit(x,y,yerr=ones(x.size)*0.01)
     
     # Write the result to the screen and plot the best fit model
-    print
-    print "--------------------------------"
-    print "Parameters for the combined fit:"
-    print "--------------------------------"
+    print()
+    print("--------------------------------")
+    print("Parameters for the combined fit:")
+    print("--------------------------------")
     twoG.parameterSummary()
     
     # Show the data and the best fit model
@@ -294,7 +295,7 @@ class ExampleSanity(unittest.TestCase):
     off = 0.2
     t0 = 40.
     
-    # Caculate fake data set
+    # Calculate fake data set
     x = arange(100)
     y = A*exp(-(x-t0)/tau) * (x>t0) + off
     y += random.normal(0., 0.1, 100)
@@ -319,7 +320,7 @@ class ExampleSanity(unittest.TestCase):
     @fuf.MiniFunc(edf)
     def mini(edf, P):
       m = sum(abs(edf.model - edf.y)/edf.yerr)
-      print "mini - current parameters: ", P, ", value is: ", m
+      print("mini - current parameters: ", P, ", value is: ", m)
       return m
     
     # Carry out fit WITH SELF-DEFINED OBJECTIVE FUNCTION
@@ -358,26 +359,26 @@ class ExampleSanity(unittest.TestCase):
     gf = GaussFit1d_Rebin()
     gf.setRebinArray_Ndt(x, 10, x[1]-x[0])
     # See what parameters are available
-    print "List of available parameters: ", gf.availableParameters()
+    print("List of available parameters: ", gf.availableParameters())
     # Set guess values for the parameters
     gf["A"] = -10.0
     gf["sig"] = 15.77
     gf["off"] = 0.87
     gf["mu"] = 7.5
     # Let us see whether the assignment worked
-    print "Parameters and guess values: "
-    print "  A   : ", gf["A"]
-    print "  sig : ", gf["sig"]
-    print "  off : ", gf["off"]
-    print "  mu  : ", gf["mu"]
-    print ""
+    print("Parameters and guess values: ")
+    print("  A   : ", gf["A"])
+    print("  sig : ", gf["sig"])
+    print("  off : ", gf["off"])
+    print("  mu  : ", gf["mu"])
+    print("")
     
     # Now some of the strengths of funcFit are demonstrated; namely, the
     # ability to consider some parameters as free and others as fixed.
     # By default, all parameters of the GaussFit1d are frozen.
     
     # Show values and names of frozen parameters
-    print "Names and values if FROZEN parameters: ", gf.frozenParameters()
+    print("Names and values if FROZEN parameters: ", gf.frozenParameters())
     
     # Which parameters shall be variable during the fit?
     # 'Thaw' those (the order is irrelevant)
@@ -397,10 +398,13 @@ class ExampleSanity(unittest.TestCase):
     # Show the overbinned (=unbinned) model, indicate by color
     # which point are averaged to obtain a point in the binned
     # model.
-    for k, v in gf.rebinIdent.iteritems():
+    for k, v in gf.rebinIdent.items():
       c = "y"
       if k % 2 == 0: c = "k"
-      plt.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')   
+      plt.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
+    
+    # Show the data and the best fit model
+#     plt.show()
 
   def sanity_simultaneousFit(self):
     from PyAstronomy import funcFit as fuf
@@ -435,9 +439,9 @@ class ExampleSanity(unittest.TestCase):
     gaussCno = sf.addComponent(gauss)
     calorCno = sf.addComponent(calor)
     
-    print "Component numbers in the syncFit container:"
-    print "  Gauss: ", gaussCno, ",  Cauchy-Lorentz: ", calorCno
-    print
+    print("Component numbers in the syncFit container:")
+    print("  Gauss: ", gaussCno, ",  Cauchy-Lorentz: ", calorCno)
+    print()
     
     # See what happened to the parameters in the
     # simultaneous fitting class.
@@ -445,7 +449,7 @@ class ExampleSanity(unittest.TestCase):
     sf.parameterSummary()
     
     # Thaw all parameters (for later fit) ...
-    sf.thaw(sf.parameters().keys())
+    sf.thaw(list(sf.parameters()))
     # but not the linear term.
     sf.freeze(["lin_Gaussian[s1]", "lin_CauLor[s2]"])
     
@@ -457,8 +461,8 @@ class ExampleSanity(unittest.TestCase):
     
     # See what happened to the parameters in the
     # simultaneous fitting class.
-    print
-    print "Parameters after 'treatAsEqual' has been applied:"
+    print()
+    print("Parameters after 'treatAsEqual' has been applied:")
     sf.parameterSummary()
     
     # Randomize starting values.
@@ -474,8 +478,8 @@ class ExampleSanity(unittest.TestCase):
     sf.fit(data, yerr=yerr)
     
     # Show the best-fit values.
-    print
-    print "Best-fit parameters:"
+    print()
+    print("Best-fit parameters:")
     sf.parameterSummary()
     
     # Plot the best-fit model(s).
@@ -618,7 +622,7 @@ class ExampleSanity(unittest.TestCase):
     # needed for nD fitting.
     g = fuf.coordinateGrid(x, y)
     
-    print "(x, y) coordinates at index (11, 28): ", g[11,28]
+    print("(x, y) coordinates at index (11, 28): ", g[11,28])
 
   def sanity_CashStatisticsExample(self):
     import numpy as np
@@ -635,7 +639,7 @@ class ExampleSanity(unittest.TestCase):
     # Generate some data with Poisson statistics
     x = np.linspace(0.0, 7., 50)
     y = np.zeros(len(x))
-    for i in xrange(len(x)):
+    for i in range(len(x)):
       y[i] = np.random.poisson(g.evaluate(x[i]))
     
     # Choose free parameters and "disturb" the
@@ -690,9 +694,10 @@ class ExampleSanity(unittest.TestCase):
     sp = gf.steppar("A", ranges={"A":[0.8, 0.95, 20, 'lin']})
     # Extract the values for the Gaussian normalization
     # (amplitude) ...
-    As = map(lambda x:x[0], sp)
+    As = list(map(lambda x:x[0], sp))
     # ... and chi square.
-    chis = map(lambda x:x[1], sp)
+    chis = list(map(lambda x:x[1], sp))
+    
     
     # Find minimum chi square
     cmin = min(chis)
@@ -738,9 +743,9 @@ class ExampleSanity(unittest.TestCase):
     
     # Get the values for `A`, `mu`, and chi-square
     # from the output of steppar.
-    As = map(lambda x:x[0], sp)
-    mus = map(lambda x:x[1], sp)
-    chis = map(lambda x:x[2], sp)
+    As = list(map(lambda x:x[0], sp))
+    mus = list(map(lambda x:x[1], sp))
+    chis = list(map(lambda x:x[2], sp))
     
     # Create a chi-square array using the
     # indices contained in the output.
@@ -802,20 +807,20 @@ class ExampleSanity(unittest.TestCase):
     sp = gf.steppar("A", ranges={"A":[0.8, 0.95, 20, 'lin']})
     # Extract the values for the Gaussian normalization
     # (amplitude) ...
-    As = map(lambda x:x[0], sp)
+    As = [x[0] for x in sp]
     # ... and chi square.
-    chis = map(lambda x:x[1], sp)
+    chis = [x[1] for x in sp]
     
     # Calculate the confidence interval automatically
     cfi90 = gf.errorConfInterval("A", dstat=2.706)
-    print "90% Confidence interval: ", cfi90["limits"]
-    print "  corresponding objective function values: ", cfi90["OFVals"]
-    print "  number of iterations needed: ", cfi90["iters"]
+    print("90% Confidence interval: ", cfi90["limits"])
+    print("  corresponding objective function values: ", cfi90["OFVals"])
+    print("  number of iterations needed: ", cfi90["iters"])
     
     cfi68 = gf.errorConfInterval("A", dstat=1.0)
-    print "68% Confidence interval: ", cfi68["limits"]
-    print "  corresponding objective function values: ", cfi68["OFVals"]
-    print "  number of iterations needed: ", cfi68["iters"]
+    print("68% Confidence interval: ", cfi68["limits"])
+    print("  corresponding objective function values: ", cfi68["OFVals"])
+    print("  number of iterations needed: ", cfi68["iters"])
     
     # Plot A vs. chi square
     plt.title('A vs. $\chi^2$ 90% (black) and 68% (blue) confidence intervals')
@@ -831,7 +836,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot([cfi68["limits"][0]]*2, [min(chis), max(chis)], 'b--')
     plt.plot([cfi68["limits"][1]]*2, [min(chis), max(chis)], 'b--')
     
-#    plt.show()
+#     plt.show()
 
 
   def sanity_conditionalRestrictions(self):
@@ -858,7 +863,7 @@ class ExampleSanity(unittest.TestCase):
     def myRestriction(A, sig):
       """
         A conditional restriction.
-    
+        
         Returns
         -------
         Penalty : float
@@ -869,13 +874,13 @@ class ExampleSanity(unittest.TestCase):
         return np.abs(A-10.0*sig + 1.0)*1e20
       return 0.0
     
-    
+      
     # Add the conditional restriction to the model and save
     # the unique ID, which can be used to refer to that
     # restriction.
     uid = g.addConditionalRestriction(["A", "sig"], myRestriction)
-    print "Conditional restriction has been assigned the ID: ", uid
-    print
+    print("Conditional restriction has been assigned the ID: ", uid)
+    print()
     
     # Now see whether the restriction is really in place
     g.showConditionalRestrictions()
@@ -896,11 +901,12 @@ class ExampleSanity(unittest.TestCase):
     unrestrictedModel = g.model.copy()
     
     # Plot the result
-#    plt.errorbar(x, y, yerr=yerr, fmt='b.')
-#    plt.plot(x, restrictedModel, 'r--', label="Restricted")
-#    plt.plot(x, unrestrictedModel, 'g--', label="Unresctricted")
-#    plt.legend()
-#    plt.show()
+#     plt.errorbar(x, y, yerr=yerr, fmt='b.')
+#     plt.plot(x, restrictedModel, 'r--', label="Restricted")
+#     plt.plot(x, unrestrictedModel, 'g--', label="Unrestricted")
+#     plt.legend()
+#     plt.show()
+
 
 
 class MCMCExampleSanity(unittest.TestCase):
@@ -912,26 +918,26 @@ class MCMCExampleSanity(unittest.TestCase):
     try:
       os.remove("mcmcExample.tmp")
     except:
-      print "Could not remove file: mcmcExample.tmp"
+      print("Could not remove file: mcmcExample.tmp")
     try:
       os.remove("mcmcTA.tmp")
     except:
-      print "Could not remove file: mcmcTA.tmp"
+      print("Could not remove file: mcmcTA.tmp")
     try:
       os.remove("mcmcSample.tmp")
     except:
-      print "Could not remove file: mcmcSample.tmp"
+      print("Could not remove file: mcmcSample.tmp")
     try:
       os.remove("chain.emcee")
     except:
       pass
 
-  def sanity_MCMCSampler(self):
+  def sanity_MCMCSampler(self):    
     # Import some required modules
     from numpy import arange, sqrt, exp, pi, random, ones
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     import pymc
-    # ... and now the funcFit module
+    # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
     # Creating a Gaussian with some noise
@@ -948,22 +954,18 @@ class MCMCExampleSanity(unittest.TestCase):
     # First, we create the Gauss1d fit object
     gf = fuf.GaussFit1d()
     # See what parameters are available
-    print "List of available parameters: ", gf.availableParameters()
+    print("List of available parameters: ", gf.availableParameters())
     # Set guess values for the parameters
     gf["A"] = -10.0
     gf["sig"] = 15.77
     gf["off"] = 0.87
     gf["mu"] = 7.5
     # Let us see whether the assignment worked
-    print "Parameters and guess values: ", gf.parameters()
+    print("Parameters and guess values: ", gf.parameters())
     
     # Which parameters shall be variable during the fit?
     # 'Thaw' those (the order is irrelevant)
     gf.thaw(["A", "sig", "off", "mu"])
-    
-    # Let us assume that we know that the amplitude is negative, i.e.,
-    # no lower boundary (None) and 0.0 as upper limit.
-    gf.setRestriction({"A":[None,0.0]})
     
     # Now start a simplex fit
     gf.fit(x,y,yerr=ones(x.size)*0.01)
@@ -991,17 +993,22 @@ class MCMCExampleSanity(unittest.TestCase):
                             upper=10.0, doc="Amplitude")
     
     # Start the sampling. The resulting Marchov-Chain will be written
-    # to the file 'mcmcExample.tmp'.
+    # to the file 'mcmcExample.tmp'. In default configuration, pickle
+    # is used to write that file.
+    # To save the chain to a compressed 'hdf5'
+    # file, you have to specify the dbArgs keyword; e.g., use:
+    #   dbArgs = {"db":"hdf5", "dbname":"mcmcExample.hdf5"}
     gf.fitMCMC(x, y, X0, Lims, steps, yerr=ones(x.size)*0.01, \
-               pymcPars=ppa, iter=2500, burn=0, thin=1, \
-               dbfile="mcmcExample.tmp")
+                pymcPars=ppa, iter=2500, burn=0, thin=1, \
+                dbfile="mcmcExample.tmp")
     
     # Reload the database (here, this is actually not required, but it is
     # if the Marchov chain is to be analyzed later).
     db = pymc.database.pickle.load('mcmcExample.tmp')
     # Plot the trace of the amplitude, 'A'.
-    mpl.hist(db.trace("A", 0)[:])
-    # mpl.show()
+    plt.hist(db.trace("A", 0)[:])
+#     plt.show()
+
 
 
   def sanity_MCMCPriorExample(self):
@@ -1100,19 +1107,20 @@ class MCMCExampleSanity(unittest.TestCase):
     X0, lims, steps = gauss.MCMCautoParameters(ranges)
     
     # Show what happened...
-    print
-    print "Auto-generated input parameters:"
-    print "X0: ", X0
-    print "lims: ", lims
-    print "steps: ", steps
-    print
+    print()
+    print("Auto-generated input parameters:")
+    print("X0: ", X0)
+    print("lims: ", lims)
+    print("steps: ", steps)
+    print()
     # Call the usual sampler
     gauss.fitMCMC(x, y, X0, lims, steps, yerr=yerr, iter=1000)
     
     # and plot the results
     plt.plot(x, y, 'k+')
     plt.plot(x, gauss.evaluate(x), 'r--')
-#    plt.show() 
+#     plt.show()
+
 
   def sanity_autoMCMCExample2(self):
     from PyAstronomy import funcFit as fuf
@@ -1191,7 +1199,7 @@ class MCMCExampleSanity(unittest.TestCase):
     
     # Use current parameters as starting point for the sampling
     X0 = vp.freeParameters()
-    print "Starting point for sampling: ", X0
+    print("Starting point for sampling: ", X0)
     
     # Now we specify the limits within which the individual parameters
     # can be varied. Actually, you specify the limits of uniform priors
@@ -1251,20 +1259,20 @@ class MCMCExampleSanity(unittest.TestCase):
     ta.setBurn(500)
     
     # See which model parameters have been sampled
-    print "Available parameters: ", ta.availableParameters()
+    print("Available parameters: ", ta.availableParameters())
     
     # Access the traces of these parameters
-    print "Trace for A: ", ta["A"]
+    print("Trace for A: ", ta["A"])
     
     # Calculate mean, median, standard deviation, and
     # credibility interval for the available parameters
     for p in ta.availableParameters():
       hpd = ta.hpd(p, cred=0.95)
-      print "Parameter %5s, mean = % g, median = % g, std = % g, 95%% HPD = % g - % g" \
-            % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1])
+      print("Parameter %5s, mean = % g, median = % g, std = % g, 95%% HPD = % g - % g" \
+            % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1]))
 
     ######## Fourth example
-    
+
     from PyAstronomy import funcFit as fuf
     
     # Create an instance of TraceAnalysis
@@ -1278,8 +1286,8 @@ class MCMCExampleSanity(unittest.TestCase):
     ta.correlationTable()
     
     # Calculate Pearson's and Spearman's r-coefficients
-    print "Pearson: ", ta.pearsonr("ad", "al")
-    print "Spearman: ", ta.spearmanr("ad", "al")
+    print("Pearson: ", ta.pearsonr("ad", "al"))
+    print("Spearman: ", ta.spearmanr("ad", "al"))
     
     # Show a plot of the correlation
     # Note that the plotCorrEnh method can also
@@ -1287,10 +1295,10 @@ class MCMCExampleSanity(unittest.TestCase):
     # chains.
     ta.plotCorr(parsList=["ad", "al"])
     # ta.plotCorrEnh(parsList=["ad", "al"])
-#    ta.show()
-
-    ######## Fifth example
+#     ta.show()
     
+    ######## Fifth example
+
     from PyAstronomy import funcFit as fuf
     import matplotlib.pylab as plt
     import numpy as np
@@ -1305,12 +1313,12 @@ class MCMCExampleSanity(unittest.TestCase):
     # Find sets of parameters
     # First, the lowest deviance set
     lds, index = ta.parameterSet(prescription="lowestDev")
-    print "Lowest deviance set: ", lds
-    print "  at chain index: ", index
+    print("Lowest deviance set: ", lds)
+    print("  at chain index: ", index)
     means = ta.parameterSet(prescription="mean")
-    print "Set of mean values: ", means
+    print("Set of mean values: ", means)
     medians = ta.parameterSet(prescription="median")
-    print "Set of median values: ", means
+    print("Set of median values: ", means)
     
     # Create Voigt model and plot the models belonging
     # to the lowest deviance, mean, and median parameter
@@ -1325,8 +1333,7 @@ class MCMCExampleSanity(unittest.TestCase):
     plt.plot(x, vp.evaluate(x), 'r.-')
     vp.assignValues(medians)
     plt.plot(x, vp.evaluate(x), 'g.-')
-#    plt.show()
-
+#     plt.show()
     
     ######## Sixth example
     
@@ -1459,9 +1466,9 @@ class MCMCExampleSanity(unittest.TestCase):
     # 2500 further iterations (per walker).
     sampleArgs = {"iters":2500, "burn":200}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
-    print
+    print()
     
     # Plot the distributions of the chains
     # NOTE: the order of the parameters in the chain object is the same
@@ -1474,26 +1481,26 @@ class MCMCExampleSanity(unittest.TestCase):
     # Fit the histogram using a Gaussian
     gf = fuf.GaussFit1d()
     gf.assignValues({"A":1.0, "mu":c, "sig":1.0/snr/np.sqrt(npoint)})
-    # First fitting only "mu" is simply quite stable
+    # First fitting only "mu" is simply quite stable 
     gf.thaw("mu")
     gf.fit(xhist, yhist)
     gf.thaw(["A", "sig"])
     gf.fit(xhist, yhist)
     
-    print
-    print "  --- Sampling results ---"
-    print "Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0])
-    print "Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint)
-    print "Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]),
-    print " and from Gaussian fit to distribution: ", gf["sig"]
+    print()
+    print("  --- Sampling results ---")
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]))
+    print("Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint))
+    print("Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print(" and from Gaussian fit to distribution: ", gf["sig"])
     
     # Evaluate best-fit model ...
     xmodel = np.linspace(c - 10.0/snr, c + 10.0/snr, 250)
     ymodel = gf.evaluate(xmodel)
     # ... and plot
-#     plt.plot(xhist, yhist, 'rp')
-#     plt.plot(xmodel, ymodel, 'r--')
-#     plt.legend()
+    plt.plot(xhist, yhist, 'rp')
+    plt.plot(xmodel, ymodel, 'r--')
+    plt.legend()
 #     plt.show()
     
     
@@ -1504,16 +1511,17 @@ class MCMCExampleSanity(unittest.TestCase):
     # information contained in the likelihood function.
     priors = {"c0":fuf.FuFPrior("gaussian", sig=1.0/snr/np.sqrt(npoint), mu=7.0)}
     
-    # Start the sampling (ps could be used to continueb the sampling)
+    # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs, priors=priors)
     
-    print
-    print "  --- Sampling results with strong prior information ---"
-    print "Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]),
-    print " +/-", np.std(pf.emceeSampler.flatchain[::,0])
+    print()
+    print("  --- Sampling results with strong prior information ---")
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print(" +/-", np.std(pf.emceeSampler.flatchain[::,0]))
     
     plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
 #     plt.show()
+
 
   def sanity_InstatiatePrior(self):
     from PyAstronomy import funcFit as fuf
@@ -1525,4 +1533,4 @@ class MCMCExampleSanity(unittest.TestCase):
     cvals = {"a":1.4, "b":0.86, "c":1.1}
     
     # Get log(prior) for parameter "b"
-    print gp(cvals, "b")
+    print(gp(cvals, "b"))

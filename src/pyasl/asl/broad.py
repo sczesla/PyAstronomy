@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import funcFit as fuf

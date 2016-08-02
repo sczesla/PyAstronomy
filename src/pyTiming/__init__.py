@@ -1,2 +1,2 @@
-import pyPDM
-import pyPeriod
+from . import pyPDM
+from . import pyPeriod

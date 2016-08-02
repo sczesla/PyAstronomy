@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class NelderMead:
   """
@@ -123,7 +125,7 @@ class NelderMead:
       if yssb > self._yi[h]:
         # Contract
         pl = self._simplex[l,::].copy()
-        for i in xrange(self._n+1):
+        for i in smo.range(self._n+1):
           if i == l: continue
           self._simplex[i,::] = (self._simplex[i,::] + pl)/2.0
           self._yi[i] = m.miniFunc(self._simplex[i,::])

@@ -239,7 +239,38 @@ class TransmissionCurves:
       
       bn = "IRAC" + wl + win
       self.addPassband(bn, dat[::,0], dat[::,1], snc=True)
+  
+  def addKeplerPassband(self, forceDownload=False, verbose=True):
+    """
+      Adds Kepler mission passband.
+      
+      Kepler high-resolution passband is downloaded from:
+      http://keplergo.arc.nasa.gov/kepler_response_hires1.txt
+      
+      and added as 'Kepler_HR'.
     
+      Parameters
+      ----------
+      forceDownload : boolean, optional
+          If True, a re-download of the passband files is triggered.
+          Default is False.
+      verbose : boolean, optional
+          If True (default), download process will print information
+          on progress.
+    """
+    
+    fno = os.path.join("pyasl", "resBased", "kepler_response_hires1.txt.gz")
+    
+    if (not self._fs.fileExists(fno)) or forceDownload:
+      self._fs.downloadToFile("http://keplergo.arc.nasa.gov/kepler_response_hires1.txt", fno, forceDownload, verbose)
+      
+    dat = np.loadtxt(self._fs.requestFile(fno))
+    # Convert into A
+    dat[::,0] *= 10.0
+    
+    bn = "Kepler_HR"
+    self.addPassband(bn, dat[::,0], dat[::,1], snc=True)
+  
   def __init__(self, fn="default"):
     self._fs = PP.PyAFS()
     self._readData(os.path.join(os.path.dirname(__file__), "transCurves.dat"))

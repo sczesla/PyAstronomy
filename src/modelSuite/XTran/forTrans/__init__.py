@@ -1,2 +1,2 @@
-from mandelAgol import *
-from mandelAgolNL import *
+from .mandelAgol import *
+from .mandelAgolNL import *

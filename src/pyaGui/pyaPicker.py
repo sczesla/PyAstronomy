@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.figure import Figure
 from PyAstronomy.pyaC import pyaErrors as PE
 
-import Tkinter as tk
+import six.moves.tkinter as tk
 import pickle
 
 

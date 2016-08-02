@@ -1,5 +1,7 @@
+from __future__ import print_function
 from . import pyaErrors as PE
 import difflib
+import six
  
 
 def fuzzyMatch(inkey, wordList, caseSensitive=True, n=3, cutoff=0.6, raises=False):
@@ -42,6 +44,10 @@ def fuzzyMatch(inkey, wordList, caseSensitive=True, n=3, cutoff=0.6, raises=Fals
         may have meant to specify.  If an exact match is found,
         also its index in `wordList` is provided.
   """
+  if not isinstance(wordList[0], six.string_types):
+    raise(PE.PyAValError("Worlist does not seem to be a list of strings. First item has type: " + str(type(wordList[0])), \
+                         where="fuzzyMatch", \
+                         solution="Convert into string."))
   if not caseSensitive:
     key = inkey.lower()
     wordList = [x.lower() for x in wordList]

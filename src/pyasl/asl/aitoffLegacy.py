@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import numpy
 from PyAstronomy.pyaC import pyaErrors as PE
 

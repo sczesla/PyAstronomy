@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import periodBase
+from __future__ import print_function, division
+from . import periodBase
 import numpy
 import scipy.special
 
@@ -19,14 +20,14 @@ class Fourier(periodBase.PeriodBase):
 
     dt=self.t[1:]-self.t[0:-1]
     if numpy.max(dt) > 1.1 * numpy.min(dt):
-      print "timingAna::fourier() - Error: data must be equally spaced!"
+      print("timingAna::fourier() - Error: data must be equally spaced!")
       exit()
 
     power=numpy.abs(numpy.fft.fft(self.y))**2.
     if self.norm=="Leahy":
       power=power*2./numpy.sum(self.y)
     else:
-      print "Normalization not yet implemented!"
+      print("Normalization not yet implemented!")
       power=power*2./numpy.sum(self.y)
     freq = numpy.fft.fftfreq(numpy.size(self.y),numpy.mean(dt))
     indi = numpy.where(freq>0)

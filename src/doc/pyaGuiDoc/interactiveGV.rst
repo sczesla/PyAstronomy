@@ -1,6 +1,8 @@
 Interactive Gauss/Voigt line fit
 ====================================
 
+.. p23ready
+
 The IAGVFit tool allows to interactively fit a series
 of Gaussian or Voigt profiles to a given data set.
 
@@ -36,31 +38,33 @@ Example: Using the interactive fitter
 ------------------------------------------
 
 ::
+    
+    from __future__ import print_function, division
+    from PyAstronomy import pyaGui
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    
+    # Data for the plot
+    x = np.linspace(5000., 5010, 200)
+    y = np.ones(len(x))
+    yerr = np.ones(len(x)) * 0.01
+    y += np.random.normal(0., 0.01, len(x))
+    
+    gf = fuf.GaussFit1d()
+    gf["A"] = -0.3
+    gf["mu"] = 5004.
+    gf["sig"] = 0.2
+    y += gf.evaluate(x)
+    
+    # Create interactive fitter
+    igv = pyaGui.IAGVFit(x, y, yerr=yerr, mode="gauss")
+    
+    r = igv.interactiveFit()
+    
+    print("Parameters of the fit: ", r[0])
+    print("Parameters of active component: ", r[1])
+    print("No. of components: ", r[2])
 
-  from PyAstronomy import pyaGui
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  
-  # Data for the plot
-  x = np.linspace(5000., 5010, 200)
-  y = np.ones(len(x))
-  yerr = np.ones(len(x)) * 0.01
-  y += np.random.normal(0., 0.01, len(x))
-  
-  gf = fuf.GaussFit1d()
-  gf["A"] = -0.3
-  gf["mu"] = 5004.
-  gf["sig"] = 0.2
-  y += gf.evaluate(x)
-  
-  # Create interactive fitter
-  igv = pyaGui.IAGVFit(x, y, yerr=yerr, mode="gauss")
-  
-  r = igv.interactiveFit()
-  
-  print "Parameters of the fit: ", r[0]
-  print "Parameters of active component: ", r[1]
-  print "No. of components: ", r[2]
 
 Class API documentation
 --------------------------

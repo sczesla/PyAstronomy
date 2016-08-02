@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 from numpy import mean, median, std
 import numpy as np
 import re
@@ -8,6 +9,8 @@ from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.funcFit.utils import ic
 import itertools
 from PyAstronomy import pyaC as PC
+import six
+import six.moves as smo
 
 try:
   import pymc
@@ -86,7 +89,7 @@ def quantiles(trace, qs):
   qfrac = np.array(qs) / 100.0
   # Evaluate quantiles
   result = {}
-  for i in xrange(len(qfrac)):
+  for i in smo.range(len(qfrac)):
     result[qs[i]] = st[int(n*qfrac[i])]
   return result
 
@@ -131,7 +134,7 @@ class TraceAnalysis:
           Variable name.
     """
     if not parm in self.tracesDic:
-      raise(PE.PyAValError("No trace available for parameter "+parm+".\n  Available parameters: "+', '.join(self.tracesDic.keys()), \
+      raise(PE.PyAValError("No trace available for parameter "+parm+".\n  Available parameters: "+', '.join(list(self.tracesDic.keys())), \
                            where="TraceAnalysis"))
 
   def __plotsizeHelper(self,size):
@@ -234,7 +237,7 @@ class TraceAnalysis:
     
   
   def __init__(self, resource, db="pickle"):
-    if isinstance(resource, basestring):
+    if isinstance(resource, six.string_types):
       # Resource is a filename
       if not os.path.isfile(resource):
         raise(PE.PyAFileError(resource, "ne"))
@@ -303,7 +306,7 @@ class TraceAnalysis:
     info += "----------------------------------\n\n"
     if hasattr(self, "file"):
       info += "MCMC sample file: "+self.file+"\n\n"
-    info+="  Stochastics:  "+str(self.stateDic["stochastics"].keys())+"\n\n"
+    info+="  Stochastics:  "+str(list(self.stateDic["stochastics"].keys()))+"\n\n"
     info+="  Sampler:      "+"Iterations: "+str(self.stateDic["sampler"]["_iter"])+"\n"
     info+="                "+"Burn:       "+str(self.stateDic["sampler"]["_burn"])+"\n"
     info+="                "+"Thin:       "+str(self.stateDic["sampler"]["_thin"])+"\n\n"
@@ -314,13 +317,13 @@ class TraceAnalysis:
     """
       Returns list of available parameter names.
     """
-    return self.stateDic["stochastics"].keys()
+    return list(self.stateDic["stochastics"].keys())
 
   def availableTraces(self):
     """
       Returns a list of available PyMC *Trace* objects
     """
-    return self.tracesDic.values()
+    return list(self.tracesDic.values())
 
   def state(self):
     """
@@ -383,7 +386,7 @@ class TraceAnalysis:
       PE.warn(PE.PyARequiredImport("To use 'plotHists', matplotlib has to be installed.", \
                                    solution="Install matplotlib."))
       return
-    if isinstance(parsList, basestring):
+    if isinstance(parsList, six.string_types):
       parsList = [parsList]
     tracesDic = {}
     if parsList is not None:
@@ -417,7 +420,7 @@ class TraceAnalysis:
       PE.warn(PE.PyARequiredImport("To use 'plotHists', matplotlib has to be installed.", \
                                    solution="Install matplotlib."))
       return
-    if isinstance(parsList, basestring):
+    if isinstance(parsList, six.string_types):
       parsList = [parsList]
     tracesDic = {}
     if parsList is not None:
@@ -431,7 +434,7 @@ class TraceAnalysis:
 
     ps = self.__plotsizeHelper(len(tracesDic))
 
-    for i,[pars,trace] in enumerate(tracesDic.items(), 1):
+    for i,[pars,trace] in enumerate(six.iteritems(tracesDic), 1):
       plt.subplot(ps[0],ps[1],i)
       plt.xlabel(pars)
       plt.ylabel("Deviance")
@@ -439,7 +442,7 @@ class TraceAnalysis:
 
 
   def plotHists(self, parsList=None, **histArgs):
-    print "TraceAnalysis::plotHists() - Warning! This function is deprecated. Use plotHist() instead."
+    print("TraceAnalysis::plotHists() - Warning! This function is deprecated. Use plotHist() instead.")
     self.plotHist(parsList, **histArgs)
 
 
@@ -522,8 +525,8 @@ class TraceAnalysis:
       for parm in self.availableParameters():
         tracesDic[parm] = self[parm]
 
-    pars = tracesDic.keys()
-    traces = tracesDic.values()
+    pars = list(tracesDic.keys())
+    traces = list(tracesDic.values())
 
     fontmap = {1:10, 2:8, 3:6, 4:5, 5:4}
     if not len(tracesDic)-1 in fontmap:
@@ -610,8 +613,8 @@ class TraceAnalysis:
       head = (" " * (max(colWidth.values()) + 1)) + "|"
       for p in pars:
         head += (" %" + str(colWidth[p]) + "s |") % p
-      print head
-      print "-" * len(head)
+      print(head)
+      print("-" * len(head))
       for p2 in pars:
         line = ("%" + str(max(colWidth.values())) + "s |") % (p2)
         for p1 in pars:
@@ -620,8 +623,8 @@ class TraceAnalysis:
           else:
             coe = corrs[(p1, p2)]
           line +=  " % 8.6f |" % coe
-        print line
-      print "-" * len(head)
+        print(line)
+      print("-" * len(head))
     
     return corrs
 
@@ -657,8 +660,8 @@ class TraceAnalysis:
       for parm in self.availableParameters():
         tracesDic[parm] = self[parm]
 
-    pars = tracesDic.keys()
-    traces = tracesDic.values()
+    pars = list(tracesDic.keys())
+    traces = list(tracesDic.values())
 
     fontmap = {1:10, 2:9, 3:8, 4:8, 5:8}
     if not len(tracesDic)-1 in fontmap:
@@ -730,8 +733,8 @@ class TraceAnalysis:
     # Calculate the matrix
     n = len(parList)
     matrix = np.zeros( (n, n) )
-    for i in xrange(n):
-      for j in xrange(n):
+    for i in smo.range(n):
+      for j in smo.range(n):
         matrix[i, j] = corFunc(parList[i], parList[j])[0]
         if covariance:
           matrix[i, j] *= (stds[parList[i]] * stds[parList[j]])
@@ -875,7 +878,7 @@ class TraceAnalysis:
     """
     try:
       plt.show()
-    except Exception, e:
+    except Exception as e:
       PE.warn(PE.PyAUnclassifiedError("Plot could not be shown. The following exception occurred:\n" \
                                       + str(e)))
 
@@ -973,24 +976,24 @@ class TraceAnalysis:
           (default is True).
     """
     if verbose:
-      print "Setting model to state: ", state
+      print("Setting model to state: ", state)
     if state == "best":
       # Setting to best state as measured by deviance
       indi = np.argmin(self["deviance"])
       if verbose:
-        print "Lowest deviance of ", self["deviance"][indi], " at index ", indi
+        print("Lowest deviance of ", self["deviance"][indi], " at index ", indi)
       for par in self.availableParameters():
-        if not par in model.parameters().keys():
+        if not par in six.iterkeys(model.parameters()):
           continue
         model[par] = self[par][indi]
         if verbose:
-          print "Setting parameter: ", par, " to value: ", model[par]
+          print("Setting parameter: ", par, " to value: ", model[par])
     if state == "mean":
       # Setting to "mean" state
       for par in self.availableParameters():
-        if not par in model.parameters().keys():
+        if not par in six.iterkeys(model.parameters()):
           continue
         model[par] = np.mean(self[par])
         if verbose:
-          print "Setting parameter: ", par, " to mean value: ", model[par]
+          print("Setting parameter: ", par, " to mean value: ", model[par])
         

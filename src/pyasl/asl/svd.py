@@ -1,5 +1,7 @@
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+import six.moves as smo
 
 class SVD:
   """
@@ -33,7 +35,7 @@ class SVD:
     # of the template are cut)
     n = len(template) - bn + 1
     self.des = np.matrix(np.zeros( (bn, n) ))
-    for i in xrange(bn):
+    for i in smo.range(bn):
       self.des[i,::] = template[i:i+n]
     self.des = self.des.T
   
@@ -78,7 +80,7 @@ class SVD:
       else:
         return (self.des * np.matrix(broad)).getA()[::,0]
     else:
-      modelInd = np.arange(self.bn/2, len(self.template)-self.bn/2)
+      modelInd = np.arange(self.bn//2, len(self.template)-self.bn//2)
       if not asarray:
         return (self.des * np.matrix(broad), modelInd)
       else:
@@ -115,7 +117,7 @@ class SVD:
     if len(flux) == (len(self.template) - self.bn + 1):
       validIndi = np.arange(len(self.template) - self.bn + 1)
     elif len(flux) == len(self.template):
-      validIndi = np.arange(self.bn/2, len(flux)-self.bn/2)
+      validIndi = np.arange(self.bn//2, len(flux)-self.bn//2)
     else:
       raise(PE.PyAValError("Inappropriate length of flux array.\n" + \
                            "  Either len(template) or len(template)-bn+1 is accepted.", \
@@ -156,7 +158,7 @@ class SVD:
     if self.bn is None:
       raise(PE.PyAOrderError("The length of the broadening function has not yet been specified.", \
                              solution="Call `decompose` first, where the length (bn) is specified."))
-    result = -np.arange(self.bn) + float(self.bn/2)
+    result = -np.arange(self.bn) + float(self.bn//2)
     result *= binsize
     result /= refWvl
     result *= 299792.458

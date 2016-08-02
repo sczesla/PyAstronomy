@@ -1,7 +1,10 @@
+from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl import _ic
 import os
+import six.moves as smo
+import six
 
 def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=None, clobber=False, refFileName=None, refFileExt=0):
   """
@@ -128,7 +131,7 @@ def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=No
     count = 0
     for k in requiredKeys:
       subCount = 0
-      for p in waveParams.iterkeys():
+      for p in six.iterkeys(waveParams):
         if p.upper() == k or p.upper() == k+"1":
           hk[k+"1"] = waveParams[p]
           subCount += 1

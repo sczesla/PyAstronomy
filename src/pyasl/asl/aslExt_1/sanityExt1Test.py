@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 from PyAstronomy import pyasl
 
@@ -118,12 +119,12 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Check sanity of Ramirez/Melendez 2005 example
     """
     from PyAstronomy import pyasl
-  
+    
     # Create class instance
     r = pyasl.Ramirez2005()
-  
+    
     # Which color bands are available
-    print "Available color bands: ", r.availableBands()
+    print("Available color bands: ", r.availableBands())
     
     # Convert B-V to effective temperature and back
     bv = 0.75
@@ -131,7 +132,24 @@ class SanityOfPyaslExt1(unittest.TestCase):
     teff = r.colorToTeff("B-V", bv, feh)
     bv1 = r.teffToColor("B-V", teff, feh)
     # Watch out for differences between input bv and the output bv1
-    print "B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1
+    print("B-V = ", bv, ", Teff = ", teff, ", bv1 = ", bv1, ", bv-bv1 = ", bv-bv1)
+
+  def sanity_ramirez2005Example2(self):
+    """
+      Checking Ramirez, Ballesteros example
+    """
+    from PyAstronomy import pyasl
+    
+    b = pyasl.BallesterosBV_T()
+    r = pyasl.Ramirez2005()
+    
+    # Convert B-V to effective temperature and back
+    for bv in [0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15, 1.25, 1.35, 1.45]:
+      tr = r.colorToTeff("B-V", bv, 0.0)
+      tb = b.bv2T(bv)
+    
+      print(("B-V [mag] = {3:4.2f} : Teff (R05) = {0:4.0f} K, " + \
+              "Teff (B12) = {1:4.0f} K, dTeff = {2: 4.0f} K").format(tr, tb, tr - tb, bv))
 
   def sanity_ramirez2005(self):
     """
@@ -174,19 +192,19 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Checking example for Ballesteros
     """
     from PyAstronomy import pyasl
-  
+    
     b = pyasl.BallesterosBV_T()
     
     bv = 0.65
     
     # Convert B-V into effective temperature
     teff = b.bv2T(0.65)
-    print "B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff)
+    print("B-V = {0:4.2f} mag -> Teff = {1:4.0f} K".format(bv, teff))
     
     # Convert effective temperature into B-V color
     teff = 4568.0
     bv = b.t2bv(teff)
-    print "Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv)
+    print("Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv))
   
   def sanity_gyroAgeBarnes(self):
     """
@@ -204,7 +222,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Example gyro age (Barnes 2007)
     """
     from PyAstronomy import pyasl
-  
+    
     # Parameters of the Sun (Barnes 2007, p 1174)
     bv = 0.642
     p = 26.09
@@ -212,9 +230,8 @@ class SanityOfPyaslExt1(unittest.TestCase):
     # Obtain solar age ...
     age = pyasl.gyroAgeBarnes(p, bv)
     # ... and print it
-    print "Solar age: {0:4.2f} +/- {1:4.2f} Ga".format(*age)
-  
-  
+    print("Solar age: {0:4.2f} +/- {1:4.2f} Ga".format(*age))
+
   def sanity_chromoAgeRHK(self):
     """
       Checking sanity of chromospheric age (Donahue)
@@ -224,7 +241,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
     dat = [[-4.25, 7.], [-4.6, 9.1], [-5.0, 9.7]]
     for d in dat:
       a = np.log10(pyasl.chromoAgeRHK(d[0])*1e9)
-      print a, d[1]
+      print(a, d[1])
       self.assertAlmostEqual(a, d[1], delta=0.3,
                              msg="Cannot reproduce age estimate from Donahue fig 1.")
   
@@ -233,31 +250,31 @@ class SanityOfPyaslExt1(unittest.TestCase):
       Example chromospheric age (Donahue)
     """
     from PyAstronomy import pyasl
-  
+    
     # Approximate chromospheric age of the Sun
-    print "Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95))
+    print("Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95)))
   
   def sanity_abundancepatternsExample(self):
     """
       Checking example of AbundancePatterns
     """
     from PyAstronomy import pyasl
-
+    
     ap = pyasl.AbundancePatterns()
-
-    print "Names of the available abundance patterns:"
-    print ap.availablePatterns()
-
-    print
-    print "Get the Asplund et al. pattern (aspl) as a dictionary using"
-    print "atomic number as a key:"
-    print ap.pattern("aspl", form="dict", key="number")
-
-    print
-    print "Get (relative) number abundance of oxygen using elemental symbol:"
-    print ap.abundance("O", pat="wilm")
-    print "or atomic number"
-    print ap.abundance(8, pat="wilm")
+    
+    print("Names of the available abundance patterns:")
+    print(ap.availablePatterns())
+    
+    print()
+    print("Get the Asplund et al. pattern (aspl) as a dictionary using")
+    print("atomic number as a key:")
+    print(ap.pattern("aspl", form="dict", key="number"))
+    
+    print()
+    print("Get (relative) number abundance of oxygen using elemental symbol:")
+    print(ap.abundance("O", pat="wilm"))
+    print("or atomic number")
+    print(ap.abundance(8, pat="wilm"))
   
   def sanity_abundancePatterns(self):
     """
@@ -272,4 +289,128 @@ class SanityOfPyaslExt1(unittest.TestCase):
     p = ap.pattern("wilm", form="dict", key="symbol")
     self.assertAlmostEqual(p["Ti"], 6.46e-08, delta=1e-12, \
                            msg="Ti abundance broken (wilm)")
+  
+  def sanity_SpecTypeDeJagerExample1(self):
+    """
+      Sanity of example 1 (SpecTypeDeJager)
+    """
+    from PyAstronomy import pyasl
     
+    # Instantiate class object
+    sdj = pyasl.SpecTypeDeJager()
+    
+    llum, lteff = sdj.lumAndTeff("K0", "V")
+    
+    print("Luminosity = {0:4.2f} Lsun".format(10.0**llum))
+    print("Effective temperature = {0:6.1f} K".format(10.0**lteff))
+    
+  def sanity_SpecTypeDeJagerExample2(self):
+    """
+      Sanity of example 2 (SpecTypeDeJager)
+    """
+#     from __future__ import print_function
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    
+    # Instantiate class object
+    sdj = pyasl.SpecTypeDeJager()
+    
+    # Set luminosity class
+    lk = "V"
+    
+    # Save spectral types, log(teff), and log(luminosity)
+    spts = []
+    lteffs = []
+    llums = []
+    
+    # Save information to annotate abscissa
+    xt = []
+    xtl = []
+    
+    for t in "OBAFGKM":
+        for n in range(10):
+            if (t == "O") and (n == 0):
+                # Skip the invalid "O0" type
+                continue
+              
+            # Save the spectral type
+            spts.append(t + str(n))
+        
+            # Get log10 of luminosity and effective temperature
+            ll, lt = sdj.lumAndTeff(spts[-1], lk)
+            # and save to lists
+            llums.append(ll)
+            lteffs.append(lt)
+        
+            # Save location (i.e., number in the list) and
+            # spectral for annotating the abscissa
+            if (n == 0) or (n == 5):
+                xt.append(len(spts)-1)
+                xtl.append(spts[-1])
+    
+    
+#     ax1 = plt.subplot(2,1,1)
+#     # Plot log10(effective temperature)
+#     plt.plot(lteffs)
+#     plt.ylabel("$\log_{10}$(T$_{eff}$)")
+#     plt.setp(ax1, xticks=xt,xticklabels=xtl)
+#     ax2 = plt.subplot(2,1,2)
+#     # Plot log10(luminosity)
+#     plt.plot(llums)
+#     plt.ylabel("$\log_{10}$($L/L_{\odot}$)")
+#     plt.setp(ax2, xticks=xt,xticklabels=xtl)
+#     plt.xlabel("Spectral type")
+#     plt.show()
+
+  def sanity_SpecTypeDeJagerSanity(self):
+    """
+      Sanity of SpecTypeDeJager
+    """
+    from PyAstronomy import pyasl
+    
+    # Instantiate class object
+    sdj = pyasl.SpecTypeDeJager()
+    
+    llum, lteff = sdj.lumAndTeff("K0", "V")
+    self.assertAlmostEqual(10.0**(lteff-3.712), 1., delta=0.05, msg="Mismatch K0 V (teff)")
+    self.assertAlmostEqual(10.0**(llum+0.258), 1., delta=0.2, msg="Mismatch K0 V (lum)")
+    
+    llum, lteff = sdj.lumAndTeff("B7", "Ia")
+    self.assertAlmostEqual(10.0**(lteff-4.072), 1., delta=0.05, msg="Mismatch B7 Ia (teff)")
+    self.assertAlmostEqual(10.0**(llum-5.123), 1., delta=0.2, msg="Mismatch B7 Ia (lum)")
+    
+    llum, lteff = sdj.lumAndTeff("G4", "IV")
+    self.assertAlmostEqual(10.0**(lteff-3.723), 1., delta=0.05, msg="Mismatch G4 IV (teff)")
+    self.assertAlmostEqual(10.0**(llum-0.802), 1., delta=0.2, msg="Mismatch G4 IV (lum)")
+    
+    llum1, lteff1 = sdj.lumAndTeff("G4", "V")
+    llum2, lteff2 = sdj.lumAndTeff("G4.5", "V")
+    llum3, lteff3 = sdj.lumAndTeff("G5", "V")
+    self.assertTrue(llum1 > llum2 > llum3, msg="Float subtype, wrong order of luminosities")
+    self.assertTrue(lteff1 >  lteff2 > lteff3, msg="Float subtype, wrong order of luminosities")
+    
+  def sanity_MMSCETSTableExample(self):
+    """
+      Sanity of example for MMSCETS table
+    """
+    from PyAstronomy import pyasl
+    import matplotlib.pylab as plt
+    
+    # Instantiate class
+    m = pyasl.MMSCETSTable()
+    
+    # Print the entire data file
+    for l in m.getContent():
+      print(l, end='')
+    
+    print()
+    print("Available columns: ", ", ".join(m.availableColumns()))
+    
+    # Get the tabulated data as an ASCII table
+    td = m.getTable()
+    
+    # Plot absolute visual brightness vs. effective temperature
+    plt.plot(td["Teff"], td["Mv"], 'b.-')
+    plt.xlabel("Teff [K]")
+    plt.ylabel("Mv [mag]")
+#     plt.show()

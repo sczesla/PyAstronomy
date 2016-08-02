@@ -1,10 +1,12 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import ImportCheck as _ImportCheck
 from PyAstronomy.pyaC import pyaErrors as _PE
 import PyAstronomy as _PyA
 from PyAstronomy.constants import _systems
 import os
-import ConfigParser as _ConfigParser
+from six.moves import configparser as _ConfigParser
 import numpy
+import six
 
 _ic = _ImportCheck(["quantities"], ["quantities"])
 
@@ -21,8 +23,8 @@ def _displaySummary(scope):
         The scope from which to get the data to
         be displayed.
   """
-  print "Current unit system: ", getattr(scope, "getSystem")()
-  print
+  print("Current unit system: ", getattr(scope, "getSystem")())
+  print()
   
   cmod = scope
   inventory = getattr(scope, "inventory")
@@ -30,7 +32,7 @@ def _displaySummary(scope):
   maxlenSym = 0
   maxlenDescr = 0
   maxlenVal = 0
-  for k in inventory.iterkeys():
+  for k in six.iterkeys(inventory):
     maxlenSym = max(maxlenSym, len(k))
     maxlenDescr = max(maxlenDescr, len(inventory[k]["descr"]))
     maxlenVal = max(maxlenVal, len("%10.5e %s" % (getattr(cmod, "f_"+k).magnitude, getattr(cmod, "f_"+k).dimensionality)))
@@ -40,15 +42,15 @@ def _displaySummary(scope):
   
   totlen = maxlenSym + maxlenDescr + maxlenVal + 6
   
-  print ("%" + str(maxlenSym) + "s | %" + str(maxlenDescr) + "s | %" + \
-         str(maxlenVal) + "s") % ("Symbol", "Description", "Value")
-  print "-" * maxlenSym + "---" + '-' * maxlenDescr + "---" + '-' * maxlenVal
+  print(("%" + str(maxlenSym) + "s | %" + str(maxlenDescr) + "s | %" + \
+         str(maxlenVal) + "s") % ("Symbol", "Description", "Value"))
+  print("-" * maxlenSym + "---" + '-' * maxlenDescr + "---" + '-' * maxlenVal)
 
   for k in sorted(inventory.keys()):
-    print (("%" + str(maxlenSym) + "s | ") % k) + \
+    print((("%" + str(maxlenSym) + "s | ") % k) + \
           ("%" + str(maxlenDescr) + "s") % inventory[k]["descr"] + " | " + \
-          "%10.5e %s" % (getattr(cmod, "f_"+k).magnitude, getattr(cmod, "f_"+k).dimensionality)
-  print "-" * totlen
+          "%10.5e %s" % (getattr(cmod, "f_"+k).magnitude, getattr(cmod, "f_"+k).dimensionality))
+  print("-" * totlen)
 
 
 class PyAConstants:
@@ -67,7 +69,7 @@ class PyAConstants:
     """
       Translate information in `inventory` into class attributes.
     """
-    for k, u in self.inventory.iteritems():
+    for k, u in six.iteritems(self.inventory):
       val = _pq.Quantity(numpy.float64(u["valueSI"]), u["units"]["SI"])
       value = val.rescale(u["units"][self._unitSystem])
       setattr(self, u["symbol"], value.magnitude)
@@ -125,7 +127,7 @@ class PyAConstants:
       Empties the `inventory` and deletes all
       related module attributes.
     """
-    for k, u in self.inventory.iteritems():
+    for k, u in six.iteritems(self.inventory):
       delattr(self, u["symbol"])
       delattr(self, "f_" + u["symbol"])
       delattr(self, "f_" + u["symbol"] + "_err")
@@ -148,11 +150,11 @@ class PyAConstants:
     """
     if not const in self.inventory:
       raise(_PE.PyAValError("No such constant: '" + str(const) + "'."))
-    print "Constant              : '" + const + "'"
-    print "Description           : " + self.inventory[const]["descr"]
-    print "Current value and unit: " + str(getattr(self, "f_"+const))
-    print "Uncertainty           : " + str(getattr(self, "f_"+const+"_err"))
-    print "Source                : " + self.inventory[const]["source"]
+    print("Constant              : '" + const + "'")
+    print("Description           : " + self.inventory[const]["descr"])
+    print("Current value and unit: " + str(getattr(self, "f_"+const)))
+    print("Uncertainty           : " + str(getattr(self, "f_"+const+"_err")))
+    print("Source                : " + self.inventory[const]["source"])
     return self.inventory[const]
 
   def getSystem(self):

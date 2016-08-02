@@ -1,6 +1,8 @@
 S-Index and RHK
 =================
 
+.. p23ready
+
 .. currentmodule:: PyAstronomy.pyasl
 .. autoclass:: SMW_RHK
    :members:
@@ -9,22 +11,23 @@ Convert Mount-Wilson S-index into RHK
 ----------------------------------------
 
 ::
-
-  from PyAstronomy import pyasl
-  
-  ss = pyasl.SMW_RHK()
-  
-  bv = 0.8
-  teff = 5100.0
-  s = 0.4
-  
-  print "Convert S-index to RHK assuming a giant"
-  ss.SMWtoRHK(s, teff, bv, lc="g", verbose=True)
-  
-  print
-  print
-  print "Convert S-index to RHK assuming a main-sequence star"
-  ss.SMWtoRHK(s, teff, bv, lc="ms", verbose=True)
+    
+    from __future__ import print_function, division
+    from PyAstronomy import pyasl
+    
+    ss = pyasl.SMW_RHK()
+    
+    bv = 0.8
+    teff = 5100.0
+    s = 0.4
+    
+    print("Convert S-index to RHK assuming a giant")
+    ss.SMWtoRHK(s, teff, bv, lc="g", verbose=True)
+    
+    print()
+    print()
+    print("Convert S-index to RHK assuming a main-sequence star")
+    ss.SMWtoRHK(s, teff, bv, lc="ms", verbose=True)
 
 
 Show the Ccf conversion factor
@@ -43,7 +46,7 @@ Show the Ccf conversion factor
     ccfr = bv * 0.0
     ccfrg = bv * 0.0
     
-    for i in xrange(len(bv)):
+    for i in range(len(bv)):
       ccfn[i] = ss.log10ccfNoyes(bv[i])
       ccfr[i] = ss.log10ccfRutten(bv[i])
       ccfrg[i] = ss.log10ccfRutten(bv[i], lc="g")

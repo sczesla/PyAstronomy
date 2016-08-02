@@ -17,7 +17,7 @@ from . import localtime
 import six
 import six.moves as smo
 
-def isInTransit(time, T0, period, halfDuration, boolOutput=False):
+def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
   """
     Check whether time is inclosed by transit interval.
     
@@ -41,6 +41,10 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False):
         If set True and `time` is an array, the function will
         return a bool array holding True for time points in-
         and False for time points out-of-transit.
+    secin : boolean, optional
+        If True, also points associated with the secondary
+        transit (around phase 0.5) will be counted as falling
+        into the transit window. Default is False.
     
     Returns
     -------
@@ -65,6 +69,8 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False):
   absPhase -= np.floor(absPhase)
   dPhase = halfDuration/period
   isIn = np.logical_or(absPhase <= dPhase, absPhase >= (1.-dPhase))
+  if secin:
+    isIn = isIn | (np.abs(absPhase - 0.5) < dPhase)
   indi = np.where(isIn)[0]
   if isinstance(time, float):
     return (len(indi) == 1)
@@ -346,8 +352,9 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True, \
   
     if hjd:
       # Convert input times into heliocentric frame
-      tmin = helio_jd(tmin, ra, dec)
-      tmax = helio_jd(tmax, ra, dec)
+      # Using 'reduced' JD in calculation
+      tmin = helio_jd(tmin-2.4e6, ra, dec) + 2.4e6
+      tmax = helio_jd(tmax-2.4e6, ra, dec) + 2.4e6
   
     print("Specified time span")
     print("Start date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmin)))
@@ -830,7 +837,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
   ax.yaxis.grid(color='gray', which="minor", linestyle='dotted')
   ax2.xaxis.grid(color='gray', linestyle='dotted')
 
-  plt.text(0.5,0.95,"Transit visibility of "+allData[n]["Planet name"], \
+  plt.text(0.5,0.95,"Transit visibility of "+allData[n]["Planet name"].decode("utf8"), \
            transform=fig.transFigure, ha='center', va='bottom', fontsize=20)
 
   if plotLegend:

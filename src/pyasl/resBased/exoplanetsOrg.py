@@ -1,11 +1,13 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE 
 import PyAstronomy.pyaC as pyaC
 import os
-import urllib2
 import gzip
 import csv
 import numpy as np
+import six.moves as smo
+import six
 
 class ExoplanetsOrg(pp.PyAUpdateCycle):
   """
@@ -69,9 +71,9 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
     """
       Download data.
     """
-    response = urllib2.urlopen("http://exoplanets.org/csv-files/exoplanets.csv")
-    data = response.read()
-    self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
+    url = "http://exoplanets.org/csv-files/exoplanets.csv"
+    self._fs.downloadToFile(url, self.dataFileName, clobber=True, verbose=False,
+                            openMethod=gzip.open)
  
   def __init__(self, skipUpdate=False):
     self.data = None
@@ -131,14 +133,15 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
                    "DEC_STRING":"dec", "RA_STRING":"ra", "KOI":"KOI", "K":"K"}
     # Check whether data file exists
     self._fs = pp.PyAFS()
-    if self.needsUpdate():
-      # Data needs update
-      print "Downloading exoplanet data from explanets.org exoplanet archive"
-      self._update(self._downloadData)
-      print "Saved data to file: ", self.dataFileName, " in data directory,"
-      print "  which has been configured as: ", self._fs.dpath
-      print "By default, the data will be downloaded anew every 7 days."
-      print "You can use the `changeDownloadCycle` to change this behavior."
+    if not skipUpdate:
+      if self.needsUpdate() or (not self._fs.fileExists(self.dataFileName)):
+        # Data needs update
+        print("Downloading exoplanet data from explanets.org exoplanet archive")
+        self._update(self._downloadData)
+        print("Saved data to file: ", self.dataFileName, " in data directory,")
+        print("  which has been configured as: ", self._fs.dpath)
+        print("By default, the data will be downloaded anew every 7 days.")
+        print("You can use the `changeDownloadCycle` to change this behavior.")
     self._readData()
 
   def downloadData(self):
@@ -151,15 +154,15 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
     """
       Read the data from local file into numpy recarray.
     """
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
     for nplanets, x in enumerate(r):
       pass
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
-    dtype = map(lambda x: (self._columns[x][0], self._columns[x][3]), range(len(self._columns)))
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
+    dtype = [(self._columns[x][0], self._columns[x][3]) for x in range(len(self._columns))]
     self.data = np.recarray((nplanets+1,), dtype=dtype)
     
     # List of keys which shall be extracted
-    desiredKeys = map(lambda x:x, self._ident.iterkeys())
+    desiredKeys = [x for x in six.iterkeys(self._ident)]
     
     # Assigned data
     for i, x in enumerate(r):
@@ -187,13 +190,13 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
     if self.data is None:
       return None
     if verbose:
-      print "{0:12s}  {1:35s}  {2:5s}".format("Column", "Description", "Unit")
-      print "-"*63
-      for v in self._columns.itervalues():
-        print "{0:12s}  {1:35s}  {2:5s}".format(*v)
-      print "-"*63
+      print("{0:12s}  {1:35s}  {2:5s}".format("Column", "Description", "Unit"))
+      print("-"*63)
+      for v in six.itervalues(self._columns):
+        print("{0:12s}  {1:35s}  {2:5s}".format(*v))
+      print("-"*63)
     
-    return map(lambda x:self._columns[x][0], range(len(self._columns)))
+    return [self._columns[x][0] for x in smo.range(len(self._columns))]
     
   def selectByPlanetName(self, planetName, caseSensitive=False):
     """
@@ -213,9 +216,10 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
           A dictionary with a key for every data column holding
           the associated value from the data table.
     """
-    r = pyaC.fuzzyMatch(planetName, self.data.pl_name, caseSensitive=caseSensitive, raises=True)
+    plnames = [name.decode("utf8") for name in self.data.pl_name]
+    r = pyaC.fuzzyMatch(planetName, plnames, caseSensitive=caseSensitive, raises=True)
     result = {}
-    for c in self._columns.itervalues():
+    for c in six.itervalues(self._columns):
       result[c[0]] = self.data[c[0]][r["index"]]
     return result
 

@@ -35,6 +35,7 @@ Uncategorized algorithms
    aslDoc/aslExt_1Doc/pizzolato2003Doc.rst
    aslDoc/aslExt_1Doc/ramirez2005.rst
    aslDoc/aslExt_1Doc/stellarAge.rst
+   aslDoc/aslExt_1Doc/spectralClass.rst
 
 General data analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -126,6 +127,7 @@ Resource based helpers
    resBasedDoc/sweet_cat.rst
    resBasedDoc/kuruczModels.rst
    resBasedDoc/fip.rst
+   aslDoc/aslExt_1Doc/mmscetsTable.rst
    
 
    

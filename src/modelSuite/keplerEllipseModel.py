@@ -25,9 +25,9 @@ class KeplerEllipseModel(fuf.OneDFit):
       -  `a`    - The semi-major axis (same units as the data)
       - `per`   - The period (same time units as data)
       - `e`     - The eccentricity
-      - `tau`   - Time of periastron passage (same time units as data)
+      - `tau`   - Time of periapsis passage (same time units as data)
       - `Omega` - Longitude of the ascending node [deg]
-      - `w`     - Longitude of periastron [deg]
+      - `w`     - Argument of periapsis [deg]
       - `i`     - Inclination angle [deg]
     
     Parameters

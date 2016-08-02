@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 try:
   from numpy.distutils.core import setup, Command
 except(ImportError):
-  print "Please install 'numpy' first."
+  print("Please install 'numpy' first.")
   
 import glob
 import sys
@@ -129,7 +130,8 @@ package_data = {"PyAstronomy":["setup.cfg"],
                 "PyAstronomy.pyasl.resBased":["*.dat"], \
                 "PyAstronomy.pyasl.asl.aslExt_1":["*.dat"], \
                 "PyAstronomy.constants":["*.dat"], \
-                "PyAstronomy.pyaC":["*.dat"]
+                "PyAstronomy.pyaC":["*.dat"], \
+                "PyAstronomy.pyaC.mtools":["*.dat"]
                 }
 
 extOccultnl = Extension('PyAstronomy.modelSuite.XTran.forTrans.occultnl',
@@ -156,7 +158,7 @@ class WithExtCommand(Command):
     def finalize_options(self):
         pass
     def run(self):
-        print "Version: ", PyA_Version()
+        print("Version: ", PyA_Version())
 
 
 
@@ -201,12 +203,12 @@ setup(cmdclass = {"with-ext":WithExtCommand},
       )
 
 if not withExt:
-  print ""
-  print ""
-  print "  USER INFO: External modules have not been built!"
-  print "    The following modules have not been compiled:"
+  print("")
+  print("")
+  print("  USER INFO: External modules have not been built!")
+  print("    The following modules have not been compiled:")
   for e in _ext_modules:
-    print "    \""+e.name+"\", Sources: ", e.sources
-  print "  USE 'python setup.py --with-ext install' to build external modules"
-  print "" 
+    print("    \""+e.name+"\", Sources: ", e.sources)
+  print("  USE 'python setup.py --with-ext install' to build external modules")
+  print("") 
   

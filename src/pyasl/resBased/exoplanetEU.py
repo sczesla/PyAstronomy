@@ -1,14 +1,15 @@
+from __future__ import print_function, division
 from PyAstronomy.pyaC import pyaPermanent as pp
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyaC
 from PyAstronomy.pyasl import _ic 
 import os
-import urllib2
 import gzip
 import csv
 import numpy as np
 import warnings
 import six.moves as smo
+import six
 import copy
 
 if _ic.check["astropy"]:
@@ -74,26 +75,25 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     """
       Download data.
     """
-    response = urllib2.urlopen("http://exoplanet.eu/catalog/csv")
-    data = response.read()
-    self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
+    self._fs.downloadToFile("http://exoplanet.eu/catalog/csv", self.dataFileName, clobber=True,
+                            verbose=False, openMethod=gzip.open)
   
   def _readData(self):
     """
     """
     # Determine number of planets in the csv file
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
     for nplanets, x in enumerate(r):
       pass
     # Reinitialize csv file
-    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'r', gzip.open), delimiter=',')
+    r = csv.DictReader(self._fs.requestFile(self.dataFileName, 'rt', gzip.open), delimiter=',')
     # Determine data types for numpy recarray from columns
-    # and initialize array
-    dtype = map(lambda x: (self._columns[x][0], self._columns[x][3]), range(len(self._columns)))
+    # and initialize 
+    dtype = [(self._columns[x][0], self._columns[x][3]) for x in range(len(self._columns))]
     self.data = np.recarray((nplanets+1,), dtype=dtype)
-    colnotfilled = map(lambda x:self._columns[x][0], self._columns.keys())
+    colnotfilled = [self._columns[x][0] for x in six.iterkeys(self._columns)]
     for i, x in enumerate(r):
-      for k, v in x.iteritems():
+      for k, v in six.iteritems(x):
         # Remove hash and white spaces from column names
         k = k.strip('#')
         k = k.strip()
@@ -127,14 +127,14 @@ class ExoplanetEU(pp.PyAUpdateCycle):
       Column names : list of strings
           The names of the columns.
     """
-    print "-"*51
-    print "%12s  %30s  %5s" % ("Column Name", "Description", "Unit")
-    print "-"*51
+    print("-"*51)
+    print("%12s  %30s  %5s" % ("Column Name", "Description", "Unit"))
+    print("-"*51)
     cols = []
-    for k, v in self._columns.iteritems():
-      print "%12s  %30s  %5s" % tuple(v[0:3])
+    for k, v in six.iteritems(self._columns):
+      print("%12s  %30s  %5s" % tuple(v[0:3]))
       cols.append(v[0])
-    print "-"*51
+    print("-"*51)
     return cols
     
   
@@ -233,8 +233,11 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     ==========================  =======  =======  ============================================================================================  
                           name   object           Name of a planet                                                                              
                           mass  float64  jovMass  Planetary Mass                                                                                
-                mass_error_min  float64  jovMass  Planetary Mass error                                                                          
-                mass_error_max  float64  jovMass  Planetary Mass error                                                                          
+                  mass_err_min  float64  jovMass  Planetary Mass error                                                                          
+                  mass_err_max  float64  jovMass  Planetary Mass error                                                                          
+                     mass_sini  float64  jovMass  Planetary Mass*sin(i)                                                                         
+           mass_sini_error_min  float64  jovMass  Planetary Mass*sin(i) error                                                                   
+           mass_sini_error_max  float64  jovMass  Planetary Mass*sin(i) error                                                                   
                         radius  float64     Rjup  Planetary Radius                                                                              
               radius_error_min  float64     Rjup  Planetary Radius error                                                                        
               radius_error_max  float64     Rjup  Planetary Radius error                                                                        
@@ -302,16 +305,37 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
                          mag_h  float64      mag  H magnitude of a host star                                                                    
                          mag_k  float64      mag  K magnitude of a host star                                                                    
                  star_distance  float64       pc  Distance to a host star                                                                       
+       star_distance_error_min  float64       pc  Distance to a host star error                                                                 
+       star_distance_error_max  float64       pc  Distance to a host star error                                                                 
               star_metallicity  float64           Metallicity of a host star                                                                    
+    star_metallicity_error_min  float64           Metallicity of a host star error                                                              
+    star_metallicity_error_max  float64           Metallicity of a host star error                                                              
                      star_mass  float64     Msun  Mass of a host star                                                                           
+           star_mass_error_min  float64     Msun  Mass of a host star error                                                                     
+           star_mass_error_max  float64     Msun  Mass of a host star error                                                                     
                    star_radius  float64     Rsun  Radius of a host star                                                                         
+         star_radius_error_min  float64     Rsun  Radius of a host star error                                                                   
+         star_radius_error_max  float64     Rsun  Radius of a host star error                                                                   
                   star_sp_type   object           Spectral type of a host star                                                                  
                       star_age  float64      Gyr  Age of a host star                                                                            
+            star_age_error_min  float64      Gyr  Age of a host star error                                                                      
+            star_age_error_max  float64      Gyr  Age of a host star error                                                                      
                      star_teff  float64        K  Effective temperature of a host star                                                          
+           star_teff_error_min  float64        K  Effective temperature of a host star error                                                    
+           star_teff_error_max  float64        K  Effective temperature of a host star error                                                    
             star_detected_disc   object           Star Detected Disc                                                                            
            star_magnetic_field     bool           Star magnetic field                                                                           
-    ==========================  =======  =======  ============================================================================================ 
+          star_alternate_names   object           List of star alternative names                                                                
+    ==========================  =======  =======  ============================================================================================  
     
+    
+    Parameters
+    ----------
+    skipUpdate : Boolean, optional
+        If True, update of data will be skipped (default is False).
+    forceUpdate : Boolean, optional
+        If True, udpate of data will be forced (independent of value
+        if `skipUpdate`, default is False)
   """
   
   
@@ -328,12 +352,13 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
   
   def forceUpdate(self):
     """
-      Force a fresh download of the data.
+      Force a fresh download of the data and read the data.
       
       By default, the data will be updated every
       7 days. 
     """
     self._update(self._download)
+    self._readData()
   
   def showAvailableData(self):
     """
@@ -345,7 +370,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     # Information to be used in output
     fs = ["name", "dtype", "unit", "description"]
     dat = {}
-    cols = self.vot.columns.values()
+    cols = list(self.vot.columns.values())
     # Collect data
     for i in smo.range(len(cols)):
       dat[i] = {}
@@ -368,9 +393,9 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
         continue
       l += ("%" + str(maxlens[v]) + "s  ") % v
     # Output header
-    print sep
-    print l
-    print sep
+    print(sep)
+    print(l)
+    print(sep)
     
     # Output information
     for i in smo.range(len(cols)):
@@ -381,8 +406,8 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
           l += ("%-" + str(maxlens[v]) + "s  ") % dat[i][v]
           continue
         l += ("%" + str(maxlens[v]) + "s  ") % dat[i][v]
-      print l
-    print sep
+      print(l)
+    print(sep)
   
   def getUnitOf(self, col):
     """
@@ -414,7 +439,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     """
     # Search keys with/without errors
     kwe, kwoe = [], []
-    for k in dat.keys():
+    for k in six.iterkeys(dat):
       if k.find("_error") != -1:
         # Ignore keys containing the '_error' phrase
         continue
@@ -441,22 +466,28 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
       if (k.find("_error") != -1) or (k.find("_err_") != -1):
         # Ignore keys containing the '_error' phrase
         continue
-      ep = "_error_"
-      if k.find("orbital_period") != -1:
-        ep = "_err_"
       if k in kwoe:
         lines.append( ("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]))
       else:
-        lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+        try:
+          # Try _error_ to locate errors
+          ep = "_error_"
+          lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+        except KeyError:
+          # Try _err_ to locate errors
+          ep = "_err_"
+          lines.append(("%" + str(maxlen) + "s") % k + ("  [%" + str(mlu) + "s]  ") % units[k] + str(dat[k]) + "(+" + str(dat[k+ep+"max"]) + ", -" + str(dat[k+ep+"min"]) + ")")
+        except:
+          raise
     
     # Maximum length of output line
     mll = max(list(smo.map(lambda x:len(x), lines)))
     
     # Print to screen
-    print "-"*mll
+    print("-"*mll)
     for l in lines :
-      print l   
-    print "-"*mll    
+      print(l)   
+    print("-"*mll)    
     
   def selectByPlanetName(self, planetName, toScreen=True, caseSensitive=False):
     """
@@ -479,7 +510,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
           A dictionary with a key for every data column holding
           the associated value from the data table.
     """
-    names = list(self.vot["name"])
+    names = [n.decode("utf8") for n in self.vot["name"]]
     r = pyaC.fuzzyMatch(planetName, names, caseSensitive=caseSensitive, raises=True)
     result = {cn:self.vot[r["index"]][cn] for cn in self.vot.colnames}
     if toScreen:
@@ -523,7 +554,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
                                  solution="Install 'pandas' package."))
     return self.vot.to_pandas()
   
-  def __init__(self, skipUpdate=False):
+  def __init__(self, skipUpdate=False, forceUpdate=False):
     
     if not _ic.check["astropy"]:
       raise(PE.PyARequiredImport("The 'astropy' package is not installed. astropy is required to read VO tables.", \
@@ -534,16 +565,19 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     pp.PyAUpdateCycle.__init__(self, configFilename, "ExoUpdate")
     self.dataFileName = os.path.join("pyasl", "resBased", "epeu.vo.gz")
     self._fs = pp.PyAFS()
-    if self.needsUpdate() and (not skipUpdate):
+    if forceUpdate:
+      self._update(self._download)
+    elif (self.needsUpdate() or (not self._fs.fileExists(self.dataFileName))) and (not skipUpdate):
+      # Download data if data file does not exist or
+      # regular update is indicated
       self._update(self._download)
     self._readData()
       
   def _download(self):
     """
       Download data.
-    """
-    response = urllib2.urlopen("http://exoplanet.eu/catalog/votable")
-    data = response.read()
-    self._fs.requestFile(self.dataFileName, 'w', gzip.open).write(data)
+    """   
+    self._fs.downloadToFile("http://exoplanet.eu/catalog/votable", self.dataFileName, clobber=True,
+                            verbose=False, openMethod=gzip.open)
   
   

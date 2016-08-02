@@ -1,5 +1,6 @@
+from __future__ import print_function, division
 from numpy import pi, sqrt, exp, meshgrid, shape, ones
-from onedfit import OneDFit
+from .onedfit import OneDFit
 from PyAstronomy.pyaC import pyaErrors as PE
 
 class GaussFit2d(OneDFit):

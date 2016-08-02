@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import unittest
 import os
 
@@ -14,7 +15,7 @@ class ModSuiteSanity(unittest.TestCase):
   def sanity_rmcl_model(self):
     # Import some unrelated modules
     from numpy import arange, pi
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # ... and the model suite
     from PyAstronomy import modelSuite as ms
     
@@ -29,15 +30,15 @@ class ModSuiteSanity(unittest.TestCase):
     rv = rmcl.evaluate(time)
     
     # Let's see what happened...
-    mpl.ylabel("Radial velocity [stellar-radii/s]")
-    mpl.xlabel("Time [d]")
-    mpl.plot(time, rv, '.')
-    # mpl.show()
+    plt.ylabel("Radial velocity [stellar-radii/s]")
+    plt.xlabel("Time [d]")
+    plt.plot(time, rv, '.')
+#     plt.show()
   
   def sanity_rmcl_fit(self):
     # Import some unrelated modules
     from numpy import arange, pi, random
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # ... and the model suite
     from PyAstronomy import modelSuite as ms
     
@@ -67,17 +68,17 @@ class ModSuiteSanity(unittest.TestCase):
     rmcl.parameterSummary()
     
     # Let's see what happened...
-    mpl.ylabel("Radial velocity [stellar-radii/s]")
-    mpl.xlabel("Time [d]")
-    mpl.plot(time, rv, '.')
-    mpl.plot(time, rmcl.model, 'r--')
-    mpl.legend(["Observation", "Model"])
-    # mpl.show()
+    plt.ylabel("Radial velocity [stellar-radii/s]")
+    plt.xlabel("Time [d]")
+    plt.plot(time, rv, '.')
+    plt.plot(time, rmcl.model, 'r--')
+    plt.legend(["Observation", "Model"])
+#     plt.show()
 
   def sanity_SinRadVel(self):
     # Import some unrelated modules
     from numpy import arange, random, ones
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     # ... and now the radVel module
     from PyAstronomy.modelSuite import radVel as rv
     
@@ -93,27 +94,27 @@ class ModSuiteSanity(unittest.TestCase):
     rvData = y + random.normal(0.0, 0.05, y.size)
     
     # Randomize starting parameters for fit
-    for p, v in r.parameters().iteritems():
+    for p, v in r.parameters().items():
       r[p] = v + (random.random() - 0.5) * v
     # Show starting values
-    print "Starting values for fit:"
+    print("Starting values for fit:")
     r.parameterSummary()
     
     # Thaw all parameters
-    r.thaw(r.parameters().keys())
+    r.thaw(list(r.parameters().keys()))
     # Start the fit
     r.fit(time, rvData, yerr=ones(y.size)*0.05)
     
     # Show fit results
-    print "Fitted values:"
+    print("Fitted values:")
     r.parameterSummary()
     
     # Let's see what happened...
-    mpl.ylabel("Radial velocity [km/s]")
-    mpl.xlabel("Radial velocity [d]")
-    mpl.errorbar(time, rvData, yerr=ones(y.size)*0.05, fmt='b.')
-    mpl.plot(time, y, 'r-')
-    # mpl.show()
+    plt.ylabel("Radial velocity [km/s]")
+    plt.xlabel("Radial velocity [d]")
+    plt.errorbar(time, rvData, yerr=ones(y.size)*0.05, fmt='b.')
+    plt.plot(time, y, 'r-')
+#     plt.show()
 
   def sanity_KeplerEllipseModel(self):
     from PyAstronomy.modelSuite import KeplerEllipseModel
@@ -141,8 +142,8 @@ class ModSuiteSanity(unittest.TestCase):
     # Note that the model has twice the number of points
     # compared to the time axis. This is because it contains
     # the data for two axes
-    print "Used " + str(len(time)) + " time points"
-    print "-> length of model: ", len(model)
+    print("Used " + str(len(time)) + " time points")
+    print("-> length of model: ", len(model))
     
     # Isolating the model for the x-axis, i.e.,
     # every second data point starting from the
@@ -157,7 +158,7 @@ class ModSuiteSanity(unittest.TestCase):
     # Plot the resulting "data"
     plt.title("Kepler Ellipse Model --- Example")
     plt.errorbar(data[0::2], data[1::2], xerr=np.ones(20)*0.5, \
-                 yerr=np.ones(20)*0.5, fmt="bp")
+                  yerr=np.ones(20)*0.5, fmt="bp")
     
     # Use MCMC to sample from the posterior
     # Specify free parameters
@@ -179,7 +180,8 @@ class ModSuiteSanity(unittest.TestCase):
     ldmodel = kem.evaluate(np.linspace(0, kem["per"], 200))
     plt.plot(ldmodel[0::2], ldmodel[1::2], 'r--')
     
-    #plt.show()
+#     plt.show()
+
 
 #  def sanity_atanProfile(self):
 #    from PyAstronomy import modelSuite as ms
@@ -388,7 +390,8 @@ class ModSuiteSanity(unittest.TestCase):
 
       d = x.evaluate(vv)
       a = sci.trapz(d, vv)
-      self.assertAlmostEqual(x["A"], a, delta=1.0/200., msg="Incorrect profile normalization")
+      self.assertAlmostEqual(x["A"], a, delta=1.0/200., msg="Incorrect profile normalization (" + \
+                             "%g vs %g)" % (x["A"], a))
   
     x["eps"] = 0.0
     x["xmax"] = 50.0

@@ -11,6 +11,7 @@ interesting...
 .. toctree::
    :maxdepth: 1
    
+   from0100to0110.rst
    from090to0100.rst
    from081to090.rst
    from070to080.rst
