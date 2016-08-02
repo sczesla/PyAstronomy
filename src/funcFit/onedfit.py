@@ -387,7 +387,7 @@ class _OndeDFitParBase:
         self.pars.assignValue({name:value})
         return
       raise(PE.PyAValError("No such parameter: "+str(name), where="OneDFit::__setitem__", \
-                           why="Did you perhaps misspell the parameter name?"))
+                           why="Did you perhaps misspell the parameter name? Available parameters:" + str(self.parameters().keys())))
     self.pars.assignValue({self.propMap[name]:value})
 
   def hasVariable(self, specifier):
