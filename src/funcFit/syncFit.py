@@ -179,7 +179,10 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
         # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
         cc = 0
         for k in self._compos.iterkeys():
-          cc += -2.0 * numpy.nansum(self.data[k][1] * numpy.log(self.models[k]) - self.models[k])
+          tmp = self.data[k][1] * numpy.log(self.models[k]) - self.models[k]
+          #gi = numpy.isfinite(tmp)
+          gi = numpy.arange(len(tmp))
+          cc += -2.0 * numpy.nansum(tmp[gi])
         return cc
       return miniCash79
   
