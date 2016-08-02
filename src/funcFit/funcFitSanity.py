@@ -107,4 +107,41 @@ class MultiVoigtSanity(unittest.TestCase):
                            msg="MultiVoigt and Voigt1d deviate with one nonvanishing profile in multiVoigt.")
       
     
+class ConvolveSanity(unittest.TestCase):
+  
+  def setUp(self):
+    pass
+  
+  def tearDown(self):
+    pass
+  
+  def Convonlve_sanity(self):    
+      
+    from PyAstronomy import funcFit as fuf
+    import numpy as np 
     
+      
+    class Broad(fuf.GaussFit1d):  
+      def convolve(self, x, y):
+        tmp = self.evaluate(x)
+        tmp/=np.sum(tmp) * self["A"]
+        return np.convolve(tmp, y, mode='same')
+
+    resp = Broad()
+    pm = fuf.GaussFit1d() + fuf.PolyFit1d(1)
+
+    m = fuf.ConvolutionModel(resp, pm)
+    
+    m["A_Gaussian"] = 1.0
+    m["sig_Gaussian"] = 1.0
+    m["sig_Response"] = 1.0
+    m["A_Response"] = 1.0
+
+    x = np.linspace(-5, 5, 101)
+    yy = m.evaluate(x)
+
+    pm["A_Gaussian"] = 1.0
+    pm["sig_Gaussian"] = np.sqrt(2)*1.0
+    
+    self.assertAlmostEqual(np.max(np.abs(m.evaluate(x) - pm.evaluate(x))), 0.0, delta=1e-12, \
+                           msg="ConvolutionModel and GaussFit1d deviate more than expected.")
