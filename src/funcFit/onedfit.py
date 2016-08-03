@@ -945,16 +945,19 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     return ((self.leftCompo is not None) and (self.rightCompo is not None))
 
   @staticmethod
-  def combineRemapping(left, right):
+  def _combineRemapping(left, right):
     """
-      This member is essentially a renaming machine. When combining models
+      A parameter renaming machine for combining models.
+    
+      When combining models
       it can easily happen that two variables share the same name. If the
       models are combined, unique variable names are needed. This method
       uses the "root name" and "component counter" to assign new, unique
       names to the variables. 
       
-      Parameters:
-        - `left`, `right` - Two fitting objects (derived from OneDFit).
+      Parameters
+      ----------
+          left, right : Two fitting objects (derived from OneDFit).
     """
     
     def extendCoDat(coDat, c):
@@ -1051,7 +1054,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     right = copy.deepcopy(right)
     # Find new parameter names to avoid parameter clashes
     # (parameter names must be unique)
-    self.combineRemapping(left, right)
+    self._combineRemapping(left, right)
     # Combine the Param instances
     npars = left.pars + right.pars
     # Obtain a new Fitting object

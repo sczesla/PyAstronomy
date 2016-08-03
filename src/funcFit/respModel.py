@@ -75,7 +75,7 @@ class ConvolutionModel(OneDFit):
         self.right = copy.deepcopy(pmodel)
         if isinstance(self.left, OneDFit):
             self.left.setRootName("Response")
-            self.combineRemapping(self.left, self.right)
+            self._combineRemapping(self.left, self.right)
             parameters = self.left.parameters().keys() + self.right.parameters().keys()
         else:
             parameters = self.right.parameters().keys()
