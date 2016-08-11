@@ -82,6 +82,9 @@ class PyAConfig(object):
     # Try to locate home directory via environment variable
     self.homeDir = os.getenv("HOME")
     if self.homeDir is None:
+      # Try alternative solution
+      self.homeDir = os.path.expanduser("~")
+    if self.homeDir is None:
       PE.warn(PE.PyAValError("Could not find a home directory. Data directory cannot be set up.", \
                              solution="Set 'HOME' environment variable."))
       return
