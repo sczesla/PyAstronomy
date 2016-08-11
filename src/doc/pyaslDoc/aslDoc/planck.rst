@@ -6,7 +6,7 @@ Planck's radiation law
 .. autofunction:: planck
 
 
-Exmaple
+Example
 -----------
 
 ::
