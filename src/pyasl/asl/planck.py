@@ -20,7 +20,7 @@ def planck(T, lam=None, nu=None):
     
         B_{\\lambda} = \\frac{2\\pi h c^2}{\\lambda^5} \\frac{1}{e^{\\frac{h c}{\\lambda kT}} - 1} \\; .
     
-    If lambda is given (in meters), the output units are W/(m^2 m). To convert into erg/(cm^2 A),
+    If lambda is given (in meters), the output units are W/(m^2 m). To convert into erg/(cm^2 A s),
     the output has to be multiplied by a factor of 1e-7.
     
     Parameters
