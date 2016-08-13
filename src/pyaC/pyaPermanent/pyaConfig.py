@@ -216,17 +216,19 @@ class PyAConfig(object):
       # There is a .pyaConfigWhere file.
       try:
         self.dpath = open(self.configWhere).readline()
-      except:
+      except Exception as e:
         PE.warn(PE.PyAValError("The file "+self.configWhere+ \
-                               "exists, but could not be opened for reading.", \
-                               solution="Check permissions of the file."))
+                               " exists, but could not be opened for reading.", \
+                               solution="Check permissions of the file.", \
+                               addInfo="Error message: " + str(e)))
         self.dpath = None
       try:
         self.dpath = os.path.realpath(self.dpath)
-      except:
+      except Exception as e:
         PE.warn(PE.PyAValError("Obtained the path '" + self.dpath + "' from .pyaConfigWhere, but" + \
                                "could not expand soft-links etc. (using os.path.realpath).", \
-                               solution="Check the path written to .pyaConfigWhere in home directory."))
+                               solution="Check the path written to .pyaConfigWhere in home directory.", \
+                               addInfo="Error message: " + str(e)))
         self.dpath = None
       if not os.path.isdir(self.dpath):
         PE.warn(PE.PyAValError("The directory " + self.dpath + "' " + \
