@@ -59,6 +59,8 @@ class ExpDecayFit1d(OneDFit):
       x : array
           Specifies the points at which to evaluate the model.
     """
-    y = self["A"]*numpy.exp(-(x-self["t0"])/self["tau"]) * (x>self["t0"]) + self["off"]
+    y = numpy.zeros(len(x)) + self["off"]
+    indi = x > self["t0"]
+    y[indi] += self["A"]*numpy.exp(-(x[indi]-self["t0"])/self["tau"])
     return y
 
