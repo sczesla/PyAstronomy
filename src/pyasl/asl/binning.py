@@ -4,7 +4,7 @@ import numpy as np
 import copy
 
 def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, removeEmpty=True, \
-                removeNoError=False, useBinCenter=True, useMeanX=False, nanHandling=None):
+                removeNoError=False, useBinCenter=True, useMeanX=False, nanHandling=None, yvalFunc=np.mean):
   """
     A simple binning algorithm.
     
@@ -61,6 +61,10 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
         If True, the binned x-values refer to the mean x-value
         of all points in that bin.
         Therefore, the new time axis does not have to be equidistant.
+    yvalFunc : callable, optional
+        Function used to determine the value in a bin based on input data.
+        Default is the mean value (np.mean). An alternative choice could, e.g.,
+        be np.median.
     nanHandling : None, "ignore", float, (optional)
         Controls how NaNs in the data are handled.
           - None: By default (None),
@@ -182,7 +186,7 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
   for b in bwd:
     indi = np.where(inWhichBin == b)[0]
     result[b, 3] = len(indi)
-    result[b, 1] = np.mean(y[indi])
+    result[b, 1] = yvalFunc(y[indi])
     if useMeanX:
       # Overwrite the time axis using the mean x-value
       result[b, 0] = np.mean(x[indi])
