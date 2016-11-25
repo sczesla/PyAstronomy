@@ -2021,6 +2021,8 @@ class SanityOfDecimalYear(unittest.TestCase):
     self.assertEqual(t[3], 12, msg="Hour does not match")
     self.assertEqual(t[4], 30, msg="Minute does not match")
     self.assertEqual(t[5], 59, msg="Second does not match")
+    
+    t = pyasl.decimalYearGregorianDate(2008.8196, "tuple")
 
 
 class SanityOfBroad(unittest.TestCase):
