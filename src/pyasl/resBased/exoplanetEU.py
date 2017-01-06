@@ -347,7 +347,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
       try:
-        self.vot = votable.parse(self._fs.requestFile(self.dataFileName, 'r', gzip.open), pedantic=False)
+        self.vot = votable.parse(self._fs.requestFile(self.dataFileName, 'r', gzip.open), pedantic=False, invalid="mask")
       except Exception as e:
         votable.validate(self._fs.requestFile(self.dataFileName, 'r', gzip.open))
         raise e
