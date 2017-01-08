@@ -75,8 +75,14 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     """
       Download data.
     """
-    self._fs.downloadToFile("http://exoplanet.eu/catalog/csv", self.dataFileName, clobber=True,
-                            verbose=False, openMethod=gzip.open)
+    try:
+        self._fs.downloadToFile("http://exoplanet.eu/catalog/csv", self.dataFileName, clobber=True,
+                                verbose=False, openMethod=gzip.open)
+    except PE.PyADownloadError as pde:
+        pde.addInfo = "Unfortunately, this is a known bug for which no fix could so far be provided.\n"
+        pde.addInfo += "    Please try ExoplanetEU2 instead."
+        raise
+        
   
   def _readData(self):
     """
