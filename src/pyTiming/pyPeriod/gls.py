@@ -377,6 +377,12 @@ class Gls:
         """
         Calculate best-fit sine curve.
 
+        The parameters of the best-fit sine curve can be accessed via
+        the dictionary attribute `hpstat`. Specifically, "amp" holds the
+        amplitude, "fbest" the best-fit frequency, "T0" the reference time
+        (i.e., time of zero phase), and "offset" holds the additive offset
+        of the sine wave. 
+
         Parameters
         ----------
         t : array
