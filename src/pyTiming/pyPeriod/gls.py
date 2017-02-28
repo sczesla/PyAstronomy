@@ -375,7 +375,7 @@ class Gls:
 
     def sinmod(self, t):
         """
-        Calcuate best-fit sine curve.
+        Calculate best-fit sine curve.
 
         Parameters
         ----------
