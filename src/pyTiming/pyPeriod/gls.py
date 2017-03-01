@@ -648,6 +648,9 @@ class Gls:
         """
         Write periodogram to file.
 
+        The output file is a standard text file with two columns,
+        viz., frequency and power. 
+
         Parameters
         ----------
         ofile : string
