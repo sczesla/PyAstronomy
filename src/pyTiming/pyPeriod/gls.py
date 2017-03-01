@@ -47,7 +47,7 @@ class Gls:
 
     Parameters
     ----------
-    lc : TimeSeries object or tuple or list
+    lc : tuple or list or TimeSeries object
         The light curve data either in the form of a TimeSeries object (or any
         object providing the attributes time, flux, and error) or a tuple or list
         providing time as first element, flux as second element, and optionally,
