@@ -102,16 +102,19 @@ class Gls:
     --------
     Create 1000 unevenly sampled data points with frequency=0.1,
     measurement error and Gaussian noise
+    
     >>> time = np.random.uniform(54000., 56000., 1000)
     >>> flux = 0.15 * np.sin(2. * np.pi * time / 10.)
 
     Add some noise
+    
     >>> error = 0.5 * np.ones(time.size)
     >>> flux += np.random.normal(0, error)
 
     Compute the full error-weighted Lomb-Periodogram
     in 'ZK' normalization and calculate the significance
     of the maximum peak.
+    
     >>> gls = Gls((time, flux, error), verbose=True)
 
     >>> maxPower = gls.pmax

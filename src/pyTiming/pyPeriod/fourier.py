@@ -7,13 +7,22 @@ import scipy.special
 
 class Fourier(periodBase.PeriodBase):
   """
-    This class computes the Fast Fourier Transform (FFT) of the input
-    data using *numpy*'s FFT routines. The constructor takes the light
+    This class computes the Fast Fourier Transform (FFT) of the input data.
+    
+    This is actually a wrapper around numpy's FFT routines.
+    The constructor takes the light
     curve, `lc` (*TimeSeries* instance), as input. The optional
     argument specifies the normalization of the Fourier Power.
     Currently, only the normalization according to [Leahy83]_
     is supported, which in the case of purely Poissonian
     noise results in a mean power of 2.
+    
+    Parameters
+    ----------
+    lc : TimeSeries instance
+        The light curve to be analyzed.
+    norm : optional, string
+        Normalization method; currently, only default ("Leahy") is supported.
   """
 
   def __calcPeriodogram(self):
@@ -36,14 +45,6 @@ class Fourier(periodBase.PeriodBase):
     self.M = len(self.freq)
 
   def __init__(self, lc, norm="Leahy"):
-    """
-      Parameters:
-        - `lc` - *TimeSeries* instance,
-                 The light curve to be analyzed.
-        - `norm` - optional, string,
-                   Normalization method; currently, only default ("Leahy") is supported.
-    """
-
     self.freq = None
     self.power = None
     self.t = lc.time
@@ -56,13 +57,11 @@ class Fourier(periodBase.PeriodBase):
 
   def Prob(self, Pn):
     """
-      Parameters:
-        - `Pn` - float, Power threshold.
+    Returns the probability to obtain a power larger than the threshold, `Pn`.
     
-      Returns the probability to obtain a power larger than the threshold, `Pn`, from
-      the noise, which is assumed to Poisson-distributed.
-
-      .. note::
+    In the calculations, the noise is assumed to be Poisson-distributed.
+    
+    .. note::
         According to [vdK]_ the probability \
         to obtain a power larger than a given threshold from the noise is given by
         
@@ -71,7 +70,16 @@ class Fourier(periodBase.PeriodBase):
         
         where :math:`Q(\chi^2, \\nu)` is the cumulative :math:`\\chi^2` distribution with :math:`\\nu` d.o.f.
 
-        
+    Parameters
+    ----------
+    Pn : float
+        Power threshold.
+    
+    Returns
+    -------
+    FAP : float
+        The probability to obtain a power larger than the specified
+        threshold from noise.
     """
     nu = 2
     Q = scipy.special.chdtrc(nu, Pn) #-- Integral from x to infinity of Chi-square pdf.

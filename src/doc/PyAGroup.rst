@@ -15,3 +15,5 @@ by the following authors:
  * Klaus F. Huber
  * Fabian Pfeifer
  * Daniel Thaagaard Andreasen
+ * Mathias Zechmeister (GLS)
+ 
