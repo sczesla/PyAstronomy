@@ -27,7 +27,7 @@ def percentileWidth(x, y, rng=[], percentile=0.1):
                          solution="Check the lengths of the input arrays.", \
                          where="percentileWidth"))
   # Check if x is increasing  
-  if not all(x[i] <= x[i+1] for i in xrange(len(x)-1)):
+  if not all(x[i] <= x[i+1] for i in range(len(x)-1)):
     raise(PE.PyAValError("x-axis should be sorted",
                          where="percentileWidth"))
   
