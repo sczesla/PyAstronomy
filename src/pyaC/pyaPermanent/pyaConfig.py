@@ -77,10 +77,38 @@ class PyAConfig(object):
     """
     return PyAConfig._rootConfig
 
+  def _ynQuestion(self, message):
+    """
+      Ask yes/no question only accepting definite answer
+      
+      Parameters
+      ----------
+      message : string
+          The question being asked.
+          
+      Returns
+      -------
+      Answer : boolean
+          True if the answer was yes and False if it was no.
+    """
+    while True:
+      yn = smo.input(message)
+      if (yn.lower() == "y" or yn.lower() == "yes"):
+        return True
+      elif (yn.lower() == "n" or yn.lower() == "no"):
+        return False
+      else:
+        print()
+        print("  What do you by '" + str(yn) + "'? Please provide a valid input (y/n).")
+        print()
+
   def __init__(self):
     self.dpath = None
     # Try to locate home directory via environment variable
     self.homeDir = os.getenv("HOME")
+    if self.homeDir is None:
+      # Try alternative solution
+      self.homeDir = os.path.expanduser("~")
     if self.homeDir is None:
       PE.warn(PE.PyAValError("Could not find a home directory. Data directory cannot be set up.", \
                              solution="Set 'HOME' environment variable."))
@@ -112,18 +140,16 @@ class PyAConfig(object):
       print("    identify it.")
       print(" -----------------------------------------------------------------")
       print("")
-      yn = smo.input("Configure PyA's data path now (y/n)? ")
-      if not (yn.lower() == "y" or yn.lower() == "yes"):
+      if self._ynQuestion("Configure PyA's data path now (y/n)? "):
+        print()
+        print("  Configure data path now.")
+        print()
+      else:
+        print()
         print("  Configure data path later.")
+        print()
         return
-      # There is not yet a file '.pyaConfigWhere', which stores the place to look
-      # for the real configure-file and data files.
-      try:
-        f = open(self.configWhere, 'wt')
-      except:
-        PE.warn(PE.PyAValError("Could not open file: "+self.configWhere+ \
-                               " for writing. Data directory cannot be set up."))
-        return
+      
       try:
         while True:
           print("Please provide a directory where PyA can store data (may already exist):")
@@ -142,54 +168,67 @@ class PyAConfig(object):
             dpatha = os.path.abspath(dpath)
             print("Did you intend to use this path:")
             print("  ", dpatha)
-            yn = smo.input("(y/n) ?")
-            if yn.lower() == "y" or yn.lower() == "yes":
+            if self._ynQuestion("(y/n) ?"):
               dpath = dpatha
               break
             else:
-              dpath = None
-              break
+              # Retry to ask for path
+              continue
           if not os.path.isdir(dpath):
             # Try to create the directory
             os.makedirs(dpath)
             break
           else:
             print("Directory '"+dpath+"' exists.")
-            yn = smo.input("Use as PyA data directory (you may want to use, e.g., a subdirectory instead) (y/n) ")
-            if yn.lower() == "y" or yn.lower() == "yes": break
-        self.dpath = dpath
-        if self.dpath is None:
+            if self._ynQuestion("Use as PyA data directory (you may want to use, e.g., a subdirectory instead) (y/n) "):
+              if not os.access(dpath, os.W_OK):
+                # Exists and shall be used. Is it writable?
+                print("")
+                print("The directory '" + dpath + "' is not writable! Therefore, it cannot be used.")
+                print("")
+                continue
+            break
+
+        if dpath is None:
           # Process has been aborted
-          f.close()
-          os.remove(self.configWhere)
+          print("No valid data path configured.")
           return
         
-        f.write(self.dpath)
-        f.close()
-      except:
-        PE.warn(PE.PyAValError("The directory: '" + self.dpath + "' " + \
-                               " could not be created. Data directory cannot be set up."))
-        f.close()
+        self.dpath = dpath
+        
+        # There is not yet a file '.pyaConfigWhere', which stores the place to look
+        # for the real configure-file and data files.
+        with open(self.configWhere, 'wt') as f:
+          f.write(self.dpath)
+        
+        # All could be created appropriately
+        print("PyA data path configured successfully. Using path: ")
+        print("  " + self.dpath)
+        
+      except Exception as e:
+        PE.warn(PE.PyAValError("The directory: '" + str(dpath) + "' " + \
+                               " could not be created. Data directory cannot be set up.\n" + \
+                               "Error message: " + str(e)))
         os.remove(self.configWhere)
         return
-      # All could be created appropriately
-      print("PyA data path configured successfully. Using path: ")
-      print("  " + self.dpath)
+    
     else:
       # There is a .pyaConfigWhere file.
       try:
         self.dpath = open(self.configWhere).readline()
-      except:
+      except Exception as e:
         PE.warn(PE.PyAValError("The file "+self.configWhere+ \
-                               "exists, but could not be opened for reading.", \
-                               solution="Check permissions of the file."))
+                               " exists, but could not be opened for reading.", \
+                               solution="Check permissions of the file.", \
+                               addInfo="Error message: " + str(e)))
         self.dpath = None
       try:
         self.dpath = os.path.realpath(self.dpath)
-      except:
+      except Exception as e:
         PE.warn(PE.PyAValError("Obtained the path '" + self.dpath + "' from .pyaConfigWhere, but" + \
                                "could not expand soft-links etc. (using os.path.realpath).", \
-                               solution="Check the path written to .pyaConfigWhere in home directory."))
+                               solution="Check the path written to .pyaConfigWhere in home directory.", \
+                               addInfo="Error message: " + str(e)))
         self.dpath = None
       if not os.path.isdir(self.dpath):
         PE.warn(PE.PyAValError("The directory " + self.dpath + "' " + \

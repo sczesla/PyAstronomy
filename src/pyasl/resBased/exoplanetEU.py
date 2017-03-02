@@ -75,8 +75,14 @@ class ExoplanetEU(pp.PyAUpdateCycle):
     """
       Download data.
     """
-    self._fs.downloadToFile("http://exoplanet.eu/catalog/csv", self.dataFileName, clobber=True,
-                            verbose=False, openMethod=gzip.open)
+    try:
+        self._fs.downloadToFile("http://exoplanet.eu/catalog/csv", self.dataFileName, clobber=True,
+                                verbose=False, openMethod=gzip.open)
+    except PE.PyADownloadError as pde:
+        pde.addInfo = "Unfortunately, this is a known bug for which no fix could so far be provided.\n"
+        pde.addInfo += "    Please try ExoplanetEU2 instead."
+        raise
+        
   
   def _readData(self):
     """
@@ -346,7 +352,11 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
     # Temporarily suppress warnings (astropy issues one on reading this table)
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
-      self.vot = votable.parse(self._fs.requestFile(self.dataFileName, 'r', gzip.open))
+      try:
+        self.vot = votable.parse(self._fs.requestFile(self.dataFileName, 'r', gzip.open), pedantic=False, invalid="mask")
+      except Exception as e:
+        votable.validate(self._fs.requestFile(self.dataFileName, 'r', gzip.open))
+        raise e
     # Use 'name' over ID field to specify column names
     self.vot = self.vot.get_first_table().to_table(use_names_over_ids=True)
   

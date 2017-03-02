@@ -2,7 +2,7 @@ Base classes
 =================
 
 Some commonly needed functionality and data structures are implemented
-by the below listed classes. These are needed throughout the package.
+by the below listed classes.
 
 The *TimeSeries* base class
 ------------------------------

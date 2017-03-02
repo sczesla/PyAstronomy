@@ -7,4 +7,6 @@ From 0.10.0 to 0.11.0
   pyasl               *New functionality*
                         - De Jager 1987 spectral types
                         - MMSCETS table
+  pyTiming            *Update*
+                        - New GLS implementation from MZ  
   ==================  =============================================

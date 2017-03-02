@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
-import numpy
+import numpy as np
 from .onedfit import OneDFit
 
 class SinusFit1d(OneDFit):
@@ -28,7 +28,7 @@ class SinusFit1d(OneDFit):
       x : array
           Specifies the points at which to evaluate the model.
     """
-    y = self["A"]*numpy.sin(2.0*numpy.pi*(self["nu"]*x+self["phi"])) \
+    y = self["A"]*np.sin(2.0*np.pi*(self["nu"]*x+self["phi"])) \
         + self["off"]
     return y
 
@@ -59,6 +59,8 @@ class ExpDecayFit1d(OneDFit):
       x : array
           Specifies the points at which to evaluate the model.
     """
-    y = self["A"]*numpy.exp(-(x-self["t0"])/self["tau"]) * (x>self["t0"]) + self["off"]
+    y = np.zeros(len(x)) + self["off"]
+    indi = x > self["t0"]
+    y[indi] += self["A"]*np.exp(-(x[indi]-self["t0"])/self["tau"])
     return y
 

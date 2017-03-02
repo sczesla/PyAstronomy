@@ -1,6 +1,5 @@
 from PyAstronomy.pyaC import pyaErrors as PE
 from datetime import datetime as dt
-import time
 
 def decimalYear(date):
     """
@@ -25,7 +24,7 @@ def decimalYear(date):
     """
     def s(date):
       # returns seconds since epoch
-      return time.mktime(date.timetuple())
+      return (date - dt(1900,1,1)).total_seconds()
 
     year = date.year
     startOfThisYear = dt(year=year, month=1, day=1)
@@ -65,7 +64,7 @@ def decimalYearGregorianDate(date, form="datetime"):
   """
   def s(date):
     # returns seconds since epoch
-    return time.mktime(date.timetuple())
+    return (date - dt(1900,1,1)).total_seconds()
   
   # Shift the input of 1e-2 microseconds
   # This step accounts for rounding issues.
@@ -83,7 +82,7 @@ def decimalYearGregorianDate(date, form="datetime"):
   # Find the day
   d = 1
   tdt = dt(year=year, month=m, day=d)
-  while s(tdt) - s(startOfThisYear) <= secondsInYear: 
+  while s(tdt) - s(startOfThisYear) <= secondsInYear:
     d+=1
     try: tdt=dt(year=year, month=m, day=d)
     except: break

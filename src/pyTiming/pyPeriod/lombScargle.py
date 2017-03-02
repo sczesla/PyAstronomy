@@ -7,12 +7,30 @@ from PyAstronomy.pyaC import pyaErrors as PE
 
 class LombScargle(periodBase.PeriodBase):
   """
-    The constructor of *LombScargle* takes a *TimeSeries* instance, i.e., a 
-    light curve object, as first argument. It then computes the usual 
-    Lomb-Scargle periodogram using a fast algorithm. The frequency array is
-    constructed on the fly based on the oversampling keywords, which are
-    mandatory in this case. The power is normalized according to the
-    prescription of [HB86]_.
+  Calculate the Lomb-Scargle periodogram.
+  
+  The constructor of *LombScargle* takes a *TimeSeries* instance, i.e., a 
+  light curve object, as first argument. It then computes the usual 
+  Lomb-Scargle periodogram using a fast algorithm. The frequency array is
+  constructed on the fly based on the oversampling keywords, which are
+  mandatory in this case. The power is normalized according to the
+  prescription of [HB86]_.
+    
+  The result, i.e., the power, is stored in the class attribute `power`.
+    
+  .. note::
+      Adapted from routine of the same routine in [NR]_ , 
+      based on period.pro by Han Wen, August 1996.
+    
+  Parameters
+  ----------
+  lc : TimesSeries instance
+      The light curve to be analyzed.
+  ofac : int
+      Oversampling factor.
+  hifac : float
+      Maximum frequency `freq` = `hifac` * (average Nyquist frequency).
+  
   """
 
   def __calcPeriodogram(self):
@@ -70,18 +88,6 @@ class LombScargle(periodBase.PeriodBase):
     return 0
 
   def __init__(self, lc, ofac, hifac):
-    """
-      Parameters:
-       - `lc` - TimesSeries instance, The light curve to be analyzed.
-       - `ofac` - int, Oversampling factor.
-       - `hifac` - float, Maximum frequency `freq` = `hifac` * (average Nyquist frequency).
-      
-      .. note::
-        Adapted from routine of the same routine in [NR]_ , 
-        based on period.pro by Han Wen, August 1996.
-      
-      The result, i.e., the power, is stored in the class property `power`.
-    """
 
     self.freq=None
     self.power=None
@@ -96,29 +102,38 @@ class LombScargle(periodBase.PeriodBase):
 
   def prob(self, Pn):
     """
-      Returns the probability to obtain a power *Pn* or larger from the noise,
-      which is assumes to be Gaussian.
-      
-      Parameters:
-        - `Pn` - float, Power threshold.
+    Returns the probability to obtain a power larger than the threshold.
+    
+    Compute the probability of obtaining a power value as large or larger
+    the the threshold based on the noise, which is assumes to be Gaussian.
 
-      .. note::
+    .. note::
         *LombScargle* calculates the quantity (N-1)/2.*p=p' (in the formalism of 
         [ZK09]_), which is de facto the normalization
         prescription of [HB86]_. In this
         scheme the probability P(p'>Pn) is given by the following statement:
-        
+      
         .. math::
-          P(p'>Pn) = \\left(1 - 2 \\frac{Pn}{N-1} \\right)^{(N-3)/2}
-
+            P(p'>Pn) = \\left(1 - 2 \\frac{Pn}{N-1} \\right)^{(N-3)/2}
+  
         If properly normalized to the population variance of the time series, which
         must be known a priori (usually not the case), the
         power :math:`p/p_n=p"` is a direct measure of the SNR as proposed by [Scargle82]_:
         
         .. math::
-          P(p">Pn) = exp(-Pn) \\; .
+            P(p">Pn) = exp(-Pn) \\; .
         
         This formula is often used erroneously in this context.
+        
+      Parameters
+      ----------
+      Pn : float
+          Power threshold
+          
+      Returns
+      -------
+      FAP : float
+          False alarm probability.
     """
     return (1.-2.*Pn/(self.N-1.))**((self.N-3.)/2.)
 
@@ -130,11 +145,19 @@ class LombScargle(periodBase.PeriodBase):
 
   def probInv(self, Prob):
     """
-      Inverse of `Prob(Pn)`. Returns the minimum power
-      for a given probability level `Prob`.
+      Returns the minimum power for a given probability level `Prob`.
       
-      Parameters:
-        - `Prob` - float, probability
+      This is the inverse of `prob(Pn)`. 
+      
+      Parameters
+      ----------
+      Prob : float
+          Probability
+      
+      Returns
+      -------
+      MPL : float
+          Minimum power level required.
     """
     return (self.N-1.)/2.*(1.-Prob**(2./(self.N-3.)))
 

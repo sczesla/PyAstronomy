@@ -72,3 +72,25 @@ class PyPeriodExSanity(unittest.TestCase):
     # Show the results
 #     plt.show()
 
+  def sanity_GlsCodeExample(self):
+    """
+      Gls in-code example
+    """
+    import numpy as np
+    from PyAstronomy.pyTiming.pyPeriod import Gls
+    
+    time = np.random.uniform(54000., 56000., 1000)
+    flux = 0.15 * np.sin(2. * np.pi * time / 10.)
+    
+    error = 0.5 * np.ones(time.size)
+    flux += np.random.normal(0, error)
+    
+    #Compute the full error-weighted Lomb-Periodogram
+    #in 'ZK' normalization and calculate the significance
+    #of the maximum peak.
+    gls = Gls((time, flux, error), verbose=True)
+    
+    maxPower = gls.pmax
+    print("GLS maximum power: ", maxPower)
+    print("GLS statistics of maximum power peak: ", gls.stats(maxPower))
+#    gls.plot(block=True)
