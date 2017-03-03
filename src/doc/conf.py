@@ -30,7 +30,7 @@ autosummary_generate = True
 extensions = []
 try:
   import numpydoc
-  extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.pngmath', 'numpydoc', 'sphinx.ext.autosummary']
+  extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.imgmath', 'numpydoc', 'sphinx.ext.autosummary']
 except:
   extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.pngmath']
 
