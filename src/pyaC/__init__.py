@@ -1,6 +1,6 @@
 from .importCheck import ImportCheck, pyaimportallfrom
 
-_ic = ImportCheck(["numpy", "scipy"], required=["numpy"])
+_ic = ImportCheck(["numpy", "scipy"], required=["numpy", "scipy"])
 
 from .sanity import *
 from .nestedLoop import NestedLoop

@@ -166,3 +166,14 @@ class SanityOfmtools(unittest.TestCase):
     self.assertAlmostEqual(np.max(np.abs(np.array([0.5, 1.+1./3.])-xz)), 0.0, delta=1e-8, msg="Found unexpected zero crossings: " + str(xz))
     self.assertEqual(np.max(np.abs(xi - np.array([0,1]))), 0, msg="Found unexpected indices: " + str(xi))
     
+  def sanity_farat(self):
+    """
+    Checking sanity of farat
+    """
+    from PyAstronomy import pyaC
+    x = pyaC.farat(5,3)
+    y = pyaC.farat(3,5)
+    self.assertAlmostEqual(x, 1./y, delta=1e-10, msg="farat(5,3) and farat(3,5) not consistent.")
+    self.assertAlmostEqual(x, 20., delta=1e-10, msg="farat(5,3) broken (returned value of " + str(x) + ")")
+    
+    
