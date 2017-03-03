@@ -11,3 +11,7 @@ with potential application throughout PyAstronomy.
    integratDoc.rst
    zerocross.rst
  
+.. toctree::
+   :maxdepth: 2
+   
+   toolbox.rst
