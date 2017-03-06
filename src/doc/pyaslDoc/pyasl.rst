@@ -113,6 +113,7 @@ Statistics
 
    aslDoc/statTest.rst
    aslDoc/aslExt_1Doc/expCorrRN.rst
+   aslDoc/aslExt_1Doc/poissonPosterior.rst
 
 Resource based helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~
