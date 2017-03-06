@@ -2,9 +2,7 @@ from PyAstronomy import pyaC
 from PyAstronomy.pyasl import _ic, _moduleImportStatus
 
 _modules = ["pizzolato2003", "expCorrRN", "ramirez2005", "stellarAge", "ballesterosBV_T", \
-           "abundances", "spectralClass", "mmscetsTable"]
-
-from poissonPosterior import *
+           "abundances", "spectralClass", "mmscetsTable", "poissonPosterior"]
 
 for m in _modules:
   _moduleImportStatus[(__name__, m)] = pyaC.pyaimportallfrom(m, "PyAstronomy.pyasl.asl.aslExt_1", globals())
