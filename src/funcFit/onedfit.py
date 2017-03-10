@@ -1555,7 +1555,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
   def fitEMCEE(self, x=None, y=None, yerr=None, nwalker=None, priors=None, pots=None, scales=None, \
                sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMD=True):
     """
-      MCMC samplign using emcee package.
+      MCMC sampling using emcee package.
       
       Sample from the posterior probability distribution using the emcee
       package. By default the likelihood is calculated as -0.5 times the
@@ -1578,7 +1578,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           The scales argument can be used to control the width of Gaussians used
           to distribute the walkers.
       sampleArgs : dictionary, optional
-          Number controling the sampling process. Use 'burn' (int) to specify
+          Number controlling the sampling process. Use 'burn' (int) to specify
           the number of burn-in iterations (default is 0). Via 'iters' (int)
           the numbers of iterations after the burn-in can be specified (default 1000).
           The 'process' (int) key can be used to control the number of iterations after
@@ -1614,7 +1614,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
           ne carried out and the other arguments should be given as previously
           to continue sampling successfully. 
       emcp : dictionary, optional
-          Extra arguemnts handed to `EnsembleSampler` object.
+          Extra arguments handed to `EnsembleSampler` object.
       toMD : boolean, optional
           If True (default), the object is set to the lowest-deviance solution
           after sampling. Otherwise, it remains in a random state.
@@ -1685,7 +1685,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     if pots is None:
       pots = []
     
-    # Chi square calucaltor
+    # Chi square calculator
     chisqr = self.__chiSqr()
     
     def likeli(names, vals):
