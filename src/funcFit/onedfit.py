@@ -2298,3 +2298,165 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 #    self.updateModel()
 
 
+
+
+
+
+def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
+  """
+    MCMC sampling using emcee package.
+    
+    Sample from the posterior probability distribution using the emcee
+    package. By default the likelihood is calculated as -0.5 times the
+    model chi-square value.
+    
+    The emcee sampler can be accessed via the `emceeSampler` attribute,
+    which may be used to continue or manipulate sampling.
+    
+    Parameters
+    ----------
+    nwalker : int, optional
+        The number of walker to be used. By default, two times the
+        number of free parameters is used.
+    scales : dictionary, optional
+        The scales argument can be used to control the initial distribution
+        of the walkers. By default, all walkers are distributed around the
+        location given by the current state of the object, i.e., the current
+        parameter values. In each direction, the walker are randomly distributed
+        with a Gaussian distribution, whose default standard deviation is one.
+        The scales argument can be used to control the width of Gaussians used
+        to distribute the walkers.
+    sampleArgs : dictionary, optional
+        Number controlling the sampling process. Use 'burn' (int) to specify
+        the number of burn-in iterations (default is 0). Via 'iters' (int)
+        the numbers of iterations after the burn-in can be specified (default 1000).
+        The 'process' (int) key can be used to control the number of iterations after
+        which the progress bar is updated (default is iters/100). Note that the
+        'progressbar' package must be installed to get a progress bar. Otherwise
+        more mundane print statements will be used.  
+    dbfile : string, optional
+        The result of the sampling, i.e., the chain(s), the corresponding
+        values of the posterior, and the names of the free parameters are
+        saved to the specified file (by default 'chain.emcee' is used).
+        The traces stored there can be analyzed using the 'TraceAnalysis'
+        class. Set this parameter to 'None' to avoid saving the results.
+    ps : tuple, optional
+        A tuple holding the current position and state of the sampler. This
+        tuple is returned by this method. The `ps` argument can be used
+        to continue sampling from the last state. Note that no burn-in will
+        ne carried out and the other arguments should be given as previously
+        to continue sampling successfully. 
+    emcp : dictionary, optional
+        Extra arguments handed to `EnsembleSampler` object.
+  """
+
+  if not ic.check["emcee"]:
+    raise(PE.PyARequiredImport("Could not import the 'emcee' package.", \
+                               solution="Please install 'emcee'."))
+
+
+  # Number of dimensions 
+  ndims = len(fpns)
+  
+  if ndims == 0:
+    raise(PE.PyAValError("At least one free parameter is required for sampling.", \
+                         where="sampleEMCEE", \
+                         solution="TBD."))
+  
+  if not dbfile is None:
+    if re.match(".*\.emcee$", dbfile) is None:
+      PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.", \
+                             solution="Use a filename of the form *.emcee"))
+  
+  # Number of walkers
+  if nwalker is None:
+      nwalker = ndims * 2
+    
+  if nwalker < ndims * 2:
+      raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.", \
+                           where="sampleEMCEE", \
+                           solution="Increase the number of walkers."))
+  if nwalker % 2 == 1:
+      raise(PE.PyAValError("The number of walkers must be even.", \
+                           where="sampleEMCEE", \
+                           solution="Use an even number of walkers."))
+  
+  # Set default values for sampleArgs
+  if sampleArgs is None:
+    sampleArgs = {}
+  if not "burn" in sampleArgs:
+    sampleArgs["burn"] = 0
+  if not "iters" in sampleArgs:
+    sampleArgs["iters"] = 1000
+  if not "progress" in sampleArgs:
+    sampleArgs["progress"] = sampleArgs["iters"] / 100
+  
+  # Dictionary used to call the provided log posterior function
+  kvs = copy.copy(fv0)
+  
+  # Generate log posterior function required by emcee
+  def logpost(x):
+      """
+      Calls user-specified log posterior function with
+      properly updated parameter disctionary.
+      """
+      for i, n in enumerate(fpns):
+          # Assign parameter values, which are variable
+          kvs[n] = x[i]
+      return lnp(kvs)
+  
+  if ps is None:
+    
+      if emcp is None:
+        emcp = {}
+    
+      # Generate the sampler
+      emceeSampler = emcee.EnsembleSampler(nwalker, ndims, logpost, **emcp)
+    
+      if scales is None:
+          scales = {}
+      
+      # Generate starting values
+      pos = []
+      for _ in smo.range(nwalker):
+          pos.append(np.zeros(ndims))
+          for i, n in enumerate(fpns):
+              if not n in scales:
+                  s = 1.0
+              else:
+                  s = scales[n]
+              pos[-1][i] = np.random.normal(fv0[n], s)
+      
+      # Default value for state
+      state = None
+      
+      if sampleArgs["burn"] > 0:
+          # Run burn-in
+          pos, prob, state = emceeSampler.run_mcmc(pos, sampleArgs["burn"])
+          # Reset the chain to remove the burn-in samples.
+          emceeSampler.reset()
+    
+  else:
+      # Assign position and state from previous run
+      pos, state = ps
+
+  if (not sampleArgs["progress"] is None) and ic.check["progressbar"]:
+      widgets = ['EMCEE progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker=progressbar.RotatingMarker()),
+                 ' ', progressbar.ETA()]
+      pbar = progressbar.ProgressBar(widgets=widgets, maxval=sampleArgs["iters"]).start()
+  
+  n = 0
+  for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+      n += 1
+      if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
+          if ic.check["progressbar"]:
+              pbar.update(n)
+          else:
+              print("EMCEE: Reached iteration ", n, " of ", sampleArgs["iters"])
+  
+  # Save the chain to a file
+  if not dbfile is None:
+      np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability, \
+                          pnames=np.array(fpns, dtype=np.string_))
+  
+  return pos, state
