@@ -711,7 +711,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
       bindist = int((2.0/24.)/jdbinsize)
       firstbin = np.random.randint(0,bindist)
       for mp in range(0, int(len(jds)/bindist)):
-        bind = firstbin+float(mp)*bindist
+        bind = int(firstbin+float(mp)*bindist)
         ax.text(jdsub[bind], altaz[0][bind]-1., str(int(mdist[bind]))+r"$^\circ$", ha="center", va="top", \
                 fontsize=8, stretch='ultra-condensed', fontproperties=font0, alpha=1.)
 
