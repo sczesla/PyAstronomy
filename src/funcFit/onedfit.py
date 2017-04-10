@@ -2428,10 +2428,10 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
             kvs[n] = x[i]
         return lnp(kvs, **_largs)
     
+    if emcp is None:
+        emcp = {}
+    
     if ps is None:
-      
-        if emcp is None:
-          emcp = {}
       
         # Generate the sampler
         emceeSampler = emcee.EnsembleSampler(nwalker, ndims, logpost, **emcp)
@@ -2460,8 +2460,11 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
             emceeSampler.reset()
       
     else:
+        # Generate the sampler
+        emceeSampler = emcee.EnsembleSampler(nwalker, ndims, logpost, **emcp)
         # Assign position and state from previous run
         pos, state = ps
+    
   
     if (not sampleArgs["progress"] is None) and ic.check["progressbar"]:
         widgets = ['EMCEE progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker=progressbar.RotatingMarker()),
