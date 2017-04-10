@@ -2302,29 +2302,41 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
 
 
-def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
+def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
     """
-    MCMC sampling using emcee package.
+    MCMC sampling from specific density using the emcee package.
     
-    Sample from the posterior probability distribution using the emcee
-    package. By default the likelihood is calculated as -0.5 times the
-    model chi-square value.
-    
-    The emcee sampler can be accessed via the `emceeSampler` attribute,
-    which may be used to continue or manipulate sampling.
+    This function may be used to use emcee to sample from any user-specified
+    density, which does not have to be normalized. The resulting Markov Chains
+    can be analyzed using the trace analysis package.
     
     Parameters
     ----------
+    fpns : list of strings
+        Names of parameters for which Markov Chains are constructed. 
+    fv0 : dictionary
+        A dictionary mapping parameter name to starting value. This
+        dictionary may contain any number of additional key-value pairs
+    lnp : callable
+        A function (or equivalent callable) which returns the (natural)
+        logarithm of the (generally unnormalized) density. The
+        first (and only mandatory) argument to the function is a dictionary
+        holding the current parameter values for which the posterior
+        density is to be evaluated. The function may take any number of
+        additional keyword arguments, which can be specifies by the `largs`
+        parameter.
+    largs : dictionary, optional
+        A set of additional arguments passed to the `lnp` callable.
     nwalker : int, optional
-        The number of walker to be used. By default, two times the
+        The number of walker to be used. By default, four times the
         number of free parameters is used.
     scales : dictionary, optional
         The scales argument can be used to control the initial distribution
         of the walkers. By default, all walkers are distributed around the
         location given by the current state of the object, i.e., the current
-        parameter values. In each direction, the walker are randomly distributed
+        parameter values. In each direction, the walkers are randomly distributed
         with a Gaussian distribution, whose default standard deviation is one.
-        The scales argument can be used to control the width of Gaussians used
+        The scales argument can be used to control the width of the Gaussians used
         to distribute the walkers.
     sampleArgs : dictionary, optional
         Number controlling the sampling process. Use 'burn' (int) to specify
@@ -2348,6 +2360,11 @@ def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfi
         to continue sampling successfully. 
     emcp : dictionary, optional
         Extra arguments handed to `EnsembleSampler` object.
+      
+    Returns
+    -------
+    pos, state : state of emcee sample
+        These information may be used to continue the sampling from previous position.
     """
 
     if not ic.check["emcee"]:
@@ -2370,7 +2387,7 @@ def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfi
   
     # Number of walkers
     if nwalker is None:
-        nwalker = ndims * 2
+        nwalker = ndims * 4
     
     if nwalker < ndims * 2:
         raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.", \
@@ -2393,7 +2410,13 @@ def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfi
     
     # Dictionary used to call the provided log posterior function
     kvs = copy.copy(fv0)
-  
+    
+    # Manage None is argument to largs
+    if largs is None:
+        _largs = {}
+    else:
+        _largs = largs
+    
     # Generate log posterior function required by emcee
     def logpost(x):
         """
@@ -2403,7 +2426,7 @@ def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfi
         for i, n in enumerate(fpns):
             # Assign parameter values, which are variable
             kvs[n] = x[i]
-        return lnp(kvs)
+        return lnp(kvs, **_largs)
     
     if ps is None:
       
