@@ -580,7 +580,6 @@ from a sample of Gaussian data using :py:func:`sampleEMCEE`.
     from __future__ import print_function
     import numpy as np
     from PyAstronomy import funcFit as fuf
-    import matplotlib.pylab as plt
     
     def lfGaussMS(v, x=None):
         """
