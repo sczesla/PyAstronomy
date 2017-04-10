@@ -2303,7 +2303,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
 
 def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
-  """
+    """
     MCMC sampling using emcee package.
     
     Sample from the posterior probability distribution using the emcee
@@ -2348,115 +2348,115 @@ def sampleEMCEE(fpns, fv0, lnp, nwalker=None, scales=None, sampleArgs=None, dbfi
         to continue sampling successfully. 
     emcp : dictionary, optional
         Extra arguments handed to `EnsembleSampler` object.
-  """
+    """
 
-  if not ic.check["emcee"]:
-    raise(PE.PyARequiredImport("Could not import the 'emcee' package.", \
+    if not ic.check["emcee"]:
+        raise(PE.PyARequiredImport("Could not import the 'emcee' package.", \
                                solution="Please install 'emcee'."))
 
 
-  # Number of dimensions 
-  ndims = len(fpns)
+    # Number of dimensions 
+    ndims = len(fpns)
   
-  if ndims == 0:
-    raise(PE.PyAValError("At least one free parameter is required for sampling.", \
-                         where="sampleEMCEE", \
-                         solution="TBD."))
-  
-  if not dbfile is None:
-    if re.match(".*\.emcee$", dbfile) is None:
-      PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.", \
-                             solution="Use a filename of the form *.emcee"))
-  
-  # Number of walkers
-  if nwalker is None:
-      nwalker = ndims * 2
-    
-  if nwalker < ndims * 2:
-      raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.", \
+    if ndims == 0:
+      raise(PE.PyAValError("At least one free parameter is required for sampling.", \
                            where="sampleEMCEE", \
-                           solution="Increase the number of walkers."))
-  if nwalker % 2 == 1:
-      raise(PE.PyAValError("The number of walkers must be even.", \
-                           where="sampleEMCEE", \
-                           solution="Use an even number of walkers."))
+                           solution="TBD."))
   
-  # Set default values for sampleArgs
-  if sampleArgs is None:
-    sampleArgs = {}
-  if not "burn" in sampleArgs:
-    sampleArgs["burn"] = 0
-  if not "iters" in sampleArgs:
-    sampleArgs["iters"] = 1000
-  if not "progress" in sampleArgs:
-    sampleArgs["progress"] = sampleArgs["iters"] / 100
+    if not dbfile is None:
+        if re.match(".*\.emcee$", dbfile) is None:
+            PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.", \
+                                   solution="Use a filename of the form *.emcee"))
   
-  # Dictionary used to call the provided log posterior function
-  kvs = copy.copy(fv0)
-  
-  # Generate log posterior function required by emcee
-  def logpost(x):
-      """
-      Calls user-specified log posterior function with
-      properly updated parameter disctionary.
-      """
-      for i, n in enumerate(fpns):
-          # Assign parameter values, which are variable
-          kvs[n] = x[i]
-      return lnp(kvs)
-  
-  if ps is None:
+    # Number of walkers
+    if nwalker is None:
+        nwalker = ndims * 2
     
-      if emcp is None:
-        emcp = {}
+    if nwalker < ndims * 2:
+        raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.", \
+                             where="sampleEMCEE", \
+                             solution="Increase the number of walkers."))
+    if nwalker % 2 == 1:
+        raise(PE.PyAValError("The number of walkers must be even.", \
+                             where="sampleEMCEE", \
+                             solution="Use an even number of walkers."))
+  
+    # Set default values for sampleArgs
+    if sampleArgs is None:
+        sampleArgs = {}
+    if not "burn" in sampleArgs:
+        sampleArgs["burn"] = 0
+    if not "iters" in sampleArgs:
+        sampleArgs["iters"] = 1000
+    if not "progress" in sampleArgs:
+        sampleArgs["progress"] = sampleArgs["iters"] / 100
     
-      # Generate the sampler
-      emceeSampler = emcee.EnsembleSampler(nwalker, ndims, logpost, **emcp)
+    # Dictionary used to call the provided log posterior function
+    kvs = copy.copy(fv0)
+  
+    # Generate log posterior function required by emcee
+    def logpost(x):
+        """
+        Calls user-specified log posterior function with
+        properly updated parameter dictionary.
+        """
+        for i, n in enumerate(fpns):
+            # Assign parameter values, which are variable
+            kvs[n] = x[i]
+        return lnp(kvs)
     
-      if scales is None:
-          scales = {}
+    if ps is None:
       
-      # Generate starting values
-      pos = []
-      for _ in smo.range(nwalker):
-          pos.append(np.zeros(ndims))
-          for i, n in enumerate(fpns):
-              if not n in scales:
-                  s = 1.0
-              else:
-                  s = scales[n]
-              pos[-1][i] = np.random.normal(fv0[n], s)
+        if emcp is None:
+          emcp = {}
       
-      # Default value for state
-      state = None
+        # Generate the sampler
+        emceeSampler = emcee.EnsembleSampler(nwalker, ndims, logpost, **emcp)
       
-      if sampleArgs["burn"] > 0:
-          # Run burn-in
-          pos, prob, state = emceeSampler.run_mcmc(pos, sampleArgs["burn"])
-          # Reset the chain to remove the burn-in samples.
-          emceeSampler.reset()
+        if scales is None:
+            scales = {}
+        
+        # Generate starting values
+        pos = []
+        for _ in smo.range(nwalker):
+            pos.append(np.zeros(ndims))
+            for i, n in enumerate(fpns):
+                if not n in scales:
+                    s = 1.0
+                else:
+                    s = scales[n]
+                pos[-1][i] = np.random.normal(fv0[n], s)
+        
+        # Default value for state
+        state = None
+        
+        if sampleArgs["burn"] > 0:
+            # Run burn-in
+            pos, prob, state = emceeSampler.run_mcmc(pos, sampleArgs["burn"])
+            # Reset the chain to remove the burn-in samples.
+            emceeSampler.reset()
+      
+    else:
+        # Assign position and state from previous run
+        pos, state = ps
+  
+    if (not sampleArgs["progress"] is None) and ic.check["progressbar"]:
+        widgets = ['EMCEE progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker=progressbar.RotatingMarker()),
+                   ' ', progressbar.ETA()]
+        pbar = progressbar.ProgressBar(widgets=widgets, maxval=sampleArgs["iters"]).start()
     
-  else:
-      # Assign position and state from previous run
-      pos, state = ps
-
-  if (not sampleArgs["progress"] is None) and ic.check["progressbar"]:
-      widgets = ['EMCEE progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker=progressbar.RotatingMarker()),
-                 ' ', progressbar.ETA()]
-      pbar = progressbar.ProgressBar(widgets=widgets, maxval=sampleArgs["iters"]).start()
-  
-  n = 0
-  for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
-      n += 1
-      if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
-          if ic.check["progressbar"]:
-              pbar.update(n)
-          else:
-              print("EMCEE: Reached iteration ", n, " of ", sampleArgs["iters"])
-  
-  # Save the chain to a file
-  if not dbfile is None:
-      np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability, \
-                          pnames=np.array(fpns, dtype=np.string_))
-  
-  return pos, state
+    n = 0
+    for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+        n += 1
+        if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
+            if ic.check["progressbar"]:
+                pbar.update(n)
+            else:
+                print("EMCEE: Reached iteration ", n, " of ", sampleArgs["iters"])
+    
+    # Save the chain to a file
+    if not dbfile is None:
+        np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability, \
+                            pnames=np.array(fpns, dtype=np.string_))
+    
+    return pos, state
