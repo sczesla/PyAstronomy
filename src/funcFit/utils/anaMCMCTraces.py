@@ -54,7 +54,7 @@ def hpd(trace, cred):
   # Number of steps to be included in the interval
   nin = int(n * cred)
   
-  # All potential intervals must be 1) continous and 2) cover
+  # All potential intervals must be 1) continuous and 2) cover
   # the given number of trace steps. Potential start and end
   # points of the HPD are given by
   starts = st[0:-nin]
