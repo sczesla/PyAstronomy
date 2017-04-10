@@ -1768,7 +1768,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     # Save the chain to a file
     if not dbfile is None:
       np.savez_compressed(open(dbfile, 'wb'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability, \
-                             pnames=np.array(fpns, dtype=np.string_))
+                             pnames=np.array(fpns, dtype=np.unicode_))
     
     if toMD:
       # Set to lowest-deviance solution
@@ -2483,6 +2483,6 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
     # Save the chain to a file
     if not dbfile is None:
         np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability, \
-                            pnames=np.array(fpns, dtype=np.string_))
+                            pnames=np.array(fpns, dtype=np.unicode_))
     
     return pos, state
