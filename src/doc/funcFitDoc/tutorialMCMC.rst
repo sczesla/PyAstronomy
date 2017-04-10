@@ -492,3 +492,149 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
     plt.show()
     
+
+Sampling from specific distribution using emcee (sampleEMCEE)
+----------------------------------------------------------------
+
+.. currentmodule:: PyAstronomy.funcFit
+
+The function :py:func:`sampleEMCEE` allows to sample arbitrary distributions using the emcee_
+implementation of MCMC sampling without the need to define a formal funcFit model. This
+function is only a wrapper around emcee functionality. The resulting chains can be studied
+using the :py:class:`TraceAnalysis` class.
+
+Sampling from a Gaussian distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following example shows how to use :py:func:`sampleEMCEE` to obtain realizations from
+a Gaussian probability distribution. Of course there are more advantageous ways of doing this.
+
+::
+    
+    from __future__ import print_function
+    import numpy as np
+    from PyAstronomy import funcFit as fuf
+    import matplotlib.pylab as plt
+    
+    def lfGauss(v, sigma, mu):
+        """
+        Gaussian density
+        
+        Parameters
+        ----------
+        v : dictionary
+            Holds current values of "x"
+        mus, sigma : float
+            Mean and standard deviation of the Gaussian. Specified via
+            the `largs` argument.
+        
+        Returns
+        -------
+        lp : float
+            Natural logarithm of the density.
+        """
+        result = 0.0
+        # Log(density)
+        result += -0.5*np.log(2.*np.pi*sigma**2) - (v["x"] - mu)**2/(2.*sigma**2)
+        return result
+    
+    # Sampling arguments
+    # burn: Number of burn-in steps per walker
+    # iters: Number of iterations per walker 
+    sa = {"burn":1000, "iters":5000}
+    
+    # Starting values
+    fv0 = {"x":0.5}
+    # Specify standard deviation and mean of Gaussian
+    la = {"mu":0.5, "sigma":0.25}
+    
+    # Sample from distribution
+    ps = fuf.sampleEMCEE(["x"], fv0, lfGauss, largs=la, sampleArgs=sa, nwalker=4, dbfile="gauss.emcee")
+    print()
+    
+    # Use TraceAnalysis to look at chains
+    ta = fuf.TraceAnalysis("gauss.emcee")
+    print("Available chains: ", ta.availableParameters())
+    
+    print("Mean and STD of chain: ", np.mean(ta["x"]), np.std(ta["x"]))
+    
+    # Check distribution of chain
+    # Plot histogram of chain
+    plt.hist(ta["x"], 60, normed=True)
+    # Overplot Gaussian model
+    xx = np.linspace(la["mu"]-6*la["sigma"], la["mu"]+6*la["sigma"], 1000)
+    yy = 1./np.sqrt(2.*np.pi*la["sigma"]**2) * np.exp(-(xx - la["mu"])**2/(2.*la["sigma"]**2))
+    plt.plot(xx, yy, 'r--')
+    plt.show()
+    
+
+Estimate mean and STD from Gaussian sample
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MCMC sampling is frequently used to sample from posterior distributions and obtain marginal
+distributions. The following example demonstrates how to estimate the mean and standard deviation
+from a sample of Gaussian data using :py:func:`sampleEMCEE`.
+
+::
+    
+    from __future__ import print_function
+    import numpy as np
+    from PyAstronomy import funcFit as fuf
+    import matplotlib.pylab as plt
+    
+    def lfGaussMS(v, x=None):
+        """
+        Gaussian posterior with 1/sigma prior on sigma.
+        
+        Parameters
+        ----------
+        v : dictionary
+            Holds current values of "sigma" and "mu"
+        x : array
+            The 'data' observed. Will be specified by the `largs` keyword.
+        
+        Returns
+        -------
+        lp : float
+            Natural logarithm of the density.
+        """
+        if v["sigma"] < 0.:
+            # Penalize negative standard deviations
+            return -1e20*abs(v["sigma"])
+    
+        result = 0.0
+        # Apply prior on sigma
+        result -= np.log(v["sigma"])
+        # Add log(likelihood)
+        result += np.sum(-0.5*np.log(2.*np.pi*v["sigma"]**2) - (x - v["mu"])**2/(2.*v["sigma"]**2))
+        return result
+    
+    # Sampling arguments
+    # burn: Number of burn-in steps per walker
+    # iters: Number of iterations per walker 
+    sa = {"burn":1000, "iters":5000}
+    
+    # Starting values
+    fv0 = {"sigma":1., "mu":1.}
+    # 'Observed' data
+    la = {"x":np.random.normal(0.,1.,1000)}
+    
+    print("Mean of 'data': ", np.mean(la["x"]))
+    print("Standard deviation of 'data': ", np.std(la["x"]))
+    
+    # Scale width for distributing the walkers
+    s = {"mu":0.01, "sigma":0.5}
+    ps = fuf.sampleEMCEE(["mu", "sigma"], fv0, lfGaussMS, largs=la, sampleArgs=sa, nwalker=4, \
+                         scales=s, dbfile="musig.emcee")
+    print()
+    
+    # Use TraceAnalysis to look at chains
+    ta = fuf.TraceAnalysis("musig.emcee")
+    print("Available chains: ", ta.availableParameters())
+    
+    ta.plotTraceHist('mu')
+    ta.show()
+    
+    ta.plotTraceHist('sigma')
+    ta.show()
+

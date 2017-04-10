@@ -44,14 +44,15 @@ Internal and external fitters
 
     extFitters.rst
 
-Parameters and further functionality
--------------------------------------
+API, parameters and further functionality
+--------------------------------------------
 
 .. toctree::
     :maxdepth: 2
     
     params.rst
     onedfit.rst
+    sampleEMCEE.rst
     modelRebin.rst
     syncFit.rst
     emceePriors.rst
