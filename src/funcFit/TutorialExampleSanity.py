@@ -931,6 +931,14 @@ class MCMCExampleSanity(unittest.TestCase):
       os.remove("chain.emcee")
     except:
       pass
+    try:
+      os.remove("gauss.emcee")
+    except:
+      print("Could not remove file: gauss.emcee")
+    try:
+      os.remove("musig.emcee")
+    except:
+      print("Could not remove file: musig.emcee")
 
   def sanity_MCMCSampler(self):    
     # Import some required modules
@@ -1534,3 +1542,125 @@ class MCMCExampleSanity(unittest.TestCase):
     
     # Get log(prior) for parameter "b"
     print(gp(cvals, "b"))
+    
+  def sanity_sampleEMCEE_sampleFromGaussian(self):
+    """
+    Checking first sampleEMCEE example (sample from Gaussian distribution)
+    """
+    import numpy as np
+    from PyAstronomy import funcFit as fuf
+    import matplotlib.pylab as plt
+    
+    def lfGauss(v, sigma, mu):
+        """
+        Gaussian density
+        
+        Parameters
+        ----------
+        v : dictionary
+            Holds current values of "x"
+        mus, sigma : float
+            Mean and standard deviation of the Gaussian. Specified via
+            the `largs` argument.
+        
+        Returns
+        -------
+        lp : float
+            Natural logarithm of the density.
+        """
+        result = 0.0
+        # Log(density)
+        result += -0.5*np.log(2.*np.pi*sigma**2) - (v["x"] - mu)**2/(2.*sigma**2)
+        return result
+    
+    # Sampling arguments
+    # burn: Number of burn-in steps per walker
+    # iters: Number of iterations per walker 
+    sa = {"burn":1000, "iters":5000}
+    
+    # Starting values
+    fv0 = {"x":0.5}
+    # Specify standard deviation and mean of Gaussian
+    la = {"mu":0.5, "sigma":0.25}
+    
+    # Sample from distribution
+    ps = fuf.sampleEMCEE(["x"], fv0, lfGauss, largs=la, sampleArgs=sa, nwalker=4, dbfile="gauss.emcee")
+    print()
+    
+    # Use TraceAnalysis to look at chains
+    ta = fuf.TraceAnalysis("gauss.emcee")
+    print("Available chains: ", ta.availableParameters())
+    
+    print("Mean and STD of chain: ", np.mean(ta["x"]), np.std(ta["x"]))
+    
+    # Check distribution of chain
+    # Plot histogram of chain
+#     plt.hist(ta["x"], 60, normed=True)
+    # Overplot Gaussian model
+    xx = np.linspace(la["mu"]-6*la["sigma"], la["mu"]+6*la["sigma"], 1000)
+    yy = 1./np.sqrt(2.*np.pi*la["sigma"]**2) * np.exp(-(xx - la["mu"])**2/(2.*la["sigma"]**2))
+#     plt.plot(xx, yy, 'r--')
+#     plt.show()
+    
+  def sanity_sampleEMCEE_estimateMuSig(self):
+    """
+    Checking sampleEMCEE example (estimate mu and sigma)
+    """
+    import numpy as np
+    from PyAstronomy import funcFit as fuf
+    
+    def lfGaussMS(v, x=None):
+        """
+        Gaussian posterior with 1/sigma prior on sigma.
+        
+        Parameters
+        ----------
+        v : dictionary
+            Holds current values of "sigma" and "mu"
+        x : array
+            The 'data' observed. Will be specified by the `largs` keyword.
+        
+        Returns
+        -------
+        lp : float
+            Natural logarithm of the density.
+        """
+        if v["sigma"] < 0.:
+            # Penalize negative standard deviations
+            return -1e20*abs(v["sigma"])
+    
+        result = 0.0
+        # Apply prior on sigma
+        result -= np.log(v["sigma"])
+        # Add log(likelihood)
+        result += np.sum(-0.5*np.log(2.*np.pi*v["sigma"]**2) - (x - v["mu"])**2/(2.*v["sigma"]**2))
+        return result
+    
+    # Sampling arguments
+    # burn: Number of burn-in steps per walker
+    # iters: Number of iterations per walker 
+    sa = {"burn":1000, "iters":5000}
+    
+    # Starting values
+    fv0 = {"sigma":1., "mu":1.}
+    # 'Observed' data
+    la = {"x":np.random.normal(0.,1.,1000)}
+    
+    print("Mean of 'data': ", np.mean(la["x"]))
+    print("Standard deviation of 'data': ", np.std(la["x"]))
+    
+    # Scale width for distributing the walkers
+    s = {"mu":0.01, "sigma":0.5}
+    ps = fuf.sampleEMCEE(["mu", "sigma"], fv0, lfGaussMS, largs=la, sampleArgs=sa, nwalker=4, \
+                         scales=s, dbfile="musig.emcee")
+    print()
+    
+    # Use TraceAnalysis to look at chains
+    ta = fuf.TraceAnalysis("musig.emcee")
+    print("Available chains: ", ta.availableParameters())
+    
+#     ta.plotTraceHist('mu')
+#     ta.show()
+#     
+#     ta.plotTraceHist('sigma')
+#     ta.show()
