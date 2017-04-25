@@ -1,12 +1,39 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-try:
-  from numpy.distutils.core import setup, Command
-except(ImportError):
-  print("Please install 'numpy' first.")
-  
-import glob
 import sys
+
+# Inspired by scipy's setup.py
+def require_numpy():
+    """Check the commands if numpy required to build extensions.
+    Return a boolean value for whether or not numpy is required.
+    """
+    print("checking numpy")
+    info_commands = ['--help-commands', '--name', '--version', '-V',
+                     '--fullname', '--author', '--author-email',
+                     '--maintainer', '--maintainer-email', '--contact',
+                     '--contact-email', '--url', '--license', '--description',
+                     '--long-description', '--platforms', '--classifiers',
+                     '--keywords', '--provides', '--requires', '--obsoletes']
+    # Add commands that do more than print info, but also don't need Cython and
+    # template parsing.
+    info_commands.extend(['egg_info', 'install_egg_info', 'rotate'])
+
+    for command in info_commands:
+        if command in sys.argv[1:]:
+           return False
+
+    return True
+
+if require_numpy():
+    try:
+      from numpy.distutils.core import setup, Command
+    except(ImportError):
+      print("Please install 'numpy' first.")
+else:
+    from setuptools import setup
+    from distutils.cmd import Command
+
+import glob
 import re
 sys.path.append("src")
 from PyA_Version import PyA_Version
@@ -162,8 +189,8 @@ class WithExtCommand(Command):
 
 
 
-if sdist:  
-  
+if sdist:
+
   manin = open("MANIFEST.in_template").readlines()
   # Add package data to Manifest.in
   for p in packages:
@@ -173,7 +200,7 @@ if sdist:
     path = p.replace('.', '/').replace("PyAstronomy", "src")
     for d in package_data[p]:
       manin.append("include "+path+"/"+d+"\n")
-  
+
   # Add documentation in Manifest.in
   for p in packages:
     # Regular expression ignoring sub-packages.
@@ -183,7 +210,7 @@ if sdist:
     if r is not None:
       manin.append("# Documentation for: "+p+"\n")
       manin.append("recursive-include src/doc/"+r.group(1)+"Doc *.rst *.png\n")
-  
+
   open("MANIFEST.in", 'w').writelines(manin)
 
 
@@ -210,5 +237,4 @@ if not withExt:
   for e in _ext_modules:
     print("    \""+e.name+"\", Sources: ", e.sources)
   print("  USE 'python setup.py --with-ext install' to build external modules")
-  print("") 
-  
+  print("")
