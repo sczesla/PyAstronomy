@@ -7,21 +7,18 @@ def require_numpy():
     """Check the commands if numpy required to build extensions.
     Return a boolean value for whether or not numpy is required.
     """
-    print("checking numpy")
     info_commands = ['--help-commands', '--name', '--version', '-V',
                      '--fullname', '--author', '--author-email',
                      '--maintainer', '--maintainer-email', '--contact',
                      '--contact-email', '--url', '--license', '--description',
                      '--long-description', '--platforms', '--classifiers',
                      '--keywords', '--provides', '--requires', '--obsoletes']
-    # Add commands that do more than print info, but also don't need Cython and
-    # template parsing.
+    # Add commands that do more than print info, but also don't need extensions
     info_commands.extend(['egg_info', 'install_egg_info', 'rotate'])
 
     for command in info_commands:
         if command in sys.argv[1:]:
            return False
-
     return True
 
 if require_numpy():
