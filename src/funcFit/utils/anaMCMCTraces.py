@@ -234,7 +234,32 @@ class TraceAnalysis:
       self._loadEMCEEChain(burn=self.burn)
     else:
       raise(PE.PyAAlgorithmFailure("Walkers can only be selected for emcee data bases. Current data base type: " + str(self.dbtype)))
-    
+  
+  def selectedWalkers(self):
+      """
+      Get the list of selected walkers.
+      
+      Parameters
+      ----------
+      walkers : array
+          The selected walkers.
+      """
+      if not hasattr(self, "_selectedWalker"):
+          raise(PE.PyAValError("Cannot determine the selected walkers. It appears that no emcee chain was loaded."))
+      return self._selectedWalker[:]
+  
+  def numberOfWalkers(self):
+      """
+      Get number of walkers in emcee chain.
+      
+      Returns
+      -------
+      nWalkers : int
+          Number of available walkers
+      """
+      if not hasattr(self, '_emceedat'):
+          raise(PE.PyAValError("Cannot determine the number of walkers. It appears that no emcee chain was loaded."))
+      return self._emceedat["chain"].shape[0]
   
   def __init__(self, resource, db="pickle"):
     if isinstance(resource, six.string_types):
@@ -285,7 +310,7 @@ class TraceAnalysis:
       ----------
       parm : string
           Name of the parameter.
-      
+       
       Returns
       -------
       trace : array
