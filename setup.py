@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-try:
-  from numpy.distutils.core import setup, Command
-except(ImportError):
-  print("Please install 'numpy' first.")
+from distutils.core import setup, Command
   
 import glob
 import sys
