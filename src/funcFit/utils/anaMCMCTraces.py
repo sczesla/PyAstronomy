@@ -28,7 +28,7 @@ def hpd(trace, cred):
   """
     Estimate the highest probability density interval.
     
-    This function determines the shortest, continous interval
+    This function determines the shortest, continuous interval
     containing the specified fraction (cred) of steps of
     the Markov chain. Note that multi-modal distribution
     may require further scrutiny.
@@ -46,6 +46,11 @@ def hpd(trace, cred):
     start, end : float
         The start and end points of the interval.
   """
+  if (cred > 1.0) or (cred < 0.0):
+      raise(PE.PyAValError("Invalid value for credibility (cred). Received: " + str(cred), \
+                           where="hpd", \
+                           solution="Use a value between 0 and 1."))
+  
   # Sort the trace steps in ascending order
   st = np.sort(trace)
   
