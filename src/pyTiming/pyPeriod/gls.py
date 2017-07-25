@@ -55,7 +55,7 @@ class Gls:
     fbeg, fend : float, optional
         The beginning and end frequencies for the periodogram
         (inverse units of time axis).
-    Pbeg, Pend : float, optional
+    pbeg, pend : float, optional
         The beginning and end periods for the periodogram
         (same units as for time axis).
     ofac : int
