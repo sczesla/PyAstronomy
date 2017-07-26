@@ -1705,6 +1705,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       # likelihood function at this step:
       pdf = prior_sum
       if pdf == -np.inf:
+        print("e prior is ", priors["e"](ps, "e"))
         return pdf
       # Likelihood
       pdf += likeli(fpns, values)
@@ -1778,8 +1779,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                              pnames=np.array(fpns, dtype=np.unicode_))
     
     if toMD:
-      # Set to lowest-deviance solution
-      indimin = np.argmin(self.emceeSampler.lnprobability)
+      # Set to lowest-deviance (highest probability) solution
+      indimin = np.argmax(self.emceeSampler.lnprobability)
       for i, p in enumerate(self.freeParamNames()):
         self[p] = self.emceeSampler.flatchain[indimin, i] 
     
