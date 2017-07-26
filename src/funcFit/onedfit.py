@@ -1705,7 +1705,6 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
       # likelihood function at this step:
       pdf = prior_sum
       if pdf == -np.inf:
-        print("e prior is ", priors["e"](ps, "e"))
         return pdf
       # Likelihood
       pdf += likeli(fpns, values)
