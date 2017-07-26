@@ -1696,11 +1696,18 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     def lnpostdf(values):
       # Parameter-Value dictionary
       ps = dict(zip(fpns, values))
-      # Likelihood
-      pdf = likeli(fpns, values)
-      # Add prior information
+      # Check prior information
+      prior_sum = 0
       for name in fpns:
-        pdf += priors[name](ps, name)
+        prior_sum += priors[name](ps, name)
+      # If log prior is negative infinity, parameters
+      # are out of range, so no need to evaluate the
+      # likelihood function at this step:
+      pdf = prior_sum
+      if pdf == -np.inf:
+        return pdf
+      # Likelihood
+      pdf += likeli(fpns, values)
       # Add information from potentials
       for p in pots:
         pdf += p(ps)
