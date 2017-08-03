@@ -38,7 +38,7 @@ def observatory(obsName):
   if not config.has_section(obsName):
     raise(PE.PyAValError("No such observatory: '" + str(obsName) + "'", \
           solution="Choose existing observatory (use listObservatories" + \
-          "to get a list)", \
+          " to get a list)", \
           where="observatory"))
   
   result = {}
