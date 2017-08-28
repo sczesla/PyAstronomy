@@ -117,7 +117,7 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edg
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
   elif mode == "doppler":
-    # Ensure that the template covers the entire observaion for all shifts
+    # Ensure that the template covers the entire observation for all shifts
     maxwl = tw[-1] * (1.0+rvmin/c)
     minwl = tw[0] * (1.0+rvmax/c)
     if minwl > w[0]:
