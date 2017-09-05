@@ -467,6 +467,15 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
   # East longitudes are positive
   obs_long = -obs_long
 
+  if (ra2000 < 0.0) or (ra2000 > 360.):
+    raise(PE.PyAValError("Invalid value for ra2000 (value given is " + str(ra2000) + ").", \
+          where="helcorr", \
+          solution="Adjust right ascension (0 - 360)."))
+  if (dec2000 < -90.0) or (dec2000 > 90.0):
+    raise(PE.PyAValError("Invalid value for dec2000 (value given is " + str(dec2000) + ").", \
+          where="helcorr", \
+          solution="Adjust declination (-90 -- +90)."))
+
   if jd < 2.4e6:
     PE.warn(PE.PyAValError("The given Julian Date (" + str(jd) + ") is exceedingly small. Did you subtract 2.4e6?"))
 
