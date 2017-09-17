@@ -67,9 +67,10 @@ def degToDMS(g):
     
     Returns
     -------
-    d, m, s : float
+    d, m, s, sign : float, int
         Degrees, (arc)minutes, and (arc)seconds. Note that only the
-        degree number is signed.
+        degree number is signed. The sign (+1/-1) is also returned to
+        yield a complete result if the value of degree (d) is zero. 
   """
   sign = 1
   if g < 0.0:
@@ -80,10 +81,10 @@ def degToDMS(g):
   m = int(g*60.0)
   g = g - m/60.0
   s = g*3600.0
-  return d, m, s
+  return d, m, s, sign
   
   
-def dmsToDeg(d, m, s):
+def dmsToDeg(d, m, s, esign=0):
   """
     Convert degree-arcminute-arcsecond specification into degrees.
     
@@ -95,6 +96,11 @@ def dmsToDeg(d, m, s):
         Arcminutes (0-60)
     s : float
         Arcseconds (0-60)
+    esign : int, optional, {-1,0,1}
+        Explicit sign with -1 representing negative sign, +1 representing
+        positive sign, and 0 indicating no explicit sign specification.
+        The explicit sign is necessary if negative southern coordinates are
+        specified but d is 0 and, thus, cannot carry the sign. 
     
     Returns
     -------
@@ -107,9 +113,28 @@ def dmsToDeg(d, m, s):
   if (s < 0.0) or (s >= 60.0):
     raise(PE.PyAValError("Second (" + str(s) + ") out of range (0 <= m < 60)", \
                          solution="Specify a value between 0 and 60."))
+  if not esign in (-1,0,+1):
+    raise(PE.PyAValError("Invalid value for 'esign' (value given is " + str(esign) + ").", \
+                         solution="Use +1, 0, or -1.", \
+                         where="dmsToDeg"))
+  if (d == 0.0) and (esign == 0):
+    raise(PE.PyAValError("When a value of zero is specified for degrees (d), the sign has to be given explicitly via the `esign` flag.", \
+                         where="dmsToDeg", \
+                         solution="Specify esign=+/-1 according to sign (i.e., northern or southern coordinates).", \
+                         addInfo="Safety device added to prevent common conversion errors from coordinates like '-00 12 08'."))
+    
   sign = 1.0
   if d < 0.0:
     sign = -1.0
+  
+  if (d != 0.0) and (esign != 0):
+    # Check consistency of sign and esign
+    if int(sign) != esign:
+      raise(PE.PyAValError("The sign of 'd' and the specification of 'esign' must not contradict.", \
+                           solution="Adjust 'esign' specification.", \
+                           where="dmsToDeg"))
+  elif d == 0.0:
+    sign = esign
   
   result = d + sign*(m/60.0) + sign*(s/3600.0)
   return result
@@ -150,15 +175,17 @@ def coordsSexaToDeg(c, fullOut=False):
     if r.group(2) != r.group(n):
       raise(PE.PyAValError("Separators (space and colon) mixed in coordinate definition.", \
                            solution="Use consistent separator."))
+
   ra = (float(r.group(1)), float(r.group(3)), float(r.group(5)))
-  de = (float(r.group(7)), float(r.group(11)), float(r.group(13)))
+  esign = {'+':+1, '-':-1}[r.group(8)]
+  de = (float(r.group(7)), float(r.group(11)), float(r.group(13)), esign)
   result = (hmsToDeg(*ra), dmsToDeg(*de))
   if not fullOut:
     return result
   return result[0], result[1], ra, de
   
 
-def coordsDegToSexa(ra, dec, asString=True, fmt="%02d %02d %06.3f  %+02d %02d %06.3f"):
+def coordsDegToSexa(ra, dec, asString=True, fmt=("%02d %02d %06.3f  ", "%s%02d %02d %06.3f")):
   """
     Convert right ascension and declination from degrees into sexagesimal representation.
     
@@ -171,8 +198,8 @@ def coordsDegToSexa(ra, dec, asString=True, fmt="%02d %02d %06.3f  %+02d %02d %0
     asString : boolean, optional
         If True (default), the result will be a string formatted
         according to the rules specified by `fmt`.
-    fmt : string, optional
-        The output format used to create the output string. Only used
+    fmt : tuple of strings, optional
+        The output format used to create the output string (first ra, second dec). Only used
         if `asString` is True (default).
     
     Returns
@@ -182,7 +209,7 @@ def coordsDegToSexa(ra, dec, asString=True, fmt="%02d %02d %06.3f  %+02d %02d %0
         is returned, which is formatted according to the rules specified by
         the `fmt` parameter. If False, a tuple of two tuples is returned,
         of which the first holds three numbers representing the right ascension
-        (hms) and the second three numbers representing the declination (dms).    
+        (hms) and the second three numbers representing the declination (dms, sign).    
   """
   if (ra < 0.0) or (ra >= 360.):
     raise(PE.PyAValError("Right ascension should be between 0 and 360 degrees."))
@@ -190,8 +217,9 @@ def coordsDegToSexa(ra, dec, asString=True, fmt="%02d %02d %06.3f  %+02d %02d %0
     raise(PE.PyAValError("Declination should be between -90 and +90 degrees."))
   rat = degToHMS(ra)
   dect = degToDMS(dec)
+
   if asString:
-    result = fmt % (rat+dect)
+    result = (fmt[0] % rat) + (fmt[1] % ({-1:'-', +1:'+'}[dect[3]], dect[0], dect[1],  dect[2]))
     return result
   return rat, dect
   
