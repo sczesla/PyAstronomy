@@ -6,6 +6,9 @@ Conversion between sexagesimal and decimal coordinate representation
 The routines below convert between sexagesimal and decimal coordinate
 representations.  
 
+.. warning:: Until (and including) version 0.11.0, the sign of declinations starting
+             with '-00' was not handled correctly.
+
 Example: Convert between decimal and sexagesimal representation
 ------------------------------------------------------------------
 

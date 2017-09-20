@@ -15,6 +15,7 @@ from .posAngle import positionAngle
 from .coordinates import hmsToDeg, degToHMS, degToDMS, dmsToDeg, coordsSexaToDeg, coordsDegToSexa
 import six
 import six.moves as smo
+from PyAstronomy.pyaC import pyaErrors as PE
 
 class SanityOfPyasl(unittest.TestCase, SaniBase):
   
@@ -340,6 +341,36 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     ks = MarkleyKESolver()
     p = ks.precisionTest()
     self.assertLess(p, 1e-14)
+
+  def sanity_dmstodeg(self):
+    """
+    Check sanity of dmstodeg
+    """
+    try:
+        dmsToDeg(0, 12, 34)
+    except PE.PyAValError:
+        # This should occur
+        pass
+    except Exception as e:
+        # Another exception -- not good
+        raise(e)
+    else:
+        # This is a mistake: no exception was raised...
+        raise(Exception("dmstodeg should have raised an exception but did not: dmsToDeg(0, 12, 34)"))
+
+    try:
+        dmsToDeg(-10, 12, 34, esign=+1)
+    except PE.PyAValError:
+        # This should occur
+        pass
+    except Exception as e:
+        # Another exception -- not good
+        raise(e)
+    else:
+        # This is a mistake: no exception was raised...
+        raise(Exception("dmstodeg should have raised an exception but did not: dmsToDeg(-10, 12, 34, esign=+1)"))
+
+    self.assertAlmostEqual(dmsToDeg(0,1,0,-1), -1./60., delta=1e-12, msg="dmsToDeg: (0,1,0,-1) not correctly converted")      
 
   def sanity_degToSexaCoordConversion(self):
     """
