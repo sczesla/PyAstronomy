@@ -229,7 +229,7 @@ class PyAFS:
       self.removeFile(ana["fullname"])
       sols = ["Check whether URL exists and is spelled correctly."]
       # Check whether network can be reached.
-      netreach = self._checkOnline(url, raiseNOC=False)
+      netreach = self._checkOnline(raiseNOC=False)
       if not netreach:
         sols.append("Network could not be reached. Check your network status.")
       raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n", \
