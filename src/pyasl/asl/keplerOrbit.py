@@ -217,6 +217,9 @@ class KeplerEllipse(object):
         this case, the corresponding value is +90 deg.
         The so-called longitude of the periapsis is given by the sum of the
         longitude of the ascending node and the argument of periapsis.
+        Note that for example in the literature on eclipsing binaries the terms
+        are not always clearly distinguished and what is referred to the longitude of
+        periapsis may actually be the argument of periapsis in the above nomenclature.
 
     Parameters
     ----------
