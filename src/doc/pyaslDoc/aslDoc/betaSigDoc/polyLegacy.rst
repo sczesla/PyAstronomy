@@ -1,9 +1,12 @@
+.. _estimateSNRFCT:
+
 Estimation by polynomial approximation
 ============================================
 
 The :py:func:`estimateSNR` function provides an algorithm
 to estimate the SNR in a data set.
 
+.. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: estimateSNR
 
 Example---Estimating SNR ratio
