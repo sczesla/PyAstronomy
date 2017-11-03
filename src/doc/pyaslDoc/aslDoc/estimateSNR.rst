@@ -31,6 +31,13 @@ terms to contribute to the value of the numerical derivative. The same idea unde
 `DER_SNR algorithm <http://www.stecf.org/software/ASTROsoft/DER_SNR/>`_; both are, in fact, identical
 for specific settings of the :math:`\beta\sigma` procedure.
 
+API documentation
+~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 2
+   
+   betaSigDoc/betaSigAPI.rst
 
 
 
