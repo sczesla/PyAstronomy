@@ -421,16 +421,28 @@ class BSArbSamp(BSBase):
         ------------  --------  -------------------------------------------
         betaSample    array     The beta sample
 
-        betaSig       float     MVU estimate of the STD in the beta
-                                sample.
-        stdBetaSig    float     Standard error of betaSig.
-
-        mbeta         float     Mean value of beta sample.
-        stdmbeta      float     Standard error on mbeta.
-
-        madstd        float     Robust (MAD-based) estimate of the STD in
-                                the beta sample.
-        stdMadstd     float     Estimate of standard error of madstd.
+        estimates     dict      Summary of the estimates obtained
+                                from the beta sample (bs).
+                                
+                                "s2E": variance estimate of the bs
+                                (expectation value of zero),
+                                "s2Evar": variance of s2E
+                                
+                                "sE": Estimate of std of bs,
+                                "sEstd": Std of sE
+                                
+                                "s2": variance estimate of the bs
+                                (mean estimated from bs),
+                                "s2var": variance of s2,
+                                "s": sqrt(s2)
+                                
+                                "sME": Standard deviation based on MAD
+                                with zero expectation,
+                                "sMEstd": Estimation of std of sME
+                                
+                                "sM": Standard deviation based on MAD
+                                with median estimated from bs,
+                                "sMEstd": Estimation of std of sM
         ============  ========  ===========================================
 
         Parameters
@@ -452,14 +464,16 @@ class BSArbSamp(BSBase):
             of the MVU estimator (default is False). The standard error is estimated by
             scaling the standard deviation of the MVU estimator by a factor of
             1.64.
+        ibs : boolean, optional
+            If True, an independent beta sample is constructed. Default is False.
 
         Returns
         -------
-        betaSigma : float
-            The standard deviation determined in the beta sample. By default
-            the MVU estimate is returned.
-        stdBetaSigma : float
-            The standard deviation of the betaSigma estimator.
+        Estimate of STD in beta sample and the STD of the estimate: float, float
+            The standard deviation determined in the beta sample. Non-robust
+            estimates sE and sEstd if `returnMAD` is False (default) or robust
+            estimates sME and sMEstd if `returnMAD` is True. The `estimates`
+            attribute holds a more comprehensive summary of the estimates.
         """
         self._checkJP(j)
         self._checkN(N)
@@ -662,16 +676,28 @@ class BSEqSamp(BSBase):
         ------------  --------  -------------------------------------------
         betaSample    array     The beta sample
 
-        betaSig       float     MVU estimate of the STD in the beta
-                                sample.
-        stdBetaSig    float     Standard error of betaSig.
-
-        mbeta         float     Mean value of beta sample.
-        stdmbeta      float     Standard error on mbeta.
-
-        madstd        float     Robust (MAD-based) estimate of the STD in
-                                the beta sample.
-        stdMadstd     float     Estimate of standard error of madstd.
+        estimates     dict      Summary of the estimates obtained
+                                from the beta sample (bs).
+                                
+                                "s2E": variance estimate of the bs
+                                (expectation value of zero),
+                                "s2Evar": variance of s2E
+                                
+                                "sE": Estimate of std of bs,
+                                "sEstd": Std of sE
+                                
+                                "s2": variance estimate of the bs
+                                (mean estimated from bs),
+                                "s2var": variance of s2,
+                                "s": sqrt(s2)
+                                
+                                "sME": Standard deviation based on MAD
+                                with zero expectation,
+                                "sMEstd": Estimation of std of sME
+                                
+                                "sM": Standard deviation based on MAD
+                                with median estimated from bs,
+                                "sMEstd": Estimation of std of sM
         ============  ========  ===========================================
 
         Parameters
@@ -690,14 +716,16 @@ class BSEqSamp(BSBase):
             of the MVU estimator (default is False). The standard error is estimated by
             scaling the standard deviation of the MVU estimator by a factor of
             1.64.
+        ibs : boolean, optional
+            If True, an independent beta sample is constructed. Default is False.
 
         Returns
         -------
-        betaSigma : float
-            The standard deviation determined in the beta sample. By default
-            the MVU estimate is returned.
-        stdBetaSigma : float
-            The standard deviation of the betaSigma estimator.
+        Estimate of STD in beta sample and the STD of the estimate: float, float
+            The standard deviation determined in the beta sample. Non-robust
+            estimates sE and sEstd if `returnMAD` is False (default) or robust
+            estimates sME and sMEstd if `returnMAD` is True. The `estimates`
+            attribute holds a more comprehensive summary of the estimates.
         """
         self._checkJP(j)
         self._checkN(N)
