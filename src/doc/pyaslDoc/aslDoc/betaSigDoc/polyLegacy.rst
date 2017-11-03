@@ -1,6 +1,6 @@
 .. _estimateSNRFCT:
 
-Estimation by polynomial approximation
+Noise estimation by polynomial approximation
 ============================================
 
 The :py:func:`estimateSNR` function provides an algorithm
