@@ -82,6 +82,15 @@ Estimating the noise contribution in a data set x, y:
           validity of the result.
 
 
+More detailed introduction
+-----------------------------
+
+.. toctree::
+   :maxdepth: 2
+   
+   betaSigDoc/betaSig.rst
+
+
 API documentation
 ~~~~~~~~~~~~~~~~~~
 
