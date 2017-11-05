@@ -64,7 +64,7 @@ Estimating the noise contribution in a data set x, y:
     # Estimate noise using robust estimate
     beq = pyasl.BSEqSamp()
     # Define order of approximation (use larger values such as 2,3, or 4 for
-    # faster varying or less well sampled data sets)
+    # faster varying or less well sampled data sets; also 0 is a valid order)
     N = 1
     # Define 'jump parameter' (use larger values such as 2,3, or 4 if correlation
     # between adjacent data point is suspected)
@@ -82,7 +82,7 @@ Estimating the noise contribution in a data set x, y:
           validity of the result.
 
 
-More detailed introduction
+More detailed examples
 -----------------------------
 
 .. toctree::

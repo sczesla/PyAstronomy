@@ -1,11 +1,18 @@
 Beta Sigma Noise Estimation
 ===================================
 
-The basic assumptions
+In the following, a number of examples demonstrate aspects of the
+:math:`\beta\sigma` procedure. See also TBD for further discussion.
 
-    - Noise contribution in individual measurements/bins is independent
-    - The noise distribution is Gaussian with standard deviation $\\sigma_0$
+    - :ref:`bsOrders`
+    - :ref:`bsRobust`
+    - :ref:`bsEquisamp`
 
+.. currentmodule:: PyAstronomy.pyasl
+
+
+
+.. _bsOrders:
 
 Noise estimates with different orders of approximations (N)
 -----------------------------------------------------------------
@@ -93,6 +100,7 @@ too high estimate for the amplitude of noise because the signal varies too quick
     plt.show()
 
 
+.. _bsRobust:
 
 The effect of outliers: A case for robust estimation
 ------------------------------------------------------------
@@ -160,4 +168,87 @@ main uncertainties arise from deviations from the assumption of Gaussian noise.
     plt.subplot(2,1,2)
     plt.title("Histogram of $\\beta$ sample")
     plt.hist(bseq.betaSample, 30)
+    plt.show()
+
+  
+.. _bsEquisamp:
+  
+Equidistant vs. arbitrary sampling
+--------------------------------------------
+
+The classes :py:func:`BSEqSamp` and :py:func:`BSArbSamp` treat the cases of equidistant and arbitrary
+sampling of the signal explicitly. Equidistant sampling is technically more simple to treat and is
+often a good approximation *even if* the actual sampling is not equidistant. This is true when there
+is a "not too complicated" transformation relating the actual and an equidistant sampling axes.
+The following example demonstrates a case, where equidistant sampling can be assumed but a higher
+order of approximation is required.
+    
+::   
+        
+    from __future__ import print_function, division
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import pyasl
+    
+    def g(t):
+        """
+        Function determining the behavior of the data.
+        """
+        return 1.3 - 10.0*t
+    
+    
+    # Number of data points
+    nd = 30
+    
+    # Creating non-equidistant samping axis (ti)
+    te = np.arange(float(nd))
+    ti = (te**3) / float(nd**2)
+    
+    # Get values of g(t)
+    gi = g(ti)
+    
+    # Standard deviation of noise
+    istd = 0.3
+    
+    # Add Gaussian noise to data
+    yi = gi + np.random.normal(0.0, istd, nd)
+    
+    print("Input standard deviation: ", istd)
+    print("Number of 'data points': ", nd)
+    print()
+    
+    # Create class instance for equidistant sampling
+    bseq = pyasl.BSEqSamp()
+    # Create class instance for arbitrary sampling
+    bsar = pyasl.BSArbSamp()
+    
+    # Get estimates assung equidistant and arbitrary sampling
+    # using N = 1 and j = 1. From the definition of g(t), N = 1
+    # will be sufficient for the case of arbitrary sampling, but
+    # not necessarily for (assumed) equidistant sampling.
+    smv_es, dsmv_es  = bseq.betaSigma(yi, 1, 1)
+    smv_as, dsmv_as  = bsar.betaSigma(ti, yi, 1, 1)
+    
+    print("Estimates for N=1 and j=1")
+    print("    Equidistant sampling: %5.3f +/- %5.3f" % (smv_es, dsmv_es))
+    print("    Arbitrary sampling: %5.3f +/- %5.3f" % (smv_as, dsmv_as))
+    print()
+    
+    # Get estimates for N=2 and 3 assuming equidistant sampling
+    smv_es2, dsmv_es2  = bseq.betaSigma(yi, 2, 1)
+    smv_es3, dsmv_es3  = bseq.betaSigma(yi, 3, 1)
+    
+    print("Estimates for N=2 and 3 based on equidistant sampling")
+    print("    N = 2: %5.3f +/- %5.3f" % (smv_es2, dsmv_es2))
+    print("    N = 3: %5.3f +/- %5.3f" % (smv_es3, dsmv_es3))
+    
+    plt.subplot(2,1,1)
+    plt.title("Data with true sampling")
+    plt.plot(ti, gi, 'b-')
+    plt.errorbar(ti, yi, yerr=np.ones(nd)*istd, fmt='b+')
+    plt.subplot(2,1,2)
+    plt.title("Same data assuming equidistant sampling")
+    plt.plot(te, gi, 'r-')
+    plt.errorbar(te, yi, yerr=np.ones(nd)*istd, fmt='r+')
+    plt.tight_layout()
     plt.show()
