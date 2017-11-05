@@ -1,5 +1,5 @@
-Beta Sigma Noise Estimation
-===================================
+Examples of Beta Sigma Noise Estimation
+=====================================================
 
 In the following, a number of examples demonstrate aspects of the
 :math:`\beta\sigma` procedure. See also TBD for further discussion.
