@@ -12,7 +12,7 @@ class PoisPost:
     def __init__(self):
         pass
     
-    def _zetaj(self, j, nQ, NB, alpha, gamma, p):
+    def zetaj(self, j, nQ, NB, alpha, gamma, p):
         """
         Zeta factor (Eq. 18)
         """
@@ -62,7 +62,7 @@ class PoisPost:
             Posterior density for lams
         """
         p = f / (1.0 + f)
-        r0 = np.array([self._zetaj(j, nQ, NB, alpha, gamma, p) * lams**(j-gamma)*np.exp(-lams) / ss.gamma(j-gamma+1) for j in smo.range(nQ+1)])
+        r0 = np.array([self.zetaj(j, nQ, NB, alpha, gamma, p) * lams**(j-gamma)*np.exp(-lams) / ss.gamma(j-gamma+1) for j in smo.range(nQ+1)])
         r1 = np.sum(r0, axis=0)
         return r1
     
