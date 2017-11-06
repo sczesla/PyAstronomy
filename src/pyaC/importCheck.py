@@ -92,6 +92,10 @@ class ImportCheck:
             except PE.PyARequiredImport:
                 self.check[module] = False
                 self.fail.append(module)
+            except Exception as e:
+                # In fact, any error prevents import
+                self.check[module] = False
+                self.fail.append(module)
 
             if (not self.check[module]) and (module in required):
                 self.requiredFail.append(module)
