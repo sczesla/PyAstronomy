@@ -14,7 +14,9 @@ class PoisPost:
     
     def zetaj(self, j, nQ, NB, alpha, gamma, p):
         """
-        Zeta factor (Eq. 18)
+        Zeta factor (Eq. 18).
+        
+        P(n_S = j) = zeta_j
         """
         numerator = p**(nQ - j) * pyaC.farat(nQ-j+NB+alpha-1, nQ-j+1-1) * pyaC.farat(j-gamma+1-1, j+1-1)
         denum = np.sum([p**(nQ - r) * pyaC.farat(nQ-r+NB+alpha-1, nQ-r+1-1) * pyaC.farat(r-gamma+1-1, r+1-1) for r in smo.range(nQ+1)])
