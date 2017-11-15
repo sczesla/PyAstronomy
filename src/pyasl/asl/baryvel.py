@@ -387,7 +387,7 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
     Calculate barycentric velocity correction.
     
     This function calculates the motion of an observer in
-    the direction of a star. In contract to :py:func:`baryvel`
+    the direction of a star. In contrast to :py:func:`baryvel`
     and :py:func:`baryCorr`, the rotation of the Earth is
     taken into account.
     
