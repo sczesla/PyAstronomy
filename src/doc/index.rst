@@ -38,6 +38,14 @@ Model fitting
    Model suite --- A collection of ready-to-use models for funcFit <modelSuiteDoc/index.rst>
 
 
+Spotlights
+----------------
+
+.. toctree::
+   :maxdepth: 1
+   
+   Beta-Sigma noise estimation <pyaslDoc/aslDoc/estimateSNR.rst>
+
 
 PyAstronomy core
 -------------------
