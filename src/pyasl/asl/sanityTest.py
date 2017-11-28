@@ -2661,3 +2661,368 @@ class SanityOfFitsSpec(unittest.TestCase):
         # manually
         wp = {"CRVAL1": 5000., "CDELT1": 0.01, "CRPIX1": 1}
         pyasl.write1dFitsSpec("test2.fits", flux, waveParams=wp, clobber=True)
+
+
+
+
+class SanityOfBetaSigma(unittest.TestCase):
+ 
+    def sanity_test1(self):
+        """
+        Beta Sigma sanity test 1
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        
+        np.random.seed(192837465)
+        x = np.arange(1000)
+        y = np.random.normal(0, 1, len(x))
+ 
+        na = pyasl.BSArbSamp()
+        ne = pyasl.BSEqSamp()
+ 
+        e, se = ne.betaSigma(y, 0, 1, ibs=True)
+        a, sa = na.betaSigma(x, y, 0, 1, ibs=True)
+ 
+        print("e, se: ", e, se)
+        print("a, sa: ", a, sa)
+ 
+        self.assertAlmostEqual(e, a, delta=1e-10, msg="SanityOfBetaSigma, test1: e and a do not match!")
+        self.assertAlmostEqual(se, sa, delta=1e-10,
+                               msg="SanityOfBetaSigma, test1: se and sa do not match!")
+        self.assertAlmostEqual(e, 1., delta=2 * se,
+                               msg="SanityOfBetaSigma, test1: e does not match 1 within 2 std.")
+ 
+    def sanity_test2(self):
+        """
+        Beta Sigma sanity test 2
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        
+        np.random.seed(192837466)
+        x = np.arange(1000)
+        y = np.random.normal(0, 1, len(x))
+ 
+        na = pyasl.BSArbSamp()
+        ne = pyasl.BSEqSamp()
+ 
+        stds = []
+ 
+        for N in smo.range(10):
+            for j in smo.range(1, 10, 1):
+ 
+                e, se = ne.betaSigma(y, N, j, ibs=True)
+                a, sa = na.betaSigma(x, y, N, j, ibs=True)
+ 
+                print("N, j, n(betaSample): ", N, j, len(
+                    ne.betaSample), len(na.betaSample))
+                print("    e, se: ", e, se)
+                print("    a, sa: ", a, sa)
+ 
+                stds.append(e)
+ 
+                self.assertAlmostEqual(
+                    e, a, delta=1e-7, msg="SanityOfBetaSigma, test2: e and a do not match! e - a = " + str(e - a))
+                self.assertAlmostEqual(
+                    se, sa, delta=1e-7, msg="SanityOfBetaSigma, test2: se and sa do not match!")
+                self.assertAlmostEqual(
+                    e, 1., delta=4 * se, msg="SanityOfBetaSigma, test2: e does not match 1 within 4 std.")
+ 
+    def sanity_test_betaSampleIndices(self):
+        """
+        Beta sigma sample indices for independent sample construction
+        """
+ 
+        import numpy as np
+        from PyAstronomy import pyasl
+        
+        x = np.arange(9)
+        y = np.random.normal(0, 1, len(x))
+ 
+        ne = pyasl.BSEqSamp()
+ 
+        _ = ne.betaSigma(x, 1, 1, ibs=True)
+ 
+        self.assertEqual(True, np.any(ne.karr[0] == np.array([0,  3,  6])))
+        self.assertEqual(True, np.any(ne.karr[1] == np.array([0,  3,  6]) + 1))
+        self.assertEqual(True, np.any(ne.karr[2] == np.array([0,  3,  6]) + 2))
+ 
+        _ = ne.betaSigma(x, 0, 3, ibs=True)
+ 
+        self.assertEqual(True, np.any(ne.karr[0] == np.array([0, 1, 2])))
+        self.assertEqual(True, np.any(ne.karr[1] == np.array([0, 1, 2]) + 3))
+ 
+        x = np.arange(1000)
+        y = np.random.normal(0, 1, len(x))
+        for N in smo.range(10):
+            for j in smo.range(10):
+                _ = ne.betaSigma(x, N, j + 1, ibs=True)
+                ka = np.empty(shape=(0,))
+                for k in ne.karr:
+                    ka = np.concatenate((ka, k))
+ 
+                u = np.unique(ka)
+                self.assertEqual(len(ka), len(u))
+                print(len(ka), len(x), N, j)
+                self.assertTrue(len(ka) >= len(x) - (N + 2) * (j + 1))
+ 
+    def test3(self):
+        """
+        Beat sigma test3
+        """
+ 
+        import numpy as np
+        from PyAstronomy import pyasl
+        
+        np.random.seed(773311)
+        x = np.arange(1000)
+        y = np.random.normal(0, 1, len(x))
+ 
+        ne = pyasl.BSEqSamp()
+ 
+        std, e = ne.stdUnbiased(y)
+        madstd = ne.estimateStdMAD(y)
+ 
+        self.assertAlmostEqual(std, madstd, delta=e,
+                               msg="SanityOfBetaSigma, test3: std and madstd do not match")
+ 
+ 
+    def sanity_example_quickstart(self):
+        """
+        Beta-Sigma Quickstart example
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        
+        # Set up artificial data set
+        x = np.linspace(0., 1., 200)
+        y = 10.2 + x + 4 * x**2
+        # Add some independent, Gaussian noise
+        gstd = 0.1
+        y += np.random.normal(0., gstd, len(x))
+        
+        # Estimate noise using robust estimate
+        beq = pyasl.BSEqSamp()
+        # Define order of approximation (use larger values such as 2,3, or 4 for
+        # faster varying or less well sampled data sets; also 0 is a valid order)
+        N = 1
+        # Define 'jump parameter' (use larger values such as 2,3, or 4 if correlation
+        # between adjacent data point is suspected)
+        j = 1
+        # Estimate noise assuming equidistant sampling (often a good approximation even
+        # if data are not strictly equidistant) and robust estimation (often advantageous
+        # in working with real data)
+        nstd, nstdstd = beq.betaSigma(y, N, j, returnMAD=True)
+        
+        print("Input noise std: ", gstd)
+        print("Estimated noise std = %5.3f +/- %5.3f" % (nstd, nstdstd))
+
+    def sanity_example_different_N(self):
+        """
+        BS example: Noise estimates with different orders of approximations (N)
+        """
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        def g(t):
+            """
+            Function determining the behavior of the data.
+            """
+            return 1.3 - 0.003*t + 1.3*np.sin(t/5.) * np.exp(-t/100.)
+        
+        
+        # Number of data points
+        nd = 200
+        
+        ti = np.arange(float(nd))
+        gi = g(ti)
+        
+        mdiff = np.max(np.abs(gi[1:] - gi[0:-1]))
+        print("""Maximum absolute difference between consecutive
+            values of g(t): """, mdiff)
+        
+        # Standard deviation of noise
+        istd = 0.02
+        
+        print("Input standard deviation: ", istd)
+        print("Number of 'data points': ", nd)
+        print()
+        
+        # Add Gaussian noise to data
+        yi = gi + np.random.normal(0.0, istd, nd)
+        
+        # Create class instance for equidistant sampling
+        bseq = pyasl.BSEqSamp()
+        
+        # Specify jump parameter (j) for construction of beta sample
+        j = 1
+        
+        # Order of approximation to use
+        Ns = [0,1,2,3]
+        
+        # Use to store noise estimates
+        smads, dsmads = [], []
+        
+        # Loop over orders of approximation between 0 and 3
+        for N in Ns:
+        
+            # Get estimates of standard deviation based on robust (MAD-based) estimator
+            smad, dsmad = bseq.betaSigma(yi, N, j, returnMAD=True)
+            print("Order of approximation (N): ", N)
+        
+            print("    Size of beta sample: ", len(bseq.betaSample))
+            print("    Robust estimate of noise std: %6.3f +/- %6.3f" % (smad, dsmad))
+            # Save result
+            smads.append(smad)
+            dsmads.append(dsmad)
+        
+#         # Plot g(t) and the synthetic data
+#         plt.subplot(2,1,1)
+#         plt.title("Data (top) and noise estimates (bottom)")
+#         plt.plot(ti, gi, 'b.-', label="$g(t_i)$")
+#         plt.errorbar(ti, yi, yerr=np.ones(nd)*istd, fmt='r+', label="$y_i$")
+#         plt.legend()
+#         plt.subplot(2,1,2)
+#         plt.title("N=0 is insufficient")
+#         plt.errorbar(Ns, smads, yerr=dsmads, fmt='k+', label="Noise estimates")
+#         plt.plot([min(Ns)-0.5, max(Ns)+0.5], [istd]*2, 'k--', label="Input value")
+#         plt.legend()
+#         plt.xlabel("Order of approximation (N)")
+#         plt.ylabel("Noise STD")
+#         plt.tight_layout()
+#         plt.show()
+
+    def sanity_example_outliers(self):
+        """
+        BS example: The effect of outliers: A case for robust estimation
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        import matplotlib.pylab as plt
+        
+        # Number of data points
+        nd = 200
+        
+        # Input standard deviation
+        istd = 0.2
+        
+        # Create some synthetic data (Gaussian noise) with
+        # input standard deviation.
+        y = np.random.normal(1.0, istd, nd)
+        
+        # Introduce some outliers
+        # Number of outliers
+        no = 15
+        for _ in range(no):
+            # Choose an index (could occur more than once)
+            index = np.random.randint(0, high=nd)
+            # Add point from normal distribution with
+            # STD of 50
+            y[index] = np.random.normal(1.0, 50.0)
+        
+        # Create class instance for equidistant sampling
+        bseq = pyasl.BSEqSamp()
+        
+        # Specify order of approximation (N) and jump parameter (j) for
+        # construction of beta sample
+        N = 0
+        j = 1
+        
+        print("Order of approximation: ", N)
+        print("Jump parameter: ", j)
+        print()
+        
+        # Get estimates of standard deviation based on MV estimator and ...
+        smv, dsmv = bseq.betaSigma(y, N, j, returnMAD=False)
+        # ... robust (MAD-based) estimator
+        smad, dsmad = bseq.betaSigma(y, N, j, returnMAD=True)
+        
+        print("Input standard deviation: ", istd)
+        print("Number of 'data points': ", nd)
+        print("Size of beta sample: ", len(bseq.betaSample))
+        print()
+        print("Minimum-variance estimate: %6.3f +/- %6.3f" % (smv, dsmv))
+        print("Robust estimate: %6.3f +/- %6.3f" % (smad, dsmad))
+        
+#         plt.subplot(2,1,1)
+#         plt.title("Synthetic data")
+#         plt.plot(y, 'bp')
+#         plt.subplot(2,1,2)
+#         plt.title("Histogram of $\\beta$ sample")
+#         plt.hist(bseq.betaSample, 30)
+#         plt.show()
+ 
+    def sanity_example_eqarbsamp(self):
+        """
+        Equidistant vs. arbitrary sampling
+        """
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        def g(t):
+            """
+            Function determining the behavior of the data.
+            """
+            return 1.3 - 10.0*t
+        
+        
+        # Number of data points
+        nd = 30
+        
+        # Creating non-equidistant samping axis (ti)
+        te = np.arange(float(nd))
+        ti = (te**3) / float(nd**2)
+        
+        # Get values of g(t)
+        gi = g(ti)
+        
+        # Standard deviation of noise
+        istd = 0.3
+        
+        # Add Gaussian noise to data
+        yi = gi + np.random.normal(0.0, istd, nd)
+        
+        print("Input standard deviation: ", istd)
+        print("Number of 'data points': ", nd)
+        print()
+        
+        # Create class instance for equidistant sampling
+        bseq = pyasl.BSEqSamp()
+        # Create class instance for arbitrary sampling
+        bsar = pyasl.BSArbSamp()
+        
+        # Get estimates assung equidistant and arbitrary sampling
+        # using N = 1 and j = 1. From the definition of g(t), N = 1
+        # will be sufficient for the case of arbitrary sampling, but
+        # not necessarily for (assumed) equidistant sampling.
+        smv_es, dsmv_es  = bseq.betaSigma(yi, 1, 1)
+        smv_as, dsmv_as  = bsar.betaSigma(ti, yi, 1, 1)
+        
+        print("Estimates for N=1 and j=1")
+        print("    Equidistant sampling: %5.3f +/- %5.3f" % (smv_es, dsmv_es))
+        print("    Arbitrary sampling: %5.3f +/- %5.3f" % (smv_as, dsmv_as))
+        print()
+        
+        # Get estimates for N=2 and 3 assuming equidistant sampling
+        smv_es2, dsmv_es2  = bseq.betaSigma(yi, 2, 1)
+        smv_es3, dsmv_es3  = bseq.betaSigma(yi, 3, 1)
+        
+        print("Estimates for N=2 and 3 based on equidistant sampling")
+        print("    N = 2: %5.3f +/- %5.3f" % (smv_es2, dsmv_es2))
+        print("    N = 3: %5.3f +/- %5.3f" % (smv_es3, dsmv_es3))
+        
+#         plt.subplot(2,1,1)
+#         plt.title("Data with true sampling")
+#         plt.plot(ti, gi, 'b-')
+#         plt.errorbar(ti, yi, yerr=np.ones(nd)*istd, fmt='b+')
+#         plt.subplot(2,1,2)
+#         plt.title("Same data assuming equidistant sampling")
+#         plt.plot(te, gi, 'r-')
+#         plt.errorbar(te, yi, yerr=np.ones(nd)*istd, fmt='r+')
+#         plt.tight_layout()
+#         plt.show()
+
+
