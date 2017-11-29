@@ -1,9 +1,13 @@
 from __future__ import print_function, division
 import os
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy.pyaC import _ic
 from .pyaConfig import *
 import six.moves.urllib as urllib
-
+from six.moves.urllib.error import URLError
+ 
+if _ic.check["ssl"]:
+    import ssl
 
 class PyAFS:
     """
@@ -227,6 +231,14 @@ class PyAFS:
                     print("  - Downloading from URL: " +
                           str(url) + ", (no context)")
                 download(url, context, nocontext=True)
+        except URLError as e:
+            # Trying to download without context (side-lining ssl verification!)
+            if verbose:
+                print("PyA download info:")
+                print("  - Downloading from URL: " +
+                      str(url) + ", (unverified context)")
+            context = ssl._create_unverified_context()
+            download(url, context)            
         except Exception as e:
             self.removeFile(ana["fullname"])
             sols = ["Check whether URL exists and is spelled correctly."]
