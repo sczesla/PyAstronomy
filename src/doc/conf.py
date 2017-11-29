@@ -8,7 +8,7 @@ import mock
 MOCK_MODULES = ['scipy', 'scipy.stats', 'scipy.special', 'scipy.optimize', 'scipy.interpolate', 'scipy.integrate', \
                 'pymc', 'matplotlib', \
                 'matplotlib.pylab', '_tkinter', 'Tkinter', 'matplotlib.backends', 'matplotlib.backends.backend_tkagg', \
-                'matplotlib.figure', 'astropy', 'astropy.table']
+                'matplotlib.figure', 'astropy', 'astropy.table', 'astropy.io']
 for mod_name in MOCK_MODULES:
   sys.modules[mod_name] = mock.Mock()
 
