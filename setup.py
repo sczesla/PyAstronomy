@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from distutils.core import setup, Command
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+from distutils.core import Command
+
   
 import glob
 import sys
