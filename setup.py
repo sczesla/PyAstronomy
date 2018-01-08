@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+
+whichSetup = "None"
+
 try:
+    from numpy.distutils.core import setup
+    whichSetup = "numpy.distutils.core"
+except ImportError:
     from setuptools import setup
+    whichSetup = "setuptools"
 except ImportError:
     from distutils.core import setup
+    whichSetup = "distutils.core"
 from distutils.core import Command
 
   
@@ -206,12 +214,17 @@ setup(cmdclass = {"with-ext":WithExtCommand},
       )
 
 if not withExt:
-  print("")
-  print("")
-  print("  USER INFO: External modules have not been built!")
-  print("    The following modules have not been compiled:")
-  for e in _ext_modules:
-    print("    \""+e.name+"\", Sources: ", e.sources)
-  print("  USE 'python setup.py --with-ext install' to build external modules")
-  print("") 
+    print("")
+    print("")
+    print("  USER INFO: External (FORTRAN) modules have not been built!")
+    print("    The following modules have not been compiled:")
+    for e in _ext_modules:
+        print("    \"" + e.name + "\", Sources: ", e.sources)
+    print("")
+    print("  Use 'python setup.py --with-ext install' to build external modules")
+    if whichSetup != "numpy.distutils.core":
+        print("  NOTE: This only works if setup can be imported from numpy.distutils.core, but currently")
+        print("    it is imported from: " + whichSetup)
+        print("  Try to install numpy to resolve this.")
+    print("")
   
