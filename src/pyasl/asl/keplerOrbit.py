@@ -329,6 +329,30 @@ class KeplerEllipse(object):
             E = self._getEccentricAnomaly(t)
         return self.a * (1. - self.e * cos(E))
 
+    def trueAnomaly(self, t, E=None):
+        """
+        Calculate the true anomaly.
+
+        Parameters
+        ----------
+        t : float or array
+            The time axis.
+        E : float or array, optional
+            If known, the eccentric anomaly corresponding
+            to the time points (note that `t` will be ignored then).
+            If not given, the numbers will be calculated.
+
+        Returns
+        -------
+        Radius : float or array
+            The orbit radius at the given points in time.
+            Type depends on input type.
+        """
+        if E is None:
+            E = self._getEccentricAnomaly(t)
+        f = arctan(sqrt((1. + self.e) / (1. - self.e)) * tan(E / 2.)) * 2.0
+        return f
+        
     def xyzPos(self, t, getTA=False):
         """
         Calculate orbit position.
@@ -354,7 +378,7 @@ class KeplerEllipse(object):
         """
         E = self._getEccentricAnomaly(t)
         r = self.radius(t, E=E)
-        f = arctan(sqrt((1. + self.e) / (1. - self.e)) * tan(E / 2.)) * 2.0
+        f = self.trueAnomaly(None, E=E)
         wf = self._w + f
         cos_Omega = cos(self._Omega)
         sin_Omega = sin(self._Omega)
@@ -380,7 +404,7 @@ class KeplerEllipse(object):
         if not getTA:
             return xyz
         else:
-            return xyz, f
+            return xyz, f 
 
     def xyzVel(self, t):
         """
