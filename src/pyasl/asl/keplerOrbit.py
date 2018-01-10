@@ -352,6 +352,22 @@ class KeplerEllipse(object):
             E = self._getEccentricAnomaly(t)
         f = arctan(sqrt((1. + self.e) / (1. - self.e)) * tan(E / 2.)) * 2.0
         return f
+    
+    def eccentricAnomaly(self, t):
+        """
+        Calculates the eccentric anomaly.
+
+        Parameters
+        ----------
+        t : array of float
+            The times at which to calculate the eccentric anomaly, E.
+
+        Returns
+        -------
+        E : Array of float
+            The eccentric anomaly.
+        """
+        return self._getEccentricAnomaly(t)
         
     def xyzPos(self, t, getTA=False):
         """
