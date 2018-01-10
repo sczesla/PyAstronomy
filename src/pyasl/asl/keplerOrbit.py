@@ -362,7 +362,7 @@ class KeplerEllipse(object):
         t : float or array
             The time axis.
         getTA : boolean, optional
-            If True, returns the "true anomaly" as a function
+            If True, also returns the "true anomaly" as a function
             of time (default is False).
 
         Returns
