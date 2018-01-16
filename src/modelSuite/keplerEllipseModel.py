@@ -1,6 +1,7 @@
 from PyAstronomy.pyasl import KeplerEllipse
 from PyAstronomy import funcFit as fuf
 from numpy import pi
+from PyAstronomy.pyaC import pyaErrors as PE
 
 
 class KeplerEllipseModel(fuf.OneDFit):
@@ -9,14 +10,14 @@ class KeplerEllipseModel(fuf.OneDFit):
 
     This class uses the *KeplerEllipse* from the PyA's pyasl
     to calculate a Keplerian orbit. It may be used to fit
-    complete 3d information on the orbit. Projections using
-    only one or two dimensions are also possible.
+    complete 3d position or velocity information on the orbit;
+    any individual axes may also be selected.
 
     The constructor allows to specify *relevant axes*, which
     are those axes considered in the calculation. The actual
-    model is, however, only one-dimensional. The values
+    (technical) model is, however, only one-dimensional. The values
     returned by evaluate have the order
-    a1, b1, c1, a2, b2, c3, ... . Where a, b, and c stand for
+    a1, b1, c1, a2, b2, c3, ... . Where a, b, and c represent
     the first, second, and third axis and the number specifies
     the data point. Note that in this case, the resulting
     model has not the same number of points as the time
@@ -37,9 +38,13 @@ class KeplerEllipseModel(fuf.OneDFit):
         A string containing any combination of x, y, and z.
         The string specifies the axes (and their order) to
         be considered in the calculations.
+    mode : string, {"pos", "vel"}
+        Determines whether the output is positions or
+        velocities. In this case, the units are determined
+        by the units of major axis and time (e.g., AU per day).
     """
 
-    def __init__(self, relevantAxes="xyz"):
+    def __init__(self, relevantAxes="xyz", mode="pos"):
         self.ke = KeplerEllipse(1.0, 1.0)
         fuf.OneDFit.__init__(self, ["a", "per", "e", "tau", "Omega", "w", "i"])
         self["a"] = 1.0
@@ -50,6 +55,12 @@ class KeplerEllipseModel(fuf.OneDFit):
         for i, axis in enumerate("xyz"):
             if axis in relevantAxes:
                 self.axes += (i,)
+        # Save the mode
+        if not mode in ["pos", "vel"]:
+            raise(PE.PyAValError("Unknown mode: " + str(mode), \
+                                 where="KeplerEllipseModel", \
+                                 solution="Choose either 'pos' or 'vel'."))
+        self._mode = mode
 
     def evaluate(self, t):
         """
@@ -75,9 +86,12 @@ class KeplerEllipseModel(fuf.OneDFit):
         self.ke.tau = self["tau"]
         self.ke.n = 2.0 * pi / self["per"]
         # Get the data pertaining to the relevant axes
-        pos = self.ke.xyzPos(t)[::, self.axes]
+        if self._mode == "pos":
+            result = self.ke.xyzPos(t)[::, self.axes]
+        else:
+            result = self.ke.xyzVel(t)[::, self.axes]
         # Reshape to 1d form
         # If the relevant axes are x and y, the order
         # of the output will be x0, y0, x1, y1, x2, y2, ...
-        pos = pos.reshape(pos.size)
-        return pos
+        result = result.reshape(result.size)
+        return result
