@@ -9,7 +9,9 @@ The *KeplerEllipseModel* class provides a fitting model for the Kepler orbit.
 In particular, the model provides the mapping from time to Cartesian x, y, and
 z coordinates. On creation of the model, one can choose which of the coordinate
 axis are of interest to the user. The coordinates will then be returned as a
-one-dimensional array as explained the `evaluate` method of the class.
+one-dimensional array as explained the `evaluate` method of the class. The
+calculation is based on algorithms implemented
+:ref:`in PyAstronomy's Astrolib <keplerorbitpyasl>`.
 
 .. autoclass:: KeplerEllipseModel
    :members:
