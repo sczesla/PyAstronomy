@@ -777,7 +777,7 @@ class FuFPrior(object):
             else:
                 raise(PE.PyAValError("No prior defined for " + str(lnp),
                                      where="FuFPrior",
-                                     solution="Use either of {uniform, jeffreyPS, gaussian}"))
+                                     solution="Use either of {uniform, limuniform, jeffreyPS, gaussian}"))
 
 
 class OneDFit(_OndeDFitParBase, _PyMCSampler):
