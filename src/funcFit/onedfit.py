@@ -1829,7 +1829,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                 pnames=np.array(fpns, dtype=np.unicode_))
 
         if toMD:
-            # Set to lowest-deviance (highest probability) solution
+            # Set to lowest-deviance (highest likelihood) solution
             indimin = np.argmax(self.emceeSampler.lnprobability)
             for i, p in enumerate(self.freeParamNames()):
                 self[p] = self.emceeSampler.flatchain[indimin, i]
