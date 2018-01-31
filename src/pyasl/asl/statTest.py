@@ -165,7 +165,7 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
         F = ((chi1 - chi2) / (dof1 - dof2)) / (chi2 / dof2)
         prob = f.cdf(F, dof1 - dof2, dof2)
 
-    # Convert probability to Gaussian 'sigmas'
+    # Convert probability into Gaussian 'sigmas'
     def err(n, prob):
         return erf(n / numpy.sqrt(2)) - prob
     sigmalvl = float(fsolve(err, 1.0, args=(prob,)))
