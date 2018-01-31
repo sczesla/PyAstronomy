@@ -1,15 +1,50 @@
 Installation of PyAstronomy
 ==============================
 
-PyAstronomy is most easily obtained as a source package. The installation is supported by
-the numpy's distutils.
+PyAstronomy is most easily obtained from the `PYthon Package Index (PYPI) <https://pypi.org/project/PyAstronomy/>`_ using pip.
+Alternatively, it can be obtained as a source package.
+
+Installation using PYPI and pip
+---------------------------------
+
+The easiest way to install PyAstronomy is by using pip (numpy may be left out; if already
+installed the command triggers, if anything, an update of numpy).
+
+.. note:: Depending on the setup of your Python installation, you may need administrator (root)
+          privileges to install a package. 
+
+::
+
+    pip install numpy PyAstronomy
+
+
+It is advisable to install a few other packages to work more efficiently with PyAstronomy
+(and python). All these packages can also be obtained from PYPI. They can be installed using
+the command
+
+::
+
+    
+    pip install scipy matplotlib quantities emcee
+
+
+Note that any package may be left out. The overhead of having more package installed is, however, rather
+small.
+
+Occasionally, PyAstronomy (and other packages) are updated. To obtain the latest version use
+
+::
+
+    pip install --upgrade PyAstronomy
 
 Installing from source code
 -------------------------------
 
 PyAstronomy (PyA) uses numpy's distutils to support installation.
-Start by downloading the source distribution and save it to whatever place
-you prefer on your system. Extract the files and change into the thus created
+Start by downloading the source distribution, which is most easily obtained from
+`github <https://github.com/sczesla/PyAstronomy>`_.
+Save it to whatever place
+you prefer on your system, extract the files, and change into the thus created
 directory; on linux use:
 
 ::
@@ -40,7 +75,9 @@ This script will do the work of installing the package for you. Execute it by ty
 Building the documentation
 -----------------------------
 
-PyAstronomy is distributed including documentation. To build the documentation yourself, change
+PyAstronomy is distributed including documentation. Note that the most convenient way to access the
+latest documentation is via `readthedocs <https://pyastronomy.readthedocs.io/en/latest/index.html>`_.
+To build the documentation yourself, change
 into the directory where you installed (or unpacked) PyA. Change into the subdirectory named *doc*
 (may not be the first level). In this directory, you find a Makefile, which is responsible for
 building the documentation.
