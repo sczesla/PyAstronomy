@@ -204,7 +204,7 @@ setup(cmdclass={"with-ext": WithExtCommand},
       packages=packages,
       ext_modules=ext_modules,
       package_dir={'PyAstronomy': 'src'},
-      install_requires=['six'],
+      install_requires=['numpy', 'six'],
       # Do not forget to give the ``correct'' name for the module! (here, e.g., PyAstronomy.funcFit)
       package_data=package_data,
       author='PyA group',
