@@ -397,6 +397,9 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         hd123456s = "14 08 24.78626 -26 20 56.6438"
         hd123456d = (212.10327608, -26.34906773)
 
+        sexa = coordsDegToSexa(92.5, -21.8)
+        self.assertEqual(sexa, "06 10 00.000  -21 48 00.000", msg="Error in conversion of '92.5, -21.8' into sexagesimal coordinates. Obtained: " + str(sexa))
+
         hdhmss = [(0.0, 5., 08.83239), (14., 8., 24.78626)]
         hddmss = [(67., 50., 24.0135), (-26., 20., 56.6438)]
 

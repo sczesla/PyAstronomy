@@ -222,6 +222,6 @@ def coordsDegToSexa(ra, dec, asString=True, fmt=("%02d %02d %06.3f  ", "%s%02d %
 
     if asString:
         result = (fmt[0] % rat) + (fmt[1] %
-                                   ({-1: '-', +1: '+'}[dect[3]], dect[0], dect[1],  dect[2]))
+                                   ({-1: '-', +1: '+'}[dect[3]], abs(dect[0]), dect[1],  dect[2]))
         return result
     return rat, dect
