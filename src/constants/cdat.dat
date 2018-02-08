@@ -31,11 +31,11 @@ source  = http://maia.usno.navy.mil/NSFA/IAU2009_consts.html
 [NewtonGravitation]
 descr   = Newton's constant of gravitation
 symbol  = G
-valueSI = 6.67428e-11 
-errSI   = 6.7e-15
+valueSI = 6.67408e-11 
+errSI   = 3.1e-15
 unitSI  = m^3 * kg^-1 * s^-2
 unitcgs = cm^3 * g^-1 * s^-2
-source  = http://maia.usno.navy.mil/NSFA/IAU2009_consts.html
+source  = https://physics.nist.gov/cgi-bin/cuu/Value?bg|search_for=gravitation
 
 [BoltzmannConst]
 descr   = Boltzmann constant                            
