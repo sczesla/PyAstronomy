@@ -1,6 +1,7 @@
 from PyAstronomy.pyasl import KeplerEllipse
 from PyAstronomy import funcFit as fuf
 from numpy import pi
+import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 
 
@@ -95,3 +96,101 @@ class KeplerEllipseModel(fuf.OneDFit):
         # of the output will be x0, y0, x1, y1, x2, y2, ...
         result = result.reshape(result.size)
         return result
+
+
+
+
+class KeplerRVModel(fuf.OneDFit):
+    """
+    A model of a Keplerian orbit.
+
+    This class uses the *KeplerEllipse* from the PyA's pyasl
+    to calculate radial velocities for a Keplerian orbit. 
+
+    *Fit parameters*
+
+      - `per`   - The period (same time units as data)
+      - `e`     - The eccentricity
+      - `tau`   - Time of periapsis passage (same time units as data)
+      - `w`     - Argument of periapsis [deg]
+      - `K`     - Semi-amplitude of radial velocity (same units as data)
+      - `mstar` - Stellar mass in solar masses. This parameter is usually not fitted.
+                  It may be used to take into account the uncertainty on stellar mass
+                  in Bayesian (MCMC) analysis.
+
+    *Derived parameters (not to be fitted)*
+      -  `a`        - The semi-major axis in AU
+      -  `MA`       - Mean anomaly corresponding to time of first data point [deg]
+      -  `msini`    - Minimum mass (msini) in Jupiter masses 
+
+    Parameters
+    ----------
+    msun : float, optional
+        Solar mass [kg]
+    mJ : float, optional
+        Jupiter mass [kg]
+    au : float, optional
+        Astronomical unit [m]
+    """
+
+    def __init__(self, msun=1.988547e30, mJ=1898.6e24, au=1.49597870700e11):
+        self._msun = msun
+        self._mJ = mJ
+        self._au = au
+        
+        self.kem = KeplerEllipseModel(relevantAxes="z", mode="vel")
+        
+        # Independent parameters
+        pars = ["K", "per", "e", "tau", "w"]
+        # Dependent parameters
+        pars.extend(["msini", "a", "mstar", "MA"])
+        
+        fuf.OneDFit.__init__(self, pars)
+        # Dummy SMA and inclination
+        self.kem["a"] = 1.0
+        self.kem["i"] = 90.0
+        # Default stellar mass = 0 solar mass (force thoughtful input)
+        self["mstar"] = 0.0
+    
+        self.setRestriction({"K":[0.,None], "per":[0.,None], "e":[0,1], "mstar":[0,None]})
+    
+    def _dtr(self, d):
+        """ Convert degrees into rad """
+        return d/180.*np.pi
+    
+    def evaluate(self, t):
+        if self["mstar"] == 0.0:
+            raise(PE.PyAValError("Stellar mass has to be specified before evaluation.", \
+                                 where="KeplerRVModel"))
+        
+        for p in ["per", "e", "tau", "w"]:
+            self.kem[p] = self[p]
+        rvmodel = self.kem.evaluate(t)
+        # Prevent dividing by zero
+        imax = np.argmax(np.abs(rvmodel))
+        cee = np.cos(self.kem.ke.trueAnomaly(t[imax]) + self._dtr(self.kem["w"])) + self["e"]*np.cos(self._dtr(self["w"]))
+        rvnew = rvmodel / rvmodel[imax] * cee * self["K"]
+        self["msini"] = self._getmsini()
+        self["MA"] = self._MA()
+        self["a"] = self._geta()
+        
+        return rvnew
+                                                                                        
+    def _getmsini(self):
+        """
+        Get msini
+        """
+        msini = self["K"] * ((self["per"]*86400.) * (self["mstar"]*self._msun)**2 / (2.*np.pi*6.67408e-11))**(1./3.) * np.sqrt(1. - self["e"]**2)
+        return msini/self._mJ
+    
+    def _MA(self):
+        """
+        Get mean anomaly corresponding to first data point [deg]
+        """
+        return self.kem.ke.meanAnomaly(0.0)/np.pi*180. % 360.0
+    
+    def _geta(self):
+        """
+        Get SMA in AU
+        """
+        return ((self["per"]*86400.)**2 * 6.67408e-11 * (self["mstar"] * self._msun) / (4.*np.pi**2) )**(1./3.) / self._au
