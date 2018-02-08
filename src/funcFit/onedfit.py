@@ -1758,6 +1758,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             # Add information from potentials
             for p in pots:
                 pdf += p(ps)
+            if np.isnan(pdf):
+                raise(PE.PyAValError("Posterior value is NaN for parameters: " + str(self.parameters()) + ".", \
+                                     where="fitEmcee", \
+                                     solution="Possibly, a prior (e.g., 'limuniform') can be used to restrict parameter range. " + \
+                                     "Note that restrictions are not automatically converted into priors."))
             return pdf
 
         # Set default values for sampleArgs
@@ -1784,6 +1789,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
             # Generate starting values
             pos = []
+            rrs = self.pars.getRestrictions()
             for _ in smo.range(self.nwalker):
                 pos.append(np.zeros(ndims))
                 for i, n in enumerate(fpns):
@@ -1791,7 +1797,26 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                         s = 1.0
                     else:
                         s = scales[n]
-                    pos[-1][i] = np.random.normal(fps[n], s)
+                    
+                    # Trial counter -- avoid values beyond restrictions
+                    tc = 0
+                    while True:
+                        if tc == 100:
+                            raise(PE.PyAAlgorithmFailure("Could not determine valid starting point for parameter: " + str(fps) + " due to restrictions", \
+                                                         where="fitEmcee", \
+                                                         solution=["Try to use 'scale' to limit range of trial starting values.", \
+                                                                   "Change starting value before MCMC call into valid range."]))
+                        propval = np.random.normal(fps[n], s)
+                        if n in rrs:
+                            # There is a restriction
+                            if (not rrs[n][0] is None) and (propval < rrs[n][0]):
+                                tc += 1
+                                continue
+                            if (not rrs[n][1] is None) and (propval > rrs[n][1]):
+                                tc += 1
+                                continue
+                        break
+                    pos[-1][i] = propval
 
             # Default value for state
             state = None
