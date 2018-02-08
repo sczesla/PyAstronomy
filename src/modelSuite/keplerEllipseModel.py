@@ -105,8 +105,10 @@ class KeplerRVModel(fuf.OneDFit):
     A model of a Keplerian orbit.
 
     This class uses the *KeplerEllipse* from the PyA's pyasl
-    to calculate radial velocities for a Keplerian orbit. 
-
+    to calculate radial velocities for a Keplerian orbit. All calculations are
+    based on the negligible companion mass hypothesis (i.e., this model has been
+    implemented with planetary systems in mind).
+    
     .. note:: Any planet with zero period will be ignored.
 
     .. note:: ? is a placeholder for an integer larger zero, indicating the number of
