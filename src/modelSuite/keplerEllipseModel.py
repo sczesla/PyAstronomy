@@ -107,24 +107,35 @@ class KeplerRVModel(fuf.OneDFit):
     This class uses the *KeplerEllipse* from the PyA's pyasl
     to calculate radial velocities for a Keplerian orbit. 
 
+    .. note:: Any planet with zero period will be ignored.
+
+    .. note:: ? is a placeholder for an integer larger zero, indicating the number of
+              the planet (the total number is controlled by the `mp` keyword).
+
     *Fit parameters*
 
-      - `per`   - The period (same time units as data)
-      - `e`     - The eccentricity
-      - `tau`   - Time of periapsis passage (same time units as data)
-      - `w`     - Argument of periapsis [deg]
-      - `K`     - Semi-amplitude of radial velocity (same units as data)
+      - `per?`   - The period (same time units as data)
+      - `e?`     - The eccentricity
+      - `tau?`   - Time of periapsis passage (same time units as data)
+      - `w?`     - Argument of periapsis [deg]
+      - `K?`     - Semi-amplitude of radial velocity (same units as data)
       - `mstar` - Stellar mass in solar masses. This parameter is usually not fitted.
                   It may be used to take into account the uncertainty on stellar mass
                   in Bayesian (MCMC) analysis.
 
     *Derived parameters (not to be fitted)*
-      -  `a`        - The semi-major axis in AU
-      -  `MA`       - Mean anomaly corresponding to time of first data point [deg]
-      -  `msini`    - Minimum mass (msini) in Jupiter masses 
+      -  `a?`        - The semi-major axis in AU
+      -  `MA?`       - Mean anomaly corresponding to time of first data point [deg]
+      -  `msini?`    - Minimum mass (msini) in Jupiter masses 
 
     Parameters
     ----------
+    mp : int, optional
+        The number of planets considered in the model. Default is one. Note that
+        signals are added, i.e., no interaction is taken into account.
+    deg : int, optional
+        Default is zero (i.e., a constant). The degree of a polynomial used to represent
+        a systematic (non-periodic) evolution in the data.
     msun : float, optional
         Solar mass [kg]
     mJ : float, optional
@@ -133,30 +144,40 @@ class KeplerRVModel(fuf.OneDFit):
         Astronomical unit [m]
     """
 
-    def __init__(self, msun=1.988547e30, mJ=1898.6e24, au=1.49597870700e11, deg=0):
+    def __init__(self, mp=1, deg=0, msun=1.988547e30, mJ=1898.6e24, au=1.49597870700e11):
         self._msun = msun
         self._mJ = mJ
         self._au = au
         self._deg = deg
+        self._mp = mp
         
         self.poly = fuf.PolyFit1d(deg)
-        self.kem = KeplerEllipseModel(relevantAxes="z", mode="vel")
+        # Kepler models for individual planets
+        self.kems = [KeplerEllipseModel(relevantAxes="z", mode="vel") for _ in range(1,mp+1)]
         
-        # Independent parameters
-        pars = ["K", "per", "e", "tau", "w"]
-        # Dependent parameters
-        pars.extend(["msini", "a", "mstar", "MA"])
+        pars = []
+        for m in range(1, mp+1):
+            # Independent parameters
+            pars.extend([pn+str(m) for pn in ["K", "per", "e", "tau", "w"]])
+            # Dependent parameters
+            pars.extend([pn+str(m) for pn in ["msini", "a", "MA"]])
+        # There is only one stellar mass
+        pars.append("mstar")
         # Use parameters from polynomial
         pars.extend(self.poly.availableParameters())
         
         fuf.OneDFit.__init__(self, pars)
+        self.setRootName("KeplerRVModel")
         # Dummy SMA and inclination
-        self.kem["a"] = 1.0
-        self.kem["i"] = 90.0
+        for m in range(mp):
+            self.kems[m]["a"] = 1.0
+            self.kems[m]["i"] = 90.0
         # Default stellar mass = 0 solar mass (force thoughtful input)
         self["mstar"] = 0.0
-    
-        self.setRestriction({"K":[0.,None], "per":[0.,None], "e":[0,1], "mstar":[0,None]})
+        self.setRestriction({"mstar":[0,None]})
+        
+        for m in range(1, 1+mp):
+            self.setRestriction({"K"+str(m):[0.,None], "per"+str(m):[0.,None], "e"+str(m):[0,1]})
     
     def _dtr(self, d):
         """ Convert degrees into rad """
@@ -167,41 +188,50 @@ class KeplerRVModel(fuf.OneDFit):
             raise(PE.PyAValError("Stellar mass has to be specified before evaluation.", \
                                  where="KeplerRVModel"))
         
+        # Take into account polynomial
         for i in range(self._deg+1):
             p = "c" + str(i)
             self.poly[p] = self[p]
+        rvnew = self.poly.evaluate(t)
         
-        for p in ["per", "e", "tau", "w"]:
-            self.kem[p] = self[p]
-        rvmodel = self.kem.evaluate(t)
-        # Prevent dividing by zero
-        imax = np.argmax(np.abs(rvmodel))
-        cee = np.cos(self.kem.ke.trueAnomaly(t[imax]) + self._dtr(self.kem["w"])) + self["e"]*np.cos(self._dtr(self["w"]))
-        rvnew = rvmodel / rvmodel[imax] * cee * self["K"]
-        # Take into account polynomial
-        rvnew += self.poly.evaluate(t)
+        for m in range(1, self._mp+1):
+            # Name add
+            nadd = str(m)
+            if self["per"+nadd] == 0.0:
+                continue
+            for p in ["per", "e", "tau", "w"]:
+                # Collect parameters from current model
+                self.kems[m-1][p] = self[p+nadd]
         
-        self["msini"] = self._getmsini()
-        self["MA"] = self._MA()
-        self["a"] = self._geta()
+                rvmodel = self.kems[m-1].evaluate(t)
+            # Prevent dividing by zero
+            imax = np.argmax(np.abs(rvmodel))
+            cee = np.cos(self.kems[m-1].ke.trueAnomaly(t[imax]) + self._dtr(self.kems[m-1]["w"])) \
+                  + self["e"+nadd]*np.cos(self._dtr(self["w"+nadd]))
+            rvnew += rvmodel / rvmodel[imax] * cee * self["K"+nadd] 
+
+            self["msini"+nadd] = self._getmsini(nadd)
+            self["MA"+nadd] = self._MA(m)
+            self["a"+nadd] = self._geta(nadd)
         
         return rvnew
                                                                                         
-    def _getmsini(self):
+    def _getmsini(self, nadd):
         """
         Get msini
         """
-        msini = self["K"] * ((self["per"]*86400.) * (self["mstar"]*self._msun)**2 / (2.*np.pi*6.67408e-11))**(1./3.) * np.sqrt(1. - self["e"]**2)
+        msini = self["K"+nadd] * ((self["per"+nadd]*86400.) * (self["mstar"]*self._msun)**2 / (2.*np.pi*6.67408e-11))**(1./3.) \
+                * np.sqrt(1. - self["e"+nadd]**2)
         return msini/self._mJ
     
-    def _MA(self):
+    def _MA(self, m):
         """
         Get mean anomaly corresponding to first data point [deg]
         """
-        return self.kem.ke.meanAnomaly(0.0)/np.pi*180. % 360.0
+        return self.kems[m-1].ke.meanAnomaly(0.0)/np.pi*180. % 360.0
     
-    def _geta(self):
+    def _geta(self, nadd):
         """
         Get SMA in AU
         """
-        return ((self["per"]*86400.)**2 * 6.67408e-11 * (self["mstar"] * self._msun) / (4.*np.pi**2) )**(1./3.) / self._au
+        return ((self["per"+nadd]*86400.)**2 * 6.67408e-11 * (self["mstar"] * self._msun) / (4.*np.pi**2) )**(1./3.) / self._au
