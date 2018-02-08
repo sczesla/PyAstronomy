@@ -133,17 +133,21 @@ class KeplerRVModel(fuf.OneDFit):
         Astronomical unit [m]
     """
 
-    def __init__(self, msun=1.988547e30, mJ=1898.6e24, au=1.49597870700e11):
+    def __init__(self, msun=1.988547e30, mJ=1898.6e24, au=1.49597870700e11, deg=0):
         self._msun = msun
         self._mJ = mJ
         self._au = au
+        self._deg = deg
         
+        self.poly = fuf.PolyFit1d(deg)
         self.kem = KeplerEllipseModel(relevantAxes="z", mode="vel")
         
         # Independent parameters
         pars = ["K", "per", "e", "tau", "w"]
         # Dependent parameters
         pars.extend(["msini", "a", "mstar", "MA"])
+        # Use parameters from polynomial
+        pars.extend(self.poly.availableParameters())
         
         fuf.OneDFit.__init__(self, pars)
         # Dummy SMA and inclination
@@ -163,6 +167,10 @@ class KeplerRVModel(fuf.OneDFit):
             raise(PE.PyAValError("Stellar mass has to be specified before evaluation.", \
                                  where="KeplerRVModel"))
         
+        for i in range(self._deg+1):
+            p = "c" + str(i)
+            self.poly[p] = self[p]
+        
         for p in ["per", "e", "tau", "w"]:
             self.kem[p] = self[p]
         rvmodel = self.kem.evaluate(t)
@@ -170,6 +178,9 @@ class KeplerRVModel(fuf.OneDFit):
         imax = np.argmax(np.abs(rvmodel))
         cee = np.cos(self.kem.ke.trueAnomaly(t[imax]) + self._dtr(self.kem["w"])) + self["e"]*np.cos(self._dtr(self["w"]))
         rvnew = rvmodel / rvmodel[imax] * cee * self["K"]
+        # Take into account polynomial
+        rvnew += self.poly.evaluate(t)
+        
         self["msini"] = self._getmsini()
         self["MA"] = self._MA()
         self["a"] = self._geta()
