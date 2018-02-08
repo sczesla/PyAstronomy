@@ -1309,7 +1309,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 else:
                     raise(PE.PyAValError("Unknown sorting mode: " + str(sorting),
                                          where="OneDFit::parameterSummary",
-                                         solution="Use 'None' or 'alpha'"))
+                                         solution="Use 'None' or 'ps'"))
 
                 for prop in cprops:
                     var = c.propMap[prop]
