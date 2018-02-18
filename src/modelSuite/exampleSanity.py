@@ -500,3 +500,49 @@ class ModSuiteSanity(unittest.TestCase):
         #=======================================================================
         # ta.show()
         #=======================================================================
+        
+
+
+class VoigtAstroPSanity(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+    
+    def sanity_normalization(self):
+        """
+        Normalization of AstroVoigtP
+        """
+        import numpy as np
+        from PyAstronomy import modelSuite as ms
+        from PyAstronomy import pyaC
+        
+        v = ms.VoigtAstroP()
+        
+        # Hypothetical wvls [A]
+        w0s = [1000., 5000, 10000.]
+        
+        # (pi e**2)/(m_e c)
+        const = (4.803e-10)**2*np.pi / (9.11e-28*29979245800.0)
+        
+        fs = [1, 100]
+        
+        for f in fs:
+            for w0 in w0s:
+        
+                v["w0"] = w0
+                v["b"] = 100.
+                v["gamma"] = 1e-10
+                v["f"] = f
+        
+                dw = 20.0
+                w = np.linspace(w0-dw, w0+dw, 1000)
+        
+                m = v.evaluate(w)
+        
+                i = pyaC.ibtrapz(w/1e8, m*29979245800.0/(w/1e8)**2 , (w0-dw)/1e8, (w0+dw)/1e8)
+                
+                self.assertAlmostEqual(i/const, f, delta=1e-2, msg="Normalization of AstroVoigtP is broken: f, w0, i: % g, % g, % g" % (f, w0, i))
+

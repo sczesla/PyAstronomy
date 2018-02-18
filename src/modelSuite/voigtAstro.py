@@ -52,9 +52,16 @@ class VoigtAstroP(fuf.OneDFit):
         w0cm = self["w0"] / 1e8
         # Doppler width in cm
         bl = w0cm * (self["b"] * 100000.0) / 29979245800.0
+        # The following formulation is, e.g., according to D.F. Gray "Stellar photospheres"
+        # (third edition, Eq. 11.46, p. 257). For the relation between H(u, a) and the Voigt
+        # profile see Pagnini and Saxena "A note on the Voigt profile" (Eq. 6,
+        # https://arxiv.org/abs/0805.2274); the relation quoted by Gray is probably not entirely
+        # accurate. Note that the Voigt profile is here evaluated at u = dw/bl.
+        # 
         # The constant equals (pi e^2)/(m_e c^2)
         self._profile["A"] = 8.85282064473e-13 * self["f"] * w0cm**2 / bl
-        # A factor of 2.0 because `al` defines the half FWHM in Voigt profile
+        # A factor of 2.0 because `al` defines the half FWHM in Voigt profile (division by bl
+        # accounts for evaluation at dw/bl).
         self._profile["al"] = (self["gamma"] / bl) / 2.0
         self._profile["lin"] = self["lin"]
         self._profile["off"] = self["off"]
