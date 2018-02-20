@@ -79,8 +79,13 @@ class MiniFunc:
         def miniFunc(P):
             # Update the parameter values in the 'Params' class instance.
             self.odf.pars.setFreeParams(P)
-            # Update self.model to hold the evaluated function.
-            self.odf.updateModel()
+            # Obtain penalties
+            pfac, pdict = self.odf.pars.getPenalty(
+                penaltyFact=self.odf.penaltyFactor)
+            # Assign penalty
+            val = pfac
+            # Apply conditional restrictions
+            val += self.odf.pars.applyConditionalRestrictions()
             # Assign x, y, and yerr attributes. This is a not-so-beautiful
             # way of not breaking the API and having the funcFit data
             # storage object.
@@ -88,12 +93,23 @@ class MiniFunc:
             self.odf.y = self.odf._fufDS.y
             self.odf.yerr = self.odf._fufDS.yerr
 
-            val = f(self.odf, P)
-            # Assign penalty
-            val += self.odf.pars.getPenalty(
-                penaltyFact=self.odf.penaltyFactor)[0]
-            # Apply conditional restrictions
-            val += self.odf.pars.applyConditionalRestrictions()
+            try:
+                # Update self.model to hold the evaluated function.
+                self.odf.updateModel()
+            except Exception as e:
+                if val > 0.0:
+                    # Allow model evaluation to fail if parameters wandered outside the
+                    # valid range (returning immediately maybe an option, but this largely maintains
+                    # behavior, preventing annoying errors)
+                    return val
+                # If no penalty is present, raise exception
+                raise(PE.PyAAlgorithmFailure("Could not evaluate model for parameters: " + str(self.odf.parameters()), \
+                                             where="ondeDFit", \
+                                             tbfe=e, \
+                                             solution=["Try to define 'restrictions' via setRestriction if parameter values are invalid.", \
+                                                       "Adjust implementation of model to prevent error."]))
+            # Add value of actual objective function
+            val += f(self.odf, P)
             return val
         return miniFunc
 
