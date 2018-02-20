@@ -28,17 +28,22 @@ class Voigt1d(OneDFit):
     The Voigt profile V is defined as the convolution
       
     .. math::
-      V = A\int G(x')L(x-x')dx'
+      V(x) = A\int G(x')L(x-x')dx'
       
     of a Gaussian distribution
       
     .. math::
-      G=1/(2 \pi \ ad)\exp(-(x-mu)^2/(2 \ ad^2))
+      G=1/(\\sqrt{2 \pi} \ ad)\exp(-(x-mu)^2/(2 \ ad^2))
       
     and a Cauchy-Lorentz distribution
       
     .. math::
-      L=al/(\pi ((x-mu)^2+al^2)) + lin \ x + off
+      L=al/(\pi ((x-mu)^2+al^2)) .
+      
+    We here take into account an additional offset and linear term so that
+    
+    .. math::
+        V'(x) = V(x) + (lin \ x + off) .
       
     The Voigt profile is calculated via the real part of
     the Faddeeva function.
