@@ -92,7 +92,7 @@ class MiniFunc:
             # Assign penalty
             val += self.odf.pars.getPenalty(
                 penaltyFact=self.odf.penaltyFactor)[0]
-            # Apply consitional restrictions
+            # Apply conditional restrictions
             val += self.odf.pars.applyConditionalRestrictions()
             return val
         return miniFunc
