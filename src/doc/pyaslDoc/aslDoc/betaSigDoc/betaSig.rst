@@ -2,7 +2,7 @@ Examples of Beta Sigma Noise Estimation
 =====================================================
 
 In the following, a number of examples demonstrate aspects of the
-:math:`\beta\sigma` procedure. Please see `the corresponding paper <https://arxiv.org/abs/1712.02226>`_ 
+:math:`\beta\sigma` procedure. Please see `the corresponding paper <http://cdsads.u-strasbg.fr/abs/2018A%26A...609A..39C>`_ 
 for further discussion.
 
     - :ref:`bsOrders`

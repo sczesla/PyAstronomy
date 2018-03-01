@@ -28,8 +28,8 @@ Noise estimation via the :math:`\beta\sigma` procedure
 ----------------------------------------------------------
 
 The :math:`\beta\sigma` procedure is based on the analysis of the distribution of
-numerical derivatives and is described in the corresponding paper entitled `"A posteriori
-noise estimation in variable data sets" <https://arxiv.org/abs/1712.02226>`_.
+numerical derivatives and is described in the **corresponding paper** entitled `"A posteriori
+noise estimation in variable data sets" <http://cdsads.u-strasbg.fr/abs/2018A%26A...609A..39C>`_.
 The idea is the following: If the signal can appropriately be
 approximated by an N-th degree polynomial, its (N+1)-th derivative vanishes, leaving only noise
 terms to contribute to the value of the numerical derivative. The same idea underlies the
