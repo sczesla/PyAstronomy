@@ -13,3 +13,4 @@ from .lineListGaussModel import *
 from .voigtAstro import VoigtAstroP
 from .LyAProfile import LyaTransmission
 from .rotBroadProfile import RotBroadProfile
+from .celeriteModel import CeleriteModel
