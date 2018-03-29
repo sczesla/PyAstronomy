@@ -38,9 +38,15 @@ class CeleriteModel(fuf.OneDFit):
         
         @fuf.MiniFunc(self)
         def mini(self, P):
+            # Negative likelihood
+            return -self.objFctLL()
+        
+        @fuf.MiniFunc(self)
+        def miniPlus(self, P):
+            # Likelihood
             return self.objFctLL()
         
-        # Preserve the initial 
+        # Preserve the initial fit function
         self._initalfit = self.fit
         
         # Monkey patch to replace the default miniFunc by likelihood
@@ -50,8 +56,18 @@ class CeleriteModel(fuf.OneDFit):
             return self._initalfit(*args, **kwargs)
         self.fit = new.instancemethod(newfit, self, CeleriteModel)
         
+        # Preserve initial fitEMCEE
+        self._initialfitEMCEE = self.fitEMCEE
+        
+        # Monkey patch to replace the default likelihood in fitEMCEE
+        def newfitEMCEE(_, *args, **kwargs):
+            if (not "llfunc" in kwargs) or (kwargs["llfunc"] is None):
+                kwargs["llfunc"] = miniPlus
+            return self._initialfitEMCEE(*args, **kwargs)
+        self.fitEMCEE = new.instancemethod(newfitEMCEE, self, CeleriteModel)
+        
     def objFctLL(self):
-        ll = -self.gp.log_likelihood(self._fufDS.y)
+        ll = self.gp.log_likelihood(self._fufDS.y)
         return ll
     
     def evaluate(self, x):
