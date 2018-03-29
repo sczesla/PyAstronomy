@@ -1601,7 +1601,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         self.MCMC.db.close()
 
     def fitEMCEE(self, x=None, y=None, yerr=None, nwalker=None, priors=None, pots=None, scales=None,
-                 sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMD=True):
+                 sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMD=True, llfunc=None):
         """
         MCMC sampling using emcee package.
 
@@ -1675,7 +1675,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         if (not x is None) and (not y is None) and (not yerr is None):
             # Assign attributes and check x, y, and yerr.
             self._fufDS = FufDS(x, y, yerr)
-        elif (not x is None) and (not y is None) and (yerr is None):
+        elif (not x is None) and (not y is None) and ((yerr is None) and (llfunc is None)):
             raise(PE.PyAValError("An error on the y values is required.",
                                  where="fitEMCEE",
                                  solution="Please specify 'yerr'"))
@@ -1684,7 +1684,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                  where="fitEMCEE",
                                  solution="Specify x, y, and yerr."))
 
-        if not self._fufDS.xyyerrDefined():
+        if (not self._fufDS.xyyerrDefined()) and (llfunc is None):
             raise(PE.PyAValError("Please specify the data completely. Either of x, y, and/or yerr are missing.",
                                  where="fitEMCEE",
                                  solution="Specify x, y, and yerr."))
@@ -1735,10 +1735,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # Chi square calculator
         chisqr = self.__chiSqr()
 
-        def likeli(names, vals):
+        def likeliDefault(vals):
             # The likelihood function
             likeli = -0.5 * chisqr(vals)
             return likeli
+
+        if llfunc is None:
+            likeli = likeliDefault
+        else:
+            likeli = llfunc
 
         def lnpostdf(values):
             # Parameter-Value dictionary
@@ -1754,7 +1759,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             if pdf == -np.inf:
                 return pdf
             # Likelihood
-            pdf += likeli(fpns, values)
+            pdf += likeli(values)
             # Add information from potentials
             for p in pots:
                 pdf += p(ps)
