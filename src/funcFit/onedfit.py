@@ -1667,6 +1667,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         toMD : boolean, optional
             If True (default), the object is set to the lowest-deviance solution
             after sampling. Otherwise, it remains in a random state.
+        llfunc : callable, optional
+            A likelihood function to be used in the sampling (should be constructed
+            using the MiniFunc decorator).
         """
 
         if not ic.check["emcee"]:
