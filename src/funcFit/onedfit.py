@@ -1384,7 +1384,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                      where="OneDFit::fit",
                                      solution="Use, e.g., 'chisqr' or another valid choice from the documentation."))
 
-            # A function has been specified
+            # A function has been specified (Use the MiniFunc decorator in the definition)
             self.miniFunc = miniFunc
             return
 
