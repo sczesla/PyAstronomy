@@ -1791,6 +1791,10 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
             if scales is None:
                 scales = {}
+            elif type(scales) == float:
+                # Use the same scale for all parameters
+                scale = scales
+                scales = {pn:scale for pn in fpns}
 
             # Generate starting values
             pos = []
