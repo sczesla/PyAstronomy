@@ -1617,14 +1617,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         nwalker : int, optional
             The number of walker to be used. By default, two times the
             number of free parameters is used.
-        scales : dictionary, optional
+        scales : dictionary or float, optional
             The scales argument can be used to control the initial distribution
             of the walkers. By default, all walkers are distributed around the
             location given by the current state of the object, i.e., the current
             parameter values. In each direction, the walker are randomly distributed
             with a Gaussian distribution, whose default standard deviation is one.
             The scales argument can be used to control the width of Gaussians used
-            to distribute the walkers.
+            to distribute the walkers. If a float is specified, that value will be
+            used for the Gaussians instead of one for all parameters.
         sampleArgs : dictionary, optional
             Number controlling the sampling process. Use 'burn' (int) to specify
             the number of burn-in iterations (default is 0). Via 'iters' (int)
