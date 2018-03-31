@@ -13,6 +13,7 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
+    ../funcFitDoc/simplemodels.rst
     Transit modeling <xtranDoc.rst>
     radVelDoc/radVel.rst
     keplerEllipseModelDoc.rst
