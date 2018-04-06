@@ -153,7 +153,7 @@ def thermalBroadeningWidth(lam0, T, m=None, fwhm=True):
     T : float
         Temperature [K].
     m : float, optional
-        Mass of the particles. If not specified,
+        Mass of the particles [kg]. If not specified,
         the proton mass is assumed.
     fwhm : boolean, optional
         If True (default), the FWHM of the Gaussian
