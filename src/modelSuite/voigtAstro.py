@@ -10,6 +10,11 @@ class VoigtAstroP(fuf.OneDFit):
     profile, as it is frequently used in astronomy. In particular,
     the line is parameterized in terms of wavelength,
     Doppler parameter, damping width, and oscillator strength.
+    
+    The velocity dispersion is the standard deviation of the
+    velocity distribution. For zero damping width (gamma), the
+    resulting model line is a Gaussian with a standard
+    deviation of b/sqrt(2) in velocity units.
 
     *Fit parameters*:
 
