@@ -26,7 +26,7 @@ def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
         not necessarily appropriate. The default is None.
     maxsig : float, optional
         The extent of the broadening kernel in terms of
-        standrad deviations. By default, the Gaussian broadening
+        standard deviations. By default, the Gaussian broadening
         kernel will be extended over the entire given spectrum,
         which can cause slow evaluation in the case of large spectra.
         A reasonable choice could, e.g., be five.  
@@ -99,7 +99,7 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False,
         If True, also the FWHM of the Gaussian will be returned.
     maxsig : float, optional
         The extent of the broadening kernel in terms of
-        standrad deviations. By default, the Gaussian broadening
+        standard deviations. By default, the Gaussian broadening
         kernel will be extended over the entire given spectrum,
         which can cause slow evaluation in the case of large spectra.
         A reasonable choice could, e.g., be five.  
