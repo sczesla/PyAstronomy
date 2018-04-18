@@ -34,6 +34,9 @@ Installation
 
   If you specify the `--with-ext` flag, setup will try to
   compile non-Python modules. This is not mandatory.
+  
+  Another option is to install it with pip, i.e.
+  `pip install git+https://github.com/sczesla/PyAstronomy.git`
 
 Documentation and further information
 -------------------------------------
