@@ -1009,7 +1009,7 @@ def jdcnv(dt):
     Parameters
     ----------
     dt : DateTime object
-        The date.
+        The date. This is interpreted as UTC and the timezone component is not considered.
     
     Returns
     -------
