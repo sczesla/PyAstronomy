@@ -30,13 +30,22 @@ What is it?
 Installation
 ------------
 
-  Use `python setup.py [--with-ext] install`
+  To install the latest release via pip from PyPI use
+  
+    pip install PyAstronomy
+    
+  or
+  
+    pip install git+https://github.com/sczesla/PyAstronomy.git
+    
+  to install the current state from github.
 
+  Alternatively, download the source and use
+  
+    python setup.py [--with-ext] install
+    
   If you specify the `--with-ext` flag, setup will try to
   compile non-Python modules. This is not mandatory.
-  
-  Another option is to install it with pip, i.e.
-  `pip install git+https://github.com/sczesla/PyAstronomy.git`
 
 Documentation and further information
 -------------------------------------
