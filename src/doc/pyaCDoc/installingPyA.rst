@@ -63,7 +63,7 @@ This script will do the work of installing the package for you. Execute it by ty
 
 .. note:: **--with-ext** is an optional flag. If specified, the installer will try to build
           non-Python extension. As of version 0.4.0, this only comprises the transit modeling
-          routines from Mandel and Agol. 
+          routines from Mandel and Agol.  Building the extensions requires a fortran compiler. 
 
 .. note:: Depending on the setup of your Python installation, you may need administrator (root)
           privileges to install a package. The default path for installing packages is the
