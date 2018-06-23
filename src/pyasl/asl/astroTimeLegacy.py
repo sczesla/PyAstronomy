@@ -8,13 +8,13 @@ import six.moves as smo
 
 
 def daycnv(xjd, mode="idl"):
-  """
+    """
     Converts Julian dates to Gregorian calendar dates. 
-    
+
     Handles both individual floats as xjd and iterables such as
     lists and arrays. In the latter case, the result is returned
     in the form of a list.
-    
+
     Parameters
     ----------
     xjd : float, list, array
@@ -29,7 +29,7 @@ def daycnv(xjd, mode="idl"):
         datetime object will be returned. If the input is an iterable,
         the mode determines the format of the individual items in the
         result list.
-    
+
     Returns
     -------
     Calendar date : list or datetime object
@@ -38,10 +38,10 @@ def daycnv(xjd, mode="idl"):
         Alternatively, a Python datetime object is returned. The format
         depends on the 'mode' specified. If the input is an iterable of
         Julian dates, the output is a list.
-        
+
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
     :IDL - Documentation:
     NAME:
@@ -73,66 +73,65 @@ def daycnv(xjd, mode="idl"):
           Converted to IDL from Yeoman's Comet Ephemeris Generator, 
           B. Pfarr, STX, 6/16/88
           Converted to IDL V5.0   W. Landsman   September 1997
-  """
-  
-  if not mode in ('idl', 'dtlist', 'dt'):
-    raise(PE.PyAValError("Unknown mode: " + str(mode), \
-                         where="daycnv", \
-                         solution="Use any of 'idl', 'dtlist', or 'dt'."))
+    """
 
-  # Adjustment needed because Julian day starts at noon, calendar day at midnight
-  
-  iterable = hasattr(xjd, "__iter__")
-  
-  # Use iterable throughout calculations
-  if not iterable:
-    xjd = [xjd]
-  
-  jd = numpy.array(xjd).astype(int)                         #Truncate to integral day
-  frac = numpy.array(xjd).astype(float) - jd + 0.5          #Fractional part of calendar day
-  gi = numpy.where(frac >= 1.0)
-  frac[gi] -= 1.0
-  jd[gi] += 1
-   
-  hr = frac*24.0
-  l = jd + 68569
-  n = 4*l // 146097
-  l = l - (146097*n + 3) // 4
-  yr = 4000*(l+1) // 1461001
-  l = l - 1461*yr // 4 + 31        #1461 = 365.25 * 4
-  mn = 80*l // 2447
-  day = l - 2447*mn // 80
-  l = mn//11
-  mn = mn + 2 - 12*l
-  yr = 100*(n-49) + yr + l
-  if mode in ('dt', 'dtlist'):
-    # [year, month, day, hours, minutes, seconds, microseconds] requested
-    hour = numpy.floor(hr).astype(int)
-    minute = numpy.floor((hr - numpy.floor(hr))*60).astype(int)
-    sec = numpy.floor((hr - hour - minute/60.)*3600.).astype(int)
-    msec = (3600*1e6*(hr - hour - minute/60. - sec/3600.)).astype(int)
-    if mode == 'dtlist':
-      if not iterable:
-        return [yr[0], mn[0], day[0], hour[0], minute[0], sec[0], msec[0]]      
-      return [[yr[i], mn[i], day[i], hour[i], minute[i], sec[i], msec[i]] for i in smo.range(len(yr))]
-    # Return datetime object
-    dts = [datetime.datetime(*(yr[i], mn[i], day[i], hour[i], minute[i], sec[i], msec[i])) for i in smo.range(len(yr))]
-    if not iterable: 
-      return dts[0]
-    return dts
-  if not iterable:
-    return [yr[0], mn[0], day[0], hr[0]]
-  return [[yr[i], mn[i], day[i], hr[i]] for i in smo.range(len(yr))]
+    if not mode in ('idl', 'dtlist', 'dt'):
+        raise(PE.PyAValError("Unknown mode: " + str(mode),
+                             where="daycnv",
+                             solution="Use any of 'idl', 'dtlist', or 'dt'."))
+
+    # Adjustment needed because Julian day starts at noon, calendar day at midnight
+
+    iterable = hasattr(xjd, "__iter__")
+
+    # Use iterable throughout calculations
+    if not iterable:
+        xjd = [xjd]
+
+    jd = numpy.array(xjd).astype(int)  # Truncate to integral day
+    frac = numpy.array(xjd).astype(float) - jd + \
+        0.5  # Fractional part of calendar day
+    gi = numpy.where(frac >= 1.0)
+    frac[gi] -= 1.0
+    jd[gi] += 1
+
+    hr = frac * 24.0
+    l = jd + 68569
+    n = 4 * l // 146097
+    l = l - (146097 * n + 3) // 4
+    yr = 4000 * (l + 1) // 1461001
+    l = l - 1461 * yr // 4 + 31  # 1461 = 365.25 * 4
+    mn = 80 * l // 2447
+    day = l - 2447 * mn // 80
+    l = mn // 11
+    mn = mn + 2 - 12 * l
+    yr = 100 * (n - 49) + yr + l
+    if mode in ('dt', 'dtlist'):
+        # [year, month, day, hours, minutes, seconds, microseconds] requested
+        hour = numpy.floor(hr).astype(int)
+        minute = numpy.floor((hr - numpy.floor(hr)) * 60).astype(int)
+        sec = numpy.floor((hr - hour - minute / 60.) * 3600.).astype(int)
+        msec = (3600 * 1e6 * (hr - hour - minute / 60. - sec / 3600.)).astype(int)
+        if mode == 'dtlist':
+            if not iterable:
+                return [yr[0], mn[0], day[0], hour[0], minute[0], sec[0], msec[0]]
+            return [[yr[i], mn[i], day[i], hour[i], minute[i], sec[i], msec[i]] for i in smo.range(len(yr))]
+        # Return datetime object
+        dts = [datetime.datetime(*(yr[i], mn[i], day[i], hour[i],
+                                   minute[i], sec[i], msec[i])) for i in smo.range(len(yr))]
+        if not iterable:
+            return dts[0]
+        return dts
+    if not iterable:
+        return [yr[0], mn[0], day[0], hr[0]]
+    return [[yr[i], mn[i], day[i], hr[i]] for i in smo.range(len(yr))]
 
 
-
-
-
-def bprecess(ra, dec, mu_radec = None,  \
-                  parallax = 0.0,  rad_vel = 0.0, epoch = 2000.0):
-  """
+def bprecess(ra, dec, mu_radec=None,
+             parallax=0.0,  rad_vel=0.0, epoch=2000.0):
+    """
     Precess positions from J2000.0 (FK5) to B1950.0 (FK4).
-  
+
     Parameters
     ----------
     ra : float
@@ -146,7 +145,7 @@ def bprecess(ra, dec, mu_radec = None,  \
         The parallax of the target
     rad_vel : float
         Radial velocity [km/s]
-        
+
     Returns
     -------
     Precessed position : list
@@ -154,7 +153,7 @@ def bprecess(ra, dec, mu_radec = None,  \
 
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
 
     :IDL - Documentation:
@@ -237,104 +236,113 @@ def bprecess(ra, dec, mu_radec = None,  \
           Converted to IDL V5.0   W. Landsman   September 1997
           Fixed bug where A term not initialized for vector input 
               W. Landsman        February 2000
-  """
+    """
 
-  radeg = 180.0/numpy.pi
-  sec_to_radian = 1.0/radeg/3600.0
+    radeg = 180.0 / numpy.pi
+    sec_to_radian = 1.0 / radeg / 3600.0
 
-  M = numpy.array( [ [+0.9999256795, -0.0111814828, -0.0048590040,  \
-        -0.000551,  -0.238560,     +0.435730     ], \
-      [ +0.0111814828, +0.9999374849, -0.0000271557,  \
-        +0.238509,     -0.002667,      -0.008541     ], \
-      [ +0.0048590039, -0.0000271771, +0.9999881946 , \
-        -0.435614,      +0.012254,      +0.002117      ], \
-      [ -0.00000242389840, +0.00000002710544, +0.00000001177742, \
-        +0.99990432,    -0.01118145,    -0.00485852    ], \
-      [ -0.00000002710544, -0.00000242392702, +0.00000000006585, \
-        +0.01118145,     +0.99991613,    -0.00002716    ], \
-      [ -0.00000001177742, +0.00000000006585,-0.00000242404995, \
-        +0.00485852,   -0.00002717,    +0.99996684] ] )
+    M = numpy.array([[+0.9999256795, -0.0111814828, -0.0048590040,
+                      -0.000551,  -0.238560,     +0.435730],
+                     [+0.0111814828, +0.9999374849, -0.0000271557,
+                      +0.238509,     -0.002667,      -0.008541],
+                     [+0.0048590039, -0.0000271771, +0.9999881946,
+                      -0.435614,      +0.012254,      +0.002117],
+                     [-0.00000242389840, +0.00000002710544, +0.00000001177742,
+                      +0.99990432,    -0.01118145,    -0.00485852],
+                     [-0.00000002710544, -0.00000242392702, +0.00000000006585,
+                      +0.01118145,     +0.99991613,    -0.00002716],
+                     [-0.00000001177742, +0.00000000006585, -0.00000242404995,
+                      +0.00485852,   -0.00002717,    +0.99996684]])
 
-  A_dot = 1e-3*numpy.array([1.244, -1.579, -0.660 ])           # in arc seconds per century
+    # in arc seconds per century
+    A_dot = 1e-3 * numpy.array([1.244, -1.579, -0.660])
 
-  ra_rad = ra/radeg       ;      dec_rad = dec/radeg
-  cosra =  cos( ra_rad )  ;       sinra = sin( ra_rad )
-  cosdec = cos( dec_rad ) ;      sindec = sin( dec_rad )
+    ra_rad = ra / radeg
+    dec_rad = dec / radeg
+    cosra = cos(ra_rad)
+    sinra = sin(ra_rad)
+    cosdec = cos(dec_rad)
+    sindec = sin(dec_rad)
 
-  dec_1950 = 0.0
-  ra_1950 = 0.0
+    dec_1950 = 0.0
+    ra_1950 = 0.0
+
+    # Following statement moved inside loop in Feb 2000.
+    A = 1e-6 * numpy.array([-1.62557, -0.31919, -0.13843])        # in radians
+
+    r0 = numpy.array([cosra * cosdec, sinra * cosdec, sindec])
+
+    if mu_radec is not None:
+        mu_a = mu_radec[0]
+        mu_d = mu_radec[1]
+        # Velocity vector
+        r0_dot = numpy.array([-mu_a * sinra * cosdec - mu_d * cosra * sindec,
+                              mu_a * cosra * cosdec - mu_d * sinra * sindec,
+                              mu_d * cosdec]) + 21.095 * rad_vel * parallax * r0
+    else:
+        r0_dot = numpy.zeros(3)
+
+    R_0 = numpy.concatenate([r0, r0_dot])
+    R_1 = numpy.dot(numpy.transpose(M), R_0)
+
+    # Include the effects of the E-terms of aberration to form r and r_dot.
+
+    r1 = R_1[0:3]
+    r1_dot = R_1[3:6]
+
+    if mu_radec is None:
+        r1 = r1 + sec_to_radian * r1_dot * (epoch - 1950.0) / 100.
+        A = A + sec_to_radian * A_dot * (epoch - 1950.0) / 100.
+
+    x1 = R_1[0]
+    y1 = R_1[1]
+    z1 = R_1[2]
+    rmag = sqrt(x1**2 + y1**2 + z1**2)
+
+    s1 = r1 / rmag
+    s1_dot = r1_dot / rmag
+
+    s = s1
+    for j in smo.range(2):
+        r = s1 + A - ((s * A).sum()) * s
+        s = r / rmag
+
+    x = r[0]
+    y = r[1]
+    z = r[2]
+    r2 = x**2 + y**2 + z**2
+    rmag = sqrt(r2)
+
+    if mu_radec is not None:
+        r_dot = s1_dot + A_dot - ((s * A_dot).sum()) * s
+        x_dot = r_dot[0]
+        y_dot = r_dot[1]
+        z_dot = r_dot[2]
+        mu_radec[0] = (x * y_dot - y * x_dot) / (x**2 + y**2)
+        mu_radec[1] = (z_dot * (x**2 + y**2) - z *
+                       (x * x_dot + y * y_dot)) / (r2 * sqrt(x**2 + y**2))
+
+    dec_1950 = arcsin(z / rmag)
+    ra_1950 = numpy.arctan2(y, x)
+
+    if parallax > 0.0:
+        rad_vel = (x * x_dot + y * y_dot + z * z_dot) / \
+            (21.095 * parallax * rmag)
+        parallax = parallax / rmag
+
+    if ra_1950 < 0.0:
+        ra_1950 += 2.0 * numpy.pi
+
+    ra_1950 = ra_1950 * radeg
+    dec_1950 = dec_1950 * radeg
+
+    return [ra_1950, dec_1950, mu_radec, parallax, rad_vel]
 
 
-  # Following statement moved inside loop in Feb 2000.
-  A = 1e-6*numpy.array([ -1.62557, -0.31919, -0.13843])        # in radians
-
-  r0 = numpy.array([ cosra*cosdec, sinra*cosdec, sindec ])
-
-  if mu_radec is not None:
-    mu_a = mu_radec[0]
-    mu_d = mu_radec[1]
-    # Velocity vector
-    r0_dot = numpy.array([ -mu_a*sinra*cosdec - mu_d*cosra*sindec , \
-              mu_a*cosra*cosdec - mu_d*sinra*sindec , \
-              mu_d*cosdec ]) + 21.095 * rad_vel * parallax * r0
-  else:
-    r0_dot = numpy.zeros(3)
-
-  R_0 = numpy.concatenate([ r0, r0_dot ])
-  R_1 =  numpy.dot(numpy.transpose(M), R_0)
-
-  # Include the effects of the E-terms of aberration to form r and r_dot.
-
-  r1 = R_1[0:3]
-  r1_dot = R_1[3:6]
-
-  if mu_radec is None:
-    r1 = r1 + sec_to_radian * r1_dot * (epoch - 1950.0)/100.
-    A = A + sec_to_radian * A_dot * (epoch - 1950.0)/100.
-
-  x1 = R_1[0]   ;   y1 = R_1[1]    ;  z1 = R_1[2]
-  rmag = sqrt( x1**2 + y1**2 + z1**2 )
-
-  s1 = r1/rmag    ; s1_dot = r1_dot/rmag
-
-  s = s1
-  for j in smo.range(2):
-    r = s1 + A - ((s * A).sum())*s
-    s = r/rmag
- 
-  x = r[0]          ; y = r[1]     ;  z = r[2]
-  r2 = x**2 + y**2 + z**2
-  rmag = sqrt( r2 )
- 
-  if mu_radec is not None:
-    r_dot = s1_dot + A_dot - ( ( s * A_dot).sum() )*s
-    x_dot = r_dot[0]  ; y_dot= r_dot[1]  ;  z_dot = r_dot[2]
-    mu_radec[0] = ( x*y_dot - y*x_dot) / ( x**2 + y**2)
-    mu_radec[1] = ( z_dot* (x**2 + y**2) - z*(x*x_dot + y*y_dot) ) / ( r2*sqrt( x**2 + y**2) )
-
-  dec_1950 = arcsin( z / rmag)
-  ra_1950 = numpy.arctan2( y, x)
-
-  if parallax > 0.0:
-    rad_vel = ( x*x_dot + y*y_dot + z*z_dot )/ (21.095*parallax*rmag)
-    parallax = parallax / rmag
-
-
-  if ra_1950 < 0.0:
-    ra_1950 += 2.0*numpy.pi
-
-  ra_1950 = ra_1950*radeg ; dec_1950 = dec_1950*radeg
-
-  return [ra_1950, dec_1950, mu_radec, parallax, rad_vel]
-
-
-
-
-
-def premat( equinox1, equinox2, FK4 = False):
-  """
+def premat(equinox1, equinox2, FK4=False):
+    """
     Return the precession matrix needed to go from EQUINOX1 to EQUINOX2.
-  
+
     Parameters
     ----------
     equinox1, equinox2 : float
@@ -344,7 +352,7 @@ def premat( equinox1, equinox2, FK4 = False):
 
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
 
     :IDL - Documentation:
@@ -386,55 +394,56 @@ def premat( equinox1, equinox2, FK4 = False):
     REVISION HISTORY
           Written, Wayne Landsman, HSTX Corporation, June 1994
           Converted to IDL V5.0   W. Landsman   September 1997
-  """
+    """
 
-  deg_to_rad = numpy.pi/180.0
-  sec_to_rad = deg_to_rad/3600.0
+    deg_to_rad = numpy.pi / 180.0
+    sec_to_rad = deg_to_rad / 3600.0
 
-  t = 0.001*(equinox2 - equinox1)
+    t = 0.001 * (equinox2 - equinox1)
 
-  if not FK4:
-    st = 0.001*(equinox1 - 2000.0)
-    # Compute 3 rotation angles
-    A = sec_to_rad * t * (23062.181 + st*(139.656 +0.0139*st) \
-        + t*(30.188 - 0.344*st+17.998*t))
+    if not FK4:
+        st = 0.001 * (equinox1 - 2000.0)
+        # Compute 3 rotation angles
+        A = sec_to_rad * t * (23062.181 + st * (139.656 + 0.0139 * st)
+                              + t * (30.188 - 0.344 * st + 17.998 * t))
 
-    B = sec_to_rad * t * t * (79.280 + 0.410*st + 0.205*t) + A
+        B = sec_to_rad * t * t * (79.280 + 0.410 * st + 0.205 * t) + A
 
-    C = sec_to_rad * t * (20043.109 - st*(85.33 + 0.217*st) \
-        + t*(-42.665 - 0.217*st -41.833*t))
+        C = sec_to_rad * t * (20043.109 - st * (85.33 + 0.217 * st)
+                              + t * (-42.665 - 0.217 * st - 41.833 * t))
 
-  else:
-    st = 0.001*(equinox1 - 1900.0)
-    # Compute 3 rotation angles
+    else:
+        st = 0.001 * (equinox1 - 1900.0)
+        # Compute 3 rotation angles
 
-    A = sec_to_rad * t * (23042.53 + st*(139.75 +0.06*st) \
-        + t * (30.23 - 0.27*st+18.0*t))
+        A = sec_to_rad * t * (23042.53 + st * (139.75 + 0.06 * st)
+                              + t * (30.23 - 0.27 * st + 18.0 * t))
 
-    B = sec_to_rad * t * t * (79.27 + 0.66*st + 0.32*t) + A
+        B = sec_to_rad * t * t * (79.27 + 0.66 * st + 0.32 * t) + A
 
-    C = sec_to_rad * t * (20046.85 - st*(85.33 + 0.37*st) \
-        + t*(-42.67 - 0.37*st -41.8*t))
+        C = sec_to_rad * t * (20046.85 - st * (85.33 + 0.37 * st)
+                              + t * (-42.67 - 0.37 * st - 41.8 * t))
 
-  sina = sin(A) ;  sinb = sin(B)  ; sinc = sin(C)
-  cosa = cos(A) ;  cosb = cos(B)  ; cosc = cos(C)
+    sina = sin(A)
+    sinb = sin(B)
+    sinc = sin(C)
+    cosa = cos(A)
+    cosb = cos(B)
+    cosc = cos(C)
 
-  r = numpy.zeros((3,3))
-  r[::,0] = numpy.array([ cosa*cosb*cosc-sina*sinb, sina*cosb+cosa*sinb*cosc,  cosa*sinc])
-  r[::,1] = numpy.array([-cosa*sinb-sina*cosb*cosc, cosa*cosb-sina*sinb*cosc, -sina*sinc])
-  r[::,2] = numpy.array([-cosb*sinc, -sinb*sinc, cosc])
-  return r
+    r = numpy.zeros((3, 3))
+    r[::, 0] = numpy.array([cosa * cosb * cosc - sina *
+                            sinb, sina * cosb + cosa * sinb * cosc,  cosa * sinc])
+    r[::, 1] = numpy.array([-cosa * sinb - sina * cosb *
+                            cosc, cosa * cosb - sina * sinb * cosc, -sina * sinc])
+    r[::, 2] = numpy.array([-cosb * sinc, -sinb * sinc, cosc])
+    return r
 
 
-
-
-
-
-
-def precess(ra, dec, equinox1, equinox2, FK4 = False, radian=False):
-  """
+def precess(ra, dec, equinox1, equinox2, FK4=False, radian=False):
+    """
     Precess coordinates from EQUINOX1 to EQUINOX2.
-  
+
     Parameters
     ----------
     ra, dec, equinox1, equinox2 : float
@@ -451,7 +460,7 @@ def precess(ra, dec, equinox1, equinox2, FK4 = False, radian=False):
 
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
 
     :IDL - Documentation:
@@ -531,67 +540,63 @@ def precess(ra, dec, equinox1, equinox2, FK4 = False, radian=False):
           Converted to IDL V5.0   W. Landsman   September 1997
           Correct negative output RA values when /RADIAN used    March 1999 
           Work for arrays, not just vectors  W. Landsman    September 2003 
-  """
-  deg_to_rad = numpy.pi/180.0
+    """
+    deg_to_rad = numpy.pi / 180.0
 
-  if not radian:
-    # ra, dec are given in degrees
-    ra_rad = ra*deg_to_rad     # Convert to double precision if not already
-    dec_rad = dec*deg_to_rad
-  else:
-    ra_rad = ra ; dec_rad = dec
+    if not radian:
+        # ra, dec are given in degrees
+        ra_rad = ra * deg_to_rad     # Convert to double precision if not already
+        dec_rad = dec * deg_to_rad
+    else:
+        ra_rad = ra
+        dec_rad = dec
 
-  a = cos( dec_rad )
+    a = cos(dec_rad)
 
+    x = [a * cos(ra_rad), a * sin(ra_rad), sin(dec_rad)]  # input direction
 
-  x = [a*cos(ra_rad), a*sin(ra_rad), sin(dec_rad)] # input direction
+    sec_to_rad = deg_to_rad / 3600.0
 
-  sec_to_rad = deg_to_rad/3600.0
+    # Use PREMAT function to get precession matrix from Equinox1 to Equinox2
 
-  # Use PREMAT function to get precession matrix from Equinox1 to Equinox2
+    r = premat(equinox1, equinox2, FK4=FK4)
 
-  r = premat(equinox1, equinox2, FK4 = FK4)
+    x2 = numpy.dot(r, x)      # rotate to get output direction cosines
 
-  x2 = numpy.dot(r,x)      # rotate to get output direction cosines
+    ra_rad = numpy.arctan2(x2[1], x2[0])
+    dec_rad = arcsin(x2[2])
 
-  ra_rad = numpy.arctan2(x2[1],x2[0])
-  dec_rad = arcsin(x2[2])
+    if not radian:
+        ra = ra_rad / deg_to_rad
+        # RA between 0 and 360 degrees
+        ra = ra + int(ra < 0.0) * 360.0
+        dec = dec_rad / deg_to_rad
+    else:
+        ra = ra_rad
+        dec = dec_rad
+        ra = ra + int(ra < 0.0) * 2.0 * numpy.pi
 
-  if not radian:
-    ra = ra_rad/deg_to_rad
-    ra = ra + int(ra < 0.0)*360.0            # RA between 0 and 360 degrees
-    dec = dec_rad/deg_to_rad
-  else:
-    ra = ra_rad ; dec = dec_rad
-    ra = ra + int(ra < 0.0)*2.0*numpy.pi
-
-  return [ra, dec]
-
-
-
-
+    return [ra, dec]
 
 
-
-
-def precess_xyz(x,y,z,equinox1,equinox2):
-  """
+def precess_xyz(x, y, z, equinox1, equinox2):
+    """
     Precess equatorial geocentric rectangular coordinates. 
-  
+
     Parameters
     ----------
     x, y, z, equinox1, equinox2 : float
-    
+
     Returns
     -------
     Precessed coordinates : list
         A list containing the updated `x`, `y`, and `z` values. 
-    
+
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
-    
+
     :IDL - Documentation:
 
     NAME:
@@ -627,38 +632,32 @@ def precess_xyz(x,y,z,equinox1,equinox2):
             (unit vectors provided by D. Lindler)
           Use /Radian call to PRECESS     W. Landsman     November 2000
           Use two parameter call to ATAN   W. Landsman    June 2001
-  """
+    """
 
-  # take input coords and convert to ra and dec (in radians)
-  ra = numpy.arctan2(y,x)
-  delp = sqrt(x*x + y*y + z*z)  # magnitude of distance to Sun
-  dec = arcsin(z/delp)
+    # take input coords and convert to ra and dec (in radians)
+    ra = numpy.arctan2(y, x)
+    delp = sqrt(x * x + y * y + z * z)  # magnitude of distance to Sun
+    dec = arcsin(z / delp)
 
-  # precess the ra and dec
-  ra, dec = precess(ra, dec, equinox1, equinox2, radian=True)
+    # precess the ra and dec
+    ra, dec = precess(ra, dec, equinox1, equinox2, radian=True)
 
-  # convert back to x, y, z
-  xunit = cos(ra)*cos(dec)
-  yunit = sin(ra)*cos(dec)
-  zunit = sin(dec)
+    # convert back to x, y, z
+    xunit = cos(ra) * cos(dec)
+    yunit = sin(ra) * cos(dec)
+    zunit = sin(dec)
 
-  x = xunit * delp
-  y = yunit * delp
-  z = zunit * delp
-  
-  return [x,y,z]
+    x = xunit * delp
+    y = yunit * delp
+    z = zunit * delp
 
-
-
-
-
-
+    return [x, y, z]
 
 
 def xyz(date, velocity=False, equinox=1950.0):
-  """
+    """
     Calculate geocentric X,Y, and Z  and velocity coordinates of the Sun.
-  
+
     Parameters
     ----------
     date : float
@@ -667,7 +666,7 @@ def xyz(date, velocity=False, equinox=1950.0):
         Equinox of output. If None, Equinox will be 1950.
     velocity : boolean
         If False, the velocity of the Sun will not be calculated
-    
+
     Returns
     -------
     Sun position and velocity : list
@@ -742,141 +741,129 @@ def xyz(date, velocity=False, equinox=1950.0):
           Added velocities, more terms to positions and EQUINOX keyword,
             some minor adjustments to calculations 
             P. Plait/ACC March 24, 1999
-  """
+    """
 
-  picon = numpy.pi/180.0
-  t = (date - 15020.0)/36525.0         # Relative Julian century from 1900
+    picon = numpy.pi / 180.0
+    t = (date - 15020.0) / 36525.0         # Relative Julian century from 1900
 
-  # NOTE: longitude arguments below are given in *equinox* of date.
-  #   Precess these to equinox 1950 to give everything an even footing.
-  #   Compute argument of precession from equinox of date back to 1950
-  pp = (1.396041 + 0.000308*(t + 0.5))*(t-0.499998)
+    # NOTE: longitude arguments below are given in *equinox* of date.
+    #   Precess these to equinox 1950 to give everything an even footing.
+    #   Compute argument of precession from equinox of date back to 1950
+    pp = (1.396041 + 0.000308 * (t + 0.5)) * (t - 0.499998)
 
-  # Compute mean solar longitude, precessed back to 1950
-  el = 279.696678 + 36000.76892*t + 0.000303*t*t - pp
+    # Compute mean solar longitude, precessed back to 1950
+    el = 279.696678 + 36000.76892 * t + 0.000303 * t * t - pp
 
-  # Compute Mean longitude of the Moon
-  c = 270.434164 + 480960.*t + 307.883142*t - 0.001133*t*t - pp
+    # Compute Mean longitude of the Moon
+    c = 270.434164 + 480960. * t + 307.883142 * t - 0.001133 * t * t - pp
 
-  # Compute longitude of Moon's ascending node
-  n = 259.183275 - 1800.*t - 134.142008*t + 0.002078*t*t - pp
+    # Compute longitude of Moon's ascending node
+    n = 259.183275 - 1800. * t - 134.142008 * t + 0.002078 * t * t - pp
 
-  # Compute mean solar anomaly
-  g = 358.475833 + 35999.04975*t - 0.00015*t*t
+    # Compute mean solar anomaly
+    g = 358.475833 + 35999.04975 * t - 0.00015 * t * t
 
-  # Compute the mean jupiter anomaly
-  j = 225.444651 + 2880.0*t + 154.906654*t*t
+    # Compute the mean jupiter anomaly
+    j = 225.444651 + 2880.0 * t + 154.906654 * t * t
 
-  # Compute mean anomaly of Venus
-  v = 212.603219 + 58320.*t + 197.803875*t + 0.001286*t*t
+    # Compute mean anomaly of Venus
+    v = 212.603219 + 58320. * t + 197.803875 * t + 0.001286 * t * t
 
-  # Compute mean anomaly of Mars
-  m = 319.529425 + 19080.*t + 59.8585*t + 0.000181*t*t
+    # Compute mean anomaly of Mars
+    m = 319.529425 + 19080. * t + 59.8585 * t + 0.000181 * t * t
 
-  # Convert degrees to radians for trig functions
-  el = el*picon
-  g  = g*picon
-  j =  j*picon
-  c  = c*picon
-  v  = v*picon
-  n  = n*picon
-  m  = m*picon
+    # Convert degrees to radians for trig functions
+    el = el * picon
+    g = g * picon
+    j = j * picon
+    c = c * picon
+    v = v * picon
+    n = n * picon
+    m = m * picon
 
-  # Calculate X,Y,Z using trigonometric series
-  X =   0.999860*cos(el)                          \
-      - 0.025127*cos(g - el)                      \
-      + 0.008374*cos(g + el)                      \
-      + 0.000105*cos(g + g + el)                  \
-      + 0.000063*t*cos(g - el)                    \
-      + 0.000035*cos(g + g - el)                  \
-      - 0.000026*sin(g - el - j)                  \
-      - 0.000021*t*cos(g + el)                    \
-      + 0.000018*sin(2.*g + el - 2.*v)            \
-      + 0.000017*cos(c)                           \
-      - 0.000014*cos(c - 2.*el)                   \
-      + 0.000012*cos(4.*g + el - 8.*m + 3.*j)     \
-      - 0.000012*cos(4.*g - el - 8.*m + 3.*j)     \
-      - 0.000012*cos(g + el - v)                  \
-      + 0.000011*cos(2.*g + el - 2.*v)            \
-      + 0.000011*cos(2.*g - el - 2.*j)
-  
+    # Calculate X,Y,Z using trigonometric series
+    X = 0.999860 * cos(el)                          \
+        - 0.025127 * cos(g - el)                      \
+        + 0.008374 * cos(g + el)                      \
+        + 0.000105 * cos(g + g + el)                  \
+        + 0.000063 * t * cos(g - el)                    \
+        + 0.000035 * cos(g + g - el)                  \
+        - 0.000026 * sin(g - el - j)                  \
+        - 0.000021 * t * cos(g + el)                    \
+        + 0.000018 * sin(2. * g + el - 2. * v)            \
+        + 0.000017 * cos(c)                           \
+        - 0.000014 * cos(c - 2. * el)                   \
+        + 0.000012 * cos(4. * g + el - 8. * m + 3. * j)     \
+        - 0.000012 * cos(4. * g - el - 8. * m + 3. * j)     \
+        - 0.000012 * cos(g + el - v)                  \
+        + 0.000011 * cos(2. * g + el - 2. * v)            \
+        + 0.000011 * cos(2. * g - el - 2. * j)
 
-  Y =   0.917308*sin(el)                             \
-      + 0.023053*sin(g - el)                         \
-      + 0.007683*sin(g + el)                         \
-      + 0.000097*sin(g + g + el)                     \
-      - 0.000057*t*sin(g - el)                       \
-      - 0.000032*sin(g + g - el)                     \
-      - 0.000024*cos(g - el - j)                     \
-      - 0.000019*t*sin(g + el)                       \
-      - 0.000017*cos(2.00*g + el - 2.00*v)           \
-      + 0.000016*sin(c)                              \
-      + 0.000013*sin(c - 2.00*el )                   \
-      + 0.000011*sin(4.00*g + el - 8.00*m + 3.00*j)  \
-      + 0.000011*sin(4.00*g - el - 8.00*m + 3.00*j)  \
-      - 0.000011*sin(g + el - v)                     \
-      + 0.000010*sin(2.00*g + el - 2.00*v )          \
-      - 0.000010*sin(2.00*g - el - 2.00*j )
+    Y = 0.917308 * sin(el)                             \
+        + 0.023053 * sin(g - el)                         \
+        + 0.007683 * sin(g + el)                         \
+        + 0.000097 * sin(g + g + el)                     \
+        - 0.000057 * t * sin(g - el)                       \
+        - 0.000032 * sin(g + g - el)                     \
+        - 0.000024 * cos(g - el - j)                     \
+        - 0.000019 * t * sin(g + el)                       \
+        - 0.000017 * cos(2.00 * g + el - 2.00 * v)           \
+        + 0.000016 * sin(c)                              \
+        + 0.000013 * sin(c - 2.00 * el)                   \
+        + 0.000011 * sin(4.00 * g + el - 8.00 * m + 3.00 * j)  \
+        + 0.000011 * sin(4.00 * g - el - 8.00 * m + 3.00 * j)  \
+        - 0.000011 * sin(g + el - v)                     \
+        + 0.000010 * sin(2.00 * g + el - 2.00 * v)          \
+        - 0.000010 * sin(2.00 * g - el - 2.00 * j)
 
+    Z = 0.397825 * sin(el)        \
+        + 0.009998 * sin(g - el)      \
+        + 0.003332 * sin(g + el)      \
+        + 0.000042 * sin(g + g + el)    \
+        - 0.000025 * t * sin(g - el)    \
+        - 0.000014 * sin(g + g - el)    \
+        - 0.000010 * cos(g - el - j)
 
-  Z =   0.397825*sin(el)        \
-      + 0.009998*sin(g-el)      \
-      + 0.003332*sin(g+el)      \
-      + 0.000042*sin(g+g+el)    \
-      - 0.000025*t*sin(g-el)    \
-      - 0.000014*sin(g+g-el)    \
-      - 0.000010*cos(g-el-j)
+    # Precess_to new equator?
+    if equinox is not None:
+        X, Y, Z = precess_xyz(X, Y, Z, 1950, equinox)
 
-  # Precess_to new equator?
-  if equinox is not None:
-    X, Y, Z = precess_xyz(X, Y, Z, 1950, equinox)
+    if not velocity:
+        return [X, Y, Z, None, None, None]
 
-  if not velocity:
-    return [X, Y, Z, None, None, None]
-  
-  XVEL = -0.017200 * sin(el)          \
-        -0.000288 * sin(g + el)       \
-        -0.000005 * sin(2.00*g + el)  \
-        -0.000004 * sin(c)            \
-        +0.000003 * sin(c - 2.00*el)  \
-        +0.000001 *t * sin(g+el)      \
-        -0.000001 * sin(2.00*g-el)
+    XVEL = -0.017200 * sin(el)          \
+        - 0.000288 * sin(g + el)       \
+        - 0.000005 * sin(2.00 * g + el)  \
+        - 0.000004 * sin(c)            \
+        + 0.000003 * sin(c - 2.00 * el)  \
+        + 0.000001 * t * sin(g + el)      \
+        - 0.000001 * sin(2.00 * g - el)
 
-  YVEL =  0.015780 * cos(el)           \
-        +0.000264 * cos(g + el)        \
-        +0.000005 * cos(2.00*g + el)   \
-        +0.000004 * cos(c)             \
-        +0.000003 * cos(c - 2.00*el)   \
-        -0.000001 * t * cos(g + el)
+    YVEL = 0.015780 * cos(el)           \
+        + 0.000264 * cos(g + el)        \
+        + 0.000005 * cos(2.00 * g + el)   \
+        + 0.000004 * cos(c)             \
+        + 0.000003 * cos(c - 2.00 * el)   \
+        - 0.000001 * t * cos(g + el)
 
-  ZVEL = 0.006843 * cos(el)             \
-        +0.000115 * cos(g  + el)        \
-        +0.000002 * cos(2.00*g + el)    \
-        +0.000002 * cos(c)              \
-        +0.000001 * cos(c - 2.00*el)
+    ZVEL = 0.006843 * cos(el)             \
+        + 0.000115 * cos(g + el)        \
+        + 0.000002 * cos(2.00 * g + el)    \
+        + 0.000002 * cos(c)              \
+        + 0.000001 * cos(c - 2.00 * el)
 
-  # Precess to new equator?
+    # Precess to new equator?
 
-  if equinox != 1950.0:
-    XVEL, YVEL, ZVEL = precess_xyz(XVEL, YVEL, ZVEL, 1950, equinox)
-  
-  return [X, Y, Z, XVEL, YVEL, ZVEL]
+    if equinox != 1950.0:
+        XVEL, YVEL, ZVEL = precess_xyz(XVEL, YVEL, ZVEL, 1950, equinox)
+
+    return [X, Y, Z, XVEL, YVEL, ZVEL]
 
 
-
-
-
-
-
-
-
-
-
-
-def helio_jd(date, ra, dec, B1950 = False, TIME_DIFF = False):
-  """
+def helio_jd(date, ra, dec, B1950=False, TIME_DIFF=False):
+    """
     Convert geocentric (reduced) Julian date to heliocentric Julian date
-  
+
     Parameters
     ----------
     date : float
@@ -889,19 +876,19 @@ def helio_jd(date, ra, dec, B1950 = False, TIME_DIFF = False):
     TIME_DIFF : boolean
         If True, this function returns the time difference
         (heliocentric JD - geocentric JD ) in seconds
-    
+
     Returns
     -------
     HJD : float
         The heliocentric Julian date.
-      
+
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
-    
+
     :IDL - Documentation:
-    
+
     NAME:
          HELIO_JD
     PURPOSE:
@@ -909,44 +896,44 @@ def helio_jd(date, ra, dec, B1950 = False, TIME_DIFF = False):
     EXPLANATION:
          This procedure correct for the extra light travel time between the Earth 
          and the Sun.
-    
+
           An online calculator for this quantity is available at 
           http://www.physics.sfasu.edu/astro/javascript/hjd.html
     CALLING SEQUENCE:
           jdhelio = HELIO_JD( date, ra, dec, /B1950, /TIME_DIFF)
-    
+
     INPUTS
           date - reduced Julian date (= JD - 2400000), scalar or vector, MUST
                   be double precision
           ra,dec - scalars giving right ascension and declination in DEGREES
                   Equinox is J2000 unless the /B1950 keyword is set
-    
+
     OUTPUTS:
           jdhelio - heliocentric reduced Julian date.  If /TIME_DIFF is set, then
                     HELIO_JD() instead returns the time difference in seconds
                     between the geocentric and heliocentric Julian date.
-    
+
     OPTIONAL INPUT KEYWORDS 
           /B1950 - if set, then input coordinates are assumed to be in equinox 
                    B1950 coordinates.
           /TIME_DIFF - if set, then HELIO_JD() returns the time difference
                    (heliocentric JD - geocentric JD ) in seconds 
-    
+
     EXAMPLE:
           What is the heliocentric Julian date of an observation of V402 Cygni
           (J2000: RA = 20 9 7.8, Dec = 37 09 07) taken June 15, 1973 at 11:40 UT?
-    
+
           IDL> juldate, [1973,6,15,11,40], jd      ;Get geocentric Julian date
           IDL> hjd = helio_jd( jd, ten(20,9,7.8)*15., ten(37,9,7) )  
-    
+
           ==> hjd = 41848.9881
-    
+
     Wayne Warren (Raytheon ITSS) has compared the results of HELIO_JD with the
     FORTRAN subroutines in the STARLINK SLALIB library (see 
     http://star-www.rl.ac.uk/).    
                                                      Time Diff (sec)
          Date               RA(2000)   Dec(2000)  STARLINK      IDL
-    
+
     1999-10-29T00:00:00.0  21 08 25.  -67 22 00.  -59.0        -59.0
     1999-10-29T00:00:00.0  02 56 33.4 +00 26 55.  474.1        474.1
     1940-12-11T06:55:00.0  07 34 41.9 -00 30 42.  366.3        370.2
@@ -955,71 +942,72 @@ def helio_jd(date, ra, dec, B1950 = False, TIME_DIFF = False):
     2100-02-26T09:18:24.2  08 26 51.7 +85 47 28.  104.0        108.8
     PROCEDURES CALLED:
           bprecess, xyz, zparcheck
-    
+
     REVISION HISTORY:
           Algorithm from the book Astronomical Photometry by Henden, p. 114
           Written,   W. Landsman       STX     June, 1989 
           Make J2000 default equinox, add B1950, /TIME_DIFF keywords, compute
           variation of the obliquity      W. Landsman   November 1999
-  """
+    """
 
-  # Because XYZ uses default B1950 coordinates, we'll convert everything to B1950
+    # Because XYZ uses default B1950 coordinates, we'll convert everything to B1950
 
-  if date > 2.4e6:
-    PE.warn(PE.PyAValError("The given Julian Date ( " + str(date) + ") is exceedingly large far a reduced JD.",
-                           solution="Did you forget to subtract 2.4e6?",
-                           where="helio_jd"))
+    if date > 2.4e6:
+        PE.warn(PE.PyAValError("The given Julian Date ( " + str(date) + ") is exceedingly large far a reduced JD.",
+                               solution="Did you forget to subtract 2.4e6?",
+                               where="helio_jd"))
 
-  if not B1950:
-    bpresult = bprecess(ra,dec)
-    ra1 = bpresult[0]
-    dec1 = bpresult[1]
-  else:
-    ra1 = ra
-    dec1 = dec
+    if not B1950:
+        bpresult = bprecess(ra, dec)
+        ra1 = bpresult[0]
+        dec1 = bpresult[1]
+    else:
+        ra1 = ra
+        dec1 = dec
 
-  radeg = 180.0/numpy.pi
-  # I think, this is not needed in Python, even at this stage...
-  # zparcheck,'HELIO_JD',date,1,[3,4,5],[0,1],'Reduced Julian Date'
+    radeg = 180.0 / numpy.pi
+    # I think, this is not needed in Python, even at this stage...
+    # zparcheck,'HELIO_JD',date,1,[3,4,5],[0,1],'Reduced Julian Date'
 
-  delta_t = (date - 33282.42345905)/36525.0
-  epsilon_sec = 44.836 - 46.8495*delta_t - 0.00429*delta_t**2 + 0.00181*delta_t**3
-  epsilon = (23.433333 + epsilon_sec/3600.0)/radeg
-  ra1 = ra1/radeg
-  dec1 = dec1/radeg
+    delta_t = (date - 33282.42345905) / 36525.0
+    epsilon_sec = 44.836 - 46.8495 * delta_t - \
+        0.00429 * delta_t**2 + 0.00181 * delta_t**3
+    epsilon = (23.433333 + epsilon_sec / 3600.0) / radeg
+    ra1 = ra1 / radeg
+    dec1 = dec1 / radeg
 
-  x, y, z, tmp, tmp, tmp = xyz(date)
+    x, y, z, tmp, tmp, tmp = xyz(date)
 
-  # Find extra distance light must travel in AU, multiply by 1.49598e13 cm/AU,
-  # and divide by the speed of light, and multiply by 86400 second/year
+    # Find extra distance light must travel in AU, multiply by 1.49598e13 cm/AU,
+    # and divide by the speed of light, and multiply by 86400 second/year
 
-  time = -499.00522*( cos(dec1)*cos(ra1)*x + \
-                  (tan(epsilon)*sin(dec1) + cos(dec1)*sin(ra1))*y)
+    time = -499.00522 * (cos(dec1) * cos(ra1) * x +
+                         (tan(epsilon) * sin(dec1) + cos(dec1) * sin(ra1)) * y)
 
-  if TIME_DIFF:
-    return time
-  else:
-    return (date + time/86400.0)
+    if TIME_DIFF:
+        return time
+    else:
+        return (date + time / 86400.0)
 
 
 def jdcnv(dt):
-  """
+    """
     Converts Gregorian dates to Julian days  
-  
+
     Parameters
     ----------
     dt : DateTime object
         The date. This is interpreted as UTC and the timezone component is not considered.
-    
+
     Returns
     -------
     Julian day : float
 
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
-    
+
     :IDL - Documentation:
 
      NAME:
@@ -1061,30 +1049,29 @@ def jdcnv(dt):
            B. Pfarr, STX, 6/15/88
            Converted to IDL V5.0   W. Landsman   September 1997
            Added checks on valid month, day ranges W. Landsman July 2008
-  """
+    """
 
-  # L = leap years, -1 for Jan, Feb, else 0
-  L = int((dt.month-14.0)/12.0)
-  julian = dt.day - 32075 + \
-           int(1461*(dt.year+4800+L)/4.0) + \
-           int(367*(dt.month - 2-L*12)/12.0) - int(int(3*((dt.year+4900+L)/100.0))/4.0)
-  julian += ((dt.hour/24.0) + (dt.minute/(24.0*60.0)) + (dt.second/86400.) + (dt.microsecond/(86400.*1e6)) - 0.5)
+    # L = leap years, -1 for Jan, Feb, else 0
+    L = int((dt.month - 14.0) / 12.0)
+    julian = dt.day - 32075 + \
+        int(1461 * (dt.year + 4800 + L) / 4.0) + \
+        int(367 * (dt.month - 2 - L * 12) / 12.0) - \
+        int(int(3 * ((dt.year + 4900 + L) / 100.0)) / 4.0)
+    julian += ((dt.hour / 24.0) + (dt.minute / (24.0 * 60.0)) +
+               (dt.second / 86400.) + (dt.microsecond / (86400. * 1e6)) - 0.5)
 
-  return julian
-
-
-
+    return julian
 
 
 def get_juldate():
-  """
+    """
     Return the current Julian Date
-  
+
     Notes
     -----
-    
+
     .. note:: This function was ported from the IDL Astronomy User's Library.
-  
+
     :IDL - Documentation:
 
     NAME:
@@ -1119,38 +1106,35 @@ def get_juldate():
           Written Wayne Landsman                March, 1991
           Converted to IDL V5.0   W. Landsman   September 1997
           Assume since V5.4 Use /UTC keyword to SYSTIME()  W. Landsman April 2006
-  """
-  now = datetime.datetime.utcnow()
-  return jdcnv(now)
-
-
-
+    """
+    now = datetime.datetime.utcnow()
+    return jdcnv(now)
 
 
 def juldate(date):
-  """
+    """
     Convert from calendar to Reduced Julian Date
-  
+
     This function returns the *reduced* Julian date, which
     is obtained by subtracting 2400000 from the Julian date.
     To convert the output into Modified Julian Date (MJD),
     another 0.5 days have to be subtracted.
-  
+
     Parameters
     ----------
     date : DateTime object
         Calendar date
-    
+
     Returns
     -------
     RJD : float
         The **reduced** Julian date.
-  
+
     Notes
     -----
 
     .. note:: This function was ported from the IDL Astronomy User's Library.
-  
+
     :IDL - Documentation:
 
     NAME:
@@ -1214,7 +1198,7 @@ def juldate(date):
         Converted to IDL V5.0   W. Landsman   September 1997
         Make negative years correspond to B.C. (no year 0), work for year 1582
         Disallow 2 digit years.    W. Landsman    March 2000
-  """
-  jd = jdcnv(date)
-  jd -= 2400000.0
-  return jd
+    """
+    jd = jdcnv(date)
+    jd -= 2400000.0
+    return jd
