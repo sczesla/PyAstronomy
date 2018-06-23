@@ -343,6 +343,9 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
     the direction of a star. In contrast to :py:func:`baryvel`
     and :py:func:`baryCorr`, the rotation of the Earth is
     taken into account.
+    
+    The coordinates (ra2000, dec2000) are precessed to the epoch
+    defined by jd. These coordinates are used in the calculation.
 
     .. note:: This function was ported from the REDUCE IDL package.
               See Piskunov & Valenti 2002, A&A 385, 1095 for a detailed
@@ -496,7 +499,9 @@ def helcorr(obs_long, obs_lat, obs_alt, ra2000, dec2000, jd, debug=False):
         print(
             '(obs_long (East positive),obs_lat,obs_alt) Observatory coordinates [deg,m]: ', -obs_long, obs_lat, obs_alt)
         print(
-            '(ra,dec) Object coordinates (for epoch 2000.0) [deg]: ', ra, dec)
+            '(ra,dec) Object coordinates (for epoch 2000.0) [deg]: ', ra2000, dec2000)
+        print(
+            '(ra,dec) Object coordinates (precessed to epoch %f) [deg]: ' % (epoch), ra, dec)
         print('(ut) Universal time (middle of exposure) [hrs]: ', ut)
         print('(jd) Julian date (middle of exposure) (JD): ', jd)
         print('(hjd) Heliocentric Julian date (middle of exposure) (HJD): ', hjd)
