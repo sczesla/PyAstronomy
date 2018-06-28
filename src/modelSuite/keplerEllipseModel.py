@@ -97,8 +97,7 @@ class KeplerEllipseModel(fuf.OneDFit):
         result = result.reshape(result.size)
         return result
 
-
-
+  
 
 class KeplerRVModel(fuf.OneDFit):
     """
@@ -121,9 +120,10 @@ class KeplerRVModel(fuf.OneDFit):
       - `tau?`   - Time of periapsis passage (same time units as data)
       - `w?`     - Argument of periapsis [deg]
       - `K?`     - Semi-amplitude of radial velocity (same units as data)
-      - `mstar` - Stellar mass in solar masses. This parameter is usually not fitted.
-                  It may be used to take into account the uncertainty on stellar mass
-                  in Bayesian (MCMC) analysis.
+      - `mstar`  - Stellar mass in solar masses. This parameter is usually not fitted.
+                   It may be used to take into account the uncertainty on stellar mass
+                   in Bayesian (MCMC) analysis.
+      - `b`      - Jitter term (Baluev)
 
     *Derived parameters (not to be fitted)*
       -  `a?`        - The semi-major axis in AU
@@ -165,6 +165,8 @@ class KeplerRVModel(fuf.OneDFit):
             pars.extend([pn+str(m) for pn in ["msini", "a", "MA"]])
         # There is only one stellar mass
         pars.append("mstar")
+        # Baluev jitter term
+        pars.append("b")
         # Use parameters from polynomial
         pars.extend(self.poly.availableParameters())
         
@@ -237,3 +239,6 @@ class KeplerRVModel(fuf.OneDFit):
         Get SMA in AU
         """
         return ((self["per"+nadd]*86400.)**2 * 6.67408e-11 * (self["mstar"] * self._msun) / (4.*np.pi**2) )**(1./3.) / self._au
+
+ 
+
