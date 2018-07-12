@@ -8,13 +8,21 @@ try:
     from . import occultquad
     _importOccultquad = True
 except ImportError:
-    _importOccultquad = False
+    try:
+        from PyAstronomy_ext.forTrans import occultquad
+        _importOccultquad = True
+    except ImportError:
+        _importOccultquad = False
 
 try:
     from . import occultnl
     _importOccultnl = True
 except ImportError:
-    _importOccultnl = False
+    try:
+        from PyAstronomy_ext.forTrans import occultnl
+        _importOccultnl = True
+    except ImportError:
+        _importOccultnl = False
 
 
 class MandelAgolLC(_ZList, fuf.OneDFit):
@@ -23,7 +31,12 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
 
     .. note :: The computation of transit light curves
                is done using the external *occultquad* FORTRAN library.
-               This library must be compiled manually using SciPy's f2py
+               
+               This library can be installed, e.g., via
+               
+               pip install PyAstronomy_ext
+               
+               It can also be compiled manually using SciPy's f2py
                wrapper (http://www.scipy.org/F2py). Simply go to the
                *forTrans* directory of the source distribution of PyAstronomy,
                then invoke
@@ -31,8 +44,6 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                f2py -c occultquad.pyf occultquad.f
 
                f2py -c occultnl.pyf occultnl.f
-
-               That's it. 
 
     :Model parameters:
 
@@ -112,13 +123,15 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
 
         if (not _importOccultquad) and (ld == "quad"):
             raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",
-                                       solution=["Invoke PyA's install script (setup.py) with the --with-ext option.",
+                                       solution=["Use 'pip install PyAstronomy_ext' to get it.",
+                                                 "Invoke PyA's install script (setup.py) with the --with-ext option.",
                                                  "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultquad.pyf occultquad.f"]
                                        ))
 
         if (not _importOccultnl) and (ld == "nl"):
             raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",
-                                       solution=["Invoke PyA's install script (setup.py) with the --with-ext option.",
+                                       solution=["Use 'pip install PyAstronomy_ext' to get it.",
+                                                 "Invoke PyA's install script (setup.py) with the --with-ext option.",
                                                  "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultnl.pyf occultnl.f"]
                                        ))
 
