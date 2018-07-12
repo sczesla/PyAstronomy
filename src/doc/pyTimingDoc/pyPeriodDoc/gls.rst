@@ -106,7 +106,7 @@ distinguish between significant and spurious peaks.
     # Add the FAP levels to the plot
     for i in range(len(fapLevels)):
         plt.plot([min(clp.freq), max(clp.freq)], [plevels[i]]*2, '--',
-        label="FAP = %4.2f%%" % fapLevels[i])
+        label="FAP = %4.1f%%" % (fapLevels[i]*100))
     plt.legend()
     
     plt.show()
