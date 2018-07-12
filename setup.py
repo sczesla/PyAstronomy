@@ -13,8 +13,6 @@ except ImportError:
     from distutils.core import setup
     whichSetup = "distutils.core"
 from distutils.core import Command
-from distutils.command.install import install as duinstall
-
 
 import glob
 import sys
@@ -170,27 +168,6 @@ class WithExtCommand(Command):
         print("Version: ", PyA_Version())
 
 
-class InsComm(duinstall):
-    description = "Allow --with-ext install-option."
-    # with-ext hands the --with-ext option to setup.py when specified in --install-options
-    # single-version-externally-managed dumps flag of inscrutable origin
-    user_options = duinstall.user_options + [
-        ('with-ext', None, None), ('single-version-externally-managed', None, None)
-    ]
-
-    def initialize_options(self):
-        duinstall.initialize_options(self)
-        self.with_ext = None
-        self.single_version_externally_managed = None
- 
-    def finalize_options(self):
-        duinstall.finalize_options(self)
- 
-    def run(self):
-        print("Version: ", PyA_Version())
-        duinstall.run(self)
-
-
 if sdist:
 
     manin = open("MANIFEST.in_template").readlines()
@@ -218,7 +195,7 @@ if sdist:
     open("MANIFEST.in", 'w').writelines(manin)
 
 
-setup(cmdclass={"with-ext": WithExtCommand, "install":InsComm},
+setup(cmdclass={"with-ext": WithExtCommand},
       name='PyAstronomy',
       url="http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/index.html",
       description='A collection of astronomy related tools for Python.',
@@ -227,6 +204,7 @@ setup(cmdclass={"with-ext": WithExtCommand, "install":InsComm},
       ext_modules=ext_modules,
       package_dir={'PyAstronomy': 'src'},
       install_requires=['numpy', 'six'],
+      extras_require={"occult":"PyAstronomy_ext"},
       # Do not forget to give the ``correct'' name for the module! (here, e.g., PyAstronomy.funcFit)
       package_data=package_data,
       author='PyA group',
