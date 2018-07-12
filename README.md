@@ -32,20 +32,21 @@ Installation
 
   To install the latest release via pip from PyPI use
   
-    pip install PyAstronomy
+    pip install PyAstronomy[occult]
     
   or
   
-    pip install git+https://github.com/sczesla/PyAstronomy.git
+    pip install git+https://github.com/sczesla/PyAstronomy.git#egg=PyAstronomy[occult]
     
-  to install the current state from github.
-
+  to install the current state from github including non-Python dependencies. Remove [occult]
+  to skip these dependencies.
+  
   Alternatively, download the source and use
   
     python setup.py [--with-ext] install
     
   If you specify the `--with-ext` flag, setup will try to
-  compile non-Python modules. This is not mandatory.
+  compile non-Python modules.
 
 Documentation and further information
 -------------------------------------
