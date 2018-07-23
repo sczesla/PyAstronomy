@@ -140,13 +140,12 @@ class PyABaSoS(object):
     
     def _rootNumbers(self, rn):
         """ All number associated with a certain root """
-        return set([r.number if r == rn else 0 for r in self._allRoots()])
+        return set([b.number if b.rootName == rn else 0 for b in self.bss])
     
     def _updatepmap(self):
         """
         """
         ar = self._allRoots()
-        print("All roots: ", ar)
         if len(ar) == 1:
             # Only one subset. Apply no name updating
             self.pmap = bidict.OrderedBidict()
@@ -158,8 +157,8 @@ class PyABaSoS(object):
             rc = {r:ar.count(r) for r in set(ar)}
             self.pmap = bidict.OrderedBidict()
             for b in self.bss:
-                useNumber = int(rc[b.rootName] > 1) 
-                for n in list(b):
+                useNumber = int(rc[b.rootName] > 1)
+                for n in list(b.pmap):
                     useName = self._composePN(n, b.rootName, b.number*useNumber)
                     self.pmap[useName] = b.pmap[n]
     
@@ -173,12 +172,12 @@ class PyABaSoS(object):
             Instance of PyABPS
         """
         snew = s.copy()
-        rns = self._rootNumbers(s.rootName)
+        rns = self._rootNumbers(snew.rootName)
         if len(rns) == 0:
-            snew.number = 0
+            snew.number = 1
         else:
             snew.number = max(rns)+1
-        self.bss.append(s)
+        self.bss.append(snew)
         self._updatepmap()
     
     def _checkParam(self, n):
@@ -248,7 +247,44 @@ class PyABaSoS(object):
         c.bss = copy.copy(self.bss)
         return c
     
+    @classmethod
+    def combine(cls, left, right):
+        """
+        Combine parameter sets
+        
+        Parameters
+        ----------
+        left, right : PyABaSoS
+            Instances of PyABaSoS holding the individual sets
+        
+        Returns
+        -------
+        Combined object : PyABaSoS
+        """
+        c = cls()
+        c.bss = []
+        for b in left.bss:
+            c.addBPS(b)
+        for b in right.bss:
+            c.addBPS(b)
+        return c
+    
     def _composePN(self, b, r, n):
+        """
+        Compose parameter name
+        
+        Parameters
+        ----------
+        b, r : strings
+            Base and root
+        n : int
+            Number
+        
+        Returns
+        -------
+        Name : string
+            Complete parameter name
+        """
         result = b
         if not r is None:
             result += "_" + r
@@ -273,126 +309,7 @@ class PyABaSoS(object):
         self._updatepmap()
       
       
-      
-      
-        
-# 
-# class PyAPS(object):
-#     
-#     def addParam(self, name, value=0.0):
-#         """
-#         Add parameter to the list
-#         
-#         Parameters
-#         ----------
-#         name : string
-#             Name of the parameter
-#         value : optional
-#             Default value of the parameter
-#         """
-#         if name in self.pmap:
-#             raise(PE.PyAValError("Name '" + str(name) + "' already exists!", \
-#                                  where="addPyAPS::Param"))
-#         self.pmap[name] = PyAPa(value)
-#     
-#     def _checkParam(self, n):
-#         """ Throws and exception if parameter 'n' does not exist """
-#         if not n in self.pmap:
-#             raise(PE.PyAValError("No such parameter: " + str(n),
-#                                  solution="Use one of: " + ', '.join(list(self.pmap))))
-#     
-#     def __getitem__(self, n, ref=False):
-#         """ Get reference to PyaPa """
-#         self._checkParam(n)
-#         if ref:
-#             return self.pmap[n]
-#         else:
-#             return self.pmap[n].value
-#     
-#     def __setitem__(self, n, v):
-#         """ Set value and update related if necessary """
-#         self._checkParam(n)
-#         self.pmap[n].value = v
-#         if len(self.pmap[n].affects) > 0:
-#             for a in self.pmap[n].affects:
-#                 a.updateRelation()
-# 
-#     def rename(self, old, new):
-#         """
-#         Rename parameter
-#         
-#         Parameters
-#         ----------
-#         old, new : strings
-#             Old and new name
-#         """
-#         self._checkParam(old)
-#         if new in self.pmap:
-#             raise(PE.PyAValError("Parameter " + str(new) + " already exists.", \
-#                                  solution="Use a unique name."))
-#         tmp = self.pmap[old]
-#         del self.pmap[old]
-#         self.pmap[new] = tmp
-#         
-#     def relate(self, dv, idv, func=None):
-#         if isinstance(idv, six.string_types):
-#             # Convert single string into list
-#             idv = [idv]
-#         # Check all parameters
-#         self._checkParam(dv)
-#         [self._checkParam(n) for n in idv]
-#         
-#         # By default, use equal
-#         if func is None:
-#             func = lambda x:x
-#         
-#         # Manage dependent variable
-#         self.pmap[dv].dependsOn = [self.pmap[n] for n in idv]
-#         self.pmap[dv].relation = PyARelation(self.pmap[dv].dependsOn, func)
-#         # Manage affected variables
-#         for n in idv:
-#             self.pmap[n].affects.update([self.pmap[dv]])
-#         # Trigger update of the value of the related parameter
-#         self.pmap[dv].updateRelation()
-#     
-#     def copy(self):
-#         """ Return a shallow copy of the object """
-#         c = PyAPS()
-#         c.pmap = copy.copy(self.pmap)  
-#         return c
-#     
-#     def _decomposePN(self, n):
-#         """
-#         Decompose parameter name into Base, Root, Number
-#         """
-#         r = re.match("([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", n)
-#         if r is None:
-#             return None, None, None
-#         else:
-#             return r.group(0), r.group(3), r.group(5)
-#     
-#     def _rootsAndNos(self, m):
-#         roots = {}
-#         for n in list(m.pmap):
-#             n, r, no = self._decomposePN(n)
-#             if (not r is None) and (not r in roots):
-#                 roots[r] = []
-#             if not no is None:
-#                 roots[r].append(int(no))
-#         return roots
-#                 
-#     def combine(self, left, rl, right, rr):
-#         c = PyAPS()
-#         
-#         
-#     
-#     def __init__(self, *args, **kwargs):
-#         self.pmap = bidict.OrderedBidict()
-#         for n in args:
-#             self.addParam(n, 0.0)
-#         for n, v in kwargs.items():
-#             self.addParam(n, v)
-#             
+    
 
 class MBO2(object):
     """
@@ -415,22 +332,49 @@ class MBO2(object):
         self.leftCompo = None
         self.rightCompo = None
      
-    def _compoWalk(self):
+    def _combineMBOs(self, right):
         """
-        TBD
-        """
-        def walk(c, refs):
-            refs.append(c)
-            if c.leftCompo is not None:
-                walk(c.leftCompo, refs)
-            if c.rightCompo is not None:
-                walk(c.rightCompo, refs)
+        Creates and returns a fitting object combining the properties/variables of
+        the current objects and that given by `right`.
 
-        refs = []
-        walk(self, refs)
-        for c in refs:
-            yield c
+        Parameters:
+          - `right` - A fitting object (derived from OneDFit).
+        """
+        r = MBO2([], rootName="combined")
+        r.pars = PyABaSoS.combine(self.pars, right.pars)
+        r.leftCompo = self
+        r.rightCompo = right
+        return r
      
+    def __add__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) + self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __sub__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) - self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __mul__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) * self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __div__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __truediv__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
 
     def parameterSummary(self):
         for k, v in self.pars.pmap.items():
