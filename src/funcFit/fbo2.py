@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
 import numpy as np
-from .params import Params
 import re
 import copy
 import types
 from PyAstronomy.pyaC import pyaErrors as PE
-from .nameIdentBase import ModelNameIdentBase
 from PyAstronomy import pyaC
-from time import time as timestamp
 from .fufDS import FufDS
 from .extFitter import NelderMead
 import six
 import six.moves as smo
-import collections
 import bidict
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
@@ -42,6 +38,7 @@ class PyAPa(object):
         self._value = value
         self.free = False
         self.affects = set()
+        self.affectsPriors = set()
         self.relation = None
         self.dependsOn = None
         self.freeable = True
@@ -64,6 +61,25 @@ class PyARelation(object):
             The independent parameters
         func : Callable
             The functional relation
+        """
+        self.ivs = ivs
+        self.func = func
+    
+    def update(self):
+        return self.func(*[p.value for p in self.ivs])
+    
+    
+class PyAPrior(object):
+    
+    def __init__(self, ivs, func):
+        """
+        Parameters
+        ----------
+        ivs : list of Parameter instances
+            The independent parameters
+        func : Callable
+            Function returning log(prior) depending on the value of the
+            independent parameters
         """
         self.ivs = ivs
         self.func = func
@@ -302,7 +318,11 @@ class PyABaSoS(object):
             return None, None, None
         else:
             return r.group(0), r.group(3), r.group(5)
-        
+    
+    def addPrior(self, pyap):
+        for p in pyap.ivs:
+            p.affectsPriors.update(pyap)
+    
     def __init__(self, *args):
         self.bss = []
         for s in args:
@@ -335,11 +355,12 @@ class MBO2(object):
      
     def _combineMBOs(self, right):
         """
-        Creates and returns a fitting object combining the properties/variables of
-        the current objects and that given by `right`.
+        Combine two MBO2s into a new one
 
-        Parameters:
-          - `right` - A fitting object (derived from OneDFit).
+        Parameters
+        ----------
+        right : MBO2 instance
+            Right side of the operation
         """
         r = MBO2([], rootName="combined")
         r.pars = PyABaSoS.combine(self.pars, right.pars)
