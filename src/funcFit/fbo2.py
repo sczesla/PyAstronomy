@@ -48,6 +48,7 @@ class PyAPa(object):
         
     def updateRelation(self):
         """
+        Update value according to relation
         """
         if not self.relation is None:
             self._value = self.relation.update()
@@ -374,6 +375,12 @@ class MBO2(object):
         result = self._combineMBOs(right)
         result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
                                            self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+
+    def __pow__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) ** self.rightCompo.evaluate(*args, **kwargs), result)
         return result
 
     def parameterSummary(self):
