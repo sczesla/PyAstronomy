@@ -70,12 +70,22 @@ class PyARelation(object):
     def update(self):
         return self.func(*[p.value for p in self.ivs])
     
-        
-
-class PyAPS(object):
+      
+class PyABPS(object):
+    """
+    Basic Parameter Set
+    """
     
     def addParam(self, name, value=0.0):
         """
+        Add parameter to the list
+        
+        Parameters
+        ----------
+        name : string
+            Name of the parameter
+        value : optional
+            Default value of the parameter
         """
         if name in self.pmap:
             raise(PE.PyAValError("Name '" + str(name) + "' already exists!", \
@@ -104,8 +114,103 @@ class PyAPS(object):
             for a in self.pmap[n].affects:
                 a.updateRelation()
 
+    def copy(self):
+        """ Return a shallow copy of the object """
+        c = PyABPS([], self.rootName, number=self.number)
+        c.pmap = copy.copy(self.pmap)
+        return c
+
+    def __init__(self, pns, rootName, number=0):
+        self.rootName = rootName
+        self.number = number
+        self.pmap = bidict.OrderedBidict()
+        for n in pns:
+            self.addParam(n, 0.0)
+        
+      
+      
+class PyABaSoS(object):
+    """
+    Basic Set of Basic Parameter Sets
+    """
+    
+    def _allRoots(self):
+        """ Get root names of all basic sets """
+        return [s.rootName for s in self.bss]
+    
+    def _rootNumbers(self, rn):
+        """ All number associated with a certain root """
+        return set([r.number if r == rn else 0 for r in self._allRoots()])
+    
+    def _updatepmap(self):
+        """
+        """
+        ar = self._allRoots()
+        print("All roots: ", ar)
+        if len(ar) == 1:
+            # Only one subset. Apply no name updating
+            self.pmap = bidict.OrderedBidict()
+            for n in list(self.bss[0].pmap):
+                self.pmap[n] = self.bss[0].pmap[n]
+        else:
+            # More than one subset
+            # Root Count
+            rc = {r:ar.count(r) for r in set(ar)}
+            self.pmap = bidict.OrderedBidict()
+            for b in self.bss:
+                useNumber = int(rc[b.rootName] > 1) 
+                for n in list(b):
+                    useName = self._composePN(n, b.rootName, b.number*useNumber)
+                    self.pmap[useName] = b.pmap[n]
+    
+    def addBPS(self, s):
+        """
+        Add Basic Parameter Set to set of sets
+        
+        Parameters
+        ----------
+        s : PyABPS
+            Instance of PyABPS
+        """
+        snew = s.copy()
+        rns = self._rootNumbers(s.rootName)
+        if len(rns) == 0:
+            snew.number = 0
+        else:
+            snew.number = max(rns)+1
+        self.bss.append(s)
+        self._updatepmap()
+    
+    def _checkParam(self, n):
+        """ Throws and exception if parameter 'n' does not exist """
+        if not n in self.pmap:
+            raise(PE.PyAValError("No such parameter: " + str(n),
+                                 solution="Use one of: " + ', '.join(list(self.pmap))))
+    
+    def __getitem__(self, n, ref=False):
+        """ Get reference to PyaPa """
+        self._checkParam(n)
+        if ref:
+            return self.pmap[n]
+        else:
+            return self.pmap[n].value
+    
+    def __setitem__(self, n, v):
+        """ Set value and update related if necessary """
+        self._checkParam(n)
+        self.pmap[n].value = v
+        if len(self.pmap[n].affects) > 0:
+            for a in self.pmap[n].affects:
+                a.updateRelation()
+
     def rename(self, old, new):
         """
+        Rename parameter
+        
+        Parameters
+        ----------
+        old, new : strings
+            Old and new name
         """
         self._checkParam(old)
         if new in self.pmap:
@@ -138,38 +243,195 @@ class PyAPS(object):
     
     def copy(self):
         """ Return a shallow copy of the object """
-        c = PyAPS()
-        c.pmap = copy.copy(self.pmap)  
+        c = PyABaSoS()
+        c.pmap = copy.copy(self.pmap)
+        c.bss = copy.copy(self.bss)
         return c
     
-    def combine(self, left, rl, right, rr):
-        c = PyAPS()
-        #=======================================================================
-        # r = re.match("([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", "dvhg_gh(8)")
-        #=======================================================================
-        #=======================================================================
-        # ('dvhg', '_gh(8)', '_gh', 'gh', '(8)', '8')
-        #=======================================================================
+    def _composePN(self, b, r, n):
+        result = b
+        if not r is None:
+            result += "_" + r
+        if (not n is None) and (n != 0):
+            result += ("(%d)" % n)
+        return result
+    
+    def _decomposePN(self, n):
+        """
+        Decompose parameter name into Base, Root, Number
+        """
+        r = re.match("([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", n)
+        if r is None:
+            return None, None, None
+        else:
+            return r.group(0), r.group(3), r.group(5)
+        
+    def __init__(self, *args):
+        self.bss = []
+        for s in args:
+            self.addBPS(s)
+        self._updatepmap()
+      
+      
+      
+      
+        
+# 
+# class PyAPS(object):
+#     
+#     def addParam(self, name, value=0.0):
+#         """
+#         Add parameter to the list
+#         
+#         Parameters
+#         ----------
+#         name : string
+#             Name of the parameter
+#         value : optional
+#             Default value of the parameter
+#         """
+#         if name in self.pmap:
+#             raise(PE.PyAValError("Name '" + str(name) + "' already exists!", \
+#                                  where="addPyAPS::Param"))
+#         self.pmap[name] = PyAPa(value)
+#     
+#     def _checkParam(self, n):
+#         """ Throws and exception if parameter 'n' does not exist """
+#         if not n in self.pmap:
+#             raise(PE.PyAValError("No such parameter: " + str(n),
+#                                  solution="Use one of: " + ', '.join(list(self.pmap))))
+#     
+#     def __getitem__(self, n, ref=False):
+#         """ Get reference to PyaPa """
+#         self._checkParam(n)
+#         if ref:
+#             return self.pmap[n]
+#         else:
+#             return self.pmap[n].value
+#     
+#     def __setitem__(self, n, v):
+#         """ Set value and update related if necessary """
+#         self._checkParam(n)
+#         self.pmap[n].value = v
+#         if len(self.pmap[n].affects) > 0:
+#             for a in self.pmap[n].affects:
+#                 a.updateRelation()
+# 
+#     def rename(self, old, new):
+#         """
+#         Rename parameter
+#         
+#         Parameters
+#         ----------
+#         old, new : strings
+#             Old and new name
+#         """
+#         self._checkParam(old)
+#         if new in self.pmap:
+#             raise(PE.PyAValError("Parameter " + str(new) + " already exists.", \
+#                                  solution="Use a unique name."))
+#         tmp = self.pmap[old]
+#         del self.pmap[old]
+#         self.pmap[new] = tmp
+#         
+#     def relate(self, dv, idv, func=None):
+#         if isinstance(idv, six.string_types):
+#             # Convert single string into list
+#             idv = [idv]
+#         # Check all parameters
+#         self._checkParam(dv)
+#         [self._checkParam(n) for n in idv]
+#         
+#         # By default, use equal
+#         if func is None:
+#             func = lambda x:x
+#         
+#         # Manage dependent variable
+#         self.pmap[dv].dependsOn = [self.pmap[n] for n in idv]
+#         self.pmap[dv].relation = PyARelation(self.pmap[dv].dependsOn, func)
+#         # Manage affected variables
+#         for n in idv:
+#             self.pmap[n].affects.update([self.pmap[dv]])
+#         # Trigger update of the value of the related parameter
+#         self.pmap[dv].updateRelation()
+#     
+#     def copy(self):
+#         """ Return a shallow copy of the object """
+#         c = PyAPS()
+#         c.pmap = copy.copy(self.pmap)  
+#         return c
+#     
+#     def _decomposePN(self, n):
+#         """
+#         Decompose parameter name into Base, Root, Number
+#         """
+#         r = re.match("([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", n)
+#         if r is None:
+#             return None, None, None
+#         else:
+#             return r.group(0), r.group(3), r.group(5)
+#     
+#     def _rootsAndNos(self, m):
+#         roots = {}
+#         for n in list(m.pmap):
+#             n, r, no = self._decomposePN(n)
+#             if (not r is None) and (not r in roots):
+#                 roots[r] = []
+#             if not no is None:
+#                 roots[r].append(int(no))
+#         return roots
+#                 
+#     def combine(self, left, rl, right, rr):
+#         c = PyAPS()
+#         
+#         
+#     
+#     def __init__(self, *args, **kwargs):
+#         self.pmap = bidict.OrderedBidict()
+#         for n in args:
+#             self.addParam(n, 0.0)
+#         for n, v in kwargs.items():
+#             self.addParam(n, v)
+#             
+
+class MBO2(object):
+    """
+    Model Base Object
+    
+    Concepts
+    --------
+    
+    Parameter names: Internal vs. external
         
     
-    def __init__(self, *args, **kwargs):
-        self.pmap = bidict.OrderedBidict()
-        for n in args:
-            self.addParam(n, 0.0)
-        for n, v in kwargs.items():
-            self.addParam(n, v)
-            
-
-class FBO2(object):
     
-    def __init__(self, pars, rootName=None):
-        self.pars = PyAPS(*pars)
+    """
+    
+    def __init__(self, pars, rootName=""):
+        self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
         
         self.rootName = rootName
-        self.leftCompo = self
+        self.leftCompo = None
         self.rightCompo = None
      
+    def _compoWalk(self):
+        """
+        TBD
+        """
+        def walk(c, refs):
+            refs.append(c)
+            if c.leftCompo is not None:
+                walk(c.leftCompo, refs)
+            if c.rightCompo is not None:
+                walk(c.rightCompo, refs)
+
+        refs = []
+        walk(self, refs)
+        for c in refs:
+            yield c
+     
+
     def parameterSummary(self):
         for k, v in self.pars.pmap.items():
             print(k, v.value)
@@ -203,10 +465,10 @@ class FBO2(object):
         
     
     
-class Poly2(FBO2):
+class Poly2(MBO2):
     
     def __init__(self):
-        FBO2.__init__(self, ["c0", "c1", "c2"], rootName="Poly2")
+        MBO2.__init__(self, ["c0", "c1", "c2"], rootName="Poly2")
     
     def evaluate(self, *args, **kwargs):
         s = self._imap
