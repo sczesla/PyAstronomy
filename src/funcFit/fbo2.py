@@ -83,21 +83,38 @@ class PyAPS(object):
         self.pmap[name] = PyAPa(value)
     
     def _checkParam(self, n):
+        """ Throws and exception if parameter 'n' does not exist """
         if not n in self.pmap:
             raise(PE.PyAValError("No such parameter: " + str(n),
                                  solution="Use one of: " + ', '.join(list(self.pmap))))
     
-    def __getitem__(self, n):
+    def __getitem__(self, n, ref=False):
+        """ Get reference to PyaPa """
         self._checkParam(n)
-        return self.pmap[n]
+        if ref:
+            return self.pmap[n]
+        else:
+            return self.pmap[n].value
     
     def __setitem__(self, n, v):
+        """ Set value and update related if necessary """
         self._checkParam(n)
         self.pmap[n].value = v
         if len(self.pmap[n].affects) > 0:
             for a in self.pmap[n].affects:
                 a.updateRelation()
 
+    def rename(self, old, new):
+        """
+        """
+        self._checkParam(old)
+        if new in self.pmap:
+            raise(PE.PyAValError("Parameter " + str(new) + " already exists.", \
+                                 solution="Use a unique name."))
+        tmp = self.pmap[old]
+        del self.pmap[old]
+        self.pmap[new] = tmp
+        
     def relate(self, dv, idv, func=None):
         if isinstance(idv, six.string_types):
             # Convert single string into list
@@ -113,11 +130,27 @@ class PyAPS(object):
         # Manage dependent variable
         self.pmap[dv].dependsOn = [self.pmap[n] for n in idv]
         self.pmap[dv].relation = PyARelation(self.pmap[dv].dependsOn, func)
-        # Manage independent variables
+        # Manage affected variables
         for n in idv:
             self.pmap[n].affects.update([self.pmap[dv]])
         # Trigger update of the value of the related parameter
         self.pmap[dv].updateRelation()
+    
+    def copy(self):
+        """ Return a shallow copy of the object """
+        c = PyAPS()
+        c.pmap = copy.copy(self.pmap)  
+        return c
+    
+    def combine(self, left, rl, right, rr):
+        c = PyAPS()
+        #=======================================================================
+        # r = re.match("([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", "dvhg_gh(8)")
+        #=======================================================================
+        #=======================================================================
+        # ('dvhg', '_gh(8)', '_gh', 'gh', '(8)', '8')
+        #=======================================================================
+        
     
     def __init__(self, *args, **kwargs):
         self.pmap = bidict.OrderedBidict()
@@ -131,6 +164,8 @@ class FBO2(object):
     
     def __init__(self, pars, rootName=None):
         self.pars = PyAPS(*pars)
+        self._imap = self.pars.copy()
+        
         self.rootName = rootName
         self.leftCompo = self
         self.rightCompo = None
@@ -171,11 +206,12 @@ class FBO2(object):
 class Poly2(FBO2):
     
     def __init__(self):
-        super().__init__(["c0", "c1", "c2"], rootName="Poly2")
+        FBO2.__init__(self, ["c0", "c1", "c2"], rootName="Poly2")
     
     def evaluate(self, *args, **kwargs):
+        s = self._imap
         x = args[0]
-        return self["c0"] + self["c1"]*x + self["c2"]*x**2
+        return s["c0"] + s["c1"]*x + s["c2"]*x**2
     
     def logL(self, *args, **kwargs):
         return super()._defLogL(*args)
