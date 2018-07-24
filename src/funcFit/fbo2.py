@@ -12,6 +12,7 @@ import six
 import six.moves as smo
 import bidict
 import collections
+import sys
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
 
@@ -96,8 +97,46 @@ class PyAPrior(object):
         return self.func(*[p.value for p in self.ivs])
     
     def __str__(self):
-        return self.descr
+        return str(self.descr)
+
+
+class PyAUniformPrior(PyAPrior):
     
+    def __init__(self, ivs, lower=None, upper=None, descr=""):
+
+        if (lower is None) and (upper is None):
+            f = lambda x:0.0
+        elif (not lower is None) and (upper is None):
+            f = lambda x:0.0 if x < upper else -np.inf
+        elif (lower is None) and (not upper is None):
+            f = lambda x:0.0 if x > lower else -np.inf
+        else:
+            if upper <= lower:
+                raise(PE.PyAValError("'lower' must be smaller than 'upper'", \
+                                     where="addUniformPrior"))
+            r = upper - lower
+            f = lambda x:np.log(r) if (x >= lower) and(x <=upper) else -np.inf
+        
+        PyAPrior.__init__(self, ivs, f, descr=descr)
+      
+      
+class PyASmoothUniformPrior(PyAPrior):
+      
+    def __init__(self, ivs, lower=None, upper=None, scale=1e-9, descr=""):
+      
+        pih = np.pi/2.0
+        flmax = sys.float_info.max
+        def f(x):
+            if not lower is None:
+                if x < lower:
+                    return -np.arctan((lower-x)/scale)/pih*flmax
+            if not upper is None:
+                if x > upper:
+                    return -np.arctan((x-upper)/scale)/pih*flmax
+            return 0.0
+        
+        PyAPrior.__init__(self, ivs, f, descr=descr)
+      
       
 class PyABPS(object):
     """
@@ -413,7 +452,85 @@ class PyABaSoS(object):
         self._updatepmap()
       
 
-class MBO2(object):
+class PStat(object):
+    
+    def setStatMode(self, mode):
+        if mode == "default":
+            self.logL = self._deflogL
+        elif (mode is None) or (mode == "manual"):
+            pass
+        else:
+            raise(PE.PyAValError("Unknown mode for PyABay: " + str(mode)))
+    
+    def __init__(self, statmode="default"):
+        self.priors = []
+        self.setStatMode(statmode)
+        self.statmode = statmode
+        
+    def logL(self, *args, **kwargs):
+        raise(PE.PyANotImplemented("The method 'logL' needs to be implemented."))
+
+    def logPrior(self, *args, **kwargs):
+        result = 0.0
+        for p in self.priors:
+            result += p.evaluate()
+            if np.isinf(result):
+                return result
+        return result
+    
+    def addUniformPrior(self, pn, lower=None, upper=None):
+        """
+        """
+        self.pars._checkParam(pn)
+        descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (lower or -np.inf, upper or np.inf)
+        self.priors.append(PyAUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+      
+    def addSmoothUniformPrior(self, pn, lower=None, upper=None, scale=1e-9):
+        """
+        """
+        self.pars._checkParam(pn)
+        descr = "Smooth uniform prior on '" + str(pn) + "' (lower = %g, upper = %g, scale = %g)" % \
+                (lower or -np.inf, upper or np.inf, scale)
+        self.priors.append(PyASmoothUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+        
+    def addPrior(self, p):
+        pass
+    
+    def margD(self, *args, **kwargs):
+        return None
+
+    def _deflogL(self, *args, **kwargs):
+        
+        if len(args) == 2:
+            x, y = args[0], args[1]
+            yerr = 1.0
+        elif len(args) == 3:
+            x, y, yerr = args[0], args[1], args[2]
+        else:
+            raise(PE.PyAValError("Invalid call to logL of PyABayDef. No. of arguments: " + str(len(args))))
+
+        if "_currentModel" in kwargs:
+            m = kwargs["_currentModel"]
+        else:
+            m = self.evaluate(x)
+        
+        return -np.sum((m-y)**2/yerr**2)
+
+    def logPost(self, *args, **kwargs):
+        """ Get log of the posterior """
+        lp = self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs)
+        md = self.margD()
+        if not md is None:
+            lp -= md
+        return lp
+
+    def objf(self, *args, **kwargs):
+        self.setFreeParamVals(args[0])
+        return -self.logPost(*args[1:], **kwargs)
+  
+        
+
+class MBO2(PStat):
     """
     Model Base Object
     
@@ -426,7 +543,8 @@ class MBO2(object):
     
     """
     
-    def __init__(self, pars, rootName=""):
+    def __init__(self, pars, rootName="", statmode="default"):
+        PStat.__init__(self, statmode=statmode)
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
         
@@ -518,105 +636,18 @@ class MBO2(object):
         
     def freeze(self, pns):
         self.pars.freeze(pns)
-        
     
+    def setRestriction(self, restricts, scale=1e-9):
+        for k, v in six.iteritems(restricts):
+            self.pars._checkParam(k)
+            self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=scale)
+
 class Poly2(MBO2):
     
     def __init__(self):
         MBO2.__init__(self, ["c0", "c1", "c2"], rootName="Poly2")
     
-    def evaluate(self, *args, **kwargs):
+    def evaluate(self, x, **kwargs):
         s = self._imap
-        x = args[0]
         return s["c0"] + s["c1"]*x + s["c2"]*x**2
     
-
-class PStat(object):
-    
-    def setMode(self, mode):
-        if mode == "default":
-            self.logL = self._deflogL
-        elif (mode is None) or (mode == "manual"):
-            pass
-        else:
-            raise(PE.PyAValError("Unknown mode for PyABay: " + str(mode)))
-    
-    def __init__(self, model, statmode="default"):
-        self.priors = []
-        self.setMode(statmode)
-        self.statmode = statmode
-        self._model = model
-        
-    def model(self):
-        return self._model
-    
-    def logL(self, *args, **kwargs):
-        raise(PE.PyANotImplemented("The method 'logL' needs to be implemented."))
-
-    def logPrior(self, *args, **kwargs):
-        result = 0.0
-        for p in self.priors:
-            result += p.evaluate()
-            if np.isinf(result):
-                return result
-        return result
-    
-    def addUniformPrior(self, pn, lower=None, upper=None):
-        """
-        """
-        if (lower is None) and (upper is None):
-            f = lambda x:0.0
-        elif (not lower is None) and (upper is None):
-            f = lambda x:0.0 if x < upper else -np.inf
-        elif (lower is None) and (not upper is None):
-            f = lambda x:0.0 if x > lower else -np.inf
-        else:
-            if upper <= lower:
-                raise(PE.PyAValError("'lower' must be smaller than 'upper'", \
-                                     where="addUniformPrior"))
-            r = upper - lower
-            f = lambda x:np.log(r) if (x >= lower) and(x <=upper) else -np.inf
-        
-        self._model.pars._checkParam(pn)
-        descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (lower, upper)
-        self.priors.append(PyAPrior(self._model.getPRef(pn), f, descr=descr))
-        
-    def addPrior(self, p):
-        pass
-    
-    def margD(self):
-        return None
-
-    def _deflogL(self, *args, **kwargs):
-        
-        if len(args) == 2:
-            x, y = args[0], args[1]
-            yerr = 1.0
-        elif len(args) == 3:
-            x, y, yerr = args[0], args[1], args[2]
-        else:
-            raise(PE.PyAValError("Invalid call to logL of PyABayDef. No. of arguments: " + str(len(args))))
-
-        if "_currentModel" in kwargs:
-            m = kwargs["_currentModel"]
-        else:
-            m = self._model.evaluate(x)
-        
-        return -np.sum((m-y)**2/yerr**2)
-
-    def logPost(self, *args, **kwargs):
-        """ Get log of the posterior """
-        lp = self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs)
-        md = self.margD()
-        if not md is None:
-            lp -= md
-        return lp
-
-    def objf(self, *args, **kwargs):
-        self._model.setFreeParamVals(args[0])
-        return -self.logPost(*args[1:], **kwargs)
-
-    def update(self):
-        pass
-        
-
