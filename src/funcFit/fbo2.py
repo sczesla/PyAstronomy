@@ -41,7 +41,7 @@ class PyAPa(object):
         self.affects = set()
         self.relation = None
         self.dependsOn = None
-        self.freeable = True
+        self.thawable = True
         
     def updateRelation(self):
         """
@@ -513,6 +513,12 @@ class MBO2(object):
     def setFreeParamVals(self, vals):
         self.pars.setFreeParamVals(vals)
         
+    def thaw(self, pns):
+        self.pars.thaw(pns)
+        
+    def freeze(self, pns):
+        self.pars.freeze(pns)
+        
     
 class Poly2(MBO2):
     
@@ -524,10 +530,6 @@ class Poly2(MBO2):
         x = args[0]
         return s["c0"] + s["c1"]*x + s["c2"]*x**2
     
-    def logL(self, *args, **kwargs):
-        return super()._defLogL(*args)
-    
-
 
 class PStat(object):
     
@@ -612,7 +614,7 @@ class PStat(object):
 
     def objf(self, *args, **kwargs):
         self._model.setFreeParamVals(args[0])
-        return self.logPost(*args[1:], **kwargs)
+        return -self.logPost(*args[1:], **kwargs)
 
     def update(self):
         pass
