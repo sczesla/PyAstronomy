@@ -596,6 +596,13 @@ class PStat(object):
         self.setFreeParamVals(args[0])
         return -self.logPost(*args[1:], **kwargs)
   
+    def setSPLikeObjf(self, f):
+        
+        def objf(self, *args, **kwargs):
+            self.setFreeParamVals(args[0])
+            return f(self, *args, **kwargs)
+        
+        self.objf = types.MethodType(objf, self)
         
 
 class MBO2(PStat):
