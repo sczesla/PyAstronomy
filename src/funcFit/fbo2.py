@@ -61,7 +61,8 @@ class PyAPa(object):
         lin = lower is None
         uin = upper is None
         if lin+uin == 0:
-            raise(PE.PyAValError("At least one of lower and upper has to be defined."))
+            # No limits defined (or removed)
+            pass
         elif lin+uin == 2:
             if lower >= upper:
                 raise(PE.PyAValError("The lower limit has to be smaller than the upper bound in restriction."))
