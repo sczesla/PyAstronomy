@@ -13,6 +13,8 @@ import six.moves as smo
 import bidict
 import collections
 import sys
+import scipy.optimize as sco
+import inspect
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
 
@@ -105,6 +107,9 @@ class PyAUniformPrior(PyAPrior):
     def __init__(self, ivs, lower=None, upper=None, descr=""):
 
         if (lower is None) and (upper is None):
+            raise(PE.PyAValError("At least one of lower and upper must be specified"))
+
+        if (lower is None) and (upper is None):
             f = lambda x:0.0
         elif (not lower is None) and (upper is None):
             f = lambda x:0.0 if x < upper else -np.inf
@@ -123,6 +128,9 @@ class PyAUniformPrior(PyAPrior):
 class PyASmoothUniformPrior(PyAPrior):
       
     def __init__(self, ivs, lower=None, upper=None, scale=1e-9, descr=""):
+      
+        if (lower is None) and (upper is None):
+            raise(PE.PyAValError("At least one of lower and upper must be specified"))      
       
         pih = np.pi/2.0
         flmax = sys.float_info.max
@@ -480,6 +488,14 @@ class PStat(object):
     
     def addUniformPrior(self, pn, lower=None, upper=None):
         """
+        Add a uniform prior
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        lower, upper : float, optional
+            Lower and upper bounds
         """
         self.pars._checkParam(pn)
         descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (lower or -np.inf, upper or np.inf)
@@ -487,6 +503,14 @@ class PStat(object):
       
     def addSmoothUniformPrior(self, pn, lower=None, upper=None, scale=1e-9):
         """
+        Add a uniform prior with 'smoothed' (arctan) edges
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        lower, upper : float, optional
+            Lower and upper bounds
         """
         self.pars._checkParam(pn)
         descr = "Smooth uniform prior on '" + str(pn) + "' (lower = %g, upper = %g, scale = %g)" % \
@@ -641,6 +665,31 @@ class MBO2(PStat):
         for k, v in six.iteritems(restricts):
             self.pars._checkParam(k)
             self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=scale)
+
+
+def fitfmin1d(m, x, y, yerr=None, **kwargs):
+    """
+    Use scipy's fmin to fit 1d model.
+    """
+    # Get keywords and default arguments
+    fi = inspect.getargspec(sco.fmin)
+    defargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
+    
+    for k in list(defargs):
+        if k in kwargs:
+            defargs[k] = kwargs[k]
+    
+    if not yerr is None:
+        defargs["args"] = (x, y, yerr)
+    else:
+        defargs["args"] = (x, y)
+    
+    defargs["full_output"] = True
+    
+    fr = sco.fmin(m.objf, m.freeParamVals(), **defargs)
+    m.setFreeParamVals(fr[0])
+    return fr
+
 
 class Poly2(MBO2):
     
