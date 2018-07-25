@@ -728,8 +728,9 @@ def fitfmin1d(m, x, y, yerr=None, **kwargs):
     return fr
 
 
-def fitfmin_cobyla1d(m, x, y, yerr=None, **kwargs):
+def fitfmin_cobyla1d(m, x, y, cons=None, yerr=None, **kwargs):
     """
+    Use scipy's fitfmin_cobyla to fit 1d model.
     """
     # Get keywords and default arguments
     fi = inspect.getargspec(sco.fmin_cobyla)
@@ -743,38 +744,36 @@ def fitfmin_cobyla1d(m, x, y, yerr=None, **kwargs):
         defargs["args"] = (x, y, yerr)
     else:
         defargs["args"] = (x, y)
-       
-    cons = []
+    
+    if cons is None:
+        cons = []
+    
     rs = m.getRestrictions()
+    # Loop over freeParamNames (get order right)
     for i, p in enumerate(m.freeParamNames()):
-        print(m.freeParamNames())
         if p in rs:
             # There is a restriction for this parameter
             lower, upper = rs[p]
-            if (not lower is None) and (not upper is None):
-                # Upper and lower limit
-                f = lambda *x:int((x[0][i] >= lower) and (x[i] <= upper))*2.-1.
-            elif (not lower is None):
-                # Only lower limit
-                f = lambda *x:int(x[0][i] >= lower)*2.-1.
-            elif (not upper is None):
-                # Only upper limit
-                print("i: ", i)
-                def g(*x):
-                    print(x[0][i])
-                    return -1
-                
-                #print("up: ", upper)
-                #f = lambda *x:int(x[0][i] <= upper)*2.-1.
-                #f = lambda *x:-1
-                f = g
-            cons.append(f)
-    
-    print(cons)
-    if len(cons) == 1:
-        defargs["cons"] = cons[0]
-    else:
-        defargs["cons"] = cons
+            # A function factory to close over 'j' (i.e., 'i' in the loop)
+            # Constraints have to be positive if valid
+            def getf(j):
+                if (not lower is None) and (not upper is None):
+                    # Upper and lower limit
+                    f = lambda x:min((x[j]-lower), (upper-x[j]))
+                elif (not lower is None):
+                    # Only lower limit
+                    f = lambda x:x[j]-lower
+                elif (not upper is None):
+                    # Only upper limit
+                    f = lambda x:upper-x[j]
+                    #f = lambda *x:
+                return f
+            cons.append(getf(i))
+
+    defargs["cons"] = cons
+    # Otherwise, the constraint function will be called with the same
+    # 'args' as the objective function
+    defargs["consargs"] = ()
     
     fr = sco.fmin_cobyla(m.objf, m.freeParamVals(), **defargs)
     m.setFreeParamVals(fr)
