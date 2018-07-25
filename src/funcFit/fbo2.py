@@ -45,7 +45,21 @@ class PyAPa(object):
         self.relation = None
         self.dependsOn = None
         self.thawable = True
-        
+        self.restriction = (None, None)
+    
+    def restrict(self, lower=None, upper=None):
+        lin = lower is None
+        uin = upper is None
+        if lin+uin == 0:
+            raise(PE.PyAValError("At least one of lower and upper has to be defined."))
+        elif lin+uin == 2:
+            if lower >= upper:
+                raise(PE.PyAValError("The lower limit has to be smaller than the upper bound in restriction."))
+        self.restriction = (lower, upper)
+    
+    def isRestricted(self):
+        return any([(not r is None) for r in self.restriction])
+    
     def updateRelation(self):
         """
         Update value according to relation
@@ -396,6 +410,25 @@ class PyABaSoS(object):
         """ Get list of names of free parameters """
         return [p for p in list(self.pmap) if self.pmap[p].free]
     
+    def getRestrictions(self):
+        """ Get dictionary mapping parameter names to restrictions """
+        return {p:self.pmap[p].restriction for p in list(self.pmap) if self.pmap[p].isRestricted()}
+    
+    def setRestriction(self, restrictions):
+        """
+        Add restrictions for parameters
+        
+        Parameters
+        ----------
+        restrictions : dictionary
+            Maps parameter to restriction. A restriction is a two-tuple
+            with lower and upper limit. If None is specified, no restriction
+            applies in this direction.
+        """
+        for k, v in six.iteritems(restrictions):
+            self._checkParam(k)
+            self.getPRef(k).restrict(lower=v[0], upper=v[1])
+    
     def freeParamVals(self):
         """ Get list of names of free parameters """
         return [self.pmap[p].value for p in list(self.pmap) if self.pmap[p].free]
@@ -662,9 +695,13 @@ class MBO2(PStat):
         self.pars.freeze(pns)
     
     def setRestriction(self, restricts, scale=1e-9):
+        self.pars.setRestriction(restricts)
         for k, v in six.iteritems(restricts):
             self.pars._checkParam(k)
             self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=scale)
+            
+    def getRestrictions(self):
+        return self.pars.getRestrictions()
 
 
 def fitfmin1d(m, x, y, yerr=None, **kwargs):
@@ -687,6 +724,83 @@ def fitfmin1d(m, x, y, yerr=None, **kwargs):
     defargs["full_output"] = True
     
     fr = sco.fmin(m.objf, m.freeParamVals(), **defargs)
+    m.setFreeParamVals(fr[0])
+    return fr
+
+
+def fitfmin_cobyla1d(m, x, y, yerr=None, **kwargs):
+    """
+    """
+    # Get keywords and default arguments
+    fi = inspect.getargspec(sco.fmin_cobyla)
+    defargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
+    
+    for k in list(defargs):
+        if k in kwargs:
+            defargs[k] = kwargs[k]
+    
+    if not yerr is None:
+        defargs["args"] = (x, y, yerr)
+    else:
+        defargs["args"] = (x, y)
+       
+    cons = []
+    rs = m.getRestrictions()
+    for i, p in enumerate(m.freeParamNames()):
+        print(m.freeParamNames())
+        if p in rs:
+            # There is a restriction for this parameter
+            lower, upper = rs[p]
+            if (not lower is None) and (not upper is None):
+                # Upper and lower limit
+                f = lambda *x:int((x[0][i] >= lower) and (x[i] <= upper))*2.-1.
+            elif (not lower is None):
+                # Only lower limit
+                f = lambda *x:int(x[0][i] >= lower)*2.-1.
+            elif (not upper is None):
+                # Only upper limit
+                print("i: ", i)
+                def g(*x):
+                    print(x[0][i])
+                    return -1
+                
+                #print("up: ", upper)
+                #f = lambda *x:int(x[0][i] <= upper)*2.-1.
+                #f = lambda *x:-1
+                f = g
+            cons.append(f)
+    
+    print(cons)
+    if len(cons) == 1:
+        defargs["cons"] = cons[0]
+    else:
+        defargs["cons"] = cons
+    
+    fr = sco.fmin_cobyla(m.objf, m.freeParamVals(), **defargs)
+    m.setFreeParamVals(fr)
+    return fr
+
+
+def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
+    """
+    Use scipy's fmin_powell to fit 1d model.
+    """
+    # Get keywords and default arguments
+    fi = inspect.getargspec(sco.fmin_powell)
+    defargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
+    
+    for k in list(defargs):
+        if k in kwargs:
+            defargs[k] = kwargs[k]
+    
+    if not yerr is None:
+        defargs["args"] = (x, y, yerr)
+    else:
+        defargs["args"] = (x, y)
+    
+    defargs["full_output"] = True
+    
+    fr = sco.fmin_powell(m.objf, m.freeParamVals(), **defargs)
     m.setFreeParamVals(fr[0])
     return fr
 
