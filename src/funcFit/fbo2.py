@@ -36,11 +36,21 @@ class PyAPa(object):
     def getVal(self):
         return self._value
     
+    def setFree(self, v):
+        if (v == True) and (not self.thawable):
+            raise(PE.PyAValError("Cannot thaw requested parameter.", \
+                                 solution="Some parameters cannot be thawed. See the documentation for details."))
+        self._free = v
+    
+    def getFree(self):
+        return self._free
+    
     value = property(getVal, setVal)
+    free = property(getFree, setFree)
     
     def __init__(self, value=0.0):
         self._value = value
-        self.free = False
+        self._free = False
         self.affects = set()
         self.relation = None
         self.dependsOn = None
@@ -462,7 +472,7 @@ class PyABaSoS(object):
             pns = [pns]
         for p in pns:
             self._checkParam(p)
-            self.pmap[p].free = True
+            self.pmap[p].free = free
     
     def thaw(self, pns):
         """
