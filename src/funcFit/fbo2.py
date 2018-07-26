@@ -873,55 +873,68 @@ def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
     return fr
 
 
+def fitfmin_l_bfgs_b1d(m, x, y, yerr=None, **kwargs):
+    """
+    Use scipy's fmin_l_bfgs_b to fit 1d model.
+    """
+    # Get keywords and default arguments
+    defargs, _ = _introdefarg(sco.fmin_l_bfgs_b, **kwargs)
+    
+    if not yerr is None:
+        defargs["args"] = (x, y, yerr)
+    else:
+        defargs["args"] = (x, y)
+    
+    rs = m.getRestrictions()
+    bounds = []
+    # Loop over freeParamNames (get order right)
+    for i, p in enumerate(m.freeParamNames()):
+        if p in rs:
+            # There is a restriction for this parameter
+            bounds.append(rs[p])
+        else:
+            bounds.append((None, None))
+            
+    defargs["bounds"] = bounds
+    defargs["approx_grad"] = True
+    
+    fr = sco.fmin_l_bfgs_b(m.objf, m.freeParamVals(), **defargs)
+    m.setFreeParamVals(fr[0])
+    return fr
+
+
 def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
               sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMAP=True):
     """
     MCMC sampling using emcee package.
     
     Sample from the posterior probability distribution using the emcee
-    package. By default the likelihood is calculated as -0.5 times the
-    model chi-square value.
+    package. 
     
     The emcee sampler can be accessed via the `emceeSampler` attribute,
     which may be used to continue or manipulate sampling.
     
     Parameters
     ----------
-    nwalker : int, optional
-        The number of walker to be used. By default, two times the
+    walkerdimfac : int, optional
+        Determines the number of walkers. By default, four times the
         number of free parameters is used.
     scales : dictionary, optional
         The scales argument can be used to control the initial distribution
         of the walkers. By default, all walkers are distributed around the
         location given by the current state of the object, i.e., the current
         parameter values. In each direction, the walker are randomly distributed
-        with a Gaussian distribution, whose default standard deviation is one.
+        with a Gaussian distribution, whose default standard deviation is 1e-8.
         The scales argument can be used to control the width of Gaussians used
         to distribute the walkers.
     sampleArgs : dictionary, optional
-        Number controlling the sampling process. Use 'burn' (int) to specify
+        Keyword controlling the sampling process. Use 'burn' (int) to specify
         the number of burn-in iterations (default is 0). Via 'iters' (int)
         the numbers of iterations after the burn-in can be specified (default 1000).
         The 'process' (int) key can be used to control the number of iterations after
         which the progress bar is updated (default is iters/100). Note that the
         'progressbar' package must be installed to get a progress bar. Otherwise
         more mundane print statements will be used.  
-    priors : dictionary, optional
-        For each parameter, a primary can be specified. In particular, a
-        prior is a callable, which is called with two arguments: first, a
-        dictionary mapping the names of the free parameters to their
-        current values, and second, a string specifying the name of the
-        parameter for which the prior is to apply. The return value must be
-        the logarithmic prior probability (natural logarithm). A number of default
-        priors are available in the form of the `FuFPrior` class. By
-        default, a uniform (improper) prior is used for all parameter, for
-        which no other prior was specified.
-    pots : list, optional
-        A list of 'potentials'. A potential is a function, which is called using
-        a dictionary holding the current value for all parameters and returns
-        the logarithm of the associated probability. Potentials may, e.g., be
-        used to implement certain relations between parameter values not otherwise
-        accounted for. 
     dbfile : string, optional
         The result of the sampling, i.e., the chain(s), the corresponding
         values of the posterior, and the names of the free parameters are
@@ -932,13 +945,20 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
         A tuple holding the current position and state of the sampler. This
         tuple is returned by this method. The `ps` argument can be used
         to continue sampling from the last state. Note that no burn-in will
-        ne carried out and the other arguments should be given as previously
+        be carried out and the other arguments should be given as previously
         to continue sampling successfully. 
     emcp : dictionary, optional
         Extra arguments handed to `EnsembleSampler` object.
     toMAP : boolean, optional
         If True (default), the object is set to the maximum posterior probability point sampled.
         Otherwise, it remains in a random state.
+    
+    Returns
+    -------
+    (pos, state) : tuple
+        Position and state of the sampler. Can be used to continue sampling.
+    sampler : emceeSampler
+        The emcee object used for sampling.
     """
     
     if not ic.check["emcee"]:
@@ -1046,7 +1066,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
         for i, p in enumerate(fpns):
             m[p] = emceeSampler.flatchain[indimin, i]
     
-    return pos, state, emceeSampler
+    return (pos, state), emceeSampler
     
     
     
