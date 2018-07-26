@@ -167,6 +167,18 @@ class PyASmoothUniformPrior(PyAPrior):
         PyAPrior.__init__(self, ivs, f, descr=descr)
       
       
+class PyAScalePrior(PyAPrior):
+    
+    def __init__(self, ivs, m=-1., descr=""):
+
+        def f(x):
+            if x <= 0.0:
+                return -np.inf
+            return m*np.log(x)
+        
+        PyAPrior.__init__(self, ivs, f, descr=descr)
+      
+      
 class PyABPS(object):
     """
     Basic Parameter Set
@@ -567,6 +579,21 @@ class PStat(object):
         descr = "Smooth uniform prior on '" + str(pn) + "' (lower = %g, upper = %g, scale = %g)" % \
                 (lower or -np.inf, upper or np.inf, scale)
         self.priors.append(PyASmoothUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+        
+    def addScalePrior(self, pn, m):
+        """
+        Add scale prior of the form x**m
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        m : float
+            Exponent (e.g., -1 for x**-1 prior distribution)
+        """
+        self.pars._checkParam(pn)
+        descr = "Scale prior on '" + str(pn) + "' (exponent = %g)" % m
+        self.priors.append(PyAScalePrior(self.getPRef(pn), m))
         
     def addPrior(self, p):
         pass
