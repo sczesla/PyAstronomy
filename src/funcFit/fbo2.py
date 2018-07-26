@@ -753,17 +753,42 @@ class MBO2(PStat):
         return self.pars.getRestrictions()
 
 
+
+def _introdefarg(f, **kwargs):
+    """
+    Analyze and update keyword arguments of callable.
+    
+    Parameters
+    ----------
+    f : callable
+        A function to be inspected (e.g., sco.fmin)
+    kwargs : dinctionary
+        Dictionary of arguments to be updated.
+    
+    Returns
+    -------
+    kwargs, original kwargs : dictionaries
+        Updated kwargs (including specifications from kwargs) and original
+        kwargs as provided by the callable.
+    """
+    # Get dictionary of default arguments and default values
+    fi = inspect.getargspec(f)
+    odefargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
+    
+    defargs = odefargs.copy()
+    # Update entries for which kwargs holds values
+    for k in list(defargs):
+        if k in kwargs:
+            defargs[k] = kwargs[k]
+    return defargs, odefargs
+
+
 def fitfmin1d(m, x, y, yerr=None, **kwargs):
     """
     Use scipy's fmin to fit 1d model.
     """
     # Get keywords and default arguments
-    fi = inspect.getargspec(sco.fmin)
-    defargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
-    
-    for k in list(defargs):
-        if k in kwargs:
-            defargs[k] = kwargs[k]
+    defargs, _ = _introdefarg(sco.fmin, **kwargs)
     
     if not yerr is None:
         defargs["args"] = (x, y, yerr)
@@ -782,12 +807,7 @@ def fitfmin_cobyla1d(m, x, y, cons=None, yerr=None, **kwargs):
     Use scipy's fitfmin_cobyla to fit 1d model.
     """
     # Get keywords and default arguments
-    fi = inspect.getargspec(sco.fmin_cobyla)
-    defargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
-    
-    for k in list(defargs):
-        if k in kwargs:
-            defargs[k] = kwargs[k]
+    defargs, _ = _introdefarg(sco.fmin_cobyla, **kwargs)
     
     if not yerr is None:
         defargs["args"] = (x, y, yerr)
@@ -834,12 +854,7 @@ def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
     Use scipy's fmin_powell to fit 1d model.
     """
     # Get keywords and default arguments
-    fi = inspect.getargspec(sco.fmin_powell)
-    defargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
-    
-    for k in list(defargs):
-        if k in kwargs:
-            defargs[k] = kwargs[k]
+    defargs, _ = _introdefarg(sco.fmin_powell, **kwargs)
     
     if not yerr is None:
         defargs["args"] = (x, y, yerr)
