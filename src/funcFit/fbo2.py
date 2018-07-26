@@ -718,11 +718,36 @@ class MBO2(PStat):
     def freeze(self, pns):
         self.pars.freeze(pns)
     
-    def setRestriction(self, restricts, scale=1e-9):
+    def setRestriction(self, restricts, usesmooth=False, sscale=1e-9):
+        """
+        Restrict parameter ranges
+        
+        Sets lower and upper bounds for parameters where desired. The bounds
+        are saved to be used in constrained optimization, e.g., via
+        fmin_cobyla. Additionally, a uniform prior is added to take effect
+        on the posterior probability distribution. If desired, the edges
+        of the priors are 'smoothed' to alleviate convergence problems with
+        unconstrained optimization algorithms working on the posterior.
+        
+        Parameters
+        ----------
+        restricts : dictionary
+            Maps parameter name to resctriction, i.e., a two-tuple giving
+            lower and upper bound. Use None where no bound is desired.
+        usesmooth : boolean, optional
+            If True, a uniform prior with 'smoothed' edges is used instead
+            if a sharply-edged uniform prior. The scale if the edge is given
+            by `sscale`. Default is False.
+        sscale : float, optional
+            Scale of the edge used for smooth uniform prior (if desired).
+        """
         self.pars.setRestriction(restricts)
         for k, v in six.iteritems(restricts):
             self.pars._checkParam(k)
-            self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=scale)
+            if not usesmooth:
+                self.addUniformPrior(k, lower=v[0], upper=v[1])
+            else:
+                self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=sscale)
             
     def getRestrictions(self):
         return self.pars.getRestrictions()
