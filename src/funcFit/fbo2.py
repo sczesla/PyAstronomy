@@ -519,6 +519,11 @@ class PStat(object):
         self.setStatMode(statmode)
         self.statmode = statmode
         
+        def defobjf(self, *args, **kwargs):
+            return -self.logPost(*args[1:], **kwargs)
+            
+        self.objf = defobjf
+        
     def logL(self, *args, **kwargs):
         raise(PE.PyANotImplemented("The method 'logL' needs to be implemented."))
 
@@ -591,10 +596,6 @@ class PStat(object):
         if not md is None:
             lp -= md
         return lp
-
-    def objf(self, *args, **kwargs):
-        self.setFreeParamVals(args[0])
-        return -self.logPost(*args[1:], **kwargs)
   
     def setSPLikeObjf(self, f):
         
@@ -602,8 +603,13 @@ class PStat(object):
             self.setFreeParamVals(args[0])
             return f(self, *args, **kwargs)
         
-        self.objf = types.MethodType(objf, self)
+        self._objf = types.MethodType(objf, self)
         
+    def getSPLikeObjf(self):
+        return self._objf
+    
+    objf = property(getSPLikeObjf, setSPLikeObjf)
+
 
 class MBO2(PStat):
     """
