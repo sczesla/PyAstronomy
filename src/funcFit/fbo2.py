@@ -20,6 +20,8 @@ from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
 
 if ic.check["progressbar"]:
     import progressbar
+if ic.check["emcee"]:
+    import emcee
 
 
 class PyAPa(object):
@@ -449,6 +451,12 @@ class PyABaSoS(object):
         vals : list or array
             The values to be assigned
         """
+        try:
+            # Handle 'singleton' arrays
+            if len(vals.shape) == 0:
+                vals = np.array([vals])
+        except:
+            pass
         for i, p in enumerate(self.freeParamNames()):
             self[p] = vals[i]
     
@@ -581,11 +589,16 @@ class PStat(object):
         else:
             m = self.evaluate(x)
         
-        return -0.5 * np.sum((m-y)**2/(yerr**2))
+        return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
 
     def logPost(self, *args, **kwargs):
         """ Get log of the posterior """
         return self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs) - (self.margD(*args, **kwargs) or 0.0)
+
+    def emceeLogPost(self, *args, **kwargs):
+        """ Get the log of the posterior assuming that first parameter is an array of free parameter values """
+        self.setFreeParamVals(args[0])
+        return self.logPost(*args[1:], **kwargs)
   
     def setSPLikeObjf(self, f):
         
@@ -860,15 +873,189 @@ def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
     return fr
 
 
-class Poly2(MBO2):
+def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
+              sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMAP=True):
+    """
+    MCMC sampling using emcee package.
     
+    Sample from the posterior probability distribution using the emcee
+    package. By default the likelihood is calculated as -0.5 times the
+    model chi-square value.
+    
+    The emcee sampler can be accessed via the `emceeSampler` attribute,
+    which may be used to continue or manipulate sampling.
+    
+    Parameters
+    ----------
+    nwalker : int, optional
+        The number of walker to be used. By default, two times the
+        number of free parameters is used.
+    scales : dictionary, optional
+        The scales argument can be used to control the initial distribution
+        of the walkers. By default, all walkers are distributed around the
+        location given by the current state of the object, i.e., the current
+        parameter values. In each direction, the walker are randomly distributed
+        with a Gaussian distribution, whose default standard deviation is one.
+        The scales argument can be used to control the width of Gaussians used
+        to distribute the walkers.
+    sampleArgs : dictionary, optional
+        Number controlling the sampling process. Use 'burn' (int) to specify
+        the number of burn-in iterations (default is 0). Via 'iters' (int)
+        the numbers of iterations after the burn-in can be specified (default 1000).
+        The 'process' (int) key can be used to control the number of iterations after
+        which the progress bar is updated (default is iters/100). Note that the
+        'progressbar' package must be installed to get a progress bar. Otherwise
+        more mundane print statements will be used.  
+    priors : dictionary, optional
+        For each parameter, a primary can be specified. In particular, a
+        prior is a callable, which is called with two arguments: first, a
+        dictionary mapping the names of the free parameters to their
+        current values, and second, a string specifying the name of the
+        parameter for which the prior is to apply. The return value must be
+        the logarithmic prior probability (natural logarithm). A number of default
+        priors are available in the form of the `FuFPrior` class. By
+        default, a uniform (improper) prior is used for all parameter, for
+        which no other prior was specified.
+    pots : list, optional
+        A list of 'potentials'. A potential is a function, which is called using
+        a dictionary holding the current value for all parameters and returns
+        the logarithm of the associated probability. Potentials may, e.g., be
+        used to implement certain relations between parameter values not otherwise
+        accounted for. 
+    dbfile : string, optional
+        The result of the sampling, i.e., the chain(s), the corresponding
+        values of the posterior, and the names of the free parameters are
+        saved to the specified file (by default 'chain.emcee' is used).
+        The traces stored there can be analyzed using the 'TraceAnalysis'
+        class. Set this parameter to 'None' to avoid saving the results.
+    ps : tuple, optional
+        A tuple holding the current position and state of the sampler. This
+        tuple is returned by this method. The `ps` argument can be used
+        to continue sampling from the last state. Note that no burn-in will
+        ne carried out and the other arguments should be given as previously
+        to continue sampling successfully. 
+    emcp : dictionary, optional
+        Extra arguments handed to `EnsembleSampler` object.
+    toMAP : boolean, optional
+        If True (default), the object is set to the maximum posterior probability point sampled.
+        Otherwise, it remains in a random state.
+    """
+    
+    if not ic.check["emcee"]:
+        raise(PE.PyARequiredImport("Could not import the 'emcee' package.",
+                                   solution="Please install 'emcee'."))
+    
+    # Names of free parameters
+    fpns = m.freeParamNames()
+    # Values of of free parameters
+    fpvs = m.freeParamVals()
+    # Names and values of free parameter (in no order)
+    fps = dict(zip(fpns, fpvs))
+    # Number of dimensions
+    ndims = len(fpns)
+    
+    if ndims == 0:
+        raise(PE.PyAValError("At least one free parameter is required for sampling.",
+                             where="sampleEMCEE2",
+                             solution="Use 'thaw' to free same parameters."))
+    
+    if not dbfile is None:
+        if re.match(".*\.emcee$", dbfile) is None:
+            PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.",
+                                   solution="Use a filename of the form *.emcee"))
+    
+    # Number of walkers
+    nwalker = ndims * walkerdimfac
+    
+    if nwalker < ndims * 2:
+        raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.",
+                             where="sampleEMCEE2",
+                             solution="Increase the number of walkers."))
+    if nwalker % 2 == 1:
+        raise(PE.PyAValError("The number of walkers must be even.",
+                             where="sampleEMCEE2",
+                             solution="Use an even number of walkers."))
+    
+    # Set default values for sampleArgs
+    if sampleArgs is None:
+        sampleArgs = {}
+    if not "burn" in sampleArgs:
+        sampleArgs["burn"] = 0
+    if not "iters" in sampleArgs:
+        sampleArgs["iters"] = 1000
+    if not "progress" in sampleArgs:
+        sampleArgs["progress"] = sampleArgs["iters"] / 100
+    
+    if ps is None:
+    
+        if emcp is None:
+            emcp = {}
+    
+        # Generate the sampler
+        emceeSampler = emcee.EnsembleSampler(nwalker, ndims, m.emceeLogPost, args=pargs, **emcp)
+    
+        if scales is None:
+            scales = {}
+    
+        # Generate starting values
+        pos = []
+        for _ in smo.range(nwalker):
+            pos.append(np.zeros(ndims))
+            for i, n in enumerate(fpns):
+                # Use 1e-8 unless scale is defined
+                s = (scales.get(n) or 1e-8)
+                pos[-1][i] = np.random.normal(fps[n], s)
+                
+        # Default value for state
+        state = None
+    
+        if sampleArgs["burn"] > 0:
+            # Run burn-in
+            pos, prob, state = emceeSampler.run_mcmc(pos, sampleArgs["burn"])
+            # Reset the chain to remove the burn-in samples.
+            emceeSampler.reset()
+    
+    else:
+        # Assign position and state from previous run
+        pos, state = ps
+    
+    if (not sampleArgs["progress"] is None) and ic.check["progressbar"]:
+        widgets = ['EMCEE progress: ', progressbar.Percentage(), ' ', progressbar.Bar(marker=progressbar.RotatingMarker()),
+                   ' ', progressbar.ETA()]
+        pbar = progressbar.ProgressBar(
+            widgets=widgets, maxval=sampleArgs["iters"]).start()
+    
+    n = 0
+    for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+        n += 1
+        if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
+            if ic.check["progressbar"]:
+                pbar.update(n)
+            else:
+                print("EMCEE: Reached iteration ",
+                      n, " of ", sampleArgs["iters"])
+    
+    # Save the chain to a file
+    if not dbfile is None:
+        np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability,
+                            pnames=np.array(fpns, dtype=np.unicode_))
+    
+    if toMAP:
+        # Set to lowest-deviance (highest likelihood) solution
+        indimin = np.argmax(emceeSampler.lnprobability)
+        for i, p in enumerate(fpns):
+            m[p] = emceeSampler.flatchain[indimin, i]
+    
+    return pos, state, emceeSampler
+    
+    
+    
+class Poly2(MBO2):
+
     def __init__(self):
         MBO2.__init__(self, ["c0", "c1", "c2"], rootName="Poly2")
     
     def evaluate(self, x, **kwargs):
         s = self._imap
         return s["c0"] + s["c1"]*x + s["c2"]*x**2
-    
-    def grad(self, x):
-        
     
