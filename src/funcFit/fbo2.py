@@ -592,7 +592,7 @@ class PStat(object):
     def logPost(self, *args, **kwargs):
         """ Get log of the posterior """
         lp = self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs)
-        md = self.margD()
+        md = self.margD(*args, **kwargs)
         if not md is None:
             lp -= md
         return lp
