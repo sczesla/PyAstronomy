@@ -18,12 +18,6 @@ import inspect
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
 
-if _pymcImport:
-    import pymc
-if _scoImport:
-    import scipy.optimize as sco
-if ic.check["emcee"]:
-    import emcee
 if ic.check["progressbar"]:
     import progressbar
 
@@ -587,15 +581,11 @@ class PStat(object):
         else:
             m = self.evaluate(x)
         
-        return -np.sum((m-y)**2/yerr**2)
+        return -0.5 * np.sum((m-y)**2/(yerr**2))
 
     def logPost(self, *args, **kwargs):
         """ Get log of the posterior """
-        lp = self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs)
-        md = self.margD(*args, **kwargs)
-        if not md is None:
-            lp -= md
-        return lp
+        return self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs) - (self.margD(*args, **kwargs) or 0.0)
   
     def setSPLikeObjf(self, f):
         
@@ -610,6 +600,8 @@ class PStat(object):
     
     objf = property(getSPLikeObjf, setSPLikeObjf)
 
+    def grad(self, *args, **kwargs):
+        raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
 
 class MBO2(PStat):
     """
@@ -690,7 +682,7 @@ class MBO2(PStat):
         
     def evaluate(self, *args, **kwargs):
         pass
-    
+
     def relate(self, dv, idv, func=None):
         self.pars.relate(dv, idv, func)
     
@@ -762,7 +754,7 @@ def _introdefarg(f, **kwargs):
     ----------
     f : callable
         A function to be inspected (e.g., sco.fmin)
-    kwargs : dinctionary
+    kwargs : dictionary
         Dictionary of arguments to be updated.
     
     Returns
@@ -876,4 +868,7 @@ class Poly2(MBO2):
     def evaluate(self, x, **kwargs):
         s = self._imap
         return s["c0"] + s["c1"]*x + s["c2"]*x**2
+    
+    def grad(self, x):
+        
     
