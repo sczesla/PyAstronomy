@@ -54,8 +54,9 @@ class PyAPa(object):
         self.restriction = (None, None)
     
     def restrict(self, lower=None, upper=None):
-        lin = lower is None
-        uin = upper is None
+        lin = not lower is None
+        uin = not upper is None
+        print(lower, upper, lin, uin)
         if lin+uin == 0:
             # No limits defined (or removed)
             pass
@@ -293,9 +294,25 @@ class PyABaSoS(object):
             raise(PE.PyAValError("No such parameter: " + str(n),
                                  solution="Use one of: " + ', '.join(list(self.pmap))))
     
+    def _lazyNameMatch(self, n):
+        """
+        """
+        try:
+            self._checkParam(n)
+            return n
+        except PE.PyAValError as e:
+            matches = [pn  for pn in list(self.pmap) if pn.find(n) != -1]
+            if len(matches) == 1:
+                return matches[0]
+            elif len(matches) > 1:
+                raise(PE.PyAValError("More than one match in lazy name matching for parameter '" + str(n) + "'. Matches: " + ', '.join(matches)))
+            else:
+                raise(PE.PyAValError("No match in lazy name matching for parameter '" + str(n) + "'."))
+            
+    
     def __getitem__(self, n):
         """ Get value of parameter """
-        self._checkParam(n)
+        n = self._lazyNameMatch(n)
         return self.pmap[n].value
     
     def getPRef(self, n):
@@ -305,7 +322,7 @@ class PyABaSoS(object):
     
     def __setitem__(self, n, v):
         """ Set value and update related if necessary """
-        self._checkParam(n)
+        n = self._lazyNameMatch(n)
         self.pmap[n].value = v
         if len(self.pmap[n].affects) > 0:
             for a in self.pmap[n].affects:
@@ -609,7 +626,7 @@ class PStat(object):
         elif len(args) == 3:
             x, y, yerr = args[0], args[1], args[2]
         else:
-            raise(PE.PyAValError("Invalid call to logL of PyABayDef. No. of arguments: " + str(len(args))))
+            raise(PE.PyAValError("Invalid call to logL of PStat. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
 
         if "_currentModel" in kwargs:
             m = kwargs["_currentModel"]
@@ -642,6 +659,7 @@ class PStat(object):
 
     def grad(self, *args, **kwargs):
         raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
+
 
 class MBO2(PStat):
     """
@@ -776,13 +794,18 @@ class MBO2(PStat):
         self.pars.setRestriction(restricts)
         for k, v in six.iteritems(restricts):
             self.pars._checkParam(k)
-            if not usesmooth:
-                self.addUniformPrior(k, lower=v[0], upper=v[1])
-            else:
-                self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=sscale)
+            if any([not b is None for b in v]):
+                # Discard cases were both limits are none
+                if not usesmooth:
+                    self.addUniformPrior(k, lower=v[0], upper=v[1])
+                else:
+                    self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=sscale)
             
     def getRestrictions(self):
         return self.pars.getRestrictions()
+    
+    def parameters(self):
+        return self.pars.parameters()
 
 
 
@@ -1105,4 +1128,79 @@ class Poly2(MBO2):
     def evaluate(self, x, **kwargs):
         s = self._imap
         return s["c0"] + s["c1"]*x + s["c2"]*x**2
+    
+
+class CeleriteModel(MBO2):
+    
+    def _nc(self, s):
+        """
+        Adjust parameter names
+        
+        Parameters
+        ----------
+        s : string
+            Parameter name from celerite
+        
+        Returns
+        -------
+        name : string
+            Adjusted name (here, 'kernel: ' removed)
+        """
+        s = s.replace("kernel:", "")
+        return s
+    
+    def __init__(self, gp, nc=None):
+        
+        # Name conversion
+        if nc is None:
+            # Use default naming convention
+            nc = self._nc
+        
+        # Save reference to GP
+        self.gp = gp
+        # Save parameter names (and the order)
+        self._pns = [nc(n) for n in gp.get_parameter_names(include_frozen=True)]
+        print("pns: ", self._pns)
+        
+        MBO2.__init__(self, self._pns, rootName="celmo", statmode="manual")
+        
+        for i, b in enumerate(self.gp.get_parameter_bounds(include_frozen=True)):
+            self.setRestriction({self._pns[i]:b})
+        
+    def _updateGPParams(self):
+        """ Assign current model parameters """
+        pv = np.zeros(len(self._pns))
+        for i, _ in enumerate(self.gp.get_parameter_names()):
+            pv[i] = self[self._pns[i]]
+        self.gp.set_parameter_vector(pv, include_frozen=True)
+    
+    def logL(self, *args, **kwargs):
+        """ Likelihood function for celerite GP """
+        self._updateGPParams()
+        ll = self.gp.log_likelihood(args[1])
+        return ll
+    
+    def evaluate(self, x):
+        return None
+    
+    def predict(self, px, y):
+        """
+        Get predicted mean and variance of GP
+        
+        Parameters
+        ----------
+        px : array
+            Position at which to evaluate the prediction
+        y : array
+            The data
+        
+        Returns
+        -------
+        mean, variance, std : arrays
+            Prediction
+        """
+        self._updateGPParams()
+        pred_mean, pred_var = self.gp.predict(y, px, return_var=True)
+        return pred_mean, pred_var, np.sqrt(pred_var)
+
     
