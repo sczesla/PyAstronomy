@@ -173,13 +173,13 @@ class TraceAnalysis:
         """
         if not fn is None:
             self._emceedat = np.load(fn)
-        self.emceepnames = list(self._emceedat["pnames"]) + ["deviance"]
+        self.emceepnames = list(self._emceedat["pnames"]) + ["lnp"]
         # Dummy tracesDic
         self.tracesDic = dict(
             zip(self.emceepnames, [None] * len(self.emceepnames)))
         # Build stateDic
-        self.stateDic = {"stochastics": dict(zip(list(self._emceedat["pnames"]), [
-                                             None] * len(list(self._emceedat["pnames"])))), "sampler": {}}
+        self.stateDic = {"stochastics": dict(zip(list(self.emceepnames), [
+                                             None] * len(list(self.emceepnames)))), "sampler": {}}
 
         # Flatten the chain
         s = self._emceedat["chain"].shape
@@ -207,8 +207,8 @@ class TraceAnalysis:
         self.emceelnp = self._emceedat["lnp"][selectedWalker, burn:]
         self.emceelnp = self.emceelnp.reshape(nchains * (s[1] - burn))
 
-        # Incorporate "deviance" into the usual chain
-        self.emceechain[::, -1] = -2.0 * self.emceelnp
+        # Incorporate ln(probability)
+        self.emceechain[::, -1] = self.emceelnp
 
         self.stateDic["sampler"]["_iter"] = self.emceechain.shape[0]
         self.stateDic["sampler"]["_burn"] = None
