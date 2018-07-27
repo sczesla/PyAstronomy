@@ -173,7 +173,7 @@ class TraceAnalysis:
         """
         if not fn is None:
             self._emceedat = np.load(fn)
-        self.emceepnames = list(self._emceedat["pnames"]) + ["lnpost", "lnprior", "lnl"]
+        self.emceepnames = list(self._emceedat["pnames"]) + ["lnp"]
         # Dummy tracesDic
         self.tracesDic = dict(
             zip(self.emceepnames, [None] * len(self.emceepnames)))
@@ -210,10 +210,8 @@ class TraceAnalysis:
             d = c.reshape(nchains * (s[1] - burn))
             return d
 
-        # Incorporate posterior, prior, and likelihood
-        self.emceechain[::, -1] = getprop("lnl")
-        self.emceechain[::, -2] = getprop("lnprior")
-        self.emceechain[::, -3] = getprop("lnpost")
+        # Incorporate ln(probability)
+        self.emceechain[::, -1] = self.emceelnp
 
         self.stateDic["sampler"]["_iter"] = self.emceechain.shape[0]
         self.stateDic["sampler"]["_burn"] = None
