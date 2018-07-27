@@ -296,6 +296,20 @@ class PyABaSoS(object):
     
     def _lazyNameMatch(self, n):
         """
+        Search by 'part of name'
+        
+        Searches the parameter map for occurrences of the specified
+        sub-string, tests whether it is unique, and returns the full
+        valid name if so. 
+        
+        Parameters
+        ----------
+        n : string
+            (Unique) Part of the parameter name
+            
+        Returns
+        -------
+        True name : string
         """
         try:
             self._checkParam(n)
@@ -857,7 +871,7 @@ def fitfmin1d(m, x, y, yerr=None, **kwargs):
     return fr
 
 
-def fitfmin_cobyla1d(m, x, y, cons=None, yerr=None, **kwargs):
+def fitfmin_cobyla1d(m, x, y, yerr=None, cons=None, **kwargs):
     """
     Use scipy's fitfmin_cobyla to fit 1d model.
     """
