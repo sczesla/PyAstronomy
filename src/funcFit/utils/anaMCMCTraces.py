@@ -206,9 +206,7 @@ class TraceAnalysis:
                                                             burn:, ::].reshape(nchains * (s[1] - burn), s[2])
         
         def getprop(prop):
-            print("xxx: ", prop, self._emceedat[prop].shape)
             c = self._emceedat[prop][selectedWalker, burn:]
-            print(c.shape, burn)
             d = c.reshape(nchains * (s[1] - burn))
             return d
 
