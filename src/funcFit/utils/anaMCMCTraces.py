@@ -320,6 +320,9 @@ class TraceAnalysis:
         # Set default burn-in and thinning
         self.burn = 0
         self.thin = 1
+        
+        # A set of chains by default belonging to a 'technical' set (not usually parameters)
+        self.technicalChains = ["lnprior", "lnl", "lnpost", "deviance"]
 
     def __getitem__(self, parm):
         """
@@ -361,11 +364,25 @@ class TraceAnalysis:
         info += "  Note: There is more information available using the state() method.\n"
         return info
 
-    def availableParameters(self):
+    def availableParameters(self, wtech=False):
         """
         Returns list of available parameter names.
+        
+        Parameters
+        ----------
+        wtech : boolean, optional
+            If True, include 'technical' traces (e.g., deviance and likelihood)
+            if available.
+        
+        Returns
+        -------
+        Parameters : list of strings
+            Available parameter traces
         """
-        return list(self.stateDic["stochastics"].keys())
+        if not wtech:
+            return [p for p in self.availableParameters(True) if p not in self.technicalChains]
+        else:
+            return list(self.stateDic["stochastics"].keys())
 
     def availableTraces(self):
         """
