@@ -173,7 +173,7 @@ class TraceAnalysis:
         """
         if not fn is None:
             self._emceedat = np.load(fn)
-        self.emceepnames = list(self._emceedat["pnames"]) + ["lnp"]
+        self.emceepnames = list(self._emceedat["pnames"]) + ["lnpost", "lnprior", "lnl"]
         # Dummy tracesDic
         self.tracesDic = dict(
             zip(self.emceepnames, [None] * len(self.emceepnames)))
@@ -201,14 +201,21 @@ class TraceAnalysis:
             raise(PE.PyAValError("You selected at least one walker beyond the valid range (0 - " + str(s[0] - 1) + ").",
                                  solution="Adjust walker selection."))
 
-        self.emceechain = np.zeros((nchains * (s[1] - burn), s[2] + 1))
-        self.emceechain[::, 0:-1] = self._emceedat["chain"][selectedWalker,
+        self.emceechain = np.zeros((nchains * (s[1] - burn), s[2] + 3))
+        self.emceechain[::, 0:-3] = self._emceedat["chain"][selectedWalker,
                                                             burn:, ::].reshape(nchains * (s[1] - burn), s[2])
-        self.emceelnp = self._emceedat["lnp"][selectedWalker, burn:]
-        self.emceelnp = self.emceelnp.reshape(nchains * (s[1] - burn))
+        
+        def getprop(prop):
+            print("xxx: ", prop, self._emceedat[prop].shape)
+            c = self._emceedat[prop][selectedWalker, burn:]
+            print(c.shape, burn)
+            d = c.reshape(nchains * (s[1] - burn))
+            return d
 
-        # Incorporate ln(probability)
-        self.emceechain[::, -1] = self.emceelnp
+        # Incorporate posterior, prior, and likelihood
+        self.emceechain[::, -1] = getprop("lnl")
+        self.emceechain[::, -2] = getprop("lnprior")
+        self.emceechain[::, -3] = getprop("lnpost")
 
         self.stateDic["sampler"]["_iter"] = self.emceechain.shape[0]
         self.stateDic["sampler"]["_burn"] = None
