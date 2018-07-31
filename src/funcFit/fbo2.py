@@ -648,8 +648,12 @@ class PStat(object):
         else:
             m = self.evaluate(x)
         
-#         print( -len(x)/2.0*np.log(2.*np.pi), - np.sum(np.log(yerr)), - 0.5 * np.sum((m-y)**2/(yerr**2)) )
-        return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        if hasattr(yerr, "__iter__"):
+            # yerr is an array
+            return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        else:
+            # yerr is a float
+            return -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
         
     def logPost(self, *args, **kwargs):
         """ Get log of the posterior """
