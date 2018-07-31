@@ -17,6 +17,7 @@ import scipy.optimize as sco
 import inspect
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
+from quantities.units.power import kW
 
 if ic.check["progressbar"]:
     import progressbar
@@ -647,15 +648,26 @@ class PStat(object):
         else:
             m = self.evaluate(x)
         
+#         print( -len(x)/2.0*np.log(2.*np.pi), - np.sum(np.log(yerr)), - 0.5 * np.sum((m-y)**2/(yerr**2)) )
         return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
-
+        
     def logPost(self, *args, **kwargs):
         """ Get log of the posterior """
-        return self.logPrior(*args, **kwargs) + self.logL(*args, **kwargs) - (self.margD(*args, **kwargs) or 0.0)
+        
+        lp = self.logPrior(*args, **kwargs)
+        ll = self.logL(*args, **kwargs)
+        md = self.margD(*args, **kwargs)
+        po = lp + ll  - (md or 0.0)
+        
+        if ("alllogs" in kwargs) and (kwargs["alllogs"] == True):
+            return po, (lp, ll)
+        
+        return po
 
     def emceeLogPost(self, *args, **kwargs):
         """ Get the log of the posterior assuming that first parameter is an array of free parameter values """
         self.setFreeParamVals(args[0])
+        kwargs["alllogs"] = True
         return self.logPost(*args[1:], **kwargs)
   
     def setSPLikeObjf(self, f):
@@ -1110,7 +1122,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
             widgets=widgets, maxval=sampleArgs["iters"]).start()
     
     n = 0
-    for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+    for pos, prob, state, blobs in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
         n += 1
         if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
             if ic.check["progressbar"]:
@@ -1119,9 +1131,23 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
                 print("EMCEE: Reached iteration ",
                       n, " of ", sampleArgs["iters"])
     
+    print(emceeSampler.blobs)
+    
     # Save the chain to a file
     if not dbfile is None:
-        np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability,
+        
+        def deblob(b):
+            """ Convert blob format (list of lists) into numpy arrays """
+            # Shape is (no. of walkers, length of chain)
+            lnprior = np.zeros( (len(b[0]), len(b)) )
+            lnl = np.zeros( (len(b[0]), len(b)) )
+            for i, blob in enumerate(b):
+                lnprior[::, i] = np.array([x[0] for x in blob])
+                lnl[::, i] = np.array([x[1] for x in blob])
+            return lnprior, lnl
+        
+        lnprior, lnl = deblob(emceeSampler.blobs)
+        np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnpost=emceeSampler.lnprobability, lnprior=lnprior, lnl=lnl,
                             pnames=np.array(fpns, dtype=np.unicode_))
     
     if toMAP:
