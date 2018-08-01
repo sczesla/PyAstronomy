@@ -3,6 +3,85 @@ import numpy as np
 from PyAstronomy.funcFit.utils import ic
 from PyAstronomy.pyaC import pyaErrors as PE
 import scipy.special as ss
+import scipy.stats as stats
+import six.moves as smo
+
+
+def pD_pr5(logpost, logftheta):
+    """
+    Estimate the marginal probability of the data
+    
+    This function estimates the marginal probability of the data using a modified version of
+    the harmonic mean of the likelihood estimator (KR95, Eq. 12); note that the actual estimate
+    is the inverse of the expression given in KR95, Eq. 12.
+    
+    The choice of the weighting density f is non-trivial. KR95 argue that high efficiency is
+    likely attained if f is roughly proportional to the posterior density. Depending on the
+    choice of f, results may be very good or poor.
+    
+    Parameters
+    ----------
+    logPost : array
+        Natural logarithm of the posterior probability used for estimation, e.g., computed
+        using a Markov Chain.
+    ftheta : array
+        Natural logarithm of the weighting density (f) corresponding to the respective
+        value of the posterior probability.
+        
+    Returns
+    -------
+    ln(pD) : float
+        Natural logarithm of the marginal probability of the data.
+    """
+    return -(-np.log(len(logpost)) + ss.logsumexp(logftheta-logpost))
+    
+    
+def pD_pr5_mvg(ta, cs=1.0, cm=None, mean=None):
+    """
+    Use pD_pr5 to estimate marginal probability of prior using multivariate Gaussian is weighting density
+    
+    Parameters
+    ----------
+    ta : TraceAnalysis object
+        Holds the chains, parameter names, etc.
+    cm : (n x n) array, optional
+        The covariance matrix (n denotes the number of chains). If not given,
+        the `correlationMatrix` method of TraceAnalysis is used to estimate it.
+        The order of parameters is defined by the result of `availableParameters`
+        if TraceAnalysis.
+    cs : float, optional
+        To define the weighting density, the covariance matrix is scaled by this
+        factor. The default is 1.
+    mean : 1-d array of length n, optional
+        The means to be used for the multivariate Gaussian (see cm for comments on
+        the order of parameters).
+    
+    Returns
+    -------
+    ln(pD) : float
+        Natural logarithm of the marginal probability of the data.
+    mean : array
+        The means used in defining the multivariate Gaussian
+    cm : array
+        The covariance matrix (scaled by `cs`) used in the definition of
+        the multivariate Gaussian.
+    """
+    aps = ta.availableParameters()
+    N = len(ta[aps[0]])
+    if cm is None:
+        cm = ta.correlationMatrix(covariance=True, toScreen=False)[1]
+    if mean is None:
+        mean = np.array([np.mean(ta[p]) for p in aps])
+        
+    mvn = stats.multivariate_normal(mean, cm*cs)
+    
+    lnf = np.zeros(N)
+    for i in smo.range(N):
+        lnf[i] = mvn.logpdf(np.array([ta[p][i] for p in aps]))
+    
+    return pD_pr5(ta["lnpost"], lnf), mean, cm*cs
+    
+
 
 def pD_pr2(logl):
     """
