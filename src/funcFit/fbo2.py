@@ -779,8 +779,8 @@ class MBO2(PStat):
             lines.append(l)
         lines.append("Priors: ")
         if len(self.priors) > 0:
-            for p in self.priors:
-                lines.append(" "*4 + str(p))
+            for i, p in enumerate(self.priors, 1):
+                lines.append(" "*4 + ("%2d) " % i) + str(p))
         else:
             lines.append("    All uniform (=1)")
         
