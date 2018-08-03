@@ -69,11 +69,14 @@ class PyAPa(object):
     def isRestricted(self):
         return any([(not r is None) for r in self.restriction])
     
+    def isRelated(self):
+        return (not self.relation is None)
+    
     def updateRelation(self):
         """
         Update value according to relation
         """
-        if not self.relation is None:
+        if self.isRelated():
             self._value = self.relation.update()
 
       
@@ -625,7 +628,7 @@ class PStat(object):
         """
         self.pars._checkParam(pn)
         descr = "Scale prior on '" + str(pn) + "' (exponent = %g)" % m
-        self.priors.append(PyAScalePrior(self.getPRef(pn), m))
+        self.priors.append(PyAScalePrior(self.getPRef(pn), m, descr=descr))
         
     def addPrior(self, p):
         pass
@@ -765,8 +768,28 @@ class MBO2(PStat):
         return result
 
     def parameterSummary(self):
+        # Max length of parameter name
+        mpl = max([len(n) for n in list(self.parameters())])
+        lines = []
+        tf = {True:"T", False:"F"}
         for k, v in self.pars.pmap.items():
-            print(k, v.value)
+            l = "    " + ("%" + str(mpl) + "s") % k + " = % 12g" % v.value
+            l += ", free: " + tf[v.free] + ", restricted: " + tf[v.isRestricted()]
+            l += ", related: " + tf[v.isRelated()]
+            lines.append(l)
+        lines.append("Priors: ")
+        if len(self.priors) > 0:
+            for p in self.priors:
+                lines.append(" "*4 + str(p))
+        else:
+            lines.append("    All uniform (=1)")
+        
+        
+        mll = max([len(l) for l in lines])
+        print("-" * (mll//3) + " Parameter summary " + "-"*(mll-mll//3-19) )
+        for l in lines:
+            print(l)
+        print("-" * mll)
         
     def evaluate(self, *args, **kwargs):
         pass
