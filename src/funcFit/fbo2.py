@@ -1111,7 +1111,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
     
         if sampleArgs["burn"] > 0:
             # Run burn-in
-            pos, prob, state = emceeSampler.run_mcmc(pos, sampleArgs["burn"])
+            pos, prob, state, blobs = emceeSampler.run_mcmc(pos, sampleArgs["burn"])
             # Reset the chain to remove the burn-in samples.
             emceeSampler.reset()
     
