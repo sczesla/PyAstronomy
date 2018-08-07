@@ -94,7 +94,7 @@ def pD_pr5_mvg(ta, cs=1.0, cm=None, mean=None):
 
 def pD_pr2(logl):
     """
-    Estimate the marginal likelihood of the data
+    Estimate the marginal likelihood of the data using the Harmonic Mean Estimator (HME)
     
     This function estimates the marginal likelihood of the data using the harmonic
     mean of the likelihood (KR95, Eq. 11).
@@ -102,10 +102,13 @@ def pD_pr2(logl):
     The resulting estimate is known to be unstable and is often dominated by extreme points.
     Although the estimate can be shown to converge to the "correct" value, its distribution
     does not generally correspond to a Gaussian shrinking in width as the number of points
-    increases (Gaussian central limit theorem). See KR95 for further discussion.
+    increases (Gaussian central limit theorem). In fact, its convergence can be shown to be
+    exceedingly slow when the prior is less informative than the likelihood, which is the
+    case in almost all practical applications (see Wolpert and Schmidler 2012, Statistica
+    Sinica 22, 1233-1251). Therefore, the HME should be used with care.
     
-    KR95: Kass, Robert E., and Adrian E. Raftery. "Bayes Factors." Journal of the American Statistical Association 90, no. 430
-    (1995): 773-95. doi:10.2307/2291091.
+    KR95: Kass, Robert E., and Adrian E. Raftery. "Bayes Factors." Journal of the American
+    Statistical Association 90, no. 430 (1995): 773-95. doi:10.2307/2291091.
     
     Parameters
     ----------
