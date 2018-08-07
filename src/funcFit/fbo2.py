@@ -57,7 +57,6 @@ class PyAPa(object):
     def restrict(self, lower=None, upper=None):
         lin = not lower is None
         uin = not upper is None
-        print(lower, upper, lin, uin)
         if lin+uin == 0:
             # No limits defined (or removed)
             pass
@@ -182,7 +181,33 @@ class PyAScalePrior(PyAPrior):
             return m*np.log(x)
         
         PyAPrior.__init__(self, ivs, f, descr=descr)
-      
+
+
+class PyACauchyPrior(PyAPrior):
+    
+    def __init__(self, ivs, scale, x0=0., side="both", descr=""):
+
+        def f(x):
+            
+            pdf = np.log(scale) - np.log(np.pi) - np.log(scale**2 + (x-x0)**2)
+            if side == "both":
+                return pdf
+            elif side == "positive":
+                if (x < x0):
+                    return -np.inf
+                # An extra factor accounts for the 'missing' other side
+                return np.log(2.) + pdf
+            elif side == "negative":
+                if (x > x0):
+                    return -np.inf
+                # An extra factor accounts for the 'missing' other side
+                return np.log(2.) + pdf
+            else:
+                raise(PE.PyAValError("Unknown side parameter in PyACauchyPrior (" + str(side) + ")", \
+                                     solution="Use either of 'both', 'positive', 'negative'"))
+        
+        PyAPrior.__init__(self, ivs, f, descr=descr)
+ 
       
 class PyABPS(object):
     """
@@ -584,6 +609,11 @@ class PStat(object):
                 return result
         return result
     
+    def _too(self, x, d):
+        if x is None:
+            return d
+        return x
+    
     def addUniformPrior(self, pn, lower=None, upper=None):
         """
         Add a uniform prior
@@ -596,7 +626,7 @@ class PStat(object):
             Lower and upper bounds
         """
         self.pars._checkParam(pn)
-        descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (lower or -np.inf, upper or np.inf)
+        descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (self._too(lower, -np.inf), self._too(upper, np.inf))
         self.priors.append(PyAUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
       
     def addSmoothUniformPrior(self, pn, lower=None, upper=None, scale=1e-9):
@@ -612,7 +642,7 @@ class PStat(object):
         """
         self.pars._checkParam(pn)
         descr = "Smooth uniform prior on '" + str(pn) + "' (lower = %g, upper = %g, scale = %g)" % \
-                (lower or -np.inf, upper or np.inf, scale)
+                (self._too(lower, -np.inf), self._too(upper, np.inf), scale)
         self.priors.append(PyASmoothUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
         
     def addScalePrior(self, pn, m):
@@ -629,6 +659,28 @@ class PStat(object):
         self.pars._checkParam(pn)
         descr = "Scale prior on '" + str(pn) + "' (exponent = %g)" % m
         self.priors.append(PyAScalePrior(self.getPRef(pn), m, descr=descr))
+        
+    def addCauchyPrior(self, pn, x0, scale, side):
+        """
+        Add Cauchy prior of the form scale / (pi*(scale**2 + (x-x0)**2)).
+        
+        The density is multiplied by two of a one-sided version is desired.
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        x0 : float
+            Location parameter of the distribution
+        scale : float
+            Scale parameter of the distribution
+        side : string, {both, positive, negative}
+            Use 'positive' to rule out values lower than x0 and negative for
+            the reverse. Use 'both' to allow both sides of the center.
+        """
+        self.pars._checkParam(pn)
+        descr = "Cauchy prior on '" + str(pn) + "' (scale = %g, location = %g, side = %s)" % (scale, x0, side)
+        self.priors.append(PyACauchyPrior(self.getPRef(pn), scale, x0, side, descr=descr))
         
     def addPrior(self, p):
         pass
@@ -662,6 +714,12 @@ class PStat(object):
         """ Get log of the posterior """
         
         lp = self.logPrior(*args, **kwargs)
+        if np.isinf(lp):
+            if ("alllogs" in kwargs) and (kwargs["alllogs"] == True):
+                return -np.inf, (-np.inf, -np.inf)
+            else:
+                return -np.inf
+        
         ll = self.logL(*args, **kwargs)
         md = self.margD(*args, **kwargs)
         po = lp + ll  - (md or 0.0)
@@ -681,7 +739,10 @@ class PStat(object):
         
         def objf(self, *args, **kwargs):
             self.setFreeParamVals(args[0])
-            return f(self, *args, **kwargs)
+            v = f(self, *args, **kwargs)
+            if not np.isfinite(v):
+                PE.PyAValError("Infinite value encountered in objective function for parameters: " + str(args[0]) + ", free parameters : " + ",".join(self.freeParamNames()))
+            return v
         
         self._objf = types.MethodType(objf, self)
         
@@ -767,20 +828,28 @@ class MBO2(PStat):
                                            self.leftCompo.evaluate(*args, **kwargs) ** self.rightCompo.evaluate(*args, **kwargs), result)
         return result
 
-    def parameterSummary(self):
+    def parameterSummary(self, toScreen=True, prefix=""):
+        """
+        Parameter summary
+        
+        Returns
+        -------
+        Summary : list of lines
+            The summary as a list of lines
+        """
         # Max length of parameter name
         mpl = max([len(n) for n in list(self.parameters())])
         lines = []
         tf = {True:"T", False:"F"}
         for k, v in self.pars.pmap.items():
-            l = "    " + ("%" + str(mpl) + "s") % k + " = % 12g" % v.value
+            l = prefix + "    " + ("%" + str(mpl) + "s") % k + " = % 12g" % v.value
             l += ", free: " + tf[v.free] + ", restricted: " + tf[v.isRestricted()]
             l += ", related: " + tf[v.isRelated()]
             lines.append(l)
-        lines.append("Priors: ")
+        lines.append(prefix + "Priors: ")
         if len(self.priors) > 0:
             for i, p in enumerate(self.priors, 1):
-                lines.append(" "*4 + ("%2d) " % i) + str(p))
+                lines.append(prefix + " "*4 + ("%2d) " % i) + str(p))
         else:
             lines.append("    All uniform (=1)")
         
@@ -790,6 +859,7 @@ class MBO2(PStat):
         for l in lines:
             print(l)
         print("-" * mll)
+        return lines
         
     def evaluate(self, *args, **kwargs):
         pass
@@ -979,6 +1049,13 @@ def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
 def fitfmin_l_bfgs_b1d(m, x, y, yerr=None, **kwargs):
     """
     Use scipy's fmin_l_bfgs_b to fit 1d model.
+    
+    Parameters
+    ----------
+    userBounds : dictionary, optional
+        Maps parameter name to a tuple of the form (lower, upper) bound.
+        If given, the bounds given there will overrule those specified
+        in the form of restrictions (should there by any).
     """
     # Get keywords and default arguments
     defargs, _ = _introdefarg(sco.fmin_l_bfgs_b, **kwargs)
@@ -988,11 +1065,15 @@ def fitfmin_l_bfgs_b1d(m, x, y, yerr=None, **kwargs):
     else:
         defargs["args"] = (x, y)
     
+    userBounds = kwargs.get("userBounds") or {}
+    
     rs = m.getRestrictions()
     bounds = []
     # Loop over freeParamNames (get order right)
     for i, p in enumerate(m.freeParamNames()):
-        if p in rs:
+        if p in userBounds:
+            bounds.append(userBounds[p])
+        elif p in rs:
             # There is a restriction for this parameter
             bounds.append(rs[p])
         else:
@@ -1178,7 +1259,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
                             pnames=np.array(fpns, dtype=np.unicode_))
     
     if toMAP:
-        # Set to lowest-deviance (highest likelihood) solution
+        # Set to Maximum-A-Posteriori solution
         indimin = np.argmax(emceeSampler.lnprobability)
         for i, p in enumerate(fpns):
             m[p] = emceeSampler.flatchain[indimin, i]
@@ -1227,9 +1308,12 @@ class CeleriteModel(MBO2):
         self.gp = gp
         # Save parameter names (and the order)
         self._pns = [nc(n) for n in gp.get_parameter_names(include_frozen=True)]
-        print("pns: ", self._pns)
         
         MBO2.__init__(self, self._pns, rootName="celmo", statmode="manual")
+        
+        vals = gp.get_parameter_vector(include_frozen=True)
+        for i, n in enumerate(self._pns):
+            self[n] = vals[i]
         
         for i, b in enumerate(self.gp.get_parameter_bounds(include_frozen=True)):
             self.setRestriction({self._pns[i]:b})
