@@ -130,7 +130,9 @@ def bayesFactors(model1, model2):
     """
     Computes the Bayes factor for two competing models.
 
-    The computation is based on Newton & Raftery 1994 (Eq. 13).
+    The computation is based on the Harmonic Mean Estimator (Newton & Raftery 1994,
+    Eq. 13). Note that the convergence of this estimator can be extremely poor (see
+    documentation of pD_pr2).
 
     Parameters
     ----------
