@@ -9,15 +9,17 @@ import six.moves as smo
 
 def pD_pr5(logpost, logftheta):
     """
-    Estimate the marginal likelihood of the data
+    Estimate the marginal likelihood of the data using a modified Harmonic Mean Estimator (HME)
     
     This function estimates the marginal likelihood of the data using a modified version of
-    the harmonic mean of the likelihood estimator (KR95, Eq. 12); note that the actual estimate
+    the HME (Gelfand and Dey 1994, KR95, Eq. 12); note that the actual estimate
     is the inverse of the expression given in KR95, Eq. 12.
     
     The choice of the weighting density f is non-trivial. KR95 argue that high efficiency is
     likely attained if f is roughly proportional to the posterior density. Depending on the
-    choice of f, results may be very good or poor.
+    choice of f, results may be very good or poor. Wolpert and Schmidler (2012) note that the
+    performance of this modified HME can also be very poor if the tails of the weighting density
+    are heavier than that of the posterior.
     
     KR95: Kass, Robert E., and Adrian E. Raftery. "Bayes Factors." Journal of the American Statistical Association 90, no. 430
     (1995): 773-95. doi:10.2307/2291091.
