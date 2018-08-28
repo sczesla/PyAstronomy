@@ -209,6 +209,8 @@ setup(cmdclass={"with-ext": WithExtCommand},
       package_data=package_data,
       author='PyA group',
       author_email='stefan.czesla@hs.uni-hamburg.de',
+      licence='MIT Licence',
+      classifiers=["License :: OSI Approved :: MIT License"],
       )
 
 if not withExt:
