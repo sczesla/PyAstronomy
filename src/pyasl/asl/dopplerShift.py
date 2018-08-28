@@ -100,25 +100,19 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05):
     nflux = f(wvl)
 
     if edgeHandling == "firstlast":
-        firsts = []
-        # Search for first non-NaN value save indices of
-        # leading NaN values
-        for i in smo.range(len(nflux)):
-            if np.isnan(nflux[i]):
-                firsts.append(i)
-            else:
-                firstval = nflux[i]
-                break
-        # Do the same for trailing NaNs
-        lasts = []
-        for i in smo.range(len(nflux) - 1, 0, -1):
-            if np.isnan(nflux[i]):
-                lasts.append(i)
-            else:
-                lastval = nflux[i]
-                break
-        # Use first and last non-NaN value to
-        # fill the nflux array
-        nflux[firsts] = firstval
-        nflux[lasts] = lastval
+        # Not is-NaN
+        nin = ~np.isnan(nflux)
+        if not nin[0]:
+            # First element in invalid (NaN)
+            # Find index of first valid (not NaN) element
+            fvindex = np.argmax(nin)
+            # Replace leading elements
+            nflux[0:fvindex] = nflux[fvindex]
+        if not nin[-1]:
+            # Last element is invalid
+            # Index of last valid element
+            lvindex = -np.argmax(nin[::-1])-1
+            # Replace trailing elements
+            nflux[lvindex+1:] = nflux[lvindex]
+
     return nflux, wlprime
