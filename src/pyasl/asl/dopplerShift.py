@@ -5,15 +5,18 @@ from PyAstronomy.pyaC import pyaErrors as PE
 import six.moves as smo
 
 
-def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None):
+def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05):
     """
     Doppler shift a given spectrum.
 
-    A simple algorithm to apply a Doppler shift
-    to a spectrum. This function, first, calculates
+    An algorithm to apply a Doppler shift
+    to a spectrum. The idea here is to obtain a shifted spectrum
+    without loosing the wavelength axis. Therefore,
+    this function, first, calculates
     the shifted wavelength axis and, second, obtains
     the new, shifted flux array at the old, unshifted
-    wavelength points by linearly interpolating.
+    wavelength points by linearly interpolating. No
+    relativistic effects are considered.
 
     Due to the shift, some bins at the edge of the
     spectrum cannot be interpolated, because they
@@ -53,6 +56,9 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None):
     fillValue : float, optional
         If the "fillValue" is specified as edge handling method,
         the value used to fill the edges of the output spectrum.
+    vlim : float, optional
+        Maximal fraction of the speed of light allowed for Doppler
+        shift, v. Default is 0.05.
 
     Returns
     -------
@@ -61,8 +67,27 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None):
     wlprime : array
         The shifted wavelength axis.
     """
+    # Order check
+    if np.any(np.diff(wvl) < 0.0):
+        raise(PE.PyAValError("Wavelength axis must be sorted in ascending order.", \
+                             solution="Use sorted axis.")) 
+        
+    # Speed of light [km/s]
+    cvel = 299792.458
+    
+    if np.abs(v) > vlim*cvel:
+        raise(PE.PyAValError("Specified velocity of % g km/s exceeds %g %% of the speed of light. No relativistic effects are considered in this implementation." % (v, vlim*100.), \
+                             where="dopplerShift", \
+                             solution="Increase 'vlim' if you wish to suppress this error."))
+    
     # Shifted wavelength axis
-    wlprime = wvl * (1.0 + v / 299792.458)
+    wlprime = wvl * (1.0 + v / cvel)
+
+    # Overlap check
+    if (wlprime[0] >= wvl[-1]) or (wlprime[-1] <= wvl[0]):
+        raise(PE.PyAValError("The shifted wavelength axis shows no overlap with the input axis. The velocity shift of %g km/s is too large." % v, \
+                             where="dopplerShift", \
+                             solution=["Use smaller shifts", "Please consider another implementation. Also note that the treatment here is not relativistic."]))
 
     fv = np.nan
     if edgeHandling == "fillValue":
