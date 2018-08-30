@@ -853,12 +853,12 @@ class MBO2(PStat):
         else:
             lines.append("    All uniform (=1)")
         
-        
-        mll = max([len(l) for l in lines])
-        print("-" * (mll//3) + " Parameter summary " + "-"*(mll-mll//3-19) )
-        for l in lines:
-            print(l)
-        print("-" * mll)
+        if toScreen:
+            mll = max([len(l) for l in lines])
+            print("-" * (mll//3) + " Parameter summary " + "-"*(mll-mll//3-19) )
+            for l in lines:
+                print(l)
+            print("-" * mll)
         return lines
         
     def evaluate(self, *args, **kwargs):
