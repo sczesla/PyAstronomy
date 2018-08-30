@@ -832,6 +832,13 @@ class MBO2(PStat):
         """
         Parameter summary
         
+        Parameters
+        ----------
+        toScreen : boolean, optional
+            If True (default), the parameter summary is printed to screen.
+        prefix : string, optional
+            If specified, the prefix is added at the front of all lines.
+        
         Returns
         -------
         Summary : list of lines
