@@ -578,24 +578,92 @@ class PyABaSoS(object):
         self._updatepmap()
       
 
+
+
+def _gaussLogL(self, *args, **kwargs):
+    """
+    Default implementation of Gaussian likelihood.
+    
+    Parameters
+    ----------
+    x, y : arrays
+        The x and y coordinates of the data points.
+    yerr : array or float, optional
+        If not specified, a value of 1.0 will be assumed. Otherwise interpreted as
+        the error of the data points.
+    
+    Returns
+    -------
+    lnl : float
+        The natural logarithm of the likelihood based on a model f(x), data points (x,y), and
+        normal errors, yerr.
+    """
+    if len(args) == 2:
+        x, y = args[0], args[1]
+        yerr = 1.0
+    elif len(args) == 3:
+        x, y, yerr = args[0], args[1], args[2]
+    else:
+        raise(PE.PyAValError("Invalid call to _gaussLogL. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
+
+    if "_currentModel" in kwargs:
+        m = kwargs["_currentModel"]
+    else:
+        m = self.evaluate(x)
+    
+    if hasattr(yerr, "__iter__"):
+        # yerr is an array
+        return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
+    else:
+        # yerr is a float
+        return -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
+
+
 class PStat(object):
     
-    def setStatMode(self, mode):
-        if mode == "default":
-            self.logL = self._deflogL
-        elif (mode is None) or (mode == "manual"):
+    def setlogL(self, logl):
+        """ Assign logL method """
+        
+        if isinstance(logl, six.string_types): 
+            # Specification by string
+            if logl == "defGauss":
+                self.logL = types.MethodType(_gaussLogL, self)
+            else:
+                raise(PE.PyAValError("Unknown mode for PStat: " + str(logl)))
+        elif hasattr(logl, "__call__"):
+            # It is a callable
+            self.logL = types.MethodType(logl, self)
+        elif logl is None:
+            # Do nothing here
             pass
         else:
-            raise(PE.PyAValError("Unknown mode for PyABay: " + str(mode)))
+            raise(PE.PyAValError("logl is neither a string nor a callable nor None.", \
+                                 where="PStat"))
     
-    def __init__(self, statmode="default"):
+    def __init__(self, logl, objf):
         self.priors = []
-        self.setStatMode(statmode)
-        self.statmode = statmode
+        self.setlogL(logl)
+        self.loglmode = str(logl)
         
-        def defobjf(self, *args, **kwargs):
-            return -self.logPost(*args[1:], **kwargs)
-            
+        # Set the objective function to 
+        if objf == "nlnP":
+            # Set objective function to negative posterior probability
+            def defobjf(self, *args, **kwargs):
+                return -self.logPost(*args[1:], **kwargs)
+        elif objf == "nlnL":
+            # Set objective function to negative posterior probability
+            def defobjf(self, *args, **kwargs):
+                return -self.logL(*args[1:], **kwargs)
+        elif objf is None:
+            # Do nothing and let user act later
+            pass
+        else:
+            raise(PE.PyAValError("Unknown objf :" + str(objf), \
+                                 where="PStat", \
+                                 solution="Use either of 'nlnP' and 'nlnL' or None."))
+        
+        # Set the objective function. Note that 'objf' is a property and
+        # actually setSPLikeObjf is invoked.
         self.objf = defobjf
         
     def logL(self, *args, **kwargs):
@@ -685,33 +753,38 @@ class PStat(object):
     def addPrior(self, p):
         pass
     
-    def margD(self, *args, **kwargs):
+    def mlD(self, *args, **kwargs):
+        """
+        Get marginal likelihood of the data (if known)
+        
+        Returns
+        -------
+        mlD : float
+            Natural logarithm of the likelihood of the data if known
+            and None otherwise.
+        """
         return None
-
-    def _deflogL(self, *args, **kwargs):
-        
-        if len(args) == 2:
-            x, y = args[0], args[1]
-            yerr = 1.0
-        elif len(args) == 3:
-            x, y, yerr = args[0], args[1], args[2]
-        else:
-            raise(PE.PyAValError("Invalid call to logL of PStat. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
-
-        if "_currentModel" in kwargs:
-            m = kwargs["_currentModel"]
-        else:
-            m = self.evaluate(x)
-        
-        if hasattr(yerr, "__iter__"):
-            # yerr is an array
-            return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
-        else:
-            # yerr is a float
-            return -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
         
     def logPost(self, *args, **kwargs):
-        """ Get log of the posterior """
+        """
+        Get natural logarithm of the posterior
+        
+        Parameters
+        ----------
+        alllogs : boolean, optional
+            If given and set True, also a tuple is returned, holding the logarithm
+            of the priors and the likelihood separately.
+        
+        Returns
+        -------
+        lnp : float
+            The (natural) logarithm of the posterior. The posterior is normalized if
+            the marginal likelihood of the data is known and specified by the `mlD`
+            method.
+        pandl : tuple of floats, optional
+            Tuple holding the natural logarithms of the priors and the likelihood.
+            Only returned if alllogs is given and True.
+        """
         
         lp = self.logPrior(*args, **kwargs)
         if np.isinf(lp):
@@ -721,7 +794,7 @@ class PStat(object):
                 return -np.inf
         
         ll = self.logL(*args, **kwargs)
-        md = self.margD(*args, **kwargs)
+        md = self.mlD(*args, **kwargs)
         po = lp + ll  - (md or 0.0)
         
         if ("alllogs" in kwargs) and (kwargs["alllogs"] == True):
@@ -730,12 +803,38 @@ class PStat(object):
         return po
 
     def emceeLogPost(self, *args, **kwargs):
-        """ Get the log of the posterior assuming that first parameter is an array of free parameter values """
+        """
+        Get the logarithm of the posterior assuming that the first parameter is an array of free parameter values
+        
+        Sets the values of the free parameters to the specified values
+        and evaluates the posterior probability. An implementation which
+        can easily combined with sampling by emcee.
+        
+        Parameters
+        ----------
+        P : array
+            An array holding values for the free parameters
+        
+        Returns
+        -------
+        lp : float
+            Natural logarithm of the posterior
+        """
         self.setFreeParamVals(args[0])
         kwargs["alllogs"] = True
         return self.logPost(*args[1:], **kwargs)
   
     def setSPLikeObjf(self, f):
+        """
+        Set SciPy (SP) like objective function.
+        
+        Parameters
+        ----------
+        f : callable
+            The scipy-like objective function to be assigned. A scipy-like objective function is one
+            which takes as its first argument an array holding the values of the free parameters. The
+            function may take any number of additional arguments and keywords.
+        """
         
         def objf(self, *args, **kwargs):
             self.setFreeParamVals(args[0])
@@ -747,6 +846,7 @@ class PStat(object):
         self._objf = types.MethodType(objf, self)
         
     def getSPLikeObjf(self):
+        """ Get the SciPy-like objective function """
         return self._objf
     
     objf = property(getSPLikeObjf, setSPLikeObjf)
@@ -768,8 +868,8 @@ class MBO2(PStat):
     
     """
     
-    def __init__(self, pars, rootName="", statmode="default"):
-        PStat.__init__(self, statmode=statmode)
+    def __init__(self, pars, rootName="", logl="defGauss", objf="nlnP"):
+        PStat.__init__(self, logl=logl)
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
         
@@ -1316,7 +1416,7 @@ class CeleriteModel(MBO2):
         # Save parameter names (and the order)
         self._pns = [nc(n) for n in gp.get_parameter_names(include_frozen=True)]
         
-        MBO2.__init__(self, self._pns, rootName="celmo", statmode="manual")
+        MBO2.__init__(self, self._pns, rootName="celmo", logl=None)
         
         vals = gp.get_parameter_vector(include_frozen=True)
         for i, n in enumerate(self._pns):
