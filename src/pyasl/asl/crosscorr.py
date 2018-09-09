@@ -113,7 +113,7 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edg
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
     if (tw[-1] + dwlmin) < w[-1]:
-      raise(PE.PyAValError("he maximum wavelength is not covered by the template for all indicated RV shifts.", \
+      raise(PE.PyAValError("The maximum wavelength is not covered by the template for all indicated RV shifts.", \
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
   elif mode == "doppler":
@@ -121,7 +121,7 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edg
     maxwl = tw[-1] * (1.0+rvmin/c)
     minwl = tw[0] * (1.0+rvmax/c)
     if minwl > w[0]:
-      raise(PE.PyAValError("he minimum wavelength is not covered by the template for all indicated RV shifts.", \
+      raise(PE.PyAValError("The minimum wavelength is not covered by the template for all indicated RV shifts.", \
                            where="crosscorrRV", \
                            solution=["Provide a larger template", "Try to use skipedge"]))
     if maxwl < w[-1]:
