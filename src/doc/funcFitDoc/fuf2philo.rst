@@ -13,8 +13,10 @@ depends on :math:`f(x_i)` and :math:`y_i` alone. Consequently, OneDFit has been
 efficiently and successfully used in a great number of application, which it handles
 well.
 
-An element of OneDFit which did stand the test of time is its concept of parameter management.
-From our point of view, 
+One particular element of OneDFit, which stood the test of time is its concept
+of parameter management, which involves addressing the parameters by 'name',
+freeze and thaw them in the fitting (and sampling) process, restrict their ranges,
+and so on. The fundamentals of this concept should be preserved.
 
 Unfortunately,
 an inconvenient situation arises when the objective function also depends on the
@@ -34,6 +36,7 @@ of course, ever more cumbersome and, thus, error prone coding.
 To handle such situations more efficiently and embed the model in a natural Bayesian
 environment, a new model class is therefore quite desirable.
 
+
 How to remedy the shortcomings?
 ----------------------------------
 
@@ -41,12 +44,17 @@ Many of the above-mentioned inconveniences can be alleviated by a slight shift i
 in particular, by making the objective function a central element of the model class
 rather than `evaluate`. This immediately resolves the complications brought about
 by objective functions depending also on the parameter values. The ultimate reason is that the
-step represented by the `evaluate` method in OneDFit is logically situated before the evaluation
-of the objective function and actually does not even always strictly require the first.
+step represented by the `evaluate` method in OneDFit is logically prior to the evaluation
+of the objective function. Actually evaluation does not even always strictly require a complete
+evaluation of the model.
 
+
+What objective function
 
 
 In the Bayesian context, the most 
 (unnormalized) posterior probability density 
 The choice of the posterior is most natural in a Bayesian context
+
+
 
