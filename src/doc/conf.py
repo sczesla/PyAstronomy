@@ -28,14 +28,23 @@ for mod_name in MOCK_MODULES:
 # generate autosummary pages
 autosummary_generate = True
 
+# Handle png vs img math
+mathext = ""
+try:
+    import sphinx.ext.pngmath
+    mathext = "sphinx.ext.pngmath"
+except ImportError:
+    mathext = "sphinx.ext.imgmath"
+    
+
 extensions = []
 try:
     import numpydoc
     extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo',
-                  'sphinx.ext.pngmath', 'numpydoc', 'sphinx.ext.autosummary']
+                  mathext, 'numpydoc', 'sphinx.ext.autosummary']
 except:
     extensions = ['sphinx.ext.autodoc',
-                  'sphinx.ext.todo', 'sphinx.ext.pngmath']
+                  'sphinx.ext.todo', mathext]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
