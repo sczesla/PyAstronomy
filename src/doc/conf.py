@@ -4,13 +4,13 @@ sys.path.append("./..")
 from PyA_Version import PyA_Version
 
 import mock
- 
-MOCK_MODULES = ['scipy', 'scipy.stats', 'scipy.special', 'scipy.optimize', 'scipy.interpolate', 'scipy.integrate', 'scipy.misc', \
-                'pymc', 'matplotlib', 'emcee', \
-                'matplotlib.pylab', '_tkinter', 'Tkinter', 'matplotlib.backends', 'matplotlib.backends.backend_tkagg', \
+
+MOCK_MODULES = ['scipy', 'scipy.stats', 'scipy.special', 'scipy.optimize', 'scipy.interpolate', 'scipy.integrate', 'scipy.misc',
+                'pymc', 'matplotlib', 'emcee',
+                'matplotlib.pylab', '_tkinter', 'Tkinter', 'matplotlib.backends', 'matplotlib.backends.backend_tkagg',
                 'matplotlib.figure', 'astropy', 'astropy.table', 'astropy.io']
 for mod_name in MOCK_MODULES:
-  sys.modules[mod_name] = mock.Mock()
+    sys.modules[mod_name] = mock.Mock()
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -30,10 +30,12 @@ autosummary_generate = True
 
 extensions = []
 try:
-  import numpydoc
-  extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.pngmath', 'numpydoc', 'sphinx.ext.autosummary']
+    import numpydoc
+    extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo',
+                  'sphinx.ext.pngmath', 'numpydoc', 'sphinx.ext.autosummary']
 except:
-  extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.pngmath']
+    extensions = ['sphinx.ext.autodoc',
+                  'sphinx.ext.todo', 'sphinx.ext.pngmath']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -104,7 +106,7 @@ html_theme = 'nature'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {"headerbg":"#00FFFF"}
+# html_theme_options = {"headerbg":"#00FFFF"}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["."]
@@ -186,8 +188,8 @@ htmlhelp_basename = 'PyAstronomydoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PyAstronomy.tex', u'PyAstronomy Documentation',
-   u'PyA group', 'manual'),
+    ('index', 'PyAstronomy.tex', u'PyAstronomy Documentation',
+     u'PyA group', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -228,11 +230,11 @@ man_pages = [
 autoclass_content = "both"
 
 # This can be used to control which parts shall be included in autodoc
-#def maybe_skip_member(app, what, name, obj, skip, options):
+# def maybe_skip_member(app, what, name, obj, skip, options):
 #    print "------------------------------------"
 #    print app, " - ", what," - ", name, " - ",obj," - ", skip, " - ",options
 #    print "------------------------------------"
 #    return False
 
-#def setup(app):
+# def setup(app):
 #    app.connect('autodoc-skip-member', maybe_skip_member)
