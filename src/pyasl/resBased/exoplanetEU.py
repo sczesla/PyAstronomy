@@ -538,7 +538,7 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
             A dictionary with a key for every data column holding
             the associated value from the data table.
         """
-        names = [n.decode("utf8") for n in self.vot["name"]]
+        names = [n for n in self.vot["name"]]
         r = pyaC.fuzzyMatch(planetName, names,
                             caseSensitive=caseSensitive, raises=True)
         result = {cn: self.vot[r["index"]][cn] for cn in self.vot.colnames}
