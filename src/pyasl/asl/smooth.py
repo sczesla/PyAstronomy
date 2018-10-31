@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
 
@@ -76,4 +77,4 @@ def smooth(x, windowLen, window='flat'):
                              solution="Choose one of the above window types."))
 
     y = np.convolve(w / w.sum(), s, mode='valid')
-    return y[(windowLen / 2):-(windowLen / 2)]
+    return y[(windowLen // 2):-(windowLen // 2)]
