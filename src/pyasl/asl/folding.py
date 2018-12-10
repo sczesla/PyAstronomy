@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 
 def foldAt(time, period, T0=0.0, getEpoch=False):
@@ -49,7 +49,7 @@ def foldAt(time, period, T0=0.0, getEpoch=False):
         The counting starts at zero. Only returned if `getEpoch`
         is True.
     """
-    epoch = numpy.floor((time - T0) / period)
+    epoch = np.floor((time - T0) / period)
     phase = (time - T0) / period - epoch
     if getEpoch:
         return phase, epoch
