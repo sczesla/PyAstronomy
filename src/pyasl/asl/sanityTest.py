@@ -866,6 +866,19 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
         pe = np.array([-2., -1., 0.0, 1.0, 9.0])
         self.assertFalse(np.any(np.abs(pe - e) > 1e-5), msg="Bad epoch")
 
+    def sanity_foldAtBackAndForth(self):
+        """
+        Checking relations from foldAt documentation
+        """
+        from PyAstronomy.pyasl import foldAt
+        import numpy as np
+        t = np.linspace(-10, 10, 137)
+        per = 2.35
+        T0 = -1.55
+        p, e = foldAt(t, per, T0=T0, getEpoch=True)
+        t2 = T0 + (e+p)*per
+        self.assertFalse(np.any(np.abs(t2 - t) > 1e-5), msg="foldAt back and forth: Bad conversion!")
+
 
 class SanityOfDopplerShift(unittest.TestCase, SaniBase):
 
