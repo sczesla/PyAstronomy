@@ -35,9 +35,12 @@ Model fitting
    :maxdepth: 1
    
    funcFit --- A convenient fitting interface <funcFitDoc/index.rst>
-   funcFit2 (beta) --- A convenient fitting interface <funcFitDoc/fuf2index.rst>
    Model suite --- A collection of ready-to-use models for funcFit <modelSuiteDoc/index.rst>
 
+.. toctree::
+   :maxdepth: 1
+
+   funcFit2 (beta) --- A convenient fitting interface (redesign) <funcFitDoc/fuf2index.rst>
 
 Spotlights
 ----------------
