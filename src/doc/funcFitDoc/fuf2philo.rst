@@ -50,6 +50,11 @@ of the objective function. Actually evaluation does not even always strictly req
 evaluation of the model. The fundamental shift is therefore a focus on the objective function
 rather than model evaluation.
 
+This change naturally allows to more clearly separate optimization from the actual model class.
+While the incorporation of the fitting (and sampling) into the model class was often convenient,
+it also helped to create those structural problems, which ultimately led to the redesign of the
+model class. Delegating optimization to convenience functions helps to maintain greater flexibility.
+
 
 
 
