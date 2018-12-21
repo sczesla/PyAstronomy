@@ -620,27 +620,8 @@ def _gaussLogL(self, *args, **kwargs):
 
 
 class PStat(object):
-    
-    def setlogL(self, logl):
-        """ Assign logL method """
         
-        if isinstance(logl, six.string_types): 
-            # Specification by string
-            if logl == "defGauss":
-                self.logL = types.MethodType(_gaussLogL, self)
-            else:
-                raise(PE.PyAValError("Unknown mode for PStat: " + str(logl)))
-        elif hasattr(logl, "__call__"):
-            # It is a callable
-            self.logL = types.MethodType(logl, self)
-        elif logl is None:
-            # Do nothing here
-            pass
-        else:
-            raise(PE.PyAValError("logl is neither a string nor a callable nor None.", \
-                                 where="PStat"))
-    
-    def __init__(self, logl, objf):
+    def __init__(self, logl=None, objf=None, **kwargs):
         self.priors = []
         self.setlogL(logl)
         self.loglmode = str(logl)
@@ -665,6 +646,25 @@ class PStat(object):
         # Set the objective function. Note that 'objf' is a property and
         # actually setSPLikeObjf is invoked.
         self.objf = defobjf
+      
+    def setlogL(self, logl):
+        """ Assign logL method """
+        
+        if isinstance(logl, six.string_types): 
+            # Specification by string
+            if logl == "defGauss":
+                self.logL = types.MethodType(_gaussLogL, self)
+            else:
+                raise(PE.PyAValError("Unknown mode for PStat: " + str(logl)))
+        elif hasattr(logl, "__call__"):
+            # It is a callable
+            self.logL = types.MethodType(logl, self)
+        elif logl is None:
+            # Do nothing here
+            pass
+        else:
+            raise(PE.PyAValError("logl is neither a string nor a callable nor None.", \
+                                 where="PStat"))
         
     def logL(self, *args, **kwargs):
         raise(PE.PyANotImplemented("The method 'logL' needs to be implemented."))
@@ -855,7 +855,7 @@ class PStat(object):
         raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
 
 
-class MBO2(PStat):
+class MBO2Base:
     """
     Model Base Object
     
@@ -868,8 +868,7 @@ class MBO2(PStat):
     
     """
     
-    def __init__(self, pars, rootName="", logl="defGauss", objf="nlnP"):
-        PStat.__init__(self, logl=logl)
+    def __init__(self, pars=None, rootName="", **kwargs):
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
         
@@ -886,7 +885,7 @@ class MBO2(PStat):
         right : MBO2 instance
             Right side of the operation
         """
-        r = MBO2([], rootName="combined")
+        r = MBO2Base([], rootName="combined")
         r.pars = PyABaSoS.combine(self.pars, right.pars)
         r.leftCompo = self
         r.rightCompo = right
@@ -953,12 +952,12 @@ class MBO2(PStat):
             l += ", free: " + tf[v.free] + ", restricted: " + tf[v.isRestricted()]
             l += ", related: " + tf[v.isRelated()]
             lines.append(l)
-        lines.append(prefix + "Priors: ")
-        if len(self.priors) > 0:
-            for i, p in enumerate(self.priors, 1):
-                lines.append(prefix + " "*4 + ("%2d) " % i) + str(p))
-        else:
-            lines.append("    All uniform (=1)")
+#         lines.append(prefix + "Priors: ")
+#         if len(self.priors) > 0:
+#             for i, p in enumerate(self.priors, 1):
+#                 lines.append(prefix + " "*4 + ("%2d) " % i) + str(p))
+#         else:
+#             lines.append("    All uniform (=1)")
         
         if toScreen:
             mll = max([len(l) for l in lines])
@@ -1038,6 +1037,20 @@ class MBO2(PStat):
         return self.pars.parameters()
 
 
+class MBO2(MBO2Base, PStat):
+    
+    def __init__(self, *args, **kwargs):
+        if not "pars" in kwargs:
+            raise(PE.PyAValError("You need to specify the parameter names via 'pars'.", \
+                                 where="MBO2", \
+                                 solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
+        MBO2Base.__init__(self, *args, **kwargs)
+        if not "logl" in kwargs:
+            kwargs["logl"] = "defGauss"
+        if not "objf" in kwargs:
+            kwargs["objf"] = "nlnP"
+        PStat.__init__(self, *args, **kwargs)
+    
 
 def _introdefarg(f, **kwargs):
     """
@@ -1374,11 +1387,12 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
     return (pos, state), emceeSampler
     
     
+
     
 class Poly2(MBO2):
 
     def __init__(self):
-        MBO2.__init__(self, ["c0", "c1", "c2"], rootName="Poly2")
+        MBO2.__init__(self, pars=["c0", "c1", "c2"], rootName="Poly2")
     
     def evaluate(self, x, **kwargs):
         s = self._imap
