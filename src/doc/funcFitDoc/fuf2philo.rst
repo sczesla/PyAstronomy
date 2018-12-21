@@ -1,6 +1,7 @@
 The reasoning behind fuf2
 =================================
 
+This gives a brief overview of why a new model class is desirable for funcFit.
 
 Why have a successor to OneDFit?
 ------------------------------------
@@ -29,7 +30,7 @@ Similar inconveniences arise when beyond point estimates credibility intervals o
 distributions under complex likelihood and prior functions are to be derived. Yet other
 difficulties emerge when data sets not corresponding to the default (x, y, error) setup
 are considered.
-Such cases were simply not considered when the basic structure of OneDFit was developed. 
+Such cases were not the focus of funcFit, when the basic structure of OneDFit was developed. 
 
 Probably many if not all cases mentioned can somehow be handled by OneDFit, the price being,
 of course, ever more cumbersome and, thus, error prone coding.
@@ -46,15 +47,10 @@ rather than `evaluate`. This immediately resolves the complications brought abou
 by objective functions depending also on the parameter values. The ultimate reason is that the
 step represented by the `evaluate` method in OneDFit is logically prior to the evaluation
 of the objective function. Actually evaluation does not even always strictly require a complete
-evaluation of the model.
+evaluation of the model. The fundamental shift is therefore a focus on the objective function
+rather than model evaluation.
 
 
-What objective function
-
-
-In the Bayesian context, the most 
-(unnormalized) posterior probability density 
-The choice of the posterior is most natural in a Bayesian context
 
 
 
