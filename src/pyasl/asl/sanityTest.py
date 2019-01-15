@@ -1920,6 +1920,37 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         td = pyasl.transitDuration(1.0, reJ, 1.0, 90.0, 365.0)
         print("The transit of Earth lasts about: %5.3f days" % td)
     
+    def sanity_transitDuration_RsExample(self):
+        """
+        Check example of transitDuration_Rs
+        """
+        from PyAstronomy import pyasl
+        
+        # Semi-major axis in units of stellar radius
+        sma = 8.8
+        # Radius ratio (Rp/Rs)
+        rprs = 0.16
+        
+        # Estimate the duration of Earth's transit
+        td = pyasl.transitDuration_Rs(sma, rprs, 85.7, 2.21858)
+        print("The transit of HD 189733 b lasts about: %5.2f hours" % (td*24.))
+    
+    def sanity_transitDuration(self):
+        """
+        """
+        from PyAstronomy import pyasl
+        from PyAstronomy import constants as PC
+        
+        td1 = pyasl.transitDuration(0.05, 0.1, 1.5, 88.0, 10.)
+        
+        pc = PC.PyAConstants()
+        rs = 1.5*pc.RSun
+        
+        trs = pyasl.transitDuration_Rs(0.05*pc.AU/rs, 0.1*pc.RJ/rs, 88., 10.)
+        
+        print("td1: ", td1, ", trs: ", trs)
+        self.assertAlmostEqual(td1, trs, delta=1e-10, msg="transitDuration and transitDuration_Rs in conflict!")
+    
     def sanity_transitDurationExact(self):
         """
         Check approximation of transit duration.

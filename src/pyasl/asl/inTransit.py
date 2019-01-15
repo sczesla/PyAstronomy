@@ -142,6 +142,38 @@ def transitDuration(sma, rp, rs, inc, period, exact=False):
     return dur
 
 
+def transitDuration_Rs(sma, rprs, inc, period, exact=False):
+    """
+    Calculate transit duration
+    
+    Invokes :py:func:`transitDuration` after parameter transformation.
+    
+    Parameters
+    ----------
+    sma : float
+        Semi-major axis [stellar radii]
+    rprs : float
+        Planet-to-star radius ratio (Rp/Rs)
+    inc : float
+        Orbital inclination [deg]
+    period : float
+        Orbital period
+    exact : boolean, optional
+        If True, a slightly more accurate expression is evaluated.
+        The default is False.
+
+    Returns
+    -------
+    Transit duration : float
+        The duration of the transit (same units as `period`).    
+    """
+    from PyAstronomy import constants as PC
+    c = PC.PyAConstants()
+
+    rs = c.RSun
+    return transitDuration(sma*rs/c.AU, rprs*rs/c.RJ, 1., inc, period, exact)
+
+
 def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
                  observatory=None, lon=None, lat=None, alt=None, minAltitude=None,
                  showTwilight="all", moonDist=None, nexaInput=False, fileOutput=None):
