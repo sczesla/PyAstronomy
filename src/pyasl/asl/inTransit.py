@@ -93,7 +93,7 @@ def transitDuration(sma, rp, rs, inc, period):
 
         T_D = \\frac{P}{\\pi} \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a} \\right)
 
-    where P is the orbital period, b the impact parameter (:math:`b=a/R_s\\cos(i)`),
+    where P is the orbital period, b the impact parameter (:math:`b=a \\cos(i)`),
     and a the semi-major axis.
 
     .. note:: The units of the transit duration are the same as the units
