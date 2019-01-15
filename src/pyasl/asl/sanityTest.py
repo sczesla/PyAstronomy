@@ -1897,7 +1897,7 @@ class SanityOfAngDist(unittest.TestCase, SaniBase):
                                38.78368896, 297.69582730, +08.86832120))
 
 
-class SanityOfTransit:
+class SanityOfTransit(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1919,6 +1919,19 @@ class SanityOfTransit:
         # Estimate the duration of Earth's transit
         td = pyasl.transitDuration(1.0, reJ, 1.0, 90.0, 365.0)
         print("The transit of Earth lasts about: %5.3f days" % td)
+    
+    def sanity_transitDurationExact(self):
+        """
+        Check approximation of transit duration.
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        td1 = pyasl.transitDuration(0.05, 0.1, 1.0, 90.0, 365.0, exact=False)
+        td2 = pyasl.transitDuration(0.05, 0.1, 1.0, 90.0, 365.0, exact=True)
+        self.assertEqual(td1, td2, msg="Exact and approximate transit duration differ by " + str(td1-td2) + " at inclination of 90 deg.")
+        td1 = pyasl.transitDuration(0.05, 0.1, 1.0, 88.0, 365.0, exact=False)
+        td2 = pyasl.transitDuration(0.05, 0.1, 1.0, 88.0, 365.0, exact=True)
+        self.assertAlmostEqual(365./np.pi*np.arcsin(np.sin(td1*np.pi/365.)/np.sin(88./180.*np.pi)), td2, delta=1e-12, msg="Relation between exact and approximate transit duration broken.")
 
     def sanity_inTransitExample_1(self):
         """

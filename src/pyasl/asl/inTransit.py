@@ -80,14 +80,14 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
     return indi
 
 
-def transitDuration(sma, rp, rs, inc, period):
+def transitDuration(sma, rp, rs, inc, period, exact=False):
     """
     Calculate the transit duration.
 
     The routine calculates the transit duration assuming
-    a circular star and planet and a circular planetary orbit.
+    a spherical star and planet and a circular planetary orbit.
 
-    In particular, it evaluates:
+    It evaluates the expression
 
     .. math::
 
@@ -95,6 +95,14 @@ def transitDuration(sma, rp, rs, inc, period):
 
     where P is the orbital period, b the impact parameter (:math:`b=a \\cos(i)`),
     and a the semi-major axis.
+
+    If the `exact` flag is set True, the slightly more accurate expression
+    
+    .. math::
+
+        T_D = \\frac{P}{\\pi} \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a \\sin(i)} \\right)
+
+    is evaluated, where the additional sine term accounts for orbit curvature.
 
     .. note:: The units of the transit duration are the same as the units
               of the input orbital period.
@@ -111,22 +119,26 @@ def transitDuration(sma, rp, rs, inc, period):
         The orbital inclination in degrees.
     period : float
         The orbital period.
+    exact : boolean, optional
+        If True, a slightly more accurate expression is evaluated.
+        The default is False.
 
     Returns
     -------
     Transit duration : float
-        The duration of the transit (same units as
-        `period`).
+        The duration of the transit (same units as `period`).
     """
     from PyAstronomy import constants as PC
 
     c = PC.PyAConstants()
     # Calculate the impact parameter
     impact = (sma * c.AU) * np.cos(inc / 180. * np.pi)
+    # Correction factor (inclination dependent factor)
+    cfac = 1.0 if not exact else np.sin(inc / 180. * np.pi) 
     # Calculate the geometric transit duration
     dur = (period / np.pi) * \
         np.arcsin(np.sqrt((rs * c.RSun + rp * c.RJ)
-                          ** 2 - impact**2) / (sma * c.AU))
+                          ** 2 - impact**2) / (sma * c.AU * cfac))
     return dur
 
 
