@@ -80,6 +80,85 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
     return indi
 
 
+def ingressDuration(sma, rp, rs, inc, period):
+    """
+    Calculate the ingress (and egress) duration of the transit.
+
+    The routine calculates the transit in- and egress duration assuming
+    a spherical star and planet and a circular planetary orbit.
+
+    It evaluates the expression
+
+    .. math::
+
+        T_I = \\frac{P}{2 \\pi} \\left( \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a \\sin(i)} \\right) - \\arcsin\\left(\\frac{\\sqrt{(R_s-R_p)^2 - b^2}}{a \\sin(i)} \\right)  \\right)
+
+    is evaluated, where b is the impact parameter (:math:`b=a \\cos(i)`).
+
+    .. note:: The units of the ingress duration are the same as the units
+              of the input orbital period.
+
+    Parameters
+    ----------
+    sma : float
+        The semi-major axis in AU.
+    rp : float
+        The planetary radius in Jovian radii.
+    rs : float
+        The stellar radius in solar radii.
+    inc : float
+        The orbital inclination in degrees.
+    period : float
+        The orbital period.
+
+    Returns
+    -------
+    Ingress duration : float
+        The duration of in- and egress (same units as `period`).
+    """
+    from PyAstronomy import constants as PC
+
+    c = PC.PyAConstants()
+    # Calculate the impact parameter
+    impact = (sma * c.AU) * np.cos(inc / 180. * np.pi)
+    imsin = (sma * c.AU) * np.sin(inc / 180. * np.pi)
+    # Calculate the geometric transit duration
+    idur = (period / (2.*np.pi)) * ( \
+        np.arcsin(np.sqrt((rs * c.RSun + rp * c.RJ)** 2 - impact**2) / imsin) - \
+        np.arcsin(np.sqrt((rs * c.RSun - rp * c.RJ)** 2 - impact**2) / imsin)   \
+        )
+    return idur
+
+
+def ingressDuration_Rs(sma, rprs, inc, period):
+    """
+    Calculate transit duration
+    
+    Invokes :py:func:`transitDuration` after parameter transformation.
+    
+    Parameters
+    ----------
+    sma : float
+        Semi-major axis [stellar radii]
+    rprs : float
+        Planet-to-star radius ratio (Rp/Rs)
+    inc : float
+        Orbital inclination [deg]
+    period : float
+        Orbital period
+
+    Returns
+    -------
+    Transit duration : float
+        The duration of the transit (same units as `period`).    
+    """
+    from PyAstronomy import constants as PC
+    c = PC.PyAConstants()
+
+    rs = c.RSun
+    return ingressDuration(sma*rs/c.AU, rprs*rs/c.RJ, 1., inc, period)
+
+
 def transitDuration(sma, rp, rs, inc, period, exact=False):
     """
     Calculate the transit duration.

@@ -1919,6 +1919,10 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         # Estimate the duration of Earth's transit
         td = pyasl.transitDuration(1.0, reJ, 1.0, 90.0, 365.0)
         print("The transit of Earth lasts about: %5.3f days" % td)
+        
+        # Estimate the duration of in- and egress
+        ti = pyasl.ingressDuration(1.0, reJ, 1.0, 90.0, 365.0)
+        print("The in- and egress last: %6.4f days or %4.2f hours" % (ti, ti*24))
     
     def sanity_transitDuration_RsExample(self):
         """
@@ -1934,6 +1938,10 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         # Estimate the duration of Earth's transit
         td = pyasl.transitDuration_Rs(sma, rprs, 85.7, 2.21858)
         print("The transit of HD 189733 b lasts about: %5.2f hours" % (td*24.))
+    
+        # Estimate the duration of in- and egress
+        ti = pyasl.ingressDuration_Rs(sma, rprs, 85.7, 2.21858)
+        print("The in- and egress of HD 189733 b lasts: %5.2f hours" % (ti*24.))
     
     def sanity_transitDuration(self):
         """
@@ -1951,6 +1959,38 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         print("td1: ", td1, ", trs: ", trs)
         self.assertAlmostEqual(td1, trs, delta=1e-10, msg="transitDuration and transitDuration_Rs in conflict!")
     
+    def sanity_ingressDuration(self):
+        """
+        Check sanity and consistency of ingressDuration
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        from PyAstronomy import constants as pc
+        
+        rp = pc.RSun / pc.RJ * 0.4
+        rprs = 0.4
+        
+        for sma in [0.2, 0.6, 0.8]:
+            for P in [2., 60., 300.]:
+                t = pyasl.ingressDuration(sma, rp, 1.0, 90, P)
+                # Linear approximation
+                app = rp*pc.RJ*P/(sma*pc.AU*np.pi)
+                print(sma, P, (t-app)/P)
+                self.assertAlmostEqual((t-app)/P, 0.0, delta=1e-6, msg="Ingress duration for 90 deg case does not match approximation.")
+                t2 = pyasl.ingressDuration_Rs(sma*pc.AU/pc.RSun, rprs, 90, P)
+                print(t-t2)
+                self.assertAlmostEqual(t, t2, delta=1e-12, msg="ingressDuration and ingressDuration_Rs differ.") 
+        
+        print()
+        for sma in [0.05, 0.1, 0.15]:
+            for P in [2., 60., 300.]:
+                t = pyasl.ingressDuration(sma, rp, 1.0, 89., P)
+                app = rp*pc.RJ*P/(sma*pc.AU*np.pi)
+                print(sma, P, t, app, (t-app)/P)
+                self.assertAlmostEqual((t-app)/P, 0.0, delta=2e-3, msg="Ingress duration for 89 deg case does not match approximation.")
+        
+        
+            
     def sanity_transitDurationExact(self):
         """
         Check approximation of transit duration.
