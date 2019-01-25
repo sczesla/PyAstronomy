@@ -202,10 +202,7 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
     ra = np.arctan2(np.sin(sunlon * np.pi / 180.) *
                     np.cos(oblt * np.pi / 180.), np.cos(sunlon * np.pi / 180.))
 
-    neg = np.where(ra < 0.0)[0]
-    nneg = len(neg)
-    if nneg > 0:
-        ra[neg] += 2.0 * np.pi
+    ra = ra % (2.*np.pi)
 
     dec = np.arcsin(np.sin(sunlon * np.pi / 180.)
                     * np.sin(oblt * np.pi / 180.))
