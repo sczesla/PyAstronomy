@@ -123,7 +123,7 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
     if end_jd is None:
         # Form time in Julian centuries from 1900.0
         start_jd = (jd - 2415020.0) / 36525.0
-        # Zime array
+        # Time array
         time = np.array([start_jd])
     else:
         if jd >= end_jd:
