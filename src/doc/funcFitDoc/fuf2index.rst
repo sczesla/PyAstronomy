@@ -7,6 +7,6 @@ implementation and maintaining what was convenient about it.
 .. note:: funcFit2 is under development. We try to maintain the API, but changes cannot be excluded.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    
    Reasoning behind fuf2 <fuf2philo.rst>
