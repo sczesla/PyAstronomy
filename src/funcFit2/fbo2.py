@@ -1272,7 +1272,7 @@ class MBO2(object):
         """
         
         def objf(self, *args, **kwargs):
-            
+            # Make sure the current parameters are assigned
             self.setFreeParamVals(args[0])
             v = f(self, *args, **kwargs)
             if not np.isfinite(v):
