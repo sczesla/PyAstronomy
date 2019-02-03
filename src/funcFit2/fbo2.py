@@ -677,8 +677,13 @@ class MBO2(object):
                                  where="MBO2", \
                                  solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
         
-        # Set objective function to negative likelihood
-        self.objfnlogL()
+        # Set objective function to negative posterior probability
+        def defobjf(self, *args, **kwargs):
+            """ Objective function: -ln(Posterior) """
+            return -self.logPost(*args[1:], **kwargs)
+        # Set the objective function. Note that 'objf' is a property and
+        # actually setSPLikeObjf is invoked.
+        self.objf = defobjf
         
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
@@ -1098,7 +1103,7 @@ class MBO2(object):
         """
         
         def objf(self, *args, **kwargs):
-            # Make sure the current parameters are assigned
+            
             self.setFreeParamVals(args[0])
             v = f(self, *args, **kwargs)
             if not np.isfinite(v):
