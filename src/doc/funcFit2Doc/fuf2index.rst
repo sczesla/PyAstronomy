@@ -10,3 +10,5 @@ implementation and maintaining what was convenient about it.
    :maxdepth: 2
    
    Reasoning behind fuf2 <fuf2philo.rst>
+
+   Tutorial <tutorial1.rst>

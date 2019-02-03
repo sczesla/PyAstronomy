@@ -13,9 +13,12 @@ import collections
 import sys
 import scipy.optimize as sco
 import inspect
+import sys
+
+_fbo2module = sys.modules[__name__]
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
-from PyAstronomy.funcFit import GaussFit1d
+from PyAstronomy import funcFit as _fuf
 
 if ic.check["progressbar"]:
     import progressbar
@@ -134,9 +137,9 @@ class PyAUniformPrior(PyAPrior):
 
         if (lower is None) and (upper is None):
             f = lambda x:0.0
-        elif (not lower is None) and (upper is None):
-            f = lambda x:0.0 if x < upper else -np.inf
         elif (lower is None) and (not upper is None):
+            f = lambda x:0.0 if x < upper else -np.inf
+        elif (not lower is None) and (upper is None):
             f = lambda x:0.0 if x > lower else -np.inf
         else:
             if upper <= lower:
@@ -853,7 +856,7 @@ class PStat(object):
         raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
 
 
-class MBO2:
+class MBO2(object):
     """
     Model Base Object
     
@@ -1047,6 +1050,34 @@ class MBO2:
     
     def parameters(self):
         return self.pars.parameters()
+    
+    def availableParameters(self):
+        """
+        Provides a list of existing parameter names.
+
+        Returns
+        -------
+        Parameters : list of strings 
+            A list with the names of available parameters.
+        """
+        return list(self.parameters())
+
+    def frozenParameters(self):
+        """
+        Get names and values of frozen parameters.
+
+        Returns
+        -------
+        Frozen parameters: dict
+             Dictionary containing the names and values
+             of all frozen parameters ({"parName":value, ...}).
+        """
+        fps = {}
+        fpns = self.freeParamNames()
+        for k, v in six.iteritems(self.parameters()):
+            if not k in fpns:
+                fps[k] = v
+        return fps
     
     def setlogL(self, logl):
         """ Assign logL method """
@@ -1599,20 +1630,55 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
     return (pos, state), emceeSampler
     
     
+def _fuf2ModelFactory(odc, rn):
+    
+    class F2M(MBO2):
+    
+        def __init__(self, *args, **kwargs):
+            self._odm = odc(*args, **kwargs)
+            MBO2.__init__(self, pars=list(self._odm.parameters()), rootName=rn)
+            self.setlogL("1dgauss")
+ 
+        def evaluate(self, *args, **kwargs):
+            self._odm.assignValues(self.parameters())
+            return self._odm.evaluate(*args, **kwargs)       
+        
+    return F2M
+       
 
-class GF1d(MBO2):
-    
-    def __init__(self):
-        self._gf = GaussFit1d()
-        MBO2.__init__(self, pars=list(self._gf.parameters()), rootName=GF1d)
-        self.setLogL("1dgauss")
-    
-    def evaluate(self, t):
-        self._gf.assignValues(self.parameters())
-        return self._gf.evaluate(t)
-    
+# Transform OneDFit objects into MBOs
+# List gives tuples with fuf2-name, fuf-class, and root name to be assigned
+_ml = [("GaussFit1d", _fuf.GaussFit1d, "GF1d"), \
+       ("MultiGaussFit1d", _fuf.MultiGauss1d, "MGF1d"),
+       ("CauchyLorentz1d", _fuf.CauchyLorentz1d, "CauchyLorentz1d"), \
+       ("Voigt1d", _fuf.voigt1d, "Voigt1d"), \
+       ("MultiVoigt1d", _fuf.MultiVoigt1d, "MultiVoigt1d"), \
+       ("SinusFit1d", _fuf.SinusFit1d, "SinusFit1d"), \
+       ("ExpDecayFit1d", _fuf.ExpDecayFit1d, "ExpDecayFit1d"), \
+       ("PolyFit1d", _fuf.PolyFit1d, "PolyFit1d"), \
+       ("ConstantFit1d", _fuf.ConstantFit1d, "ConstantFit1d"), \
+       ("GaussFit2d", _fuf.GaussFit2d, "GaussFit2d"), \
+       ("MultiGauss2d", _fuf.MultiGauss2d, "MultiGauss2d"), \
+       ("Circle2d", _fuf.Circle2d, "Circle2d")]
 
-    
+for m in _ml:
+    setattr(_fbo2module, m[0], _fuf2ModelFactory(m[1], m[2]) )
+
+
+
+# class GF1d(MBO2):
+#     
+#     def __init__(self):
+#         self._gf = GaussFit1d()
+#         MBO2.__init__(self, pars=list(self._gf.parameters()), rootName=GF1d)
+#         self.setLogL("1dgauss")
+#     
+#     def evaluate(self, t):
+#         self._gf.assignValues(self.parameters())
+#         return self._gf.evaluate(t)
+#     
+# 
+#     
 class Poly2(MBO2):
 
     def __init__(self):
