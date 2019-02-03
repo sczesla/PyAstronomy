@@ -878,6 +878,7 @@ class MBO2(object):
         
         # Set objective function to negative posterior probability
         def defobjf(self, *args, **kwargs):
+            """ Objective function: -ln(Posterior) """
             return -self.logPost(*args[1:], **kwargs)
         # Set the objective function. Note that 'objf' is a property and
         # actually setSPLikeObjf is invoked.
@@ -1271,12 +1272,14 @@ class MBO2(object):
         """
         
         def objf(self, *args, **kwargs):
+            
             self.setFreeParamVals(args[0])
             v = f(self, *args, **kwargs)
             if not np.isfinite(v):
                 PE.PyAValError("Infinite value encountered in objective function for parameters: " + str(args[0]) + ", free parameters : " + ",".join(self.freeParamNames()))
             return v
         
+        objf.__doc__ = f.__doc__
         self._objf = types.MethodType(objf, self)
         
     def getSPLikeObjf(self):
