@@ -126,4 +126,11 @@ It shows how free parameters can be specified and restrictions can be applied.
     plt.show()
     
 
+Applying restrictions
+----------------------------
+
+A "restriction" limits the valid range of values a parameter can take, which can be useful
+in many ways. For example, the width of a Gaussian should be positive. Restrictions can be
+handled in many ways
+
 
