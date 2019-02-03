@@ -777,7 +777,7 @@ class MBO2(object):
     def freeze(self, pns):
         self.pars.freeze(pns)
     
-    def setRestriction(self, restricts, usesmooth=False, sscale=1e-9):
+    def setRestriction(self, restricts, ap=True, usesmooth=False, sscale=1e-9):
         """
         Restrict parameter ranges
         
@@ -793,6 +793,9 @@ class MBO2(object):
         restricts : dictionary
             Maps parameter name to resctriction, i.e., a two-tuple giving
             lower and upper bound. Use None where no bound is desired.
+        ap : boolean, optional
+            Apply priors? If True (default), priors will be defined according
+            to the restrictions.
         usesmooth : boolean, optional
             If True, a uniform prior with 'smoothed' edges is used instead
             if a sharply-edged uniform prior. The scale if the edge is given
@@ -801,14 +804,16 @@ class MBO2(object):
             Scale of the edge used for smooth uniform prior (if desired).
         """
         self.pars.setRestriction(restricts)
-        for k, v in six.iteritems(restricts):
-            self.pars._checkParam(k)
-            if any([not b is None for b in v]):
-                # Discard cases were both limits are none
-                if not usesmooth:
-                    self.addUniformPrior(k, lower=v[0], upper=v[1])
-                else:
-                    self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=sscale)
+        if ap:
+            # Add prior(s)
+            for k, v in six.iteritems(restricts):
+                self.pars._checkParam(k)
+                if any([not b is None for b in v]):
+                    # Discard cases were both limits are none
+                    if not usesmooth:
+                        self.addUniformPrior(k, lower=v[0], upper=v[1])
+                    else:
+                        self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=sscale)
             
     def getRestrictions(self):
         return self.pars.getRestrictions()
