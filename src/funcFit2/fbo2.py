@@ -14,7 +14,6 @@ import sys
 import scipy.optimize as sco
 import inspect
 import sys
-import fnmatch
 
 _fbo2module = sys.modules[__name__]
 
@@ -139,9 +138,9 @@ class PyAUniformPrior(PyAPrior):
         if (lower is None) and (upper is None):
             f = lambda x:0.0
         elif (lower is None) and (not upper is None):
-            f = lambda x:0.0 if x <= upper else -np.inf
+            f = lambda x:0.0 if x < upper else -np.inf
         elif (not lower is None) and (upper is None):
-            f = lambda x:0.0 if x >= lower else -np.inf
+            f = lambda x:0.0 if x > lower else -np.inf
         else:
             if upper <= lower:
                 raise(PE.PyAValError("'lower' must be smaller than 'upper'", \
