@@ -6,8 +6,6 @@ import copy
 import types
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyaC
-from .fufDS import FufDS
-from .extFitter import NelderMead
 import six
 import six.moves as smo
 import bidict
@@ -17,7 +15,7 @@ import scipy.optimize as sco
 import inspect
 
 from PyAstronomy.funcFit import _pymcImport, _scoImport, ic
-from quantities.units.power import kW
+from PyAstronomy.funcFit import GaussFit1d
 
 if ic.check["progressbar"]:
     import progressbar
@@ -855,7 +853,7 @@ class PStat(object):
         raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
 
 
-class MBO2Base:
+class MBO2:
     """
     Model Base Object
     
@@ -869,8 +867,22 @@ class MBO2Base:
     """
     
     def __init__(self, pars=None, rootName="", **kwargs):
+        
+        if pars is None:
+            raise(PE.PyAValError("You need to specify the parameter names via 'pars'.", \
+                                 where="MBO2", \
+                                 solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
+        
+        # Set objective function to negative posterior probability
+        def defobjf(self, *args, **kwargs):
+            return -self.logPost(*args[1:], **kwargs)
+        # Set the objective function. Note that 'objf' is a property and
+        # actually setSPLikeObjf is invoked.
+        self.objf = defobjf
+        
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
+        self.priors = []
         
         self.rootName = rootName
         self.leftCompo = None
@@ -885,7 +897,7 @@ class MBO2Base:
         right : MBO2 instance
             Right side of the operation
         """
-        r = MBO2Base([], rootName="combined")
+        r = MBO2([], rootName="combined")
         r.pars = PyABaSoS.combine(self.pars, right.pars)
         r.leftCompo = self
         r.rightCompo = right
@@ -1035,22 +1047,222 @@ class MBO2Base:
     
     def parameters(self):
         return self.pars.parameters()
+    
+    def setlogL(self, logl):
+        """ Assign logL method """
+        
+        if isinstance(logl, six.string_types): 
+            # Specification by string
+            if logl.lower() == "1dgauss":
+                self.logL = types.MethodType(_gaussLogL, self)
+            else:
+                raise(PE.PyAValError("Unknown logl specification: " + str(logl)))
+        elif hasattr(logl, "__call__"):
+            # It is a callable
+            self.logL = types.MethodType(logl, self)
+        elif logl is None:
+            # Do nothing here
+            pass
+        else:
+            raise(PE.PyAValError("logl is neither a string nor a callable nor None.", \
+                                 where="MBO2"))
+        
+    def logL(self, *args, **kwargs):
+        raise(PE.PyANotImplemented("The log(likelihood) method 'logL' needs to be implemented."))
+
+    def logPrior(self, *args, **kwargs):
+        """ Returns natural logarithm of prior for current parameter values """
+        result = 0.0
+        for p in self.priors:
+            result += p.evaluate()
+            if np.isinf(result):
+                return result
+        return result
+    
+    def _too(self, x, d):
+        """ Returns d if x is None and x otherwise """
+        if x is None:
+            return d
+        return x
+    
+    def addUniformPrior(self, pn, lower=None, upper=None):
+        """
+        Add a uniform prior
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        lower, upper : float, optional
+            Lower and upper bounds
+        """
+        self.pars._checkParam(pn)
+        descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (self._too(lower, -np.inf), self._too(upper, np.inf))
+        self.priors.append(PyAUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+      
+    def addSmoothUniformPrior(self, pn, lower=None, upper=None, scale=1e-9):
+        """
+        Add a uniform prior with 'smoothed' (arctan) edges
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        lower, upper : float, optional
+            Lower and upper bounds
+        """
+        self.pars._checkParam(pn)
+        descr = "Smooth uniform prior on '" + str(pn) + "' (lower = %g, upper = %g, scale = %g)" % \
+                (self._too(lower, -np.inf), self._too(upper, np.inf), scale)
+        self.priors.append(PyASmoothUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+        
+    def addScalePrior(self, pn, m):
+        """
+        Add scale prior of the form x**m
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        m : float
+            Exponent (e.g., -1 for x**-1 prior distribution)
+        """
+        self.pars._checkParam(pn)
+        descr = "Scale prior on '" + str(pn) + "' (exponent = %g)" % m
+        self.priors.append(PyAScalePrior(self.getPRef(pn), m, descr=descr))
+        
+    def addCauchyPrior(self, pn, x0, scale, side):
+        """
+        Add Cauchy prior of the form scale / (pi*(scale**2 + (x-x0)**2)).
+        
+        The density is multiplied by two of a one-sided version is desired.
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        x0 : float
+            Location parameter of the distribution
+        scale : float
+            Scale parameter of the distribution
+        side : string, {both, positive, negative}
+            Use 'positive' to rule out values lower than x0 and negative for
+            the reverse. Use 'both' to allow both sides of the center.
+        """
+        self.pars._checkParam(pn)
+        descr = "Cauchy prior on '" + str(pn) + "' (scale = %g, location = %g, side = %s)" % (scale, x0, side)
+        self.priors.append(PyACauchyPrior(self.getPRef(pn), scale, x0, side, descr=descr))
+        
+    def addPrior(self, p):
+        pass
+    
+    def mlD(self, *args, **kwargs):
+        """
+        Get marginal likelihood of the data (if known)
+        
+        Returns
+        -------
+        mlD : float
+            Natural logarithm of the likelihood of the data if known
+            and None otherwise.
+        """
+        return None
+        
+    def logPost(self, *args, **kwargs):
+        """
+        Get natural logarithm of the posterior
+        
+        Parameters
+        ----------
+        alllogs : boolean, optional
+            If given and set True, also a tuple is returned, holding the logarithm
+            of the priors and the likelihood separately.
+        
+        Returns
+        -------
+        lnp : float
+            The (natural) logarithm of the posterior. The posterior is normalized if
+            the marginal likelihood of the data is known and specified by the `mlD`
+            method.
+        pandl : tuple of floats, optional
+            Tuple holding the natural logarithms of the priors and the likelihood.
+            Only returned if alllogs is given as a keyword argument and True.
+        """
+        
+        lp = self.logPrior(*args, **kwargs)
+        if np.isinf(lp):
+            if ("alllogs" in kwargs) and (kwargs["alllogs"] == True):
+                return -np.inf, (-np.inf, -np.inf)
+            else:
+                return -np.inf
+        
+        ll = self.logL(*args, **kwargs)
+        md = self.mlD(*args, **kwargs)
+        po = lp + ll  - (md or 0.0)
+        
+        if ("alllogs" in kwargs) and (kwargs["alllogs"] == True):
+            return po, (lp, ll)
+        
+        return po
+
+    def emceeLogPost(self, *args, **kwargs):
+        """
+        Get the logarithm of the posterior assuming that the first parameter is an array of free parameter values
+        
+        Sets the values of the free parameters to the specified values
+        and evaluates the posterior probability. An implementation which
+        can easily combined with sampling by emcee.
+        
+        Parameters
+        ----------
+        P : array
+            An array holding values for the free parameters
+        
+        Returns
+        -------
+        lp : float
+            Natural logarithm of the posterior
+        """
+        self.setFreeParamVals(args[0])
+        kwargs["alllogs"] = True
+        return self.logPost(*args[1:], **kwargs)
+  
+    def setSPLikeObjf(self, f):
+        """
+        Set SciPy (SP) like objective function.
+        
+        Parameters
+        ----------
+        f : callable
+            The scipy-like objective function to be assigned. A scipy-like objective function is one
+            which takes as its first argument an array holding the values of the free parameters. The
+            function may take any number of additional arguments and keywords.
+        """
+        
+        def objf(self, *args, **kwargs):
+            self.setFreeParamVals(args[0])
+            v = f(self, *args, **kwargs)
+            if not np.isfinite(v):
+                PE.PyAValError("Infinite value encountered in objective function for parameters: " + str(args[0]) + ", free parameters : " + ",".join(self.freeParamNames()))
+            return v
+        
+        self._objf = types.MethodType(objf, self)
+        
+    def getSPLikeObjf(self):
+        """ Get the SciPy-like objective function """
+        return self._objf
+    
+    objf = property(getSPLikeObjf, setSPLikeObjf)
+
+    def grad(self, *args, **kwargs):
+        raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
 
 
-class MBO2(MBO2Base, PStat):
-    
-    def __init__(self, *args, **kwargs):
-        if not "pars" in kwargs:
-            raise(PE.PyAValError("You need to specify the parameter names via 'pars'.", \
-                                 where="MBO2", \
-                                 solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
-        MBO2Base.__init__(self, *args, **kwargs)
-        if not "logl" in kwargs:
-            kwargs["logl"] = "defGauss"
-        if not "objf" in kwargs:
-            kwargs["objf"] = "nlnP"
-        PStat.__init__(self, *args, **kwargs)
-    
+
+
+
+
+
 
 def _introdefarg(f, **kwargs):
     """
@@ -1388,11 +1600,24 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
     
     
 
+class GF1d(MBO2):
+    
+    def __init__(self):
+        self._gf = GaussFit1d()
+        MBO2.__init__(self, pars=list(self._gf.parameters()), rootName=GF1d)
+        self.setLogL("1dgauss")
+    
+    def evaluate(self, t):
+        self._gf.assignValues(self.parameters())
+        return self._gf.evaluate(t)
+    
+
     
 class Poly2(MBO2):
 
     def __init__(self):
         MBO2.__init__(self, pars=["c0", "c1", "c2"], rootName="Poly2")
+        self.setlogL("1dgauss")
     
     def evaluate(self, x, **kwargs):
         s = self._imap
