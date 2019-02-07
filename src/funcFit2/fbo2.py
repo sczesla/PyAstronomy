@@ -610,11 +610,13 @@ def _gaussLogL(self, *args, **kwargs):
     if "_currentModel" in kwargs:
         m = kwargs["_currentModel"]
     else:
+        print("Evaluating at ", self.parameters())
         m = self.evaluate(x)
     
     if hasattr(yerr, "__iter__"):
         # yerr is an array
-        return -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        lnl = -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        return lnl
     else:
         # yerr is a float
         return -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
@@ -770,6 +772,18 @@ class MBO2(object):
     
     def setFreeParamVals(self, vals):
         self.pars.setFreeParamVals(vals)
+        
+    def assignValues(self, vals):
+        """
+        Assign values to parameters
+        
+        Parameters
+        ----------
+        vals : dictionary
+            Maps parameter name to new value
+        """
+        for k, v in six.iteritems(vals):
+            self.pars[k] = v
         
     def thaw(self, pns):
         self.pars.thaw(pns)
