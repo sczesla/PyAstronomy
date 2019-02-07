@@ -612,6 +612,7 @@ def _gaussLogL(self, *args, **kwargs):
     if "_currentModel" in kwargs:
         m = kwargs["_currentModel"]
     else:
+        print("Evaluating at ", self.parameters())
         m = self.evaluate(x)
     
     if hasattr(yerr, "__iter__"):
@@ -785,18 +786,7 @@ class MBO2(object):
         """
         for k, v in six.iteritems(vals):
             self.pars[k] = v
-    
-    def _pex(self, pns):
-        """
-        Apply unix filename-like pattern matching and return updated list of parameters
-        """
-        if isinstance(pns, six.string_types):
-            pns = [pns]
-        r = []
-        for p in pns:
-            r.extend(fnmatch.filter(list(self.parameters()), p))
-        return r
-       
+        
     def thaw(self, pns):
         pns = self._pex(pns)
         self.pars.thaw(pns)
