@@ -612,7 +612,6 @@ def _gaussLogL(self, *args, **kwargs):
     if "_currentModel" in kwargs:
         m = kwargs["_currentModel"]
     else:
-        print("Evaluating at ", self.parameters())
         m = self.evaluate(x)
     
     if hasattr(yerr, "__iter__"):
@@ -623,6 +622,40 @@ def _gaussLogL(self, *args, **kwargs):
         # yerr is a float
         return -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
 
+
+def chisqrobjf(self, pars, *args, **kwargs):
+    """
+    Default implementation of chi-square objective function
+    
+    Parameters
+    ----------
+    x, y : arrays
+        The x and y coordinates of the data points.
+    yerr : array or float, optional
+        If not specified, a value of 1.0 will be assumed. Otherwise interpreted as
+        the error of the data points.
+    
+    Returns
+    -------
+    chi square : float
+        Returns chi square if uncertainty is specified and sum of squared residuals
+        otherwise.
+    """
+    if len(args) == 2:
+        x, y = args[0], args[1]
+        yerr = 1.0
+    elif len(args) == 3:
+        x, y, yerr = args[0], args[1], args[2]
+    else:
+        raise(PE.PyAValError("Invalid call to _chisqr. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
+
+    if "_currentModel" in kwargs:
+        m = kwargs["_currentModel"]
+    else:
+        m = self.evaluate(x)
+    
+    return np.sum( (m-y)**2/yerr**2 )
+    
 
 class MBO2(object):
     """
@@ -1090,6 +1123,12 @@ class MBO2(object):
             """ -ln(Posterior) """
             return -self.logPost(*args[1:], **kwargs)
         self.objf = nln
+
+    def objfnChiSquare(self):
+        """
+        Use chi square (or squared distance if uncertainty not given) as objective function
+        """
+        self.objf =  chisqrobjf
 
     def objfInfo(self):
         """
