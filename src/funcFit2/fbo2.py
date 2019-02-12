@@ -138,9 +138,9 @@ class PyAUniformPrior(PyAPrior):
         if (lower is None) and (upper is None):
             f = lambda x:0.0
         elif (lower is None) and (not upper is None):
-            f = lambda x:0.0 if x < upper else -np.inf
+            f = lambda x:0.0 if x <= upper else -np.inf
         elif (not lower is None) and (upper is None):
-            f = lambda x:0.0 if x > lower else -np.inf
+            f = lambda x:0.0 if x >= lower else -np.inf
         else:
             if upper <= lower:
                 raise(PE.PyAValError("'lower' must be smaller than 'upper'", \
@@ -644,13 +644,8 @@ class MBO2(object):
                                  where="MBO2", \
                                  solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
         
-        # Set objective function to negative posterior probability
-        def defobjf(self, *args, **kwargs):
-            """ -ln(Posterior) """
-            return -self.logPost(*args[1:], **kwargs)
-        # Set the objective function. Note that 'objf' is a property and
-        # actually setSPLikeObjf is invoked.
-        self.objf = defobjf
+        # Set objective function to negative likelihood
+        self.objfnlogL()
         
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self._imap = self.pars.copy()
@@ -1082,9 +1077,18 @@ class MBO2(object):
         """
         Use the negative (natural) logarithm of the likelihood as objective function
         """
-        def nln(*args, **kwargs):
+        def nln(self, *args, **kwargs):
             """ -ln(Likelihood) """
-            return -self.logL(*args, **kwargs)
+            return -self.logL(*args[1:], **kwargs)
+        self.objf = nln
+        
+    def objfnlogPost(self):
+        """
+        Use the negative (natural) logarithm of the likelihood as objective function
+        """
+        def nln(self, *args, **kwargs):
+            """ -ln(Posterior) """
+            return -self.logPost(*args[1:], **kwargs)
         self.objf = nln
 
     def objfInfo(self):

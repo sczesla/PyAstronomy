@@ -147,26 +147,11 @@ Whose answer reads:
 ::
 
     Information on the objective function:
-          Objective function: -ln(Posterior) 
+          Objective function: -ln(Likelihood) 
 
 The default objective function is the negative (natural) logarithm of
-the posterior. For one or more parameters collectively referred to as :math:`\theta`,
-data D, and available information I, the posterior reads:
+the likelihood.
 
-.. math::
-
-   p(\theta|D,I) = \frac{p(\theta|I) L(D|\theta,I)}{p(D|I)} \;\;\;\; \mbox{posterior} = \frac{\mbox{prior times likelihood}}{\mbox{marginal likelihood}}
-    
-where the right is the same as the left only "in words". If not specified otherwise, the priors are assumed to be
-improper uniform distributions (i.e., :math:`p(\theta|I) = 1`) and the marginal likelihood is also assumed to be one;
-the latter is often hard to calculate. This means that, in this case, the posterior is (a) most likely not normalized and
-(b) equal to the negative likelihood function.
-
-If you want to make sure to use the (negative natural logarithm of the) likelihood as objective, use
-
-::
-
-    gf.objfnlogL()
 
 
 
@@ -181,6 +166,8 @@ lines must only occur in absorption or emission for physical reasons.
 
 Restrictions can be handled in many ways:
 
+- The restriction can be absorbed in the definition of the model, e.g., by using the absolute value of the
+  standard deviation in calculating a Gaussian curve.
 - Some optimization algorithm allow to specify boundaries (or more general constraints) for the parameter
   values. One example of such an algorithm is scipy's "fmin_l_bfgs_b".
 - Restrictions can be implemented by penalizing the objective function when the boundaries are violated.
@@ -193,8 +180,12 @@ Restrictions can be handled in many ways:
 Algorithm allowing boundary conditions (fmin_l_bfgs_b)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here directly invoke scipy's fmin_l_bfgs_b to carry out an optimization with
-boundary conditions.
+Here directly invoke the
+`fmin_l_bfgs_b <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html>`_
+as implemented in scipy to carry out an optimization with boundary conditions.
+
+.. note:: Please mind the citation request for use of the algorithm explained
+          `here <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html>`_.
   
 ::
     
@@ -242,7 +233,72 @@ boundary conditions.
     plt.show()
 
 
+Built-in restriction
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+    
+    from __future__ import print_function, division
+    from numpy import arange, sqrt, exp, pi, random, ones_like
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit2 as fuf2
+    import scipy.optimize as sco
+    
+    
+    # Creating a Gaussian with some noise
+    # Choose some parameters...
+    gPar = {"A":1.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
+    # Calculate profile
+    x = arange(100) - 50.0
+    y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
+        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
+    # Add some noise...
+    y += random.normal(0.0, 0.002, x.size)
+    # ...and save the error bars
+    yerr = ones_like(x)*0.002
+    # Let us see what we have done...
+    plt.plot(x, y, 'bp')
+    
+    # Create a model object
+    gf = fuf2.GaussFit1d()
+    
+    # Set guess values for the parameters
+    gf.assignValues({"A":3, "sig":3.77, "off":0.96, "mu":10.5})
+    
+    # 'Thaw' those (the order is irrelevant)
+    gf.thaw(["mu", "sig", "off", "A"])
+    
+    # Restrict the valid range for sigma
+    gf.setRestriction({"sig":[0,5]})
+    
+    fuf2.fitfmin_l_bfgs_b1d(gf, x, y, yerr=yerr)
+    
+    gf.parameterSummary()
+    plt.plot(x, gf.evaluate(x), 'r--')
+    plt.show()
 
 
+
+
+TBD
+-------
+
+For one or more parameters collectively referred to as :math:`\theta`,
+data D, and available information I, the posterior reads:
+
+.. math::
+
+   p(\theta|D,I) = \frac{p(\theta|I) L(D|\theta,I)}{p(D|I)} \;\;\;\; \mbox{posterior} = \frac{\mbox{prior times likelihood}}{\mbox{marginal likelihood}}
+    
+where the right is the same as the left only "in words". If not specified otherwise, the priors are assumed to be
+improper uniform distributions (i.e., :math:`p(\theta|I) = 1`) and the marginal likelihood is also assumed to be one;
+the latter is often hard to calculate. This means that, in this case, the posterior is (a) most likely not normalized and
+(b) equal to the negative likelihood function.
+
+If you want to make sure to use the (negative natural logarithm of the) likelihood as objective, use
+
+::
+
+    gf.objfnlogL()
 
 
