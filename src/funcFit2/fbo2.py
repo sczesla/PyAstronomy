@@ -644,7 +644,7 @@ class MBO2(object):
         
         # Set objective function to negative posterior probability
         def defobjf(self, *args, **kwargs):
-            """ Objective function: -ln(Posterior) """
+            """ -ln(Posterior) """
             return -self.logPost(*args[1:], **kwargs)
         # Set the objective function. Note that 'objf' is a property and
         # actually setSPLikeObjf is invoked.
@@ -1074,6 +1074,29 @@ class MBO2(object):
     def grad(self, *args, **kwargs):
         raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
 
+    def objfnlogL(self):
+        """
+        Use the negative (natural) logarithm of the likelihood as objective function
+        """
+        def nln(*args, **kwargs):
+            """ -ln(Likelihood) """
+            return -self.logL(*args, **kwargs)
+        self.objf = nln
+
+    def objfInfo(self):
+        """
+        Information on objective function
+        
+        Returns
+        -------
+        Info : string or None
+            If assigned, the docstring of the objective function and None
+            otherwise.
+        """
+        oi = None
+        if hasattr(self, "objf"):
+            oi = self.objf.__doc__
+        return oi
 
 
 
