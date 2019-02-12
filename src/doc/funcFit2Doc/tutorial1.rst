@@ -126,6 +126,51 @@ It shows how free parameters can be specified and restrictions can be applied.
     plt.show()
     
 
+On the objective function
+----------------------------------
+
+So what do we minimize in the previous example or elsewhere?
+
+::
+
+    from __future__ import print_function, division
+    from PyAstronomy import funcFit2 as fuf2
+    
+    # Create a model object
+    gf = fuf2.GaussFit1d()
+    
+    print("Information on the objective function:")
+    print("    ", gf.objfInfo())
+
+Whose answer reads:
+
+::
+
+    Information on the objective function:
+          Objective function: -ln(Posterior) 
+
+The default objective function is the negative (natural) logarithm of
+the posterior. For one or more parameters collectively referred to as :math:`\theta`,
+data D, and available information I, the posterior reads:
+
+.. math::
+
+   p(\theta|D,I) = \frac{p(\theta|I) L(D|\theta,I)}{p(D|I)} \;\;\;\; \mbox{posterior} = \frac{\mbox{prior times likelihood}}{\mbox{marginal likelihood}}
+    
+where the right is the same as the left only "in words". If not specified otherwise, the priors are assumed to be
+improper uniform distributions (i.e., :math:`p(\theta|I) = 1`) and the marginal likelihood is also assumed to be one;
+the latter is often hard to calculate. This means that, in this case, the posterior is (a) most likely not normalized and
+(b) equal to the negative likelihood function.
+
+If you want to make sure to use the (negative natural logarithm of the) likelihood as objective, use
+
+::
+
+    gf.objfnlogL()
+
+
+
+
 Restrictions
 ----------------------------
 
