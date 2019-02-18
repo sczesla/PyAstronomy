@@ -1115,6 +1115,44 @@ class MBO2(object):
             return -self.logL(*args[1:], **kwargs)
         self.objf = nln
         
+    def getRPenalty(self, pf=1e20):
+        """
+        Get penalty for violating restrictions
+        
+        Parameters
+        ----------
+        pf : float
+            If a boundary, b, specified in a restriction is violated, the
+            penalty is calculated as abs(b-v) x pf, where v is the current
+            parameter value.
+        
+        Returns
+        -------
+        Penalty : float
+            Penalty for current restrictions and parameter values
+        """
+        x = 0.0
+        for p, r in six.iteritems(self.getRestrictions()):
+            if (not r[0] is None) and (self[p] < r[0]):
+                x += pf*abs(self[p]-r[0])
+                continue
+            if (not r[1] is None) and (self[p] > r[1]):
+                x += pf*abs(self[p]-r[1])
+                continue
+        return x
+    
+    def objfPenalize(self, pf=1e20):
+        """
+        Add restriction penalties to objective function
+        """
+        self._nonpenobjf = self.getSPLikeObjf()
+        def pobj(self, *args, **kwargs):
+            x = self._nonpenobjf(*args, **kwargs)
+            x += self.getRPenalty()
+            return x
+        pobj.__doc__ = self._nonpenobjf.__doc__ + " (penalized)"
+        self.objf = pobj
+        
     def objfnlogPost(self):
         """
         Use the negative (natural) logarithm of the likelihood as objective function
@@ -1128,7 +1166,10 @@ class MBO2(object):
         """
         Use chi square (or squared distance if uncertainty not given) as objective function
         """
-        self.objf =  chisqrobjf
+        def csq(self, *args, **kwargs):
+            """ chi-square """
+            return chisqrobjf(self, *args, **kwargs)
+        self.objf = csq
 
     def objfInfo(self):
         """
