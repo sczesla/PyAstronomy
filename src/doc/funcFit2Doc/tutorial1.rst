@@ -458,3 +458,107 @@ Relations define functional dependences between different parameter values.
     plt.plot(x, gf.evaluate(x), 'r--')
     plt.show()
 
+
+Custom models
+---------------------
+
+Straight line
+~~~~~~~~~~~~~~~~~
+
+::
+
+    from __future__ import print_function, division
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit2 as fuf2
+    import scipy.optimize as sco
+    
+    
+    class LinMod(fuf2.MBO2):
+        """ Linear model with additional jitter """
+        
+        def __init__(self):
+            # 'pars' specifies parameter names in the model
+            fuf2.MBO2.__init__(self, pars=["const", "slope"], rootName="LinMod")
+            # Use likelihood based on Gaussian errors with std yerr
+            self.setlogL("1dgauss")
+        
+        def evaluate(self, x):
+            """ Evaluate line """
+            return self["const"] + x * self["slope"]
+    
+    
+    # Instantiate model
+    lm = LinMod()
+    lm["slope"] = 1.1
+    lm["const"] = -0.5
+    
+    # Get some 'data' and add Gaussian noise with STD 10
+    x = np.arange(15.)
+    y = lm.evaluate(x) + np.random.normal(0,1,len(x))
+    yerr = np.ones_like(x)
+    
+    lm.thaw(["slope", "const"])
+    
+    fr = sco.fmin(lm.objf, x0=lm.freeParamVals(), args=(x,y,yerr))
+    lm.setFreeParamVals(fr)
+    
+    lm.parameterSummary()
+    
+    plt.errorbar(x, y, yerr=yerr, fmt='b+')
+    plt.plot(x, lm.evaluate(x), 'r--')
+    plt.show()
+
+
+
+Straight line with jitter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    from __future__ import print_function, division
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit2 as fuf2
+    import scipy.optimize as sco
+    
+    
+    class LinMod(fuf2.MBO2):
+        """ Linear model with additional jitter """
+        
+        def __init__(self):
+            fuf2.MBO2.__init__(self, pars=["const", "slope", "jitter"], rootName="LinMod")
+        
+        def evaluate(self, x):
+            """ Evaluate line """
+            return self["const"] + x * self["slope"]
+    
+        def logL(self, x, y, yerr, **kwargs):
+            """ ln(Likelihood) with jitter as additional term """
+            yr = np.sqrt(yerr**2 + self["jitter"]**2)
+            m = self.evaluate(x)
+            lnl = -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yr)) - 0.5 * np.sum((m-y)**2/(yr**2))
+            return lnl
+    
+    # Instantiate model
+    lm = LinMod()
+    lm["slope"] = 1.1
+    lm["const"] = -0.5
+    
+    # Get some 'data' and add Gaussian noise with STD 10
+    x = np.arange(150.)
+    y = lm.evaluate(x) + np.random.normal(0,10,len(x))
+    # Nominal error has STD 1
+    yerr = np.ones_like(x)
+    
+    lm.thaw(["slope", "const", "jitter"])
+    
+    fr = sco.fmin(lm.objf, x0=lm.freeParamVals(), args=(x,y,yerr))
+    lm.setFreeParamVals(fr)
+    
+    lm.parameterSummary()
+    
+    plt.errorbar(x, y, yerr=yerr, fmt='b+')
+    plt.plot(x, lm.evaluate(x), 'r--')
+    plt.show()
+
