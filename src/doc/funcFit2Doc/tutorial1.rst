@@ -514,6 +514,10 @@ Straight line
 Straight line with jitter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+A linear model with custom specification of the likelihood, which allows to take into account
+an additional contribution to the uncertainty of the data (jitter). The jitter can be treated
+as a free parameter in the fit. 
+
 ::
 
     from __future__ import print_function, division
