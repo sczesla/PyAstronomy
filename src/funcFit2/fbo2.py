@@ -14,6 +14,7 @@ import sys
 import scipy.optimize as sco
 import inspect
 import sys
+import fnmatch
 
 _fbo2module = sys.modules[__name__]
 
@@ -814,7 +815,18 @@ class MBO2(object):
         """
         for k, v in six.iteritems(vals):
             self.pars[k] = v
-        
+    
+    def _pex(self, pns):
+        """
+        Apply unix filename-like pattern matching and return updated list of parameters
+        """
+        if isinstance(pns, six.string_types):
+            pns = [pns]
+        r = []
+        for p in pns:
+            r.extend(fnmatch.filter(list(self.parameters()), p))
+        return r
+       
     def thaw(self, pns):
         pns = self._pex(pns)
         self.pars.thaw(pns)
@@ -1200,7 +1212,6 @@ class MBO2(object):
         if hasattr(self, "objf"):
             oi = self.objf.__doc__
         return oi
-
 
 
 
