@@ -286,7 +286,11 @@ class Picker:
             y coordinates of the selected points.
         """
         self.root.wm_title(self.windowTitle)
-        self.canvas.show()
+        try:
+            self.canvas.show()
+        except AttributeError:
+            # Seems to be dispensable with newer (> about 3) matplotlib versions
+            pass
         tk.mainloop()
         # Prepare return value
         self.points = []
