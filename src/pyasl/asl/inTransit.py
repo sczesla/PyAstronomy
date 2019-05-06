@@ -593,6 +593,10 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
             trData = {}
             # Get times
             Tmid = T0 + float(i) * period
+            if (Tmid < tmin) or (Tmid > tmax):
+                # This may happen because the transit may occur in the first
+                # relevant epoch but still before tmin. Likewise for tmax.
+                continue
             obs_start_hjd = Tmid - (dur / 2.0) - obsOffset
             obs_start = daycnv(obs_start_hjd)
             obs_mid = daycnv(Tmid)
