@@ -33,7 +33,7 @@ def airmassSpherical(zangle, obsAltitude, rearth=6371.0, yatm=10.0):
 
     Parameters
     ----------
-    zangle : float
+    zangle : float, array
         Zenith angle of an object in deg.
     obsAltitude :  float
         Elevation of the observer in meter.
@@ -44,7 +44,7 @@ def airmassSpherical(zangle, obsAltitude, rearth=6371.0, yatm=10.0):
 
     Returns
     -------
-    Airmass : float
+    Airmass : float or array
         The airmass.
     """
 
@@ -56,8 +56,8 @@ def airmassSpherical(zangle, obsAltitude, rearth=6371.0, yatm=10.0):
 
     # Find maximal zenith angle
     zmax = 180.0 - PC.radtodeg(np.arcsin(rearth / (rearth + obsAltitude)))
-    if zangle > zmax:
-        raise(PE.PyAValError("Zenith angle is too large. The maximum allowed angle is " + str(zmax) + " deg.",
+    if np.any(zangle > zmax):
+        raise(PE.PyAValError("At least one zenith angle is too large. The maximum allowed angle is " + str(zmax) + " deg.",
                              solution="Use an angle within the limit. Check observer's altitude."))
 
     # Convert into deg
