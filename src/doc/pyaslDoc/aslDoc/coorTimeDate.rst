@@ -16,6 +16,7 @@ Below you find the documentation of the following routines:
  * :py:func:`get_juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.get_juldate>`
  * :py:func:`juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.juldate>`
  * :py:func:`localTime <PyAstronomy.pyasl.asl.localTime>`
+ * :py:func:`localTime <PyAstronomy.pyasl.asl.weekday>`
 
 Example: Convert from JD into calendar date (daycnv)
 --------------------------------------------------------------
@@ -58,6 +59,7 @@ Example: daycnv, helio_jd, jdcnv, get_juldate, and juldate
     print("Input date: ", dt)
     print("Corresponding Julian date: ", pyasl.jdcnv(dt))
     print("Corresponding reduced Julian date: ", pyasl.juldate(dt))
+    print("Corresponds to weekday: ", pyasl.weekday(dt))
     print()
     
     # Get current Julian date and convert to heliocentric date

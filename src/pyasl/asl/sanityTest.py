@@ -242,6 +242,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         print("Input date: ", dt)
         print("Corresponding Julian date: ", pyasl.jdcnv(dt))
         print("Corresponding reduced Julian date: ", pyasl.juldate(dt))
+        print("Corresponds to weekday: ", pyasl.weekday(dt))
         print()
 
         # Get current Julian date and convert to heliocentric date

@@ -7,6 +7,31 @@ from PyAstronomy.pyaC import pyaErrors as PE
 import six.moves as smo
 
 
+def weekday(date):
+    """
+    Return weekday by name
+
+    Parameters
+    ----------
+    date : DATETIME object
+       Give the date of a day as DATETIME object.
+
+    Returns
+    -------
+    name: string
+        "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday", "Sunday"
+    """
+    if not isinstance(date, datetime.date):
+        raise(ValueError("ERROR weekday: Given date is not a DATETIME object."))
+
+    dayname = ["Monday", "Tuesday", "Wednesday",
+               "Thursday", "Friday", "Saturday", "Sunday"]
+    ind = date.weekday()
+
+    return dayname[ind]
+
+
 def daycnv(xjd, mode="idl"):
     """
     Converts Julian dates to Gregorian calendar dates. 
