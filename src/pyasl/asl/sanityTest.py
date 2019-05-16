@@ -2382,6 +2382,37 @@ class SanityOfBroad(unittest.TestCase):
         self.assertAlmostEqual(fwhm, sig * 2 * np.sqrt(2. * np.log(2.0)), delta=1e-9,
                                msg="FWHM and std differ.")
 
+    def sanity_thermalExample(self):
+        """
+        Checking example of thermal broadening
+        """
+        from PyAstronomy import pyasl
+        
+        w0 = 6564.0
+        T = 9567.0
+        
+        linefwhm = pyasl.thermalBroadeningWidth(w0, T)
+        tbroad = pyasl.tempFromthermalBroadeningWidth(w0, linefwhm, awidth=0.0)
+        
+        print("Line width [FWHM]: %5.2f" % linefwhm)
+        print("Thermal broadening temperature: %6.1f" % tbroad)
+        
+    def sanity_thermalBroadeningAndReverse(self):
+        """
+        Checking thermal broadening and its reverse
+        """
+        from PyAstronomy import pyasl
+
+        for w in [1000, 5000, 10000]:
+            for T in [100., 1000., 10000.]:
+        
+                linefwhm = pyasl.thermalBroadeningWidth(w, T)
+                tbroad = pyasl.tempFromthermalBroadeningWidth(w, linefwhm, awidth=0.0)
+                self.assertAlmostEqual(T, tbroad, delta=1e-8, msg="Input and output temperature differ in thermal broadening.")
+                tbroad2 = pyasl.tempFromthermalBroadeningWidth(w, linefwhm, awidth=linefwhm/2.)
+                self.assertAlmostEqual(T*0.75, tbroad2, delta=1e-8, msg="Input and output temperature differ in thermal broadening width awidth=0.5*linewidth.")
+
+
 
 class SanityOfCrosscor(unittest.TestCase):
 

@@ -179,3 +179,70 @@ def thermalBroadeningWidth(lam0, T, m=None, fwhm=True):
         return result / (2.0 * np.sqrt(2.0 * np.log(2.0)))
     else:
         return result
+    
+    
+    
+def tempFromthermalBroadeningWidth(lam0, width, m=None, awidth=0.0):
+    """
+    Calculate the temperature required to obtain thermal broadening width.
+
+    Thermal motion of particles causes Doppler
+    broadening of the line profile. The resulting
+    line profile is Gaussian with FWHM given by
+
+    .. math::
+
+        fwhm = \\lambda_0\\sqrt{\\frac{8k_B T\\ln(2)}{m c^2}}
+
+    See, e.g.,
+    http://hyperphysics.phy-astr.gsu.edu/hbase/atomic/broaden.html
+
+    Here, the relation is reversed, so that the temperature, T, can be
+    obtained from the width. The relation is only strictly valid in the case
+    of Gaussian lines.
+
+    .. note:: Units of lam0, width, and awidth have to be consistent.
+
+    Parameters
+    ----------
+    lam0 : float
+        Wavelength at which to width (FWHM) was measured.
+    width : float
+        Measured width of the feature (FWHM) 
+    m : float, optional
+        Mass of the particles [kg]. If not specified,
+        the proton mass is assumed.
+    awidth : float
+        Additional width contributed by other effects such as
+        instrumental resolution. The thermal width, ft, is obtained by
+        quadratic subtraction, i.e., ft**2 = width**2 - awidth**2.
+        Default is zero.
+
+    Returns
+    -------
+    Temperature : float
+        The temperature required to achieve the specified broadening
+        width.
+    Thermal width : float
+        The thermal width used in the calculations (may be modified
+        if `awidth` has been specified.
+    """
+    from PyAstronomy import constants as PC
+    pc = PC.PyAConstants()
+    pc.setSystem("SI")
+    if m is None:
+        # Use proton mass if not specified otherwise
+        m = pc.mp
+        
+    if awidth > width:
+        raise(PE.PyAValError("The additional width (awidth) is larger than the specified width of the feature.", \
+                             where="tempFromthermalBroadeningWidth", \
+                             solution="Check width specification.")) 
+        
+    # Take into account additional width
+    width = np.sqrt(width**2 - awidth**2)
+        
+    result = width**2 / lam0**2 * (m * (pc.c)**2) / (8.0 * pc.k * np.log(2.0))
+    return result
+    
+
