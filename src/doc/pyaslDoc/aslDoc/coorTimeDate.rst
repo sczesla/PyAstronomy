@@ -16,7 +16,7 @@ Below you find the documentation of the following routines:
  * :py:func:`get_juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.get_juldate>`
  * :py:func:`juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.juldate>`
  * :py:func:`localTime <PyAstronomy.pyasl.asl.localTime>`
- * :py:func:`localTime <PyAstronomy.pyasl.asl.weekday>`
+ * :py:func:`weekday <PyAstronomy.pyasl.asl.astroTimeLegacy.weekday>`
 
 Example: Convert from JD into calendar date (daycnv)
 --------------------------------------------------------------
