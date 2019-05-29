@@ -1443,6 +1443,31 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
         plt.plot(xnew, ynew, 'bp')
 #     plt.show()
 
+    def sanity_generalizedESD_NISTR_compatibility(self):
+        """ Checking generalizedESD vs R implementation of NIST """
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        # Convert data given at:
+        # http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
+        # to array.
+        x = np.array([float(x) for x in "-0.25 0.68 0.94 1.15 1.20 1.26 1.26 1.34 1.38 1.43 1.49 1.49 \
+                  1.55 1.56 1.58 1.65 1.69 1.70 1.76 1.77 1.81 1.91 1.94 1.96 \
+                  1.99 2.06 2.09 2.10 2.14 2.15 2.23 2.24 2.26 2.35 2.37 2.40 \
+                  2.47 2.54 2.62 2.64 2.90 2.92 2.92 2.93 3.21 3.26 3.30 3.59 \
+                  3.68 4.30 4.64 5.34 5.42 6.01".split()])
+        
+        # Apply the generalized ESD
+        r = pyasl.generalizedESD(x, 10, 0.05, fullOutput=True, ubvar=True)
+        
+        # NIST example
+        # https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.r
+        r1 = r[2][0] - 3.118906
+        r2 = r[2][6] - 2.279327
+        self.assertAlmostEqual(r1, 0.0, delta=1e-7, msg="generalizedESD incompatible with NIST's R implementation (r1 = " + str(r1) + ")")
+        self.assertAlmostEqual(r2, 0.0, delta=1e-7, msg="generalizedESD incompatible with NIST's R implementation (r2 = " + str(r2) + ")")
+
 
 class SanityOfMagnitudes(unittest.TestCase, SaniBase):
 

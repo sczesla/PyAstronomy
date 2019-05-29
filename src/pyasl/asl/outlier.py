@@ -6,7 +6,7 @@ from PyAstronomy.pyaC import ImportCheck
 import six.moves as smo
 
 
-def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
+def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False, ubvar=False):
     """
     Carry out a Generalized ESD Test for Outliers.
 
@@ -26,7 +26,12 @@ def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
     fullOutput : boolean, optional
         Determines whether additional return values
         are provided. Default is False.
-
+    ubvar : boolean, optional
+        If True, an unbiased estimate for the variance will be used in the
+        calculation; this provides compatibility with the R implementation of
+        NIST. If False (default), the maximum-likelihood variance estimate
+        will be used.
+    
     Returns
     -------
     Number of outliers : int
@@ -59,7 +64,7 @@ def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
     for i in smo.range(maxOLs + 1):
         # Compute mean and std of x
         xmean = xm.mean()
-        xstd = xm.std()
+        xstd = xm.std(ddof=int(ubvar))
         # Find maximum deviation
         rr = np.abs((xm - xmean) / xstd)
         minds.append(np.argmax(rr))
@@ -96,7 +101,7 @@ def generalizedESD(x, maxOLs, alpha=0.05, fullOutput=False):
             return 0, [], R, L, minds
 
 
-def pointDistGESD(x, maxOLs, alpha=0.05):
+def pointDistGESD(x, maxOLs, alpha=0.05, ubvar=False):
     """
     Search for outliers by comparing distance of adjacent points.
 
@@ -116,6 +121,11 @@ def pointDistGESD(x, maxOLs, alpha=0.05):
     alpha : float, optional
         The significance level to be used in applying
         `generalizedESD`. The default is 0.05.
+    ubvar : boolean, optional
+        If True, an unbiased estimate for the variance will be used in the
+        calculation; this provides compatibility with the R implementation of
+        NIST. If False (default), the maximum-likelihood variance estimate
+        will be used.
 
     Returns
     -------
@@ -128,7 +138,7 @@ def pointDistGESD(x, maxOLs, alpha=0.05):
     # Get the distances
     ds = x[1:] - x[0:-1]
     # Apply the generalized ESD to the distances
-    r = generalizedESD(ds, maxOLs=maxOLs * 2, alpha=alpha, fullOutput=False)
+    r = generalizedESD(ds, maxOLs=maxOLs * 2, alpha=alpha, fullOutput=False, ubvar=ubvar)
     # Detect outliers (distance to left AND right should
     # be abnormal).
     oll = []
