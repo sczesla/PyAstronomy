@@ -13,6 +13,7 @@ Several often needed models are shipped with funcFit.
   - Sine wave (class :py:class:`SinusFit1d`)
   - Exponential decay (class :py:class:`ExpDecayFit1d`)
   - Polynomial of degree *n* (class :py:class:`PolyFit1d`)
+  - Hyperbolic secant (class :py:class:`Sech1d`)
   - Constant (class :py:class:`ConstantFit1d`)
   - 2d Gaussian (class :py:class:`GaussFit2d`)
   - Multicomponent 2d Gaussian (class :py:class:`MultiGauss2d`)
@@ -60,6 +61,10 @@ Exponential decay
 Polynomial of degree n
 ---------------------------------------------
 .. autoclass:: PolyFit1d
+
+Hyperbolic secant
+---------------------------------------------
+.. autoclass:: Sech1d
 
 Constant
 ---------------------------------------------
