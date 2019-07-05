@@ -106,14 +106,14 @@ class TransmissionCurves:
 
         Returns
         -------
-        Availabale names : list of strings
+        Available names : list of strings
             All bands for which data are available.
         """
         return sorted(list(self.bands))
 
     def getTransCurve(self, bn, ik='linear'):
         """
-        Get a tranmission curve.
+        Get a transmission curve.
 
         Parameters
         ----------
@@ -121,12 +121,12 @@ class TransmissionCurves:
             Name of the band.
         ik : string, optional
             The type of interpolation. Accepts all values also
-            accepted by the `kind` keyword of scipy's `interp1d` rountine.
+            accepted by the `kind` keyword of scipy's `interp1d` routine.
             Default is 'linear'.
 
         Returns
         -------
-        Tranmission curve : callable
+        Transmission curve : callable
             An object (scipy.interpolate.interp1d) that can be called
             with wavelength (float or array in [A]) as argument and returns
             the transmission. 
@@ -144,7 +144,7 @@ class TransmissionCurves:
         -------
         Transmission table : 2d array
             A table (array) with wavelength [A] in first column and
-            tranmission (0-1) in the second column. 
+            transmission (0-1) in the second column. 
         """
         self._checkBand(bn)
         return self.bands[bn]
@@ -161,7 +161,7 @@ class TransmissionCurves:
             Name of the band.
         ik : string, optional
             The type of interpolation. Accepts all values also
-            accepted by the `kind` keyword of scipy's `interp1d` rountine.
+            accepted by the `kind` keyword of scipy's `interp1d` routine.
             Default is 'linear'.
 
         Returns
