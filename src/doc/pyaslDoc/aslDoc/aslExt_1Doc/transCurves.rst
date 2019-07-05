@@ -27,7 +27,12 @@ Further information on photometric bands:
   Kepler              `Kepler passband (high resolution)
                       <http://keplergo.arc.nasa.gov/kepler_response_hires1.txt>`_
                       
-                      Call **addKeplerPassband** to add passband to inventory.         
+                      Call **addKeplerPassband** to add passband to inventory.     
+                      
+  TESS                Transmission curve for TESS mission
+                      `see <https://heasarc.gsfc.nasa.gov/docs/tess/the-tess-space-telescope.html>`_
+                      
+                      Call **addTESSPassband** to add passband to inventory.
   ==================  ===========================================================================================
 
 
