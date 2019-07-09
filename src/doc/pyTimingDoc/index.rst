@@ -13,3 +13,4 @@ Lomb-Scargle periodograms.
 
     pyPeriodDoc/pyPeriod.rst
     pyPDMDoc/pdm.rst
+    stringlength.rst
