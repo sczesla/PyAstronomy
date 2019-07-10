@@ -499,6 +499,43 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
 #     plt.plot(lam*1e10, s7erg, 'b-')
 #     plt.show()
 
+    def sanity_magToFluxDensity_bessel98(self):
+        """
+        Checking consistency of magToFluxDensity_bessel98
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        
+        fnu = np.array("1.790 4.063 3.636 3.064 2.416 1.589 1.021 0.640 0.676 0.285 0.238".split(), dtype=np.float)
+        flam = np.array("417.5 632 363.1 217.7 112.6 31.47 11.38 3.961 4.479 0.708 0.489".split(), dtype=np.float)
+        
+        for i, b in enumerate("U, B, V, R, I, J, H, K, Kp, L, L*".split(",")):
+            a, lame = pyasl.magToFluxDensity_bessel98(b.strip(), 0.0, "nu")
+            self.assertAlmostEqual((a*1e20 - fnu[i])/fnu[i], 0.0, delta=8e-3, msg="fnu does not match for zero magnitude")
+            b, lame = pyasl.magToFluxDensity_bessel98(b.strip(), 0.0, "lam")
+            print()       
+            self.assertAlmostEqual((b*1e11 - flam[i])/flam[i], 0.0, delta=8e-3, msg="flam does not match for zero magnitude")
+
+    def sanity_magToFluxDensity_bessel98_example(self):
+        """
+        Checking example of magToFluxDensity_bessel98
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        
+        mag_R = 15.5
+        
+        fd_nu, le = pyasl.magToFluxDensity_bessel98("R", mag_R, "nu")
+        fd_lam, _ = pyasl.magToFluxDensity_bessel98("R", mag_R, "lam")
+        
+        print("R-band magnitude: ", mag_R)
+        print("R-band flux density [erg/cm**2/s/Hz]: ", fd_nu)
+        print("R-band flux density [erg/cm**2/s/A]: ", fd_lam)
+        
+        print("Effective wavelength of filter [A]: ", le)
+        print("Convert f_nu into f_lam [erg/cm**2/s/A] by multiplication with (c/lam**2): ", \
+            fd_nu * (299792458e2/(le/1e8)**2) / 1e8 )
+
 
 class SanityOfMoonpos(unittest.TestCase, SaniBase):
 
