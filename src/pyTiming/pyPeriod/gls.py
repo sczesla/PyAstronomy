@@ -124,7 +124,7 @@ class Gls:
 
     """
     # Available normalizations
-    norms = ['ZK', 'Scargle', 'HorneBaliunas', 'Cumming', 'wrms', 'chisq']
+    norms = ['ZK', 'Scargle', 'HorneBaliunas', 'Cumming', 'wrms', 'chisq', 'lnL', 'dlnL']
 
     def __init__(self, lc, fbeg=None, fend=None, Pbeg=None, Pend=None, ofac=10, hifac=1, freq=None, norm="ZK", ls=False, fast=False, verbose=False, **kwargs):
 
@@ -335,6 +335,14 @@ class Gls:
         elif norm == "wrms":
             power = sqrt(self._YY*(1.-p))
             self.label["ylabel"] = "wrms"
+        elif norm == "lnL":
+            chi2 = self._YY *self.wsum * (1.-p)
+            power = -0.5*chi2 - 0.5*np.sum(np.log(2*np.pi * self.yerr))
+            self.label["ylabel"] = "lnL"
+        elif norm == "dlnL":
+            # dlnL = lnL - lnL0 = -0.5 chi^2 + 0.5 chi0^2 = 0.5 (chi0^2 - chi^2) = 0.5 chi0^2 p
+            power = 0.5 * self._YY * self.wsum * p
+            self.label["ylabel"] = "dlnL"
 
         self.power = power
 
@@ -549,10 +557,19 @@ class Gls:
         self._normcheck(self.norm)
         if self.norm == "ZK": return (1.-Pn)**((self.N-3.)/2.)
         if self.norm == "Scargle": return exp(-Pn)
-        if self.norm == "HorneBaliunas": return (1.-2.*Pn/(self.N-1.))**((self.N-3.)/2.)
-        if self.norm == "Cumming": return (1.+2.*Pn/(self.N-3.))**(-(self.N-3.)/2.)
-        if self.norm == "wrms": return (Pn**2/self._YY)**((self.N-3.)/2.)
-        if self.norm == "chisq": return (Pn/self._YY/self.wsum)**((self.N-3.)/2.)
+        if self.norm == "HorneBaliunas": return (1-2*Pn/(self.N-1)) ** ((self.N-3)/2)
+        if self.norm == "Cumming": return (1+2*Pn/(self.N-3)) ** (-(self.N-3)/2)
+        if self.norm == "wrms": return (Pn**2/self._YY) ** ((self.N-3)/2)
+        if self.norm == "chisq": return (Pn/self._YY/self.wsum) ** ((self.N-3)/2)
+        if self.norm == "ZK":
+            p = Pn
+        if self.norm == "dlnL":
+            p = 2 * Pn / self._YY / self.wsum
+        if self.norm == "lnL":
+            chi2 = -2*Pn - np.sum(np.log(2*np.pi * self.yerr**2))
+            p = 1 - chi2/self._YY/self.wsum
+        return (1-p) ** ((self.N-3)/2)
+
 
     def probInv(self, Prob):
         """
@@ -575,10 +592,15 @@ class Gls:
         self._normcheck(self.norm)
         if self.norm == "ZK": return 1.-Prob**(2./(self.N-3.))
         if self.norm == "Scargle": return -log(Prob)
-        if self.norm == "HorneBaliunas": return (self.N-1) / 2. * (1.-Prob**(2./(self.N-3)))
-        if self.norm == "Cumming": return (self.N-3) / 2. * (Prob**(-2./(self.N-3.))-1.)
-        if self.norm == "wrms": return sqrt(self._YY * Prob**(2./(self.N-3.)))
-        if self.norm == "chisq": return self._YY * self.wsum * Prob**(2./(self.N-3.))
+        if self.norm == "HorneBaliunas": return (self.N-1) / 2 * (1-Prob**(2/(self.N-3)))
+        if self.norm == "Cumming": return (self.N-3) / 2 * (Prob**(-2./(self.N-3))-1)
+        if self.norm == "wrms": return sqrt(self._YY * Prob**(2/(self.N-3)))
+        if self.norm == "chisq": return self._YY * self.wsum * Prob**(2/(self.N-3))
+        p = 1 - Prob**(2/(self.N-3))
+        if self.norm == "ZK": return p
+        if self.norm == "lnL": return -0.5*self._YY*self.wsum*(1.-p) - 0.5*np.sum(np.log(2*np.pi * self.yerr**2))
+        if self.norm == "dlnL": return 0.5 * self._YY * self.wsum * p
+
 
     def FAP(self, Pn):
         """
