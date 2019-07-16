@@ -93,7 +93,7 @@ class Gls:
         The abscissa data values.
     y : array
         The ordinate data values.
-    yerr : array
+    e_y : array
         The errors of the data values.
     norm : string, {'ZK', 'Scargle', 'HorneBaliunas', 'Cumming', 'wrms', 'chisq'}
         The used normalization.
@@ -156,6 +156,16 @@ class Gls:
         if verbose:
             self.info()
 
+    def _sete_y(self, ey):
+        self.yerr = ey
+    
+    def _gete_y(self):
+        return self.yerr
+
+    """ Treat e_y and yerr synonymously for backward compatibility """
+    e_y = property(_gete_y, _sete_y)
+    
+
     def _assignTimeSeries(self, lc):
         """
         A container class that holds the observed light curve.
@@ -171,29 +181,29 @@ class Gls:
 
         """
         if isinstance(lc, (tuple, list)):
-            # t, y[, yerr] were given as list or tuple.
+            # t, y[, e_y] were given as list or tuple.
             if len(lc) in (2, 3):
                 self.t = np.ravel(lc[0])
                 self.y = np.ravel(lc[1])
-                self.yerr = None
+                self.e_y = None
                 if len(lc) == 3 and lc[2] is not None:
                     # Error has been specified.
-                    self.yerr = np.ravel(lc[2])
+                    self.e_y = np.ravel(lc[2])
             else:
                 raise(ValueError("lc is a list or tuple with " + str(len(lc)) + " elements. Needs to have 2 or 3 elements." + \
-                                   " solution=Use 2 or 3 elements (t, y[, yerr]) or an instance of TimeSeries"))
+                                   " solution=Use 2 or 3 elements (t, y[, e_y]) or an instance of TimeSeries"))
         else:
             # Assume lc is an instance of TimeSeries.
-            self.t, self.y, self.yerr = lc.time, lc.flux, lc.error
+            self.t, self.y, self.e_y = lc.time, lc.flux, lc.error
 
         self.th = self.t - self.t.min()
         self.tbase = self.th.max()
         self.N = len(self.y)
 
         # Re-check array length compatibility
-        if (len(self.th) != self.N) or ((self.yerr is not None) and (len(self.yerr) != self.N)):
+        if (len(self.th) != self.N) or ((self.e_y is not None) and (len(self.e_y) != self.N)):
             raise(ValueError("Incompatible dimensions of input data arrays (time and flux [and error]). Current shapes are: " + \
-                             ', '.join(str(np.shape(x)) for x in (self.t, self.y, self.yerr))))
+                             ', '.join(str(np.shape(x)) for x in (self.t, self.y, self.e_y))))
 
     def _buildFreq(self):
         """
@@ -233,10 +243,10 @@ class Gls:
 
     def _calcPeriodogram(self):
 
-        if self.yerr is None:
+        if self.e_y is None:
             w = np.ones(self.N)
         else:
-            w = 1 / (self.yerr * self.yerr)
+            w = 1 / (self.e_y * self.e_y)
         self.wsum = w.sum()
         w /= self.wsum
 
@@ -337,7 +347,7 @@ class Gls:
             self.label["ylabel"] = "wrms"
         elif norm == "lnL":
             chi2 = self._YY *self.wsum * (1.-p)
-            power = -0.5*chi2 - 0.5*np.sum(np.log(2*np.pi * self.yerr))
+            power = -0.5*chi2 - 0.5*np.sum(np.log(2*np.pi * self.e_y))
             self.label["ylabel"] = "lnL"
         elif norm == "dlnL":
             # dlnL = lnL - lnL0 = -0.5 chi^2 + 0.5 chi0^2 = 0.5 (chi0^2 - chi^2) = 0.5 chi0^2 p
@@ -428,8 +438,8 @@ class Gls:
         print()
         print("Maximum power p [%s]: % f" % (self.norm, self.power.max()))
         print("RMS of residuals:     % f" % self.rms)
-        if self.yerr is not None:
-            print("  Mean weighted internal error:  %f" % (sqrt(self.N/sum(1./self.yerr**2))))
+        if self.e_y is not None:
+            print("  Mean weighted internal error:  %f" % (sqrt(self.N/sum(1./self.e_y**2))))
         print("Best sine frequency:  % f +/- % f" % (self.hpstat["fbest"], self.hpstat["f_err"]))
         print("Best sine period:     % f +/- % f" % (1./self.hpstat["fbest"], self.hpstat["Psin_err"]))
         print("Amplitude:            % f +/- % f" % (self.hpstat["amp"], self.hpstat["amp_err"]))
@@ -465,7 +475,7 @@ class Gls:
 
         fbest, T0 = self.hpstat["fbest"], self.hpstat["T0"]
         # Data and model
-        datstyle = {'yerr':self.yerr, 'fmt':'r.', 'capsize':0}
+        datstyle = {'yerr':self.e_y, 'fmt':'r.', 'capsize':0}
         tt = arange(self.t.min(), self.t.max(), 0.01/fbest)
         ymod = self.sinmod(tt)
         yfit = self.sinmod(self.t)
@@ -566,7 +576,7 @@ class Gls:
         if self.norm == "dlnL":
             p = 2 * Pn / self._YY / self.wsum
         if self.norm == "lnL":
-            chi2 = -2*Pn - np.sum(np.log(2*np.pi * self.yerr**2))
+            chi2 = -2*Pn - np.sum(np.log(2*np.pi * self.e_y**2))
             p = 1 - chi2/self._YY/self.wsum
         return (1-p) ** ((self.N-3)/2)
 
@@ -598,7 +608,7 @@ class Gls:
         if self.norm == "chisq": return self._YY * self.wsum * Prob**(2/(self.N-3))
         p = 1 - Prob**(2/(self.N-3))
         if self.norm == "ZK": return p
-        if self.norm == "lnL": return -0.5*self._YY*self.wsum*(1.-p) - 0.5*np.sum(np.log(2*np.pi * self.yerr**2))
+        if self.norm == "lnL": return -0.5*self._YY*self.wsum*(1.-p) - 0.5*np.sum(np.log(2*np.pi * self.e_y**2))
         if self.norm == "dlnL": return 0.5 * self._YY * self.wsum * p
 
 
