@@ -141,8 +141,8 @@ class Gls:
         self.label = {'title': 'Generalized Lomb Periodogram',
                       'xlabel': 'Frequency'}
         if "stats" in kwargs:
-          print("Warning: 'stats' option is outdated. Please use 'verbose' instead.")
-          verbose = kwargs["stats"]
+            print("Warning: 'stats' option is outdated. Please use 'verbose' instead.")
+            verbose = kwargs["stats"]
 
         self._normcheck(norm)
 
