@@ -39,6 +39,28 @@ class VoigtAstroP(fuf.OneDFit):
         # Set to zero, because evaluation is done in velocity space
         self._profile["mu"] = 0.0
 
+    def bl(self):
+        """
+        Doppler with in cm
+        """
+        bl = self["w0"] / 1e8 * (self["b"] * 100000.0) / 29979245800.0
+        return bl
+
+    def FWHM(self):
+        """
+        Estimate FWHM
+        
+        Applies same approximation is Voigt1d
+        
+        Returns
+        -------
+        FWHM : float
+            FWHM of line profile in wavelength units [A]
+        """
+        fwhm = self._profile.FWHM()
+        c = 1e8 * self.bl()
+        return fwhm * c
+            
     def evaluate(self, x):
         """
         Evaluate the absorption-line profile.
@@ -56,7 +78,7 @@ class VoigtAstroP(fuf.OneDFit):
         # Wavelength in cm
         w0cm = self["w0"] / 1e8
         # Doppler width in cm
-        bl = w0cm * (self["b"] * 100000.0) / 29979245800.0
+        bl = self.bl()
         # The following formulation is, e.g., according to D.F. Gray "Stellar photospheres"
         # (third edition, Eq. 11.46, p. 257). For the relation between H(u, a) and the Voigt
         # profile see Pagnini and Saxena "A note on the Voigt profile" (Eq. 6,
