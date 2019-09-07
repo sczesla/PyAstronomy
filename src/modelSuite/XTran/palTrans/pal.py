@@ -400,19 +400,31 @@ class PalLCKep(PalLC):
 
     Parameters
     ----------
-    collisionCheck : boolean
+    ke : None, optional
+        If an instance of KeplerEllipse is given, the parameters a, i, tau, per, w, Omega,
+        and e will be adopted from it.
+    collisionCheck : boolean, optional
         If set True, it will be checked whether the two bodies collide on the current orbit.
     """
 
-    def __init__(self, collisionCheck=False):
+    def __init__(self, ke=None, collisionCheck=False):
         _ZList.__init__(self, "keplerian", collisionCheck)
         fuf.OneDFit.__init__(self, ["p", "a", "i", "linLimb", "quadLimb", "tau", "per", "b",
                                     "w", "Omega", "e"])
         self.freeze(["p", "a", "i", "linLimb", "quadLimb", "tau", "per", "b",
                      "w", "Omega", "e"])
         self.setRootName("Pal08")
-        self["per"] = 1.0
-        self["w"] = -90
+        if ke is None:
+            self["per"] = 1.0
+            self["w"] = -90
+        else:
+            self["per"] = ke.per
+            self["w"] = ke.w
+            self["i"] = ke.i
+            self["tau"] = ke.tau
+            self["a"] = ke.a        
+            self["Omega"] = ke.Omega
+            self["e"] = ke.e    
 
         self._zlist = None
 
