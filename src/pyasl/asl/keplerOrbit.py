@@ -224,7 +224,9 @@ class KeplerEllipse(object):
     Parameters
     ----------
     a : float
-        Semi-major axis
+        Semi-major axis. The units of this parameter define the
+        length scale of the orbit. Common choices are AU, solar, or
+        stellar radii.
     per : float
         Orbital period
     e : float, optional
@@ -659,7 +661,7 @@ class KeplerEllipse(object):
 
         return psdist
 
-    def yzCrossingTime(self):
+    def yzCrossingTime(self, ordering="y"):
         """
         Calculate times of crossing the yz-plane.
 
@@ -667,15 +669,21 @@ class KeplerEllipse(object):
         the yz-plane is crossed by the orbit. This
         is equivalent to finding the times where
         x=0.
+        
+        Parameters
+        ----------
+        ordering : string, {y,z}
+            Determines whether the sign of y or z axis position at
+            crossing time is used for ordering the output.
 
         Returns
         -------
         Time 1 : float
             First crossing time defined as having POSITIVE
-            y position.
+            y/z position.
         Time 2 : float
             Second crossing time defined as having NEGATIVE
-            y position.
+            y/z position.
         """
         if abs(self._Omega) < 1e-16:
             f = -self._w + pi / 2.0
@@ -691,7 +699,11 @@ class KeplerEllipse(object):
         t1 -= self._per * numpy.floor(t1 / self._per)
         t2 -= self._per * numpy.floor(t2 / self._per)
 
-        if p1[1] >= 0.0:
+        if not ordering in ["y", "z"]:
+            raise(PE.PyAValError("Use 'y' or 'z' for `ordering`."))
+        i = {"y":1, "z":2}[ordering]
+
+        if p1[i] >= 0.0:
             # y position of p1 is > 0
             return (t1, t2)
         else:
