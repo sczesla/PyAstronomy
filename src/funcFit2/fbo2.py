@@ -621,8 +621,9 @@ def _gaussLogL(self, *args, **kwargs):
         return lnl
     else:
         # yerr is a float
-        return -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
-
+        lnl = -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        return lnl
+        
 
 def chisqrobjf(self, pars, *args, **kwargs):
     """
