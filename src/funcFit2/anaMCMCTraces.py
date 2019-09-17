@@ -6,7 +6,7 @@ import re
 import os
 from scipy.stats import spearmanr, pearsonr
 from PyAstronomy.pyaC import pyaErrors as PE
-from PyAstronomy.funcFit.utils import ic
+from PyAstronomy.funcFit.utils import ic, hpd, quantiles
 import itertools
 from PyAstronomy import pyaC as PC
 import six
@@ -23,82 +23,8 @@ except ImportError:
     pass
 
 
-def hpd(trace, cred):
-    """
-    Estimate the highest probability density interval.
 
-    This function determines the shortest, continuous interval
-    containing the specified fraction (cred) of steps of
-    the Markov chain. Note that multi-modal distribution
-    may require further scrutiny.
-
-    Parameters
-    ----------
-    trace : array
-        The steps of the Markov chain.
-    cred : float
-        The probability mass to be included in the
-        interval (between 0 and 1).
-
-    Returns
-    -------
-    start, end : float
-        The start and end points of the interval.
-    """
-    if (cred > 1.0) or (cred < 0.0):
-        raise(PE.PyAValError("Invalid value for credibility (cred). Received: " + str(cred),
-                             where="hpd",
-                             solution="Use a value between 0 and 1."))
-
-    # Sort the trace steps in ascending order
-    st = np.sort(trace)
-
-    # Number of steps in the chain
-    n = len(st)
-    # Number of steps to be included in the interval
-    nin = int(n * cred)
-
-    # All potential intervals must be 1) continuous and 2) cover
-    # the given number of trace steps. Potential start and end
-    # points of the HPD are given by
-    starts = st[0:-nin]
-    ends = st[nin:]
-    # All possible widths are
-    widths = ends - starts
-    # The density is highest in the shortest one
-    imin = np.argmin(widths)
-    return starts[imin], ends[imin]
-
-
-def quantiles(trace, qs):
-    """
-    Get quantiles for trace.
-
-    Parameters
-    ----------
-    trace : array
-        The steps of the Markov chain.
-    qs : list or array
-        The quantiles in *percent*.
-
-    Returns
-    -------
-    Quantiles : dictionary
-        For each quantile, the corresponding value.
-    """
-    # Sort the trace steps in ascending order
-    st = np.sort(trace)
-    n = len(st)
-    # Convert percent into fractions
-    qfrac = np.array(qs) / 100.0
-    # Evaluate quantiles
-    result = {}
-    for i in smo.range(len(qfrac)):
-        result[qs[i]] = st[int(n * qfrac[i])]
-    return result
-
-
-class TraceAnalysis:
+class TraceAnalysis2:
     """
     Support to analyze MCMC chains.
 
@@ -173,13 +99,13 @@ class TraceAnalysis:
         """
         if not fn is None:
             self._emceedat = np.load(fn)
-        self.emceepnames = list(self._emceedat["pnames"]) + ["deviance"]
+        self.emceepnames = list(self._emceedat["pnames"]) + ["lnpost", "lnprior", "lnl"]
         # Dummy tracesDic
         self.tracesDic = dict(
             zip(self.emceepnames, [None] * len(self.emceepnames)))
         # Build stateDic
-        self.stateDic = {"stochastics": dict(zip(list(self._emceedat["pnames"]), [
-                                             None] * len(list(self._emceedat["pnames"])))), "sampler": {}}
+        self.stateDic = {"stochastics": dict(zip(list(self.emceepnames), [
+                                             None] * len(list(self.emceepnames)))), "sampler": {}}
 
         # Flatten the chain
         s = self._emceedat["chain"].shape
@@ -201,14 +127,19 @@ class TraceAnalysis:
             raise(PE.PyAValError("You selected at least one walker beyond the valid range (0 - " + str(s[0] - 1) + ").",
                                  solution="Adjust walker selection."))
 
-        self.emceechain = np.zeros((nchains * (s[1] - burn), s[2] + 1))
-        self.emceechain[::, 0:-1] = self._emceedat["chain"][selectedWalker,
+        self.emceechain = np.zeros((nchains * (s[1] - burn), s[2] + 3))
+        self.emceechain[::, 0:-3] = self._emceedat["chain"][selectedWalker,
                                                             burn:, ::].reshape(nchains * (s[1] - burn), s[2])
-        self.emceelnp = self._emceedat["lnp"][selectedWalker, burn:]
-        self.emceelnp = self.emceelnp.reshape(nchains * (s[1] - burn))
+        
+        def getprop(prop):
+            c = self._emceedat[prop][selectedWalker, burn:]
+            d = c.reshape(nchains * (s[1] - burn))
+            return d
 
-        # Incorporate "deviance" into the usual chain
-        self.emceechain[::, -1] = -2.0 * self.emceelnp
+        # Incorporate posterior, prior, and likelihood
+        self.emceechain[::, -1] = getprop("lnl")
+        self.emceechain[::, -2] = getprop("lnprior")
+        self.emceechain[::, -3] = getprop("lnpost")
 
         self.stateDic["sampler"]["_iter"] = self.emceechain.shape[0]
         self.stateDic["sampler"]["_burn"] = None
@@ -315,6 +246,9 @@ class TraceAnalysis:
         # Set default burn-in and thinning
         self.burn = 0
         self.thin = 1
+        
+        # A set of chains by default belonging to a 'technical' set (not usually parameters)
+        self.technicalChains = ["lnprior", "lnl", "lnpost", "deviance"]
 
     def __getitem__(self, parm):
         """
@@ -356,11 +290,25 @@ class TraceAnalysis:
         info += "  Note: There is more information available using the state() method.\n"
         return info
 
-    def availableParameters(self):
+    def availableParameters(self, wtech=False):
         """
         Returns list of available parameter names.
+        
+        Parameters
+        ----------
+        wtech : boolean, optional
+            If True, include 'technical' traces (e.g., deviance and likelihood)
+            if available.
+        
+        Returns
+        -------
+        Parameters : list of strings
+            Available parameter traces
         """
-        return list(self.stateDic["stochastics"].keys())
+        if not wtech:
+            return [p for p in self.availableParameters(True) if p not in self.technicalChains]
+        else:
+            return list(self.stateDic["stochastics"].keys())
 
     def availableTraces(self):
         """

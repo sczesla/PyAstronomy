@@ -24,6 +24,7 @@ _mplImport = ic.check["matplotlib"]
 
 from PyAstronomy.funcFit.utils import *
 from .fbo2 import *
+from .anaMCMCTraces import TraceAnalysis2
 
 def __question(tf):
     if tf:
