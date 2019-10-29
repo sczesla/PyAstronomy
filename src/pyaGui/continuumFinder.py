@@ -619,6 +619,9 @@ class ContinuumInteractive:
                                  data.
         """
         self.root.wm_title(self.windowTitle)
-        self.canvas.show()
+        try:
+            self.canvas.show()
+        except AttributeError:
+            self.canvas.draw()
         tk.mainloop()
         return self._getState()
