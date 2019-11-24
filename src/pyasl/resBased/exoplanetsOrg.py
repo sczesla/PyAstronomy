@@ -76,8 +76,9 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
         self._fs.downloadToFile(url, self.dataFileName, clobber=True, verbose=False,
                                 openMethod=gzip.open)
 
-    def __init__(self, skipUpdate=False):
+    def __init__(self, skipUpdate=False, verbose=False):
         self.data = None
+        self._verbose = verbose
         self.dataFileName = os.path.join("pyasl", "resBased", "eporg.csv.gz")
         configFilename = os.path.join("pyasl", "resBased", "eporg.cfg")
         pp.PyAUpdateCycle.__init__(self, configFilename, "eporgupdate")
@@ -192,7 +193,16 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
                 v = x[k]
                 if len(v) == 0:
                     v = None
-                self.data[self._ident[k]][i] = v
+                try:
+                    self.data[self._ident[k]][i] = v
+                except ValueError as ve:
+                    self.data[self._ident[k]][i] = None
+                    if self._verbose:
+                        print("Assignment error encountered for: ", self._ident[k], ", i: ", i)
+                        print(x)
+                        print(ve)
+                        print()
+                    
 
     def availableColumns(self, verbose=True):
         """
