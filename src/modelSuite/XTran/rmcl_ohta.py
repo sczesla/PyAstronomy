@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
-import numpy
+import numpy as np
 from numpy import sqrt, sin, cos, pi, exp
 from numpy import arcsin as asin
 from numpy import arccos as acos
@@ -56,7 +56,7 @@ class RmcL(OneDFit):
         return result
 
     def XpVec(self, f):
-        result = numpy.zeros(3)
+        result = np.zeros(3)
         result[0] = -cos(self["lambda"]) * sin(f) - \
             sin(self["lambda"]) * cos(self["i"]) * cos(f)
         result[1] = sin(self["i"]) * cos(f)
@@ -93,11 +93,11 @@ class RmcL(OneDFit):
 
     def trueAnomaly(self, time):
         result = ((time - self["T0"]) / self["P"] -
-                  numpy.floor((time - self["T0"]) / self["P"])) * 2.0 * numpy.pi
+                  np.floor((time - self["T0"]) / self["P"])) * 2.0 * np.pi
         return result
 
     def z0(self, etap, indi):
-        result = numpy.zeros(etap.size)
+        result = np.zeros(etap.size)
         result[indi] = sqrt((self["gamma"]**2 - etap[indi]**2) * ((etap[indi] + 2.0)**2 - self["gamma"]**2)) / \
             (2.0 * (1.0 + etap[indi]))
         return result
@@ -151,12 +151,12 @@ class RmcL(OneDFit):
 
         # dphase is the phase difference between the primary transit and the time points
         # It is used to exclude the secondary transit from the calculations
-        dphase = numpy.abs((xOrig - self["T0"]) / self["P"])
-        dphase = numpy.minimum(dphase - numpy.floor(dphase),
-                               numpy.abs(dphase - numpy.floor(dphase) - 1))
+        dphase = np.abs((xOrig - self["T0"]) / self["P"])
+        dphase = np.minimum(dphase - np.floor(dphase),
+                               np.abs(dphase - np.floor(dphase) - 1))
 
-        y = numpy.zeros(len(x))
-        indi = numpy.where(numpy.logical_and(
+        y = np.zeros(len(x))
+        indi = np.where(np.logical_and(
             rho < (1.0 - self["gamma"]), dphase < 0.25))[0]
 
         y[indi] = Xp[indi] * self["Omega"] * sin(self["Is"]) * self["gamma"]**2 * \
@@ -164,8 +164,8 @@ class RmcL(OneDFit):
             (1.0 - self["gamma"]**2 - self["epsilon"] * (1. /
                                                          3. - self["gamma"]**2 * (1.0 - self.W1(rho[indi]))))
 
-        indi = numpy.where(numpy.logical_and(
-            numpy.logical_and(rho >= 1. - self["gamma"], rho < 1.0 + self["gamma"]), dphase < 0.25))[0]
+        indi = np.where(np.logical_and(
+            np.logical_and(rho >= 1. - self["gamma"], rho < 1.0 + self["gamma"]), dphase < 0.25))[0]
         z0 = self.z0(etap, indi)
 
         y[indi] = (Xp[indi] * self["Omega"] * sin(self["Is"]) * (
@@ -219,13 +219,13 @@ class RmcLell(OneDFit):
 
     def _setkepellpars(self):
         """ Set parameters values of Kepler ellipse object from current settings """
-        self._ke.i = self["i"]/numpy.pi*180
-        self._ke.w = self["w"]/numpy.pi*180
+        self._ke.i = self["i"]/np.pi*180
+        self._ke.w = self["w"]/np.pi*180
         self._ke.e = self["e"]
         self._ke.a = self["a"]
         self._ke.per = self["P"]
         self._ke.tau = self["tau"]
-        self._ke.Omega = self["lambda"]/numpy.pi*180
+        self._ke.Omega = self["lambda"]/np.pi*180
 
     g = RmcL.g
     W1 = RmcL.W1
@@ -261,15 +261,15 @@ class RmcLell(OneDFit):
         xc = RmcL.xc(self, zeta, x0)
 
         # Planet in front of star
-        y = numpy.zeros_like(xOrig)
-        indi = numpy.where((Yp < 0) & (rho < (1.0 - self["gamma"])))[0]
+        y = np.zeros_like(xOrig)
+        indi = np.where((Yp < 0) & (rho < (1.0 - self["gamma"])))[0]
 
         y[indi] = Xp[indi] * self["Omega"] * sin(self["Is"]) * self["gamma"]**2 * \
             (1.0 - self["epsilon"] * (1.0 - RmcL.W2(self, rho[indi]))) / \
             (1.0 - self["gamma"]**2 - self["epsilon"] * (1. /
                                                          3. - self["gamma"]**2 * (1.0 - RmcL.W1(self, rho[indi]))))
 
-        indi = numpy.where((rho >= 1. - self["gamma"]) & (rho < 1.0 + self["gamma"]) & (Yp < 0))[0]
+        indi = np.where((rho >= 1. - self["gamma"]) & (rho < 1.0 + self["gamma"]) & (Yp < 0))[0]
         z0 = RmcL.z0(self, etap, indi)
 
         y[indi] = (Xp[indi] * self["Omega"] * sin(self["Is"]) * (
@@ -340,7 +340,7 @@ class RmcL_Hirano(OneDFit):
 
     def trueAnomaly(self, time):
         result = ((time - self["T0"]) / self["P"] -
-                  numpy.floor((time - self["T0"]) / self["P"])) * 2.0 * numpy.pi
+                  np.floor((time - self["T0"]) / self["P"])) * 2.0 * np.pi
         return result
 
     def supplyFlux(self, flux):
@@ -386,7 +386,7 @@ class RmcL_Hirano(OneDFit):
             plc.assignValue({"p": self["gamma"],
                              "per": self["P"],
                              "a": self["a"],
-                             "i": self["i"] * 180. / numpy.pi,
+                             "i": self["i"] * 180. / np.pi,
                              "linLimb": self["linLimb"],
                              "quadLimb": self["quadLimb"],
                              "T0": self["T0"],
