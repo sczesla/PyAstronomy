@@ -203,13 +203,15 @@ class RmcLell(OneDFit):
      - e       - Eccentricity
 
     .. note::
+        In the case of zero eccentricity, an argument of periastron (w) of -90 deg
+        corresponds to the circular solution.
+
+    .. note::
          According to the input parameter units, the units of the model RV
          curve are **stellar-radii per second**.
     """
 
     def __init__(self):
-#         (1.3, 2., e=0.5, Omega=70., i=10.0, w=110.0)
-
         OneDFit.__init__(self, ["epsilon", "gamma", "P",
                                 "tau", "i", "Is", "Omega", "lambda", "a", "e", "w"])
         self.setRootName("OhtaELL05")

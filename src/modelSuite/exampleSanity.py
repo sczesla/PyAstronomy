@@ -14,6 +14,7 @@ class ModSuiteSanity(unittest.TestCase):
             os.remove("kemExample.tmp")
 
     def sanity_rmcl_model(self):
+        """ Checking sanity of RmcL calculation (example) """
         # Import some unrelated modules
         from numpy import arange, pi
         import matplotlib.pylab as plt
@@ -37,6 +38,7 @@ class ModSuiteSanity(unittest.TestCase):
 #     plt.show()
 
     def sanity_rmcl_fit(self):
+        """ Checking sanity of RmcL fit (example) """
         # Import some unrelated modules
         from numpy import arange, pi, random
         import matplotlib.pylab as plt
@@ -75,6 +77,84 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(time, rmcl.model, 'r--')
         plt.legend(["Observation", "Model"])
 #     plt.show()
+
+    def sanity_rmclell_calc(self):
+        """
+        Checking sanity of RmcLell (example)
+        """
+        # Import some unrelated modules
+        from numpy import arange, pi
+        import matplotlib.pylab as plt
+        # ... and the model suite
+        from PyAstronomy import modelSuite as ms
+        
+        # Create Rossiter-McLaughlin object (circular orbit)
+        rmcl = ms.RmcL()
+        # and one for an elliptical orbit
+        rmel = ms.RmcLell()
+        
+        # Assign parameter values
+        rmcl.assignValue({"a":6.7, "lambda":7.2/180.0*pi, "epsilon":0.5, \
+                            "P":1.74, "T0":0.2, "i":87.8/180.*pi, \
+                            "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
+        rmel.assignValue({"a":6.7, "lambda":7.2/180.0*pi, "epsilon":0.5, \
+                            "P":1.74, "tau":0.2, "i":87.8/180.*pi, "w":-90/180.*pi, \
+                            "e":0.05, "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
+        
+        
+        # Choose some time axis and calculate model
+        time = arange(100)/100.0 * 0.2 + 0.1
+        rvc = rmcl.evaluate(time)
+        rve = rmel.evaluate(time)
+        
+        # Let's see what happened...
+#         plt.ylabel("Radial velocity [stellar-radii/s]")
+#         plt.xlabel("Time [d]")
+#         plt.plot(time, rvc, 'b.-', label="circular")
+#         plt.plot(time, rve, 'r.-', label="elliptical")
+#         plt.legend()
+#         plt.show()
+
+    def sanity_rmcl_vs_rmclell(self):
+        """ Cross-checking Rmcl and RmcLell """
+        from numpy import arange, pi
+        import numpy as np
+        # ... and the model suite
+        from PyAstronomy import modelSuite as ms
+        
+        # Create Rossiter-McLaughlin object
+        rmcl = ms.RmcL()
+        r2 = ms.RmcLell()
+        
+        np.random.seed(9234667)
+        
+        for i in range(10):
+        
+            a = np.random.random()*5 + 3
+            l = np.random.random()*180 - 90
+            inc = np.random.random()*2 + 88
+            Omega = 1e-5 + np.random.random()*1e-5
+        
+            # Set parameters
+            rmcl.assignValue({"a":a, "lambda":l/180.0*pi, "epsilon":0.5, \
+                            "P":1.74, "T0":0.2, "i":inc/180.*pi, \
+                            "Is":80.0/180.0*pi, "Omega":Omega, "gamma":0.2})
+        
+            # Set parameters
+            r2.assignValue({"a":a, "lambda":l/180.0*pi, "epsilon":0.5, \
+                            "P":1.74, "tau":0.2, "i":inc/180.*pi, \
+                            "Is":80.0/180.0*pi, "Omega":Omega, "gamma":0.2,
+                            "e":0.0, "w":-90/180*pi})
+        
+            # Choose some time axis and calculate model
+            time = arange(20)/20.0 * 0.2 - 0.1 + rmcl["T0"]
+            rv = rmcl.evaluate(time)
+            rv2 = r2.evaluate(time)
+            
+            d = np.max(np.abs(rv-rv2))
+            m = np.max(np.abs(rv))
+            self.assertAlmostEqual(d/m, 0.0, delta=1e-8, msg="Elliptical and circular orbit solution for RmcL and RmcLell do not match. " + \
+                                   str(r2.parameters()))
 
     def sanity_SinRadVel(self):
         # Import some unrelated modules
