@@ -4,7 +4,7 @@ ic = ImportCheck(["numpy", "scipy"], required=["numpy"])
 
 from .XTran import palTrans
 from .XTran import forTrans
-from .XTran import LimBrightTrans, RmcL, RmcL_Hirano
+from .XTran import LimBrightTrans, RmcL, RmcL_Hirano, RmcLell
 from .radVel import SinRadVel
 from .planetBrightnessPhases import GeomPlanetBrightPhase
 from .keplerEllipseModel import KeplerEllipseModel, KeplerRVModel
