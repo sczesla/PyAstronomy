@@ -1,10 +1,18 @@
-Estimate the transit duration
-==============================
+Transit duration and contact point times
+===========================================================
 
 .. p23ready
 .. currentmodule:: PyAstronomy.pyasl
 
-Functions to estimate the duration of the transit and the in- and egress based on input in solar system units (AU, solar and Jovian radius)
+
+.. contents::
+
+
+Transit and in- and egress duration for circular orbit
+--------------------------------------------------------------
+
+Functions to estimate the duration of the transit and the in- and egress for circular orbits based on
+input in solar system units (AU, solar and Jovian radius)
 
 * :py:func:`Transit duration (solar system units) <transitDuration>`
 * :py:func:`Ingress duration (solar system units) <ingressDuration>`
@@ -15,8 +23,9 @@ or parameters expressed in terms of the stellar radius
 * :py:func:`Ingress duration (stellar units) <ingressDuration_Rs>`
 
 
+
 Example: Estimate duration of Earth's transit and ingress (solar system units)
----------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -38,7 +47,7 @@ Example: Estimate duration of Earth's transit and ingress (solar system units)
 
 
 Example: Estimate transit and ingress duration of HD 189733 b (stellar units)
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -60,10 +69,56 @@ Example: Estimate transit and ingress duration of HD 189733 b (stellar units)
 
 
 Function documentation
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: transitDuration
 .. autofunction:: transitDuration_Rs
 .. autofunction:: ingressDuration
 .. autofunction:: ingressDuration_Rs
+
+
+Estimate times of contact (T1-T4) for eccentric orbit
+---------------------------------------------------------
+
+Numerically estimate contact points for primary and secondary eclipse.
+
+Example
+~~~~~~~~
+
+::
+    
+    from __future__ import print_function
+    from PyAstronomy import pyasl
+    
+    # SMA in stellar radii
+    sma = 5.67
+    # Rp/Rs
+    rprs = 0.15
+    # Orbital inclination
+    inc = 89.2
+    # Orbital period (time units are arbitrary but must be consistent)
+    p = 2.0
+    # Eccentricity
+    e = 0.63
+    # Argument of periastron (planetary orbit)
+    w = 155.
+    # Time of periastron passage
+    tau = 2412345.346 
+    
+    # Contact times for primary transit
+    pts = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="p")
+    # Contact times for secondary transit
+    sts = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="s")
+    
+    print("Transit times at arbitrary epoch (N*period may added)")
+    print("Primary transit T1-4: ", pts)
+    print("Secondary trabnsit T1-4: ", sts)
+    print()
+    print("Duration of primary and secondary transit: %5.3f, %5.3f " % (pts[3]-pts[0], sts[3]-sts[0]))
+
+
+Function documentation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: transit_T1_T4_ell
 

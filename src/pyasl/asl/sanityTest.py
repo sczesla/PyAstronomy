@@ -2111,6 +2111,106 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         print(pyasl.isInTransit(times, T0, period,
                                 duration / 2.0, boolOutput=True))
 
+    def sanity_transit_T1_T4_ell_example(self):
+        """
+        Checking example for transit_T1_T4_ell example
+        """
+        from PyAstronomy import pyasl
+        
+        # SMA in stellar radii
+        sma = 5.67
+        # Rp/Rs
+        rprs = 0.15
+        # Orbital inclination
+        inc = 89.2
+        # Orbital period (time units are arbitrary but must be consistent)
+        p = 2.0
+        # Eccentricity
+        e = 0.63
+        # Argument of periastron (planetary orbit)
+        w = 155.
+        # Time of periastron passage
+        tau = 2412345.346 
+        
+        # Contact times for primary transit
+        pts = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="p")
+        # Contact times for secondary transit
+        sts = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="s")
+        
+        print("Transit times at arbitrary epoch (N*period may added)")
+        print("Primary transit T1-4: ", pts)
+        print("Secondary trabnsit T1-4: ", sts)
+        print()
+        print("Duration of primary and secondary transit: %5.3f, %5.3f " % (pts[3]-pts[0], sts[3]-sts[0]))
+
+    def sanity_ell_vs_circ_duration(self):
+        """
+        Checking sanity of T1-4 elliptical contact points vs. circular solution
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+
+        np.random.seed(23847746)
+        
+        for i in range(20):
+        
+            sma = 3 + 10*np.random.random()
+            rprs = 0.01+0.2*np.random.random()
+            inc = 87. + 3*np.random.random()
+            p = 1 + 10*np.random.random()
+        
+            a = pyasl.transitDuration_Rs(sma, rprs, inc, p, exact=True)
+            #print(a)
+            d = pyasl.ingressDuration_Rs(sma, rprs, inc, p)
+            #print(d)
+        
+            b = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, 0.0, 0.0, -90, transit="p")
+            t21 = b[1] - b[0]
+            t43 = b[3] - b[2]
+            
+            bs = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, 0.0, 0.0, -90, transit="s")
+            db = [ (b[j]-bs[j]) % p - p/2 for j in range(4)]
+            
+            self.assertAlmostEqual(a - (b[3]-b[0]), 0, delta=1e-5, msg="Problem with transit duration at iteration %d" % i)
+            self.assertAlmostEqual(d - (b[1]-b[0]), 0, delta=1e-5, msg="Problem with ingress duration at iteration %d" % i)
+            
+            x = np.max(np.abs(db))
+            self.assertAlmostEqual(x, 0, delta=1e-5, msg="Problem with offset between primary and secondary transit at iteration %d" % i)
+
+        
+        np.random.seed(23847746+1)
+        
+        for i in range(10):
+        
+            sma = 3 + 10*np.random.random()
+            rprs = 0.01+0.2*np.random.random()
+            inc = 87. + 3*np.random.random()
+            p = 1 + 10*np.random.random()
+            e = np.random.random() * 0.6
+            w = 360 * np.random.random()
+            tau = 1e3 * np.random.random()
+            
+            print(i,sma, rprs, inc, p, tau, e, w)
+        
+            b = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="p")
+            
+            b = [np.NaN if b[j] is None else b[j] for j in range(4)]
+            #print(b)
+            
+            bim = sma * np.cos(inc/180.*np.pi)
+            da = 1/np.pi * p / sma * np.sqrt((1+rprs)**2-bim**2) * np.sqrt(1-e**2) / (1+e*np.sin((w+180)/180.*np.pi))
+         
+            self.assertAlmostEqual((b[3]-b[0]-da)/(b[3]-b[0]), 0.0, delta=0.1, msg="Problem with transit duration (elliptical) at iteration %d" % i)
+
+            k = e*np.sin((w+180)/180.*np.pi)
+            tt = (1+k)/(1-k)
+            
+            bs = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="s")
+            bs = [np.NaN if bs[j] is None else bs[j] for j in range(4)]
+            
+            self.assertAlmostEqual((tt-(bs[3]-bs[0])/(b[3]-b[0]))/tt, 0.0, delta=0.1, msg="Problem with transit duration ratio (elliptical) at iteration %d" % i)
+            
+        
 
 class SanityOfAirmass(unittest.TestCase):
 

@@ -529,7 +529,7 @@ class KeplerEllipse(object):
         ae = self.a * self.e
         return (center + ae * direc, center - ae * direc)
 
-    def xyzNodes_LOSZ(self, los="+z"):
+    def xyzNodes_LOSZ(self, los="+z", getTimes=False):
         """
         Calculate the nodes of the orbit for LOS in +/-z direction.
 
@@ -545,27 +545,32 @@ class KeplerEllipse(object):
             Line of sight points either in +z direction (observer
             at -z) or vice versa. Changing the direction
             interchanges the ascending and descending node.
+        getTimes : boolean, optional
+            If True, also the times will be returned at which the
+            nodes are reached. Default is False.
 
         Returns
         -------
         Nodes : Tuple of two coordinate arrays
             Returns the xyz coordinates of both nodes. The first is the
             ascending node and the second is the descending node.
+            If `getTimes` is True, tuples of the form (xyz-pos, time)
+            will be returned.
         """
         # f = -w (z-component vanishes there)
         E = arctan(tan(-self._w / 2.0) *
                    sqrt((1. - self.e) / (1. + self.e))) * 2.
         M = E - self.e * sin(E)
-        t = M / self._n + self.tau
-        node1 = self.xyzPos(t)
+        t1 = M / self._n + self.tau
+        node1 = self.xyzPos(t1)
         # Velocity is used to distinguish nodes
-        v1 = self.xyzVel(t)
+        v1 = self.xyzVel(t1)
         # f = -w + pi
         E = arctan(tan((-self._w + pi) / 2.0) *
                    sqrt((1. - self.e) / (1. + self.e))) * 2.
         M = E - self.e * sin(E)
-        t = M / self._n + self.tau
-        node2 = self.xyzPos(t)
+        t2 = M / self._n + self.tau
+        node2 = self.xyzPos(t2)
         # Find the ascending and descending node
         from PyAstronomy.pyasl import LineOfSight
         l = LineOfSight(los).los
@@ -574,6 +579,9 @@ class KeplerEllipse(object):
                                  where="xyzNodes_LOSZ",
                                  solution="Use '-z' or '+z'."))
 
+        if getTimes:
+            node1, node2 = (node1, t1), (node2, t2)
+        
         if l[2] == 1.0:
             # Looking in +z direction
             if v1[2] > 0.0:

@@ -2,6 +2,7 @@
 from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+from .keplerOrbit import KeplerEllipse
 from .astroTimeLegacy import helio_jd, daycnv
 from . import observatory as pyaobs
 from . import eq2hor
@@ -16,6 +17,7 @@ from . import airmass
 from . import localtime
 import six
 import six.moves as smo
+import scipy.optimize as sco
 
 
 def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
@@ -251,6 +253,86 @@ def transitDuration_Rs(sma, rprs, inc, period, exact=False):
 
     rs = c.RSun
     return transitDuration(sma*rs/c.AU, rprs*rs/c.RJ, 1., inc, period, exact)
+
+
+def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
+    """
+    Calculate first to fourth contact times for elliptical orbit.
+    
+    The contact times are numerically estimated using the algorithms
+    provided by :py:class:`KeplerEllipse`.
+    
+    Parameters
+    ----------
+    sma : float
+        Semi-major axis [stellar radii]
+    rprs : float
+        Planet-to-star radius ratio (Rp/Rs)
+    inc : float
+        Orbital inclination [deg]
+    period : float
+        Orbital period
+    tau : float
+        Time of periastron passage
+    e : float
+        Eccentricity
+    w : float
+        Argument of periastron
+    transit : string, {p, s}, optional
+        Determines whether contact point times for primary (p, default)
+        or secondary (s) transit are to be calculated.
+    
+    Returns
+    -------
+    T1-T4 : tuple of floats
+        Contact times (arbitrary epoch)
+    """
+    ke = KeplerEllipse(sma, period, e=e, tau=tau, w=w, i=inc)
+    
+    def r(t):
+        # R in terms of Rs
+        p = ke.xyzPos(t)
+        r = np.sqrt( p[0]**2 + p[1]**2 )
+        return r
+    
+    # Estimate transit time (central transit time in case of circular orbit)
+    t0sec, t0prim = ke.yzCrossingTime(ordering='z')
+    if transit == "p":
+        t0 = t0prim
+    else:
+        t0 = t0sec
+    t0 = t0 % period
+    
+    # Get nodes positions and times
+    na, nd = ke.xyzNodes_LOSZ(getTimes=True)
+    # Times between which T1 and T4 must occur
+    if transit == "p":
+        lims = (nd[1], na[1])
+    else:
+        lims = (na[1], nd[1])
+    lims = [l % period for l in lims]
+    if lims[0] > lims[1]:
+        lims[1] += period
+    if t0 < lims[0]:
+        t0 += period
+    
+    try:
+        t1 = sco.brentq(lambda t : r(t) - (1+rprs), lims[0], t0)
+    except ValueError:
+        t1 = None
+    try: 
+        t2 = sco.brentq(lambda t : r(t) - (1-rprs), lims[0], t0)
+    except ValueError:
+        t2 = None
+    try:
+        t3 = sco.brentq(lambda t : r(t) - (1-rprs), t0, lims[1])
+    except ValueError:
+        t3 = None
+    try:
+        t4 = sco.brentq(lambda t : r(t) - (1+rprs), t0, lims[1])
+    except ValueError:
+        t4 = None
+    return t1, t2, t3, t4
 
 
 def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
