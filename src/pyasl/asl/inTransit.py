@@ -287,6 +287,11 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     T1-T4 : tuple of floats
         Contact times (arbitrary epoch)
     """
+    
+    if not transit in ["p", "s"]:
+        raise(PE.PyAValError("transit must be 'p' or 's' ('" + str(transit) + "' was given).", \
+                             where="transit_T1_T4_ell"))
+    
     ke = KeplerEllipse(sma, period, e=e, tau=tau, w=w, i=inc)
     
     def r(t):
