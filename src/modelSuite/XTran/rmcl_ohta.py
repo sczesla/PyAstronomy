@@ -203,8 +203,9 @@ class RmcLell(OneDFit):
      - e       - Eccentricity
 
     .. note::
-        In the case of zero eccentricity, an argument of periastron (w) of -90 deg
-        corresponds to the circular solution.
+        In the case of zero eccentricity, a value of -90 deg for the argument of
+        periastron (w) makes the time of periastron (tau) numerically identical
+        with the central transit time of the circular case (T0).
 
     .. note::
          According to the input parameter units, the units of the model RV
