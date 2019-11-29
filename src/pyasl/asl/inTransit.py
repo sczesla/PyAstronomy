@@ -285,7 +285,9 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     Returns
     -------
     T1-T4 : tuple of floats
-        Contact times (arbitrary epoch)
+        Contact times (arbitrary epoch). Note that contact time may not exist
+        in the case of grazing transits or no transit at all. None is returned
+        for undefined contact times.
     """
     
     if not transit in ["p", "s"]:
