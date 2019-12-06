@@ -392,6 +392,40 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(wvl, m, 'b.-')
 #    plt.show()
 
+
+    def sanity_VoigtAstroP_R_Example(self):
+        """
+        Sanity of VoigtAstroP example with instrumental resolution
+        """
+
+        from PyAstronomy import modelSuite as ms
+        import numpy as np
+        import matplotlib.pylab as plt
+        
+        # Obtain an object of type VoigtAstroP ...
+        v = ms.VoigtAstroP()
+        # ... and set some parameters
+        v["b"] = 40.7
+        v["f"] = 0.5
+        v["w0"] = 1214.0
+        # Damping constant [cm]
+        v["gamma"] = 2e-9
+        
+        # Generate wavelength axis ...
+        wvl = np.linspace(1212.,1216.,200)
+        # ... and evaluate model
+        m = v.evaluate(wvl)
+        
+        # Add (Gaussian) instrumental broadening with resolution 5000
+        v["R"] = 5000
+        mr = v.evaluate(wvl)
+        
+        # Plot result
+#         plt.plot(wvl, m, 'b.-', label="R = inf")
+#         plt.plot(wvl, mr, 'r.-', label="R = 5000")
+#         plt.legend()
+#         plt.show()
+
     def sanity_LyATransmission(self):
         """
         Checking sanity of LyATransmission example
@@ -626,3 +660,40 @@ class VoigtAstroPSanity(unittest.TestCase):
                 
                 self.assertAlmostEqual(i/const, f, delta=1e-2, msg="Normalization of AstroVoigtP is broken: f, w0, i: % g, % g, % g" % (f, w0, i))
 
+    def sanity_instrumentalResolution(self):
+        """
+        Checking integrity of instrumental resolution in VoigtAstroP
+        """
+        import numpy as np
+        from PyAstronomy import modelSuite as ms
+        from PyAstronomy import pyasl
+        
+        v = ms.VoigtAstroP()
+        
+        w0 = 10830
+        
+        for R in [2500, 5000, 80000]:
+        
+            v["w0"] = w0
+            v["b"] = 10.
+            v["gamma"] = 1e-8
+            v["f"] = 100.0
+            v["R"] = 0
+        
+            dw = 40.0
+            w = np.linspace(w0-dw, w0+dw, 4000)
+        
+            m = v.evaluate(w)
+        
+            v["R"] = R
+            m2 = v.evaluate(w)
+        
+            
+            fb = pyasl.instrBroadGaussFast(w, m, R, edgeHandling=None, fullout=False, maxsig=None)
+
+            d = 1000
+            
+            self.assertAlmostEqual(np.max(np.abs(fb[d:-d] - m2[d:-d])/m2[d:-d]), 0.0, delta=1e-10,
+                                   msg="VoigtAstroP instrumental broadening broken for R = " + str(R))
+
+            

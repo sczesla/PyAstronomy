@@ -15,6 +15,13 @@ class VoigtAstroP(fuf.OneDFit):
     velocity distribution. For zero damping width (gamma), the
     resulting model line is a Gaussian with a standard
     deviation of b/sqrt(2) in velocity units.
+    
+    Instrumental resolution can be applied via the parameter R.
+    The instrumental profile is assumed to be a Gaussian with
+    FWHM of w0/R. The additional broadening is implemented by
+    using an internal, effective Doppler parameter. The case
+    R=0 corresponds to infinite instrumental resolution (i.e.,
+    no additional broadening).
 
     *Fit parameters*:
 
@@ -26,24 +33,30 @@ class VoigtAstroP(fuf.OneDFit):
     gamma   Damping width (full width at half maximum of
             the Lorentzian)                                  cm
     f       Oscillator strength (unitless)                   --
+    R       Instrumental resolution                          --
     ======= ================================================ =====
 
     """
 
     def __init__(self):
         fuf.OneDFit.__init__(
-            self, ["w0", "b", "gamma", "f", "lin", "off"], rootName="VoigtAstroP")
+            self, ["w0", "b", "gamma", "f", "lin", "off", "R"], rootName="VoigtAstroP")
         self._profile = fuf.Voigt1d()
         # Set default parameter, which may not be changed
         self._profile["ad"] = 1. / np.sqrt(2.0)
         # Set to zero, because evaluation is done in velocity space
         self._profile["mu"] = 0.0
+        # Conversion factor between Gaussian FWHM and STD
+        self._fwhmstd = 2*np.sqrt(2*np.log(2.))
 
     def bl(self):
         """
-        Doppler with in cm
+        Doppler width in cm
         """
         bl = self["w0"] / 1e8 * (self["b"] * 100000.0) / 29979245800.0
+        if self["R"] > 0:
+            # Account for instrumental resolution
+            bl = np.sqrt(bl**2 + 2*(self["w0"]/(1e8*self["R"]*self._fwhmstd))**2)
         return bl
 
     def FWHM(self):
@@ -85,7 +98,7 @@ class VoigtAstroP(fuf.OneDFit):
         # https://arxiv.org/abs/0805.2274); the relation quoted by Gray is probably not entirely
         # accurate. Note that the Voigt profile is here evaluated at u = dw/bl.
         # 
-        # The constant equals (pi e^2)/(m_e c^2)
+        # The constant equals (pi e^2)/(m_e c^2) (pi times the classical electron radius)
         self._profile["A"] = 8.85282064473e-13 * self["f"] * w0cm**2 / bl
         # A factor of 2.0 because `al` defines the half FWHM in Voigt profile (division by bl
         # accounts for evaluation at dw/bl).
