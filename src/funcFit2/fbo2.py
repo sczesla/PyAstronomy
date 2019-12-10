@@ -1199,22 +1199,6 @@ class MBO2(object):
             oi = self.objf.__doc__
         return oi
 
-    def objfInfo(self):
-        """
-        Information on objective function
-        
-        Returns
-        -------
-        Info : string or None
-            If assigned, the docstring of the objective function and None
-            otherwise.
-        """
-        oi = None
-        if hasattr(self, "objf"):
-            oi = self.objf.__doc__
-        return oi
-
-
 
 
 
