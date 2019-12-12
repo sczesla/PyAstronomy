@@ -928,7 +928,13 @@ class MBO2(object):
                                  where="MBO2"))
         
     def logL(self, *args, **kwargs):
-        raise(PE.PyANotImplemented("The log(likelihood) method 'logL' needs to be implemented."))
+        raise(PE.PyANotImplemented("""
+The log(likelihood) method 'logL' needs to be implemented.
+
+The likelihood function calculates the (natural) logarithm of the likelihood for the
+current set of parameter values. It takes no obligatory arguments. Usually, however,
+it requires a data set as input.
+        """))
 
     def logPrior(self, *args, **kwargs):
         """ Returns natural logarithm of prior for current parameter values """
