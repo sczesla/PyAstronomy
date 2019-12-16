@@ -583,6 +583,34 @@ class PyABaSoS(object):
       
 
 
+def gaussLogL(x, y, yerr, m):
+    """
+    Gaussian likelihood
+    
+    Parameters
+    ----------
+    x, y : arrays
+        The x and y coordinates of the data points.
+    yerr : array or float
+        Uncertainty of data points
+    m : array
+        The model
+    
+    Returns
+    -------
+    lnl : float
+        The natural logarithm of the likelihood.
+    """
+    if hasattr(yerr, "__iter__"):
+        # yerr is an array
+        lnl = -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        return lnl
+    else:
+        # yerr is a float
+        lnl = -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
+        return lnl
+    
+
 
 def _gaussLogL(self, *args, **kwargs):
     """
@@ -615,14 +643,8 @@ def _gaussLogL(self, *args, **kwargs):
     else:
         m = self.evaluate(x)
     
-    if hasattr(yerr, "__iter__"):
-        # yerr is an array
-        lnl = -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yerr)) - 0.5 * np.sum((m-y)**2/(yerr**2))
-        return lnl
-    else:
-        # yerr is a float
-        lnl = -len(x)/2.0*np.log(2.*np.pi) - len(x)*np.log(yerr) - 0.5 * np.sum((m-y)**2/(yerr**2))
-        return lnl
+    return gaussLogL(x, y, yerr, m)
+
         
 
 def chisqrobjf(self, pars, *args, **kwargs):
