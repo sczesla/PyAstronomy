@@ -15,7 +15,8 @@ _modules.extend(["idlMod", "idlCirrange", "rotBroad", "svd", "unred", "estimateS
 _modules.extend(["moonpos", "moonphase", "localtime", "lineWidth", "cardinalPoint", \
                 "twilight", "angularDistance", "airmass", "decimalYear", "broad", \
                 "crosscorr", "quadextreme", "readFitsSpec", "posAngle", "sindex", \
-                "atomicNo", "coordinates", "writeFitsSpec", "aslExt_1"])
+                "atomicNo", "coordinates", "writeFitsSpec", "aslExt_1", \
+                "gal_uvw"])
 
 
 from .aslExt_1 import *

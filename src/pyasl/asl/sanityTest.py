@@ -2967,7 +2967,59 @@ class SanityOfFitsSpec(unittest.TestCase):
         pyasl.write1dFitsSpec("test2.fits", flux, waveParams=wp, clobber=True)
 
 
+class SanityOftgal_uvw(unittest.TestCase):
 
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+    
+    def sanity_example(self):
+        """
+        Checking sanity of gal_uvw example
+        """
+        from PyAstronomy import pyasl
+        
+        ra, dec = 017.4294147291650, +61.5473037149441
+        pmra, pmdec = 627.89, 77.84
+        d = 144
+        rv = -321.4
+        
+        print("U, V, W [kms/s]: % 5.3f, % 5.3f, % 5.3f " % \
+            pyasl.gal_uvw(ra, dec, pmra, pmdec, d, rv))
+        print("U, V, W (LSR corrected) [kms/s]:  % 5.3f, % 5.3f, % 5.3f" % \
+            pyasl.gal_uvw(ra, dec, pmra, pmdec, d, rv, lsr=(8.5, 13.38, 6.49) ) )
+
+    def sanity_galuvw(self):
+        """
+        Checking sanity of gal_uvw 
+        """
+        from PyAstronomy import pyasl
+        
+        ra, dec = 017.4294147291650, +61.5473037149441
+        pmra, pmdec = 627.89, 77.84
+        d = 144
+        rv = -321.4
+
+        u0, v0, w0 = -154, -493, 97
+        
+        u, v, w = pyasl.gal_uvw(ra, dec, pmra, pmdec, d, rv, lsr=(8.5, 13.38, 6.49))
+        self.assertAlmostEqual(u-u0, 0, delta=1.5, msg="Problem with U")
+        self.assertAlmostEqual(v-v0, 0, delta=1.5, msg="Problem with V")
+        self.assertAlmostEqual(w-w0, 0, delta=1.5, msg="Problem with W")
+        
+        ra, dec = 200., -50.
+        pmra, pmdec = 235., -571.
+        d = 37.6
+        rv = 112.
+        u, v, w = pyasl.gal_uvw(ra, dec, pmra, pmdec, d, rv)
+        # from http://www.astro.ucla.edu/~drodrigu/UVWCalc.html#data
+        u0, v0, w0 = 104.66,   -86.50,   -78.86
+        self.assertAlmostEqual(u-u0, 0, delta=0.1, msg="Problem with U (no 2)")
+        self.assertAlmostEqual(v-v0, 0, delta=0.1, msg="Problem with V (no 2)")
+        self.assertAlmostEqual(w-w0, 0, delta=0.1, msg="Problem with W (no 2)")
+        
 
 class SanityOfBetaSigma(unittest.TestCase):
  
