@@ -493,6 +493,14 @@ class PyABaSoS(object):
         """ Get list of names of free parameters """
         return [p for p in list(self.pmap) if self.pmap[p].free]
     
+    def freeParameters(self):
+        """
+        Get a dictionary mapping parameter name to value
+        """
+        fpn = self.freeParamNames()
+        fpv = self.freeParamVals()
+        return dict(zip(fpn, fpv))
+    
     def getRestrictions(self):
         """ Get dictionary mapping parameter names to restrictions """
         return {p:self.pmap[p].restriction for p in list(self.pmap) if self.pmap[p].isRestricted()}
@@ -823,6 +831,9 @@ class MBO2(object):
     
     def freeParamNames(self):
         return self.pars.freeParamNames()
+    
+    def freeParameters(self):
+        return self.pars.freeParameters()
     
     def setFreeParamVals(self, vals):
         self.pars.setFreeParamVals(vals)
