@@ -13,12 +13,12 @@ class Voigt1d(OneDFit):
     and Gaussian distribution).
 
     .. note:: The profile is implemented so that `al` is half
-              the FWHM.
+              the FWHM of the Cauchy-Lorentz distribution.
 
     *Fit parameters*:
-      - `A` - Amplitude
-      - `al` - Scale parameter of the Cauchy-Lorentz distribution
-      - `ad` - The width of the Gaussian (usually called sigma)
+      - `A` - Area under the curve
+      - `al` - Scale parameter of the Cauchy-Lorentz distribution (half its FWHM)
+      - `ad` - The width (standard deviation) of the Gaussian (usually called sigma)
       - `mu` - Center
       - `off` - Constant offset
       - `lin` - Linear contribution
