@@ -20,7 +20,7 @@ Example use of Picker
     import numpy as np
     
     # Data for the plot
-    x = np.linspace(0., 10., 100.)
+    x = np.linspace(0., 10., 100)
     y = np.exp(-x/10.)
     
     # Create Picker instance
@@ -35,4 +35,4 @@ Example use of Picker
     print("Number of selected points: ", len(points))
     print("Selected points (x, y):")
     for p in points:
-      print("%g, %g" % p) 
+        print("%g, %g" % p) 

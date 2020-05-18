@@ -14,7 +14,7 @@ class ExampleSanity(unittest.TestCase):
     import numpy as np
     
     # Data for the plot
-    x = np.linspace(0., 10., 100.)
+    x = np.linspace(0., 10., 100)
     y = np.exp(-x/10.)
     
     # Create Picker instance
