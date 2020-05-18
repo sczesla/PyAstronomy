@@ -145,7 +145,7 @@ Example: Convert spectrum from vacuum into air conditions
     g["off"] = 1.0
     
     # Create a "spectrum" ...
-    wvl = np.linspace(5000.,5010.,1000.)
+    wvl = np.linspace(5000.,5010.,1000)
     flux = g.evaluate(wvl)
     # ... and add some noise
     flux += np.random.normal(0., 0.02, len(wvl))

@@ -100,7 +100,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         g["off"] = 1.0
 
         # Create a "spectrum" ...
-        wvl = np.linspace(5000., 5010., 1000.)
+        wvl = np.linspace(5000., 5010., 1000)
         flux = g.evaluate(wvl)
         # ... and add some noise
         flux += np.random.normal(0., 0.02, len(wvl))
@@ -823,7 +823,7 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
         """
         Checking `flux2photons` and `photons2flux`.
         """
-        wvl = numpy.linspace(300., 20000., 100.)
+        wvl = numpy.linspace(300., 20000., 100)
         flux = 1. / wvl
 
         photons = flux2photons(wvl, flux)
