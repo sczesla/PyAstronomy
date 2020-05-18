@@ -1060,8 +1060,8 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
 
         refEW = abs(g["A"])
 
-        for broad in np.linspace(0.1, 100., 1.):
-            for eps in np.linspace(0., 1., 0.2):
+        for broad in np.linspace(0.1, 100., 10):
+            for eps in np.arange(0., 1., 0.2):
                 nflux = rotBroad(wvl, flux, epsilon=eps, vsini=broad)
                 ew = 4. - sci.trapz(nflux, wvl)
                 self.assertAlmostEqual(ew, refEW, 5, "The EW in rotbroad changes for: vsini = " +
