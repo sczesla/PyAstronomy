@@ -197,7 +197,7 @@ if sdist:
 
 setup(cmdclass={"with-ext": WithExtCommand},
       name='PyAstronomy',
-      url="http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/index.html",
+      url="https://github.com/sczesla/PyAstronomy",
       description='A collection of astronomy related tools for Python.',
       version=PyA_Version() + versionAdd,
       packages=packages,
