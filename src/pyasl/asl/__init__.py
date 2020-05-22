@@ -16,7 +16,7 @@ _modules.extend(["moonpos", "moonphase", "localtime", "lineWidth", "cardinalPoin
                 "twilight", "angularDistance", "airmass", "decimalYear", "broad", \
                 "crosscorr", "quadextreme", "readFitsSpec", "posAngle", "sindex", \
                 "atomicNo", "coordinates", "writeFitsSpec", "aslExt_1", \
-                "gal_uvw"])
+                "gal_uvw", "properMotion"])
 
 
 from .aslExt_1 import *

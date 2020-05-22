@@ -93,6 +93,7 @@ Coordinates, time, and observation tools
    aslDoc/airmass.rst
    aslDoc/observatory.rst
    aslDoc/coordinates.rst
+   aslDoc/properMotion.rst
    aslDoc/gal_uvw.rst
 
 Transit and planet routines

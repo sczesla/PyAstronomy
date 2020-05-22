@@ -3021,6 +3021,80 @@ class SanityOftgal_uvw(unittest.TestCase):
         self.assertAlmostEqual(w-w0, 0, delta=0.1, msg="Problem with W (no 2)")
         
 
+class SanityOfProperMotion(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def sanity_pm(self):
+        """
+        Test sanity of proper motion
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        # Year 2018 (GJ 1215)
+        ra, dec = 259.4319131981014, +11.6678903453170
+        pmra, pmdec = -352.897, -445.558
+        
+        # 2100 by SIMBAD
+        ra2100, dec2100 = 259.4237057511850, +11.6577413569938
+        # 2050 by SIMBAD
+        ra2050, dec2050 = 259.4287102205105, +11.6639297921180
+
+        ra2, dec2 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=2100-2018, fixes=1)
+        ra5, dec5 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=2050-2018, fixes=1)
+        
+        self.assertAlmostEqual(ra2, ra2100, delta=1e-6, msg="Ra2100 does not match")
+        self.assertAlmostEqual(ra5, ra2050, delta=1e-6, msg="Ra2050 does not match")
+        self.assertAlmostEqual(dec2, dec2100, delta=1e-6, msg="Dec2100 does not match")
+        self.assertAlmostEqual(dec5, dec2050, delta=1e-6, msg="Dec2050 does not match")
+        
+        ra, dec = 0, 0
+        pmra, pmdec = 1, 0
+        ra2, dec2 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=5, fixes=1)
+        self.assertAlmostEqual(ra2, 5/3600/1000, delta=1e-6, msg="Ra 1,0 does not match")
+        self.assertAlmostEqual(dec2, 0, delta=1e-6, msg="Dec 1,0 does not match")
+        
+        np.random.seed(997177)
+        for i in range(40):
+        
+            ra, dec = np.random.random()+360, np.random.random()*178-79.
+            pmra, pmdec = np.random.random()*1000-500, np.random.random()*1000-500
+            ra2, dec2 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=43, fixes=1)
+            ra2, dec2 = pyasl.applyProperMotion(ra2, dec2, pmra, pmdec, dt=-43, fixes=1)
+            self.assertAlmostEqual(ra, ra2, delta=1e-6, msg="Forth-Back test failed (ra, no. %d)" % i)
+            self.assertAlmostEqual(dec, dec2, delta=1e-6, msg="Forth-Back test failed (dec, no. %d)" % i)
+
+        # Year 2018 (GJ 1215)
+        ra, dec = 259.4319131981014, +11.6678903453170
+        pmra, pmdec = -352.897, -445.558
+        ra2, dec2 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=2100-2018, fixes=1)
+        for i in range(1, 6, 1):
+            ra3, dec3 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=2100-2018, fixes=i)
+            self.assertAlmostEqual(ra2, ra3, delta=1e-6, msg="Fixes test failed (ra, no. %d)" % i)
+            self.assertAlmostEqual(dec2, dec3, delta=1e-6, msg="Fixes test failed (dec, no. %d)" % i)
+
+    def sanity_example(self):
+        """
+        Testing proper motion example
+        """
+        from PyAstronomy import pyasl
+        
+        # Year 2018 coordinates and proper motion (mas/yr)
+        # of GJ 1215
+        ra, dec = 259.4319131981014, +11.6678903453170
+        pmra, pmdec = -352.897, -445.558
+        
+        # Calculate 2050 position
+        ra5, dec5 = pyasl.applyProperMotion(ra, dec, pmra, pmdec, dt=2050-2018, fixes=1)
+        
+        print("Position 2018: %10.6f  % 10.6f" % (ra, dec))
+        print("Position 2050: %10.6f  % 10.6f" % (ra5, dec5))
+
+
 class SanityOfBetaSigma(unittest.TestCase):
  
     def sanity_test1(self):
