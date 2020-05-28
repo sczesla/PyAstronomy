@@ -554,7 +554,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
                 continue
             if isinstance(planetData[key], (tuple(six.integer_types) + (float,))):
                 if np.isnan(planetData[key]):
-                    msg += "The required key '" + key + "' has NaN value in the input data\n!"
+                    msg += "The required key '" + key + "' has NaN value in the input data!\n"
                     fail = True
         if fail:
             raise(PE.PyAValError("The input `planetData` is inappropriate:\n" + msg,
