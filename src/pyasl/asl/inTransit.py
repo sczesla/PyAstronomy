@@ -1080,10 +1080,10 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
         ytickformat.append(str(int(yticks[t])) + r"$^\circ$")
     ax.set_yticklabels(ytickformat, fontsize=20)
     ax.set_ylabel("Altitude", fontsize=18)
-    yticksminor = ax.get_yticks(minor=True)
+    yticksminor = np.array(ax.get_yticks(minor=True))
     ymind = np.where(yticksminor % 15. != 0.)[0]
     yticksminor = yticksminor[ymind]
-    ax.set_yticks(yticksminor, minor=True)
+#     ax.set_yticks(yticksminor, minor=True)
     m_ytickformat = []
     for t in range(yticksminor.size):
         m_ytickformat.append(str(int(yticksminor[t])) + r"$^\circ$")
@@ -1093,7 +1093,14 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     ax.yaxis.grid(color='gray', which="minor", linestyle='dotted')
     ax2.xaxis.grid(color='gray', linestyle='dotted')
 
-    plt.text(0.5, 0.95, "Transit visibility of " + allData[n]["Planet name"].decode("utf8"),
+    def decifnec(s):
+        try:
+            r = s.decode("utf8")
+        except AttributeError:
+            r = s
+        return r
+            
+    plt.text(0.5, 0.95, "Transit visibility of " + decifnec(allData[n]["Planet name"]),
              transform=fig.transFigure, ha='center', va='bottom', fontsize=20)
 
     if plotLegend:
