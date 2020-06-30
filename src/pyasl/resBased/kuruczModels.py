@@ -73,6 +73,9 @@ class KuruczMT:
                     models.append(model[::])
                 model = []
             model.append(l.rstrip("\n"))
+        if len(model) > 0:
+            # Add last model to list (no new TEFF/GRAVITY specification to trigger addition)
+            models.append(model[::])
         # Build models dictionary
         teffs = set()
         loggs = set()
