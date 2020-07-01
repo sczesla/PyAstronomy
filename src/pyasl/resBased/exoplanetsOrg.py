@@ -86,7 +86,7 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
         # Column name, Description, Unit
         self._columns = {}
         # planetary parameters
-        self._columns[0] = ["pl_name", "Name of the planet", "", "S15"]
+        self._columns[0] = ["pl_name", "Name of the planet", "", "U15"]
         self._columns[1] = ["pl_orbper",
                             "Planetary orbital period", "d", np.float]
         self._columns[2] = ["pl_massj", "Planetary mass", "MJ", np.float]
@@ -116,10 +116,10 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
                              "Planetary surface gravity", "log10(cm/s^2)", np.float]
         self._columns[17] = ["pl_dens",
                              "Planetary Density", "g/cm^3", np.float]
-        self._columns[18] = ["pl_dtype", "Detection type", "", "S27"]
+        self._columns[18] = ["pl_dtype", "Detection type", "", "U27"]
         self._columns[19] = ["KOI", "Kepler ID (if available)", "", np.float]
         # stellar pars
-        self._columns[20] = ["pl_hostname", "Name of host star", "", "S15"]
+        self._columns[20] = ["pl_hostname", "Name of host star", "", "U15"]
         self._columns[21] = ["st_binary", "Binary Flag", "", np.float]
         self._columns[22] = ["st_rad", "Radius of star", "Solar", np.float]
         self._columns[23] = ["st_dist", "Distance to Star", "pc", np.float]
@@ -140,8 +140,8 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
                              "System radial velocity", "km/s", np.float]
         self._columns[34] = ["st_dens", "Density of star", "g/cm^3", np.float]
         self._columns[35] = ["K", "Velocity Semi-amplitude", "m/s", np.float]
-        self._columns[36] = ["dec", "Declination (J2000)", "dms", "S12"]
-        self._columns[37] = ["ra", "Right ascension (J2000)", "hms", "S12"]
+        self._columns[36] = ["dec", "Declination (J2000)", "dms", "U12"]
+        self._columns[37] = ["ra", "Right ascension (J2000)", "hms", "U12"]
 
         self._ident = {"STAR": "pl_hostname", "NAME": "pl_name", "PER": "pl_orbper", "MASS": "pl_massj", "MSINI": "pl_msini", "R": "pl_radj",
                        "DEPTH": "pl_trandep", "B": "pl_impact", "T14": "pl_trandur", "TT": "pl_tranmid", "T0": "pl_tperi", "A": "pl_orbsmax", "AR": "pl_orbsmaxr",
@@ -249,7 +249,10 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
             A dictionary with a key for every data column holding
             the associated value from the data table.
         """
-        plnames = [name.decode("utf8") for name in self.data.pl_name]
+        try:
+            plnames = [name.decode("utf8") for name in self.data.pl_name]
+        except AttributeError:
+            plnames = [name for name in self.data.pl_name]
         r = pyaC.fuzzyMatch(planetName, plnames,
                             caseSensitive=caseSensitive, raises=True)
         result = {}

@@ -180,7 +180,7 @@ class ExoplanetEU(pp.PyAUpdateCycle):
 
         # Define internal column names and data types
         self._columns = {}
-        self._columns[0] = ["plName", "Name of planet", "", "S15"]
+        self._columns[0] = ["plName", "Name of planet", "", "U15"]
         self._columns[1] = ["plMass", "Mass of planet", "MJ", np.float]
         self._columns[2] = ["plRadius", "Radius of planet", "RJ", np.float]
         self._columns[3] = ["period", "Orbital period", "d", np.float]
@@ -191,18 +191,18 @@ class ExoplanetEU(pp.PyAUpdateCycle):
                             "Orbital inclination", "deg", np.float]
         self._columns[7] = ["angDistance",
                             "Angular Distance", "arcsec", np.float]
-        self._columns[8] = ["pubStatus", "Publication status", "", "S2"]
+        self._columns[8] = ["pubStatus", "Publication status", "", "U2"]
         self._columns[9] = ["discovered", "Year of discovery", "yr", np.float]
-        self._columns[10] = ["updated", "Date of data update", "", "S10"]
+        self._columns[10] = ["updated", "Date of data update", "", "U10"]
         self._columns[11] = [
             "omega", "Argument of Periastron", "deg", np.float]
         self._columns[12] = ["tperi", "Epoch of Periastron", "d", np.float]
-        self._columns[13] = ["detType", "Detection type", "", "S2"]
+        self._columns[13] = ["detType", "Detection type", "", "U2"]
         self._columns[14] = ["molecules",
-                             "List of detected molecules", "", "S10"]
-        self._columns[15] = ["stName", "Name of star", "", "S15"]
-        self._columns[16] = ["ra", "Right ascension (J2000)", "hms", "S12"]
-        self._columns[17] = ["dec", "Declination (J2000)", "dms", "S12"]
+                             "List of detected molecules", "", "U10"]
+        self._columns[15] = ["stName", "Name of star", "", "U15"]
+        self._columns[16] = ["ra", "Right ascension (J2000)", "hms", "U12"]
+        self._columns[17] = ["dec", "Declination (J2000)", "dms", "U12"]
         self._columns[18] = [
             "mag_v", "V magnitude of a host star", "mag", np.float]
         self._columns[19] = [
@@ -217,11 +217,11 @@ class ExoplanetEU(pp.PyAUpdateCycle):
         self._columns[24] = ["mh", "Metallicity of host star", "dex", np.float]
         self._columns[25] = ["stMass", "Stellar mass", "solar", np.float]
         self._columns[26] = ["stRadius", "Radius of star", "solar", np.float]
-        self._columns[27] = ["SpT", "Spectral type of host star", "", "S5"]
+        self._columns[27] = ["SpT", "Spectral type of host star", "", "U5"]
         self._columns[28] = ["stAge", "Stellar age", "Ga", np.float]
         self._columns[29] = [
             "stTeff", "Stellar effective temperature", "K", np.float]
-        self._columns[30] = ["plRadMM", "Measuring method of Rpl", "", "S15"]
+        self._columns[30] = ["plRadMM", "Measuring method of Rpl", "", "U15"]
         # Identify exoplanet.eu csv column names with internal column names
         self._ident = {"name": "plName", "mass": "plMass", "radius": "plRadius",
                        "semi_major_axis": "sma", "angular_distance": "angDistance", "publication_status": "pubStatus",

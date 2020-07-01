@@ -71,10 +71,10 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
         # Define columns to select
         # Column name, Description, Unit
         self._columns = {}
-        self._columns[0] = ["pl_hostname", "Name of host star", "", "S15"]
-        self._columns[1] = ["pl_name", "Name of the planet", "", "S15"]
+        self._columns[0] = ["pl_hostname", "Name of host star", "", "U15"]
+        self._columns[1] = ["pl_name", "Name of the planet", "", "U15"]
         self._columns[2] = ["pl_letter",
-                            "Planet letter (e.g., b, c, d, etc.)", "", "S2"]
+                            "Planet letter (e.g., b, c, d, etc.)", "", "U2"]
         self._columns[3] = ["ra", "Right ascension", "deg", np.float]
         self._columns[4] = ["dec", "Declination", "deg", np.float]
         self._columns[5] = ["pl_orbper",
@@ -182,7 +182,10 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
             A dictionary with a key for every data column holding
             the associated value from the data table.
         """
-        pnames = [name.decode("utf8") for name in self.data.pl_name]
+        if hasattr(self.data.pl_name[0], "decode"):
+            pnames = [name.decode("utf8") for name in self.data.pl_name]
+        else:
+            pnames = self.data.pl_name
         r = pyaC.fuzzyMatch(planetName, pnames,
                             caseSensitive=caseSensitive, raises=True)
         result = {}
