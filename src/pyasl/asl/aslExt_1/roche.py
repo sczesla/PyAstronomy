@@ -209,10 +209,38 @@ def get_lagrange_3(q, getdlrp=True, eps=1e-4):
     xL3 : float
         The location of the first Lagrange point (xL3, 0, 0).
     Potential : float, optional
-        The dimensionless potential at the first Lagrange point (default is True).
+        The dimensionless potential at the third Lagrange point (default is True).
     """
     _checkq(q)
     return _get_lagrange_123(q, -10, -eps, getdlrp)
+
+def get_lagrange_4():
+    """
+    Get location of forth Lagrange point
+    
+    Orbital angular momentum is supposed to point into +z direction.
+    L4 is in direction of motion of m2.
+    
+    Returns
+    -------
+    x,y,z : float
+        The location of the fourth Lagrange point (xL3, 0, 0).
+    """
+    return (0.5, np.sin(np.radians(60)), 0)
+
+def get_lagrange_5():
+    """
+    Get location of fifth Lagrange point
+    
+    Orbital angular momentum is supposed to point into +z direction.
+    L5 is behind motion of m2.
+    
+    Returns
+    -------
+    x,y,z : float
+        The location of the fifth Lagrange point (xL3, 0, 0).
+    """
+    return (0.5, -np.sin(np.radians(60)), 0)
 
 def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
     """
