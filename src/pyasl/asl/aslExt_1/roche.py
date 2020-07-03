@@ -246,6 +246,8 @@ def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
     """
     Calculate (dimensionless) Roche lobe volume
     
+    Uses numerical integration with fixed number of points.
+    
     Parameters
     ----------
     q : float
