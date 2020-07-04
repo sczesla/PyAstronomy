@@ -95,6 +95,27 @@ def ddz_rochepot(z, q, x=1, y=0):
     ddz = 2/(1+q) * (-z/r1**3) + 2*q/(1+q) * (-z/r2**3) 
     return ddz
 
+def ddy_rochepot(y, q, x=1, z=0):
+    """
+    Derive of dimensionless Roche potential along y-axis
+    
+    Parameters
+    ----------
+    x, y, z : float or array
+        Position (default for x is one and zero for z)
+    q : float
+        Mass ratio m2/m1
+    
+    Returns
+    -------
+    Derivative: float or array
+        d/dy of dimensionless Roche potential
+    """
+    _checkq(q)
+    r1, r2 = _r1r2_dl(x, y, z)
+    ddy = 2/(1+q) * (-y/r1**3) + 2*q/(1+q) * (-y/r2**3) + 2*y 
+    return ddy
+
 def roche_lobe_radius_eggleton(q, m):
     """
     Approximate dimensionless Roche lobe radius according to Eggelton 1983 (ApJ 268, 368).
@@ -242,66 +263,44 @@ def get_lagrange_5():
     """
     return (0.5, -np.sin(np.radians(60)), 0)
 
-# def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
-#     """
-#     Calculate (dimensionless) Roche lobe volume
-#     
-#     Uses numerical integration with fixed number of points.
-#     
-#     Parameters
-#     ----------
-#     q : float
-#         Mass ratio (m2/m1)
-#     m : int, {1,2}
-#         Whether to calculate volume for m1 or m2
-#     n : int, optional
-#         Number of point to be used in numerical integration. Default is 50.
-#         Increase to improve accuracy.
-#     eps : float, optional
-#         Parameter used to avoid singularities of Roche potential. Default is 1e-4.
-#     fullout : boolean, optional
-#         If True, provides more output than volume.
-#     
-#     Returns
-#     -------
-#     Volume : float
-#         Dimensionless volume of Roche lobe
-#     Effective radius : float, optional
-#         Radius of a sphere with the same radius (dimensionless)
-#     xx, rx : arrays, optional
-#         Points on the x-axis as well as extent of body in the z (and equivalently y) direction.
-#         Volume is calculated as V = pi*int_xx rx**2.
-#     """
-#     _checkq(q)
-#     _checkm(m)
-#     l1, l1pot = get_lagrange_1(q, eps=eps)
-#     l2, _ = get_lagrange_2(q, eps=eps)
-#     l3, _ = get_lagrange_3(q, eps=eps)
-#     f = lambda x: rochepot_dl(x,0,0,q) - l1pot
-#     if m == 2:
-#         # Outer limit (beyond m2) of Roche lobe
-#         p1 = l1
-#         p2 = sco.brentq(f, 1+eps, l2)
-#     elif m == 1:
-#         # Outer limit (behind m1) of Roche lobe
-#         p1 = sco.brentq(f, l3, -eps)
-#         p2 = l1
-#     # Prepare numerical integration
-#     xx = np.linspace(p1, p2, n)
-#     fx = np.zeros_like(xx)
-#     # Leaves outer point at zero expansion
-#     for i in range(1,len(xx)-1):
-#         f = lambda z: rochepot_dl(xx[i],0,z,q) - l1pot
-#         fx[i] = sco.brentq(f, 0, 1)
-#     # Get volume of rotational body
-#     vol = np.pi*np.trapz(fx**2, xx)
-#     if fullout:
-#         reff = (vol*3./4/np.pi)**(1./3)
-#         return vol, reff, xx, fx
-
-def rl_vol_MC(q, m=2, n=100000, eps=1e-4, fullout=True):
+def roche_yz_extent(q, m=2, pl=None, eps=1e-4):
     """
-    Calculate (dimensionless) Roche lobe volume
+    Extent of equipotential surface in y and z direction
+    
+    Parameter
+    ---------
+    q : float
+        Mass ratio m2/m1
+    m : int, {1,2}, optional
+        Whether to center on m1 or m2
+    pl : float, optional
+        The (dimensional) potential level to be considered. If None (default),
+        the Roche lobe (L1) potential level is used.
+    eps : float, optional
+        Margin used to avoid singularities of Roche potential. Default is 1e-4.
+    
+    Returns
+    -------
+    dy, dz : float
+        Distance to equipotential level along y and z direction.
+    """
+    _checkm(m)
+    _checkq(q)
+    x = m - 1
+    l1, l1pot = get_lagrange_1(q, getdlrp=True, eps=eps)
+    if m == 2:
+        l1 = 1 - l1
+    if pl is None:
+        pl = l1pot
+    f = lambda y: rochepot_dl(x,y,0,q) - pl
+    p1y = sco.brentq(f, eps, l1)
+    f = lambda z: rochepot_dl(x,0,z,q) - pl
+    p1z = sco.brentq(f, eps, l1)
+    return p1y, p1z
+
+def roche_vol_MC(q, m=2, n=100000, pl=None, eps=1e-4, fullout=True):
+    """
+    Calculate (dimensionless) volume of equipotential surface such as the Roche lobe
     
     Uses Monte Carlo (MC) integration
     
@@ -314,8 +313,11 @@ def rl_vol_MC(q, m=2, n=100000, eps=1e-4, fullout=True):
     n : int, optional
         Number of samples to be used in the Monte Carlo integration. Default is 100000.
         Increase to improve accuracy.
+    pl : float, optional
+        The (dimensionless) potential level bounding the volume. If None (default), the Roche
+        lobe potential (L1) is used.
     eps : float, optional
-        Parameter used to avoid singularities of Roche potential. Default is 1e-4.
+        Margin used to avoid singularities of Roche potential. Default is 1e-4.
     fullout : boolean, optional
         If True (default), provides more output than volume.
     
@@ -348,8 +350,11 @@ def rl_vol_MC(q, m=2, n=100000, eps=1e-4, fullout=True):
     y = np.random.random(n)*2*r-r
     z = np.random.random(n)*2*r-r
     
+    if pl is None:
+        pl = l1pot
+    
     ps = rochepot_dl(x, y, z, q)
-    indi = np.where(ps > l1pot)[0]
+    indi = np.where(ps > pl)[0]
     ef = len(indi)/n
     
     # Get volume of rotational body
