@@ -242,11 +242,68 @@ def get_lagrange_5():
     """
     return (0.5, -np.sin(np.radians(60)), 0)
 
-def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
+# def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
+#     """
+#     Calculate (dimensionless) Roche lobe volume
+#     
+#     Uses numerical integration with fixed number of points.
+#     
+#     Parameters
+#     ----------
+#     q : float
+#         Mass ratio (m2/m1)
+#     m : int, {1,2}
+#         Whether to calculate volume for m1 or m2
+#     n : int, optional
+#         Number of point to be used in numerical integration. Default is 50.
+#         Increase to improve accuracy.
+#     eps : float, optional
+#         Parameter used to avoid singularities of Roche potential. Default is 1e-4.
+#     fullout : boolean, optional
+#         If True, provides more output than volume.
+#     
+#     Returns
+#     -------
+#     Volume : float
+#         Dimensionless volume of Roche lobe
+#     Effective radius : float, optional
+#         Radius of a sphere with the same radius (dimensionless)
+#     xx, rx : arrays, optional
+#         Points on the x-axis as well as extent of body in the z (and equivalently y) direction.
+#         Volume is calculated as V = pi*int_xx rx**2.
+#     """
+#     _checkq(q)
+#     _checkm(m)
+#     l1, l1pot = get_lagrange_1(q, eps=eps)
+#     l2, _ = get_lagrange_2(q, eps=eps)
+#     l3, _ = get_lagrange_3(q, eps=eps)
+#     f = lambda x: rochepot_dl(x,0,0,q) - l1pot
+#     if m == 2:
+#         # Outer limit (beyond m2) of Roche lobe
+#         p1 = l1
+#         p2 = sco.brentq(f, 1+eps, l2)
+#     elif m == 1:
+#         # Outer limit (behind m1) of Roche lobe
+#         p1 = sco.brentq(f, l3, -eps)
+#         p2 = l1
+#     # Prepare numerical integration
+#     xx = np.linspace(p1, p2, n)
+#     fx = np.zeros_like(xx)
+#     # Leaves outer point at zero expansion
+#     for i in range(1,len(xx)-1):
+#         f = lambda z: rochepot_dl(xx[i],0,z,q) - l1pot
+#         fx[i] = sco.brentq(f, 0, 1)
+#     # Get volume of rotational body
+#     vol = np.pi*np.trapz(fx**2, xx)
+#     if fullout:
+#         reff = (vol*3./4/np.pi)**(1./3)
+#         return vol, reff, xx, fx
+
+def rl_vol_MC(q, m=2, n=100000, eps=1e-4, fullout=True):
     """
     Calculate (dimensionless) Roche lobe volume
     
-    Uses numerical integration with fixed number of points.
+    Uses Monte Carlo (MC) integration
     
     Parameters
     ----------
@@ -255,22 +312,20 @@ def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
     m : int, {1,2}
         Whether to calculate volume for m1 or m2
     n : int, optional
-        Number of point to be used in numerical integration. Default is 50.
+        Number of samples to be used in the Monte Carlo integration. Default is 100000.
         Increase to improve accuracy.
     eps : float, optional
         Parameter used to avoid singularities of Roche potential. Default is 1e-4.
     fullout : boolean, optional
-        If True, provides more output than volume.
+        If True (default), provides more output than volume.
     
     Returns
     -------
-    Volume : float
-        Dimensionless volume of Roche lobe
-    Effective radius : float, optional
-        Radius of a sphere with the same radius (dimensionless)
-    xx, rx : arrays, optional
-        Points on the x-axis as well as extent of body in the z (and equivalently y) direction.
-        Volume is calculated as V = pi*int_xx rx**2.
+    V, Verr : floats
+        Dimensionless volume of Roche lobe and estimate of uncertainty
+    Reff, Refferr: floats, optional
+        Radius of a sphere with the same radius (dimensionless) and estimate
+        of uncertainty. Provided if fullout is True (default).
     """
     _checkq(q)
     _checkm(m)
@@ -282,22 +337,29 @@ def rl_vol_tabint(q, m=2, n=50, eps=1e-4, fullout=True):
         # Outer limit (beyond m2) of Roche lobe
         p1 = l1
         p2 = sco.brentq(f, 1+eps, l2)
+        r = max(1-p1, p2-1)
     elif m == 1:
         # Outer limit (behind m1) of Roche lobe
         p1 = sco.brentq(f, l3, -eps)
         p2 = l1
-    # Prepare numerical integration
-    xx = np.linspace(p1, p2, n)
-    fx = np.zeros_like(xx)
-    # Leaves outer point at zero expansion
-    for i in range(1,len(xx)-1):
-        f = lambda z: rochepot_dl(xx[i],0,z,q) - l1pot
-        fx[i] = sco.brentq(f, 0, 1)
+        r = max(abs(p1), abs(p2))
+    
+    x = np.random.random(n)*2*r-r + (m-1)
+    y = np.random.random(n)*2*r-r
+    z = np.random.random(n)*2*r-r
+    
+    ps = rochepot_dl(x, y, z, q)
+    indi = np.where(ps > l1pot)[0]
+    ef = len(indi)/n
+    
     # Get volume of rotational body
-    vol = np.pi*np.trapz(fx**2, xx)
+    vol = (2*r)**3 * len(indi)/n
+    dvol = (2*r)**3 * np.sqrt( (ef - ef**2)/n )
     if fullout:
         reff = (vol*3./4/np.pi)**(1./3)
-        return vol, reff, xx, fx
+        refferr = reff/(3*vol)*dvol
+        return vol, dvol, reff, refferr
+    return vol, dvol
 
 def rochepot(x, y, z, m1, m2, a):
     """
