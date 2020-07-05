@@ -1,7 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
 import inspect
-from PyAstronomy import constants as PC
 from PyAstronomy.pyaC import pyaErrors as PE
 from scipy import optimize as sco
 
@@ -74,7 +73,7 @@ def ddx_rochepot_dl(x, q, y=0, z=0):
     ddx = 2/(1+q) * (-x/r1**3) + 2*q/(1+q) * (-(x-1)/r2**3) + 2*(x - q/(1+q))
     return ddx
 
-def ddz_rochepot(z, q, x=1, y=0):
+def ddz_rochepot_dl(z, q, x=1, y=0):
     """
     Derive of dimensionless Roche potential along z-axis
     
@@ -95,7 +94,7 @@ def ddz_rochepot(z, q, x=1, y=0):
     ddz = 2/(1+q) * (-z/r1**3) + 2*q/(1+q) * (-z/r2**3) 
     return ddz
 
-def ddy_rochepot(y, q, x=1, z=0):
+def ddy_rochepot_dl(y, q, x=1, z=0):
     """
     Derive of dimensionless Roche potential along y-axis
     
@@ -118,7 +117,10 @@ def ddy_rochepot(y, q, x=1, z=0):
 
 def roche_lobe_radius_eggleton(q, m):
     """
-    Approximate dimensionless Roche lobe radius according to Eggelton 1983 (ApJ 268, 368).
+    Approximate effective dimensionless Roche lobe radius according to Eggelton 1983 (ApJ 268, 368).
+    
+    The effective Roche lobe radius is the radius of a sphere with the same
+    volume as the actual equipotential surface defining the Roche lobe.
     
     .. math::
     
@@ -249,7 +251,7 @@ def get_lagrange_4():
     """
     return (0.5, np.sin(np.radians(60)), 0)
 
-def get_lagrange_5():
+def get_lagrange_5(getdlrp=True):
     """
     Get location of fifth Lagrange point
     

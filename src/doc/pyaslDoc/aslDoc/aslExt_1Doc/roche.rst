@@ -42,8 +42,51 @@ we write
     
 where :math:`\Phi_n` is the dimensionless Roche potential.
 
-Functions to obtain the potential
+Functionality
 -----------------------------------
+
+    - :ref:`rlpot`
+    - :ref:`rlpade`
+    - :ref:`rlvol`
+    - :ref:`rllps`
+    
+
+.. _rlpot:
+
+Roche lobe potential
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: rochepot_dl
 .. autofunction:: rochepot
+
+.. _rlpade:
+
+Partial derivatives
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: ddx_rochepot_dl
+.. autofunction:: ddy_rochepot_dl
+.. autofunction:: ddz_rochepot_dl
+
+.. _rlvol:
+
+Roche lobe volume and radius
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: roche_lobe_radius_eggleton
+.. autofunction:: roche_vol_MC
+.. autofunction:: roche_yz_extent
+
+.. _rllps:
+
+Lagrange points
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_lagrange_1
+.. autofunction:: get_lagrange_2
+.. autofunction:: get_lagrange_3
+.. autofunction:: get_lagrange_4
+.. autofunction:: get_lagrange_5
+
+
+
