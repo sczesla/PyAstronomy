@@ -19,7 +19,7 @@ Available functionality
 Below, you find a list of available functionality roughly sorted
 by category.
 
-Uncategorized algorithms
+General algorithms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentModule:: PyAstronomy.pyasl
