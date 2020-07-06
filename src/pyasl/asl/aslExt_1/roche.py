@@ -124,7 +124,7 @@ def roche_lobe_radius_eggleton(q, m):
     
     .. math::
     
-        r_L \\approx \frac{0.49\,q^{2/3}}{0.6\,q^{2/3} + \\ln(1+q^{1/3})}
+        r_L \\approx \\frac{0.49\,q^{2/3}}{0.6\,q^{2/3} + \\ln(1+q^{1/3})}
     
     Parameters
     ----------
