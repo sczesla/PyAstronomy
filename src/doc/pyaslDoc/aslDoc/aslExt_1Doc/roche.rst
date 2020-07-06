@@ -68,8 +68,9 @@ Example of usage
     l2, l2pot = pyasl.get_lagrange_2(q)
     l3, l3pot = pyasl.get_lagrange_3(q)
     l4, l5 = pyasl.get_lagrange_4(), pyasl.get_lagrange_5()
-    l4pot = pyasl.rochepot_dl(*l4, q)
-    l5pot = pyasl.rochepot_dl(*l5, q)
+    l4pot = pyasl.rochepot_dl(l4[0], l4[1], l4[2], q)
+    l5pot = pyasl.rochepot_dl(l5[0], l5[1], l5[2], q)
+
     
     print("Effective (dimensionless) radii of first and second mass")
     print("According to the approximation of Eggleton 1983:")
