@@ -26,7 +26,7 @@ Apply rotational broadening to a Gaussian and check the
 result equivalent widths.
 
 ::
-
+    
     from __future__ import print_function, division
     import numpy as np
     import matplotlib.pylab as plt
@@ -83,7 +83,7 @@ Example: Using the fast algorithm
 ----------------------------------
 
 ::
-  
+    
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import pyasl
@@ -97,7 +97,7 @@ Example: Using the fast algorithm
     s = 0.1
     mu = 5004.1635788
     flux += A/np.sqrt(2.*np.pi*s**2) * \
-      np.exp(-(wvl-mu)**2/(2.*s**2))
+        np.exp(-(wvl-mu)**2/(2.*s**2))
     
     # Apply the fast algorithm and ...
     bfast = pyasl.fastRotBroad(wvl, flux, 0.81, 11.37)

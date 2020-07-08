@@ -12,28 +12,28 @@ Example: Evaluation and fitting
 -------------------------------   
 
 ::
-  
+    
     from PyAstronomy import modelSuite as ms
     import numpy as np
     import matplotlib.pylab as plt
     
     # Create our line list with 4 line
-    lineList = np.zeros((4,3))
+    lineList = np.zeros((4, 3))
     # Assign wavelengths (in A)
-    lineList[0,0] = 5002.37
-    lineList[1,0] = 5005.9
-    lineList[2,0] = 5007.52
-    lineList[3,0] = 5007.64
+    lineList[0, 0] = 5002.37
+    lineList[1, 0] = 5005.9
+    lineList[2, 0] = 5007.52
+    lineList[3, 0] = 5007.64
     # Assign EWs (in A)
-    lineList[0,1] = 0.01
-    lineList[1,1] = 0.05
-    lineList[2,1] = 0.009
-    lineList[3,1] = 0.12
+    lineList[0, 1] = 0.01
+    lineList[1, 1] = 0.05
+    lineList[2, 1] = 0.009
+    lineList[3, 1] = 0.12
     # Assign depths (0-1)
-    lineList[0,2] = 0.97
-    lineList[1,2] = 0.9
-    lineList[2,2] = 0.99
-    lineList[3,2] = 0.35
+    lineList[0, 2] = 0.97
+    lineList[1, 2] = 0.9
+    lineList[2, 2] = 0.99
+    lineList[3, 2] = 0.35
     
     wvl = np.arange(5000., 5010., 0.01)
     
@@ -54,7 +54,7 @@ Example: Evaluation and fitting
     # and evaluate
     mvrad = llg.evaluate(wvl)
     # Plot the results
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.plot(wvl, m1, 'b.-')
     plt.plot(wvl, mvsini, 'g.-')
     plt.plot(wvl, mvrad, 'y.-')
@@ -67,13 +67,13 @@ Example: Evaluation and fitting
     # Lets modify the strengths of the Gaussians
     # and get it back.
     for i in range(llg.numberOfLines()):
-      llg["A"+str(i+1)] += np.random.normal(0.0, 0.1)
+        llg["A"+str(i+1)] += np.random.normal(0.0, 0.1)
     # Use all line strengths for fitting
     llg.thawLineStrengths()
     # and fit
     llg.fit(wvl, data)
     # Plot the result
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.errorbar(wvl, data, yerr=np.ones(len(wvl))*0.01, fmt='bp')
     plt.plot(wvl, llg.evaluate(wvl), 'r--')
     plt.show()

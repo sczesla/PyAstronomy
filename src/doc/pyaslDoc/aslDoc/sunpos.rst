@@ -36,5 +36,5 @@ Example
     pos = pyasl.sunpos(startjd, end_jd=endjd, jd_steps=10, plot=False, full_output=True)
     
     for i in range(len(pos[0])):
-      print("At JD = %g: ra = %g, dec = %g" % (pos[0][i], pos[1][i], pos[2][i]))
+        print("At JD = %g: ra = %g, dec = %g" % (pos[0][i], pos[1][i], pos[2][i]))
     

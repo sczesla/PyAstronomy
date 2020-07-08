@@ -20,11 +20,11 @@ Example: Cross-correlation with a Gaussian
     import matplotlib.pylab as plt
     
     # Create the template
-    tw = np.linspace(5000,5010,1000)
+    tw = np.linspace(5000, 5010, 1000)
     tf = np.exp(-(tw-5004.0)**2/(2.*0.1**2))
     
     # Create data, which are not that well sampled
-    dw = np.linspace(5000,5010,200)
+    dw = np.linspace(5000, 5010, 200)
     df = np.exp(-(dw-5004.17)**2/(2.*0.1**2))
     
     # Plot template and data
@@ -43,9 +43,9 @@ Example: Cross-correlation with a Gaussian
     
     print("Cross-correlation function is maximized at dRV = ", rv[maxind], " km/s")
     if rv[maxind] > 0.0:
-      print("  A red-shift with respect to the template")
+        print("  A red-shift with respect to the template")
     else:
-      print("  A blue-shift with respect to the template")
+        print("  A blue-shift with respect to the template")
     
     plt.plot(rv, cc, 'bp-')
     plt.plot(rv[maxind], cc[maxind], 'ro')

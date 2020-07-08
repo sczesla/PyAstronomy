@@ -5,6 +5,7 @@ import argparse
 import configparser
 import hashlib
 import datetime
+import autopep8
 
 
 class CandidateBlock:
@@ -168,6 +169,50 @@ class FileBlocks:
             return
         os.mkdir(self.snDir)
 
+    def pep8blocks(self):
+        """
+        """
+        ll = open(self.fn).readlines()
+        
+        add = 0
+        for b in self.blocks:
+            if not b.isExample:
+                continue
+            
+            print("Startline: ", b.startLine)
+            afteradd = 0
+            lls = [l[b.indentLevel:] for l in b.lines]
+            for i in range(len(lls)):
+                lls[i] = lls[i].rstrip("\n") + "\n"
+            print("PRE")
+            for j, l in enumerate(lls):
+                print(j, " '"+l+"'")
+            print("END PRE")
+            nl = autopep8.fix_code(''.join(lls), options={"max_line_length":1000})
+            nls = nl.split("\n")[0:-1]
+            nls = [" "*4+l.rstrip("\n") for l in nls]
+            print("POST")
+            for j, l in enumerate(nls):
+                print(j, " '"+l.rstrip("\n")+"'")
+            print("END POST")
+            print("lens: ", len(nls), len(b.lines))
+            if len(nls) > len(b.lines):
+                print("Adding ", len(nls) - len(b.lines), " additional lines")
+                for i in range(len(nls) - len(b.lines)):
+                    ll.insert(b.startLine+1, "")
+                    afteradd += 1
+
+            for i in range(len(nls)):
+                print("Old: '" + ll[i+b.startLine+add] + "'")
+                print("New: '" + nls[i] + "'")
+                ll[i+b.startLine+add] = nls[i] +"\n"
+            add += afteradd
+        
+        for l in ll:            
+            print(l, end="")
+        open(self.fn, 'wt').writelines(ll)
+            
+
     def toSanityCheckFile(self):
         """
         Write all blocks identified as examples to a file identified by
@@ -225,6 +270,8 @@ parser.add_argument('--cf', dest='cf', default="dysSetup.cfg",
                     help="Name of config file.")
 parser.add_argument('--root', dest='root',
                     help="The root directory for the example search.")
+parser.add_argument('--apep8', dest='apep8', action="store_true", 
+                    help="Convert detected example to PEP8.")
 args = parser.parse_args()
 
 
@@ -242,4 +289,6 @@ walker = Walker(rootPath=rootPath, fnRegex=fnRegex)
 for fn in walker.walk():
     fbs = FileBlocks(fn)
     fbs.summary()
+    if args.apep8:
+        fbs.pep8blocks()
     fbs.toSanityCheckFile()

@@ -50,7 +50,7 @@ Example: daycnv, helio_jd, jdcnv, get_juldate, and juldate
     
     # Convert JD to calendar date
     jd = 2440000.0
-    print("year = %4d, month = %2d, day = %2d, hour = %5.3f" \
+    print("year = %4d, month = %2d, day = %2d, hour = %5.3f"
           % tuple(pyasl.daycnv(jd)))
     print()
     
@@ -65,7 +65,7 @@ Example: daycnv, helio_jd, jdcnv, get_juldate, and juldate
     # Get current Julian date and convert to heliocentric date
     cjd = pyasl.get_juldate()
     print("Current Julian date: ", cjd)
-    print("Current (reduced) heliocentric Julian date (ra=100 deg, dec=37 deg): ", \
+    print("Current (reduced) heliocentric Julian date (ra=100 deg, dec=37 deg): ",
           pyasl.helio_jd(cjd-2.4e6, 100.0, 37.0))
 
 

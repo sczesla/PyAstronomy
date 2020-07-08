@@ -7,7 +7,7 @@ Fourier spectrum of evenly-sampled Poisson data
 --------------------------------------------------
 
 ::
-
+    
     from __future__ import print_function, division
     import numpy
     import matplotlib.pylab as plt
@@ -26,7 +26,7 @@ Fourier spectrum of evenly-sampled Poisson data
     # power level is 2 as expected.
     fft = pyPeriod.Fourier(lc)
     fig, ax = fft.plot()
-    print('Mean power level:',numpy.mean(fft.power))
+    print('Mean power level:', numpy.mean(fft.power))
     plt.show()
 
 
@@ -50,7 +50,7 @@ Error-weighted (generalized) Lomb periodogram
     error = numpy.ones(time.size) * 0.5
     
     # Plot the light curve in top panel
-    plt.subplot(3,1,1)
+    plt.subplot(3, 1, 1)
     plt.errorbar(time, flux, yerr=error)
     
     # Build the TimeSeries instance
@@ -60,7 +60,7 @@ Error-weighted (generalized) Lomb periodogram
     # which does not take errors into account.
     ls = pyPeriod.LombScargle(lc, ofac=1, hifac=1)
     # Plot the Lomb-Scargle periodogram in middle panel
-    plt.subplot(3,1,2)
+    plt.subplot(3, 1, 2)
     plt.plot(ls.freq, ls.power, 'r-')
     
     # Compute the full error-weighted Lomb-Periodogram
@@ -73,7 +73,7 @@ Error-weighted (generalized) Lomb periodogram
     
     # Plot the generalized Lomb-Scargle periodogram in
     # bottom panel.
-    plt.subplot(3,1,3)
+    plt.subplot(3, 1, 3)
     plt.plot(clp.freq, clp.power)
     # Show the results
     plt.show()

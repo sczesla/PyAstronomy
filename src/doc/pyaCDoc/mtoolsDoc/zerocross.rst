@@ -8,7 +8,7 @@ Example
 ~~~~~~~~
 
 ::
-
+    
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import pyaC

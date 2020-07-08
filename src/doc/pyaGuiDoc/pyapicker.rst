@@ -35,4 +35,4 @@ Example use of Picker
     print("Number of selected points: ", len(points))
     print("Selected points (x, y):")
     for p in points:
-        print("%g, %g" % p) 
+        print("%g, %g" % p)

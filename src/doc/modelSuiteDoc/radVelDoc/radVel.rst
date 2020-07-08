@@ -33,7 +33,7 @@ Example code - Fit RV curve
     # Create Radial Velocity object
     r = rv.SinRadVel()
     # Set parameters
-    r.assignValue({"P":1.8, "T0":0.25, "K": 0.5, "rv0": 10.0})
+    r.assignValue({"P": 1.8, "T0": 0.25, "K": 0.5, "rv0": 10.0})
     # Choose some time axis and calculate model
     time = arange(100)/100.0 * 3.0 - 1.5
     y = r.evaluate(time)
@@ -43,7 +43,7 @@ Example code - Fit RV curve
     
     # Randomize starting parameters for fit
     for p, v in r.parameters().items():
-      r[p] = v + (random.random() - 0.5) * v
+        r[p] = v + (random.random() - 0.5) * v
     # Show starting values
     print("Starting values for fit:")
     r.parameterSummary()

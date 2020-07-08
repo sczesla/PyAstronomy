@@ -33,7 +33,7 @@ Example
 ~~~~~~~~
 
 ::
-
+    
     from __future__ import print_function
     import numpy as np
     from PyAstronomy import pyaC as pc
@@ -97,18 +97,18 @@ Example
 ~~~~~~~~
 
 ::
-
+    
     from __future__ import print_function
     from PyAstronomy import pyaC as PC
     import numpy as np
     
-    m = np.zeros((4,3))
+    m = np.zeros((4, 3))
     colNames = ["first", "second", "third"]
     rowNames = ["1", "2", "3", "4"]
     
     for j in range(4):
-      for i in range(3):
-        m[j,i] = (i+1) * 10**(j+1) * np.sin(i*j)
+        for i in range(3):
+            m[j, i] = (i+1) * 10**(j+1) * np.sin(i*j)
     
     PC.matrix2doutput(m, colNames=colNames, rowNames=rowNames)
     print()
@@ -129,7 +129,7 @@ Simple Input-Output file
    :members:
 
 ::
-  
+    
     from __future__ import print_function
     from PyAstronomy import pyaC as PC
     import numpy as np
@@ -141,10 +141,10 @@ Simple Input-Output file
     c = 5
     
     f.addProp("a", a, fmt="% 4.4e")
-    f.addProp(["b", "c"], [b,c])
+    f.addProp(["b", "c"], [b, c])
     
     for x in range(10):
-      f.write(str(x) + "\n")
+        f.write(str(x) + "\n")
     
     f.close()
     

@@ -11,7 +11,7 @@ Example of usage
 -----------------
    
 ::
-     
+    
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import modelSuite as ms
@@ -25,7 +25,7 @@ Example of usage
     x["off"] = 0.0
     
     # Define a radial velocity axis
-    vv = np.linspace(-90.,90.,200)
+    vv = np.linspace(-90., 90., 200)
     
     # Construct some "data" and ...
     data = x.evaluate(vv)

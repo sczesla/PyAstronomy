@@ -23,7 +23,7 @@ Example of usage
 ~~~~~~~~~~~~~~~~~~~
 
 ::
-
+    
     import numpy as np
     from PyAstronomy import pyasl
     
@@ -36,5 +36,5 @@ Example of usage
     
     # Write spectrum specifying wavelength-related header keywords
     # manually
-    wp = {"CRVAL1":5000., "CDELT1":0.01, "CRPIX1":1}
+    wp = {"CRVAL1": 5000., "CDELT1": 0.01, "CRPIX1": 1}
     pyasl.write1dFitsSpec("test2.fits", flux, waveParams=wp, clobber=True)

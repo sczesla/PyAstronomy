@@ -11,7 +11,7 @@ Example of usage
 ------------------
 
 ::
-  
+    
     from PyAstronomy import pyasl
     import numpy as np
     import matplotlib.pylab as plt

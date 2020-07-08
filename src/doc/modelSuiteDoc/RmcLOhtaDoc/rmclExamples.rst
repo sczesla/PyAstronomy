@@ -27,9 +27,9 @@ Circular orbit
     # Create Rossiter-McLaughlin object
     rmcl = ms.RmcL()
     # Set parameters
-    rmcl.assignValue({"a":6.7, "lambda":7.2/180.0*pi, "epsilon":0.5, \
-                      "P":1.74, "T0":0.2, "i":87.8/180.*pi, \
-                      "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
+    rmcl.assignValue({"a": 6.7, "lambda": 7.2/180.0*pi, "epsilon": 0.5,
+                      "P": 1.74, "T0": 0.2, "i": 87.8/180.*pi,
+                      "Is": 90.0/180.0*pi, "Omega": 1.609e-5, "gamma": 0.2})
     # Choose some time axis and calculate model
     time = arange(100)/100.0 * 0.2 + 0.1
     rv = rmcl.evaluate(time)
@@ -45,7 +45,7 @@ Elliptical orbit
 ~~~~~~~~~~~~~~~~~~~~~
 
 ::
-
+    
     # Import some unrelated modules
     from numpy import arange, pi
     import matplotlib.pylab as plt
@@ -58,12 +58,12 @@ Elliptical orbit
     rmel = ms.RmcLell()
     
     # Assign parameter values
-    rmcl.assignValue({"a":6.7, "lambda":7.2/180.0*pi, "epsilon":0.5, \
-                        "P":1.74, "T0":0.2, "i":87.8/180.*pi, \
-                        "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
-    rmel.assignValue({"a":6.7, "lambda":7.2/180.0*pi, "epsilon":0.5, \
-                        "P":1.74, "tau":0.2, "i":87.8/180.*pi, "w":-90/180.*pi, \
-                        "e":0.05, "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
+    rmcl.assignValue({"a": 6.7, "lambda": 7.2/180.0*pi, "epsilon": 0.5,
+                      "P": 1.74, "T0": 0.2, "i": 87.8/180.*pi,
+                      "Is": 90.0/180.0*pi, "Omega": 1.609e-5, "gamma": 0.2})
+    rmel.assignValue({"a": 6.7, "lambda": 7.2/180.0*pi, "epsilon": 0.5,
+                      "P": 1.74, "tau": 0.2, "i": 87.8/180.*pi, "w": -90/180.*pi,
+                      "e": 0.05, "Is": 90.0/180.0*pi, "Omega": 1.609e-5, "gamma": 0.2})
     
     
     # Choose some time axis and calculate model
@@ -98,9 +98,9 @@ be carried out.
     # Create Rossiter-McLaughlin object
     rmcl = ms.RmcL()
     # Set parameters
-    rmcl.assignValue({"a":6.7, "lambda":7.2/180.0*pi, "epsilon":0.5, \
-                      "P":1.74, "T0":0.2, "i":87.8/180.*pi, \
-                      "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
+    rmcl.assignValue({"a": 6.7, "lambda": 7.2/180.0*pi, "epsilon": 0.5,
+                      "P": 1.74, "T0": 0.2, "i": 87.8/180.*pi,
+                      "Is": 90.0/180.0*pi, "Omega": 1.609e-5, "gamma": 0.2})
     # Choose some time axis and calculate model
     time = arange(100)/100.0 * 0.2 + 0.1
     rv = rmcl.evaluate(time)
@@ -109,9 +109,9 @@ be carried out.
     rv += random.normal(0.0, 0.05*rv.max(), rv.size)
     
     # Assign guess parameters
-    rmcl.assignValue({"a":6.0, "lambda":7.2/180.0*pi, "epsilon":0.5, \
-                      "P":1.74, "T0":0.17, "i":87.8/180.*pi, \
-                      "Is":90.0/180.0*pi, "Omega":1.609e-5, "gamma":0.2})
+    rmcl.assignValue({"a": 6.0, "lambda": 7.2/180.0*pi, "epsilon": 0.5,
+                      "P": 1.74, "T0": 0.17, "i": 87.8/180.*pi,
+                      "Is": 90.0/180.0*pi, "Omega": 1.609e-5, "gamma": 0.2})
     
     # Thaw parameters and fit
     rmcl.thaw(["a", "T0"])

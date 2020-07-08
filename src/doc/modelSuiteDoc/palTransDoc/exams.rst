@@ -12,7 +12,7 @@ Calculating a model
 In this first example, we demonstrate how to calculate a model transit light-curve. 
 
 ::
-  
+    
     from PyAstronomy.modelSuite import palTrans
     import matplotlib.pylab as plt
     import numpy as np

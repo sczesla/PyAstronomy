@@ -53,13 +53,13 @@ Example
     print("Indices of outliers: ", r[1])
     print("        R      Lambda")
     for i in range(len(r[2])):
-      print("%2d  %8.5f  %8.5f" % ((i+1), r[2][i], r[3][i]))
+        print("%2d  %8.5f  %8.5f" % ((i+1), r[2][i], r[3][i]))
     
     # Plot the "data"
     plt.plot(x, 'b.')
     # and mark the outliers.
     for i in range(r[0]):
-      plt.plot(r[1][i], x[r[1][i]], 'rp')
+        plt.plot(r[1][i], x[r[1][i]], 'rp')
     plt.show()
     
 
@@ -91,7 +91,7 @@ Example
     from PyAstronomy import pyasl
     
     # Get some data
-    x = np.random.normal(0.,0.1,50)
+    x = np.random.normal(0., 0.1, 50)
     
     # Introduce outliers
     x[27] = 1.0
@@ -105,7 +105,7 @@ Example
     
     plt.plot(x, 'b.')
     for i in range(len(r[1])):
-      plt.plot(r[1][i], x[r[1][i]], 'rp')
+        plt.plot(r[1][i], x[r[1][i]], 'rp')
     plt.show()
 
 
@@ -128,7 +128,7 @@ Example: polyResOutlier
 The `polyResOutlier` method relies on a single polynomial fit.
 
 ::
-
+    
     from __future__ import print_function, division
     from PyAstronomy import pyasl
     import numpy as np
@@ -168,7 +168,7 @@ The `slidingPolyResOutlier` method usus  polynomial fits in a sliding window
 to detect outliers.
 
 ::
-
+    
     from __future__ import print_function, division
     from PyAstronomy import pyasl
     import numpy as np

@@ -59,7 +59,7 @@ Example: Compare Edlen and Ciddor conversions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
-  
+    
     from PyAstronomy import pyasl
     import numpy
     import matplotlib.pylab as plt
@@ -69,12 +69,12 @@ Example: Compare Edlen and Ciddor conversions
     wvlVacCiddor = pyasl.airtovac2(wvl, mode="ciddor")
     wvlVacEdlen = pyasl.airtovac2(wvl, mode="edlen53")
     
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.title("Difference in air wavelength (Ciddor-Edlen)")
     plt.ylabel("dWvl [A]")
     plt.xlabel("Vacuum wvl [A]")
     plt.plot(wvl, wvlVacCiddor-wvlVacEdlen, 'b.-')
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.title("Difference in air wavelength (Ciddor-Edlen, in RV)")
     plt.ylabel("dRV [m/s]")
     plt.xlabel("Vacuum wvl [A]")
@@ -120,7 +120,7 @@ Example: Obtain refractive index of standard air
     
     print("Wavelength and 1.0 - Refractive index of 'standard air':")
     for w, nc in zip(wvl, n):
-      print("{0:5.1f}  {1:10.8e}".format(w, nc-1.0))
+        print("{0:5.1f}  {1:10.8e}".format(w, nc-1.0))
 
 
 Transform spectrum, but retain wavelength axis
@@ -132,7 +132,7 @@ Example: Convert spectrum from vacuum into air conditions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
-  
+    
     from PyAstronomy import pyasl
     from PyAstronomy import funcFit as fuf
     import numpy as np
@@ -145,7 +145,7 @@ Example: Convert spectrum from vacuum into air conditions
     g["off"] = 1.0
     
     # Create a "spectrum" ...
-    wvl = np.linspace(5000.,5010.,1000)
+    wvl = np.linspace(5000., 5010., 1000)
     flux = g.evaluate(wvl)
     # ... and add some noise
     flux += np.random.normal(0., 0.02, len(wvl))
@@ -154,8 +154,8 @@ Example: Convert spectrum from vacuum into air conditions
     # or modeled in vacuum conditions. We want
     # to convert it into a spectrum in air, but
     # retain the old wavelength axis.
-    airflux, vind = pyasl.specAirVacConvert(wvl, flux, \
-                    direction="vactoair")
+    airflux, vind = pyasl.specAirVacConvert(wvl, flux,
+                                            direction="vactoair")
     
     # Plot the result
     plt.plot(wvl, flux, "b.-")

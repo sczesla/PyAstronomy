@@ -133,22 +133,22 @@ Here we show how the orbit can be calculated.
     ascn, descn = ke.xyzNodes_LOSZ()
     
     # Plot x and y coordinates of the orbit
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.title("Periapsis (red diamond), Asc. node (green circle), desc. node (red circle)")
     plt.xlabel("East ->")
     plt.ylabel("North ->")
     plt.plot([0], [0], 'k+', markersize=9)
-    plt.plot(pos[::,1], pos[::,0], 'bp')
+    plt.plot(pos[::, 1], pos[::, 0], 'bp')
     # Point of periapsis
-    plt.plot([pos[0,1]], [pos[0,0]], 'rd')
+    plt.plot([pos[0, 1]], [pos[0, 0]], 'rd')
     # Nodes of the orbit
     plt.plot([ascn[1]], [ascn[0]], 'go', markersize=10)
     plt.plot([descn[1]], [descn[0]], 'ro', markersize=10)
     # Plot RV
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.xlabel("Time")
     plt.ylabel("Radial velocity [length/time]")
-    plt.plot(t, vel[::,2], 'r.-')
+    plt.plot(t, vel[::, 2], 'r.-')
     plt.show()
 
 

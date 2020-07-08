@@ -15,7 +15,7 @@ Example: Delta functions and rotational broadening
 --------------------------------------------------
 
 ::
-  
+    
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import pyasl
@@ -83,9 +83,9 @@ Example: Adding noise and neglecting singular values
     # model.
     chi = []
     for i in range(1, len(sv), 5):
-      b = svd.getBroadeningFunction(nflux, wlimit=sorted(sv)[i])
-      m, mind = svd.getModel(b, modelIndices=True, asarray=True)
-      chi.append( ((nflux[mind] - m)**2/0.005**2).sum() / len(mind) )
+        b = svd.getBroadeningFunction(nflux, wlimit=sorted(sv)[i])
+        m, mind = svd.getModel(b, modelIndices=True, asarray=True)
+        chi.append(((nflux[mind] - m)**2/0.005**2).sum() / len(mind))
     
     plt.title("Reduced $\chi^2$ vs. number of neglected singular values")
     plt.plot(range(1, len(sv), 5), chi, 'bp-')

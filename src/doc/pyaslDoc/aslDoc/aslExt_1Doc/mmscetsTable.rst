@@ -27,14 +27,14 @@ Example
     
     # Print the entire data file
     for l in m.getContent():
-      print(l, end='')
+        print(l, end='')
     
     print()
     print("Available columns: ", ", ".join(m.availableColumns()))
     
     # Get the tabulated data as an ASCII table
     td = m.getTable()
-      
+    
     # Plot absolute visual brightness vs. effective temperature
     plt.plot(td["Teff"], td["Mv"], 'b.-')
     plt.xlabel("Teff [K]")

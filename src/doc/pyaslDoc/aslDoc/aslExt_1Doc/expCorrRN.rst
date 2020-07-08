@@ -10,7 +10,7 @@ Example: Generating correlated numbers
 ---------------------------------------------
 
 ::
-  
+    
     import matplotlib.pylab as plt
     from PyAstronomy import pyasl
     
@@ -27,9 +27,9 @@ Example: Generating correlated numbers
     # correlated coefficient (exp(-1/tau)).
     c2, g, f = pyasl.expCorrRN(200, 10, mean=4.0, std=2.3, fullOut=True)
     
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.plot(range(200), c1, 'bp-')
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.plot(range(200), c2, 'bp-')
     plt.plot(range(200), g, 'g.')
     plt.show()
@@ -39,7 +39,7 @@ Example: Exploring the autocorrelation function
 ---------------------------------------------------
 
 ::
-  
+    
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import pyasl
@@ -56,9 +56,9 @@ Example: Exploring the autocorrelation function
     # Plot correlated random numbers and autocorrelation
     # function along with exponential model.
     x = np.arange(float(n))
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.plot(x, c1, 'bp-')
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.plot(x, ac, 'b.')
     plt.plot(x, np.exp(-x/tau)*ac.max(), 'r--')
     plt.show()

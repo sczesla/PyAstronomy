@@ -11,7 +11,7 @@ Example of usage
 ~~~~~~~~~~~~~~~~~
 
 ::
-
+    
     from __future__ import print_function, division
     from PyAstronomy.pyasl import resBased as rb
     import matplotlib.pylab as plt
@@ -35,8 +35,8 @@ Example of usage
     print()
     print("Number of models found: ", len(models))
     for i, model in enumerate(models):
-      print("Model no. %3d : Met = %3.1f, Y = %5.3f, Lmix = %3.1f, Mass = %4.2f" \
-            % ((i+1,) + model))
+        print("Model no. %3d : Met = %3.1f, Y = %5.3f, Lmix = %3.1f, Mass = %4.2f"
+              % ((i+1,) + model))
     
     # Finally, show the plot
     plt.show()

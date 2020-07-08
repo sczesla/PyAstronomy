@@ -26,7 +26,7 @@ only default options and an artificial input data set. No errors
 are specified.
 
 ::
-
+    
     from __future__ import print_function, division
     import numpy as np
     import matplotlib.pylab as plt
@@ -41,7 +41,7 @@ are specified.
     sig = 0.2
     
     time = np.arange(float(N))
-    flux = A * np.sin(2.* np.pi*time*f)
+    flux = A * np.sin(2. * np.pi*time*f)
     # Adding the noise
     flux += np.random.normal(0, sig, time.size)
     
@@ -66,7 +66,7 @@ calculate and show a number of False-Alarm-Probability levels to help
 distinguish between significant and spurious peaks.
 
 ::
-
+    
     from __future__ import print_function, division
     import numpy as np
     import matplotlib.pylab as plt
@@ -81,7 +81,7 @@ distinguish between significant and spurious peaks.
     sig = 0.2
     
     time = np.arange(float(N))
-    flux = A * np.sin(2.* np.pi*time*f)
+    flux = A * np.sin(2. * np.pi*time*f)
     # Adding the noise
     flux += np.random.normal(0, sig, time.size)
     # Adding an error column
@@ -106,7 +106,7 @@ distinguish between significant and spurious peaks.
     # Add the FAP levels to the plot
     for i in range(len(fapLevels)):
         plt.plot([min(clp.freq), max(clp.freq)], [plevels[i]]*2, '--',
-        label="FAP = %4.1f%%" % (fapLevels[i]*100))
+                 label="FAP = %4.1f%%" % (fapLevels[i]*100))
     plt.legend()
     
     plt.show()
@@ -120,7 +120,7 @@ Example: Getting highest-power (best-fit) sine curve
 The best-fit sine curve is extracted from the periodogram class. 
 
 ::
-
+    
     from __future__ import print_function, division
     import numpy as np
     import matplotlib.pylab as plt
@@ -135,7 +135,7 @@ The best-fit sine curve is extracted from the periodogram class.
     sig = 0.2
     
     time = np.arange(float(N))
-    flux = A * np.sin(2.* np.pi*time*f)
+    flux = A * np.sin(2. * np.pi*time*f)
     # Adding the noise
     flux += np.random.normal(0, sig, time.size)
     # Adding an error column
@@ -157,11 +157,11 @@ The best-fit sine curve is extracted from the periodogram class.
     # Calculate sine wave associated with 'best-fit' frequency
     bestSine = clp.sinmod(time)
     
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.title("Data and sine asscoiated with highest-power frequency")
     plt.plot(time, flux, 'b.')
     plt.plot(time, bestSine, 'r--')
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.title("Folded data")
     plt.plot(time/hpp-np.floor(time/hpp), flux, 'b.')
     plt.show()

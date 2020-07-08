@@ -22,7 +22,7 @@ Code
 ~~~~~~
 
 ::
-
+    
     from PyAstronomy import pyasl
     import datetime as dt
     
@@ -36,8 +36,8 @@ Code
     
     # Calculate transit data for transits within 100 days starting
     # form July 14th, 2018.
-    dat = pyasl.transitTimes(jd, jd+100., dat, nexaInput=True, \
-                             observatory="esoparanal", obsOffset=1./24., \
+    dat = pyasl.transitTimes(jd, jd+100., dat, nexaInput=True,
+                             observatory="esoparanal", obsOffset=1./24.,
                              minAltitude=10.0)
     # Plot the result
     pyasl.transitVisibilityPlot(dat, markTransit=True)

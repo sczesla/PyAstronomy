@@ -40,7 +40,7 @@ Example of usage
 -----------------
 
 ::
-
+    
     from __future__ import print_function
     from PyAstronomy import pyasl
     import numpy as np
@@ -60,16 +60,16 @@ Example of usage
     wvl = np.linspace(3000, 10000, 10000)
     
     # Plot transmission curves for Bessel b, v, and r bands
-    for (b, c) in six.iteritems({"b":"b", "v":"k", "r":"r"}):
-      tc = tcs.getTransCurve("Bessel " + b)
-      trans = tc(wvl)
-      plt.plot(wvl, trans, c+'-', label="Bessel " + b)
+    for (b, c) in six.iteritems({"b": "b", "v": "k", "r": "r"}):
+        tc = tcs.getTransCurve("Bessel " + b)
+        trans = tc(wvl)
+        plt.plot(wvl, trans, c+'-', label="Bessel " + b)
     
     # Plot transmission curves for Johnson U, B, and V bands
-    for (b, c) in six.iteritems({"U":"m", "B":"b", "V":"k"}):
-      tc = tcs.getTransCurve("Johnson " + b)
-      trans = tc(wvl)
-      plt.plot(wvl, trans, c+'--', label="Johnson " + b)
+    for (b, c) in six.iteritems({"U": "m", "B": "b", "V": "k"}):
+        tc = tcs.getTransCurve("Johnson " + b)
+        trans = tc(wvl)
+        plt.plot(wvl, trans, c+'--', label="Johnson " + b)
     
     plt.legend()
     plt.xlabel("Wavelength [$\AA$]")

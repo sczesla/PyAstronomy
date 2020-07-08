@@ -91,7 +91,7 @@ exploit the functionality of funcFit to fit a Gaussian to artificially created d
 It shows how free parameters can be specified and restrictions can be applied.
 
 ::
-
+    
     from __future__ import print_function, division
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -104,7 +104,7 @@ It shows how free parameters can be specified and restrictions can be applied.
     
     # Creating a Gaussian with some noise
     # Choose some parameters...
-    gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
+    gPar = {"A": -5.0, "sig": 10.0, "mu": 10.0, "off": 1.0, "lin": 0.0}
     # Calculate profile
     x = arange(100) - 50.0
     y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
@@ -149,7 +149,7 @@ It shows how free parameters can be specified and restrictions can be applied.
     
     # Let us assume that we know that the amplitude is negative, i.e.,
     # no lower boundary (None) and 0.0 as upper limit.
-    gf.setRestriction({"A":[None,0.0]})
+    gf.setRestriction({"A": [None, 0.0]})
     
     # Now start the fit
     gf.fit(x, y, yerr=ones(x.size)*0.01)
@@ -218,33 +218,35 @@ to use custom models. Introducing a new model is easy in funcFit and will be dem
 in the next example. Here we implement a straight line and fit it to some artificial data.
 
 ::
-
+    
     # Import numpy and matplotlib
     from numpy import arange, random
     import matplotlib.pylab as plt
     # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
+    
     class StraightLine(fuf.OneDFit):
-      """
-        Implements a straight line of the form y = "off" + x * "lin".
-      """
-    
-      def __init__(self):
-        fuf.OneDFit.__init__(self, ["off", "lin"])
-    
-      def evaluate(self, x):
         """
-          Calculates and returns model according to the \
-          current parameter values.
+        Implements a straight line of the form y = "off" + x * "lin".
+        """
     
-          Parameters:
+        def __init__(self):
+            fuf.OneDFit.__init__(self, ["off", "lin"])
+    
+        def evaluate(self, x):
+            """
+            Calculates and returns model according to the \
+            current parameter values.
+    
+            Parameters:
             - `x` - Array specifying the positions at \
                     which to evaluate the model.
-        """
-        y = self["off"] + (self["lin"] * x)
-        return y
-      
+            """
+            y = self["off"] + (self["lin"] * x)
+            return y
+    
+    
     # Generate some data and add noise
     x = arange(100)
     y = 10.0 + 2.0 * x + random.normal(0.0, 5.0, 100)
@@ -265,7 +267,6 @@ in the next example. Here we implement a straight line and fit it to some artifi
     plt.plot(x, y, 'bp')
     plt.plot(x, lf.model, 'r--')
     plt.show()
-
 This example resembles the first one, but here we defined a custom fitting
 model at the top instead of using the *GaussFit1d* class as in the first example.
 
@@ -286,41 +287,42 @@ To demonstrate the application of such a relation, we slightly extend the previo
 In particular, we will assume that the gradient of our line is a multiple of the offset.
 
 ::
-  
+    
     # import numpy and matplotlib
     from numpy import arange, random
     import matplotlib.pylab as plt
     # ... and now the funcFit package
     from PyAstronomy import funcFit as fuf
     
+    
     class StraightLine(fuf.OneDFit):
-      """
+        """
         Implements a straight line of the form y = "off" + x * "lin".
-      """
-    
-      def __init__(self):
-        fuf.OneDFit.__init__(self, ["off", "lin"])
-    
-      def evaluate(self, x):
         """
-          Calculates and returns model according to the current parameter values.
     
-          Parameters:
-            - x - Array specifying the positions at which to evaluate the model.
-        """
-        y = self["off"] + (self["lin"] * x)
-        return y
+        def __init__(self):
+            fuf.OneDFit.__init__(self, ["off", "lin"])
+    
+        def evaluate(self, x):
+            """
+            Calculates and returns model according to the current parameter values.
+    
+            Parameters:
+            x - Array specifying the positions at which to evaluate the model.
+            """
+            y = self["off"] + (self["lin"] * x)
+            return y
     
     
     # Create a function, which defines the relation.
     
     def getLinearRelation(factor):
-      def linOffRel(off):
-        """
-          Function used to relate parameters "lin" and "off".
-        """
-        return factor * off
-      return linOffRel
+        def linOffRel(off):
+            """
+            Function used to relate parameters "lin" and "off".
+            """
+            return factor * off
+        return linOffRel
     
     # Note, above we used a nested function (a closure) to define
     # the relation. This approach is very flexible. If we were already
@@ -329,6 +331,7 @@ In particular, we will assume that the gradient of our line is a multiple of the
     #
     # def linOffRel(off):
     #   return 10.0 * off
+    
     
     # Generate some data with noise
     x = arange(100)
@@ -354,8 +357,6 @@ In particular, we will assume that the gradient of our line is a multiple of the
     plt.plot(x, y, 'bp')
     plt.plot(x, lf.model, 'r--')
     plt.show()
-  
-
 The output of the script reads (numbers may differ):
 
 ::
@@ -391,7 +392,7 @@ more complex models and requires only little effort. The following example shows
 can be summed.
 
 ::
-       
+    
     from __future__ import print_function, division
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -401,8 +402,8 @@ can be summed.
     
     # Creating Gaussians with some noise
     # Choose some parameters...
-    gPar1 = {"A":-5.0, "sig":10.0, "mu":20.0, "off":1.0, "lin":0.0}
-    gPar2 = {"A":+10.0, "sig":10.0, "mu":-20.0, "off":0.0, "lin":0.0}
+    gPar1 = {"A": -5.0, "sig": 10.0, "mu": 20.0, "off": 1.0, "lin": 0.0}
+    gPar2 = {"A": +10.0, "sig": 10.0, "mu": -20.0, "off": 0.0, "lin": 0.0}
     # Calculate profile
     x = arange(100) - 50.0
     y = gPar1["off"] + gPar1["A"] / sqrt(2*pi*gPar1["sig"]**2) \
@@ -464,7 +465,7 @@ can be summed.
     twoG.freeze("off_Gaussian(2)")
     
     # Start fit as usual
-    twoG.fit(x,y,yerr=ones(x.size)*0.01)
+    twoG.fit(x, y, yerr=ones(x.size)*0.01)
     
     # Write the result to the screen and plot the best fit model
     print()
@@ -515,13 +516,13 @@ models are combined.
     g["sig"] = 0.06
     
     # Generate some "data" with noise included
-    x = np.linspace(-1.0,1.0,200)
+    x = np.linspace(-1.0, 1.0, 200)
     y = g.evaluate(x) + np.random.normal(0.0, 0.1, len(x))
     yerr = np.ones(len(x)) * 0.1
     
     
     def myRestriction(A, sig):
-      """
+        """
         A conditional restriction.
         
         Returns
@@ -529,12 +530,12 @@ models are combined.
         Penalty : float
             A large value if condition is violated
             and zero otherwise.
-      """
-      if A > 10.0*sig:
-        return np.abs(A-10.0*sig + 1.0)*1e20
-      return 0.0
+        """
+        if A > 10.0*sig:
+            return np.abs(A-10.0*sig + 1.0)*1e20
+        return 0.0
     
-      
+    
     # Add the conditional restriction to the model and save
     # the unique ID, which can be used to refer to that
     # restriction.
@@ -579,39 +580,39 @@ Built-in statistics can be used by specifying the `miniFunc` parameter
 on call to fit, as is demonstrated in the following example.
 
 ::
-
-  import numpy as np
-  import matplotlib.pylab as plt
-  from PyAstronomy import funcFit as fuf
-  
-  # Get a Gaussian fitting object and
-  # set some parameters
-  g = fuf.GaussFit1d()
-  g["A"] = 5.1
-  g["sig"] = 0.5
-  g["mu"] = 3.94
-  
-  # Generate some data with Poisson statistics
-  x = np.linspace(0.0, 7., 50)
-  y = np.zeros(len(x))
-  for i in range(len(x)):
-    y[i] = np.random.poisson(g.evaluate(x[i]))
-  
-  # Choose free parameters and "disturb" the
-  # starting parameters for the fit a little.
-  g.thaw(["A", "sig", "mu"])
-  for par in g.freeParamNames():
-    g[par] += np.random.normal(0.0, g[par]*0.1)
-  
-  # Fit using Cash statistic and print out
-  # result.
-  g.fit(x, y, miniFunc="cash79")
-  g.parameterSummary()
-  
-  # Plot the result
-  plt.plot(x, y, 'bp')
-  plt.plot(x, g.evaluate(x), 'r--')
-  plt.show()
+    
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit as fuf
+    
+    # Get a Gaussian fitting object and
+    # set some parameters
+    g = fuf.GaussFit1d()
+    g["A"] = 5.1
+    g["sig"] = 0.5
+    g["mu"] = 3.94
+    
+    # Generate some data with Poisson statistics
+    x = np.linspace(0.0, 7., 50)
+    y = np.zeros(len(x))
+    for i in range(len(x)):
+        y[i] = np.random.poisson(g.evaluate(x[i]))
+    
+    # Choose free parameters and "disturb" the
+    # starting parameters for the fit a little.
+    g.thaw(["A", "sig", "mu"])
+    for par in g.freeParamNames():
+        g[par] += np.random.normal(0.0, g[par]*0.1)
+    
+    # Fit using Cash statistic and print out
+    # result.
+    g.fit(x, y, miniFunc="cash79")
+    g.parameterSummary()
+    
+    # Plot the result
+    plt.plot(x, y, 'bp')
+    plt.plot(x, g.evaluate(x), 'r--')
+    plt.show()
  
 
 Using "steppar" to determine confidence intervals
@@ -627,141 +628,14 @@ The example below shows how to determine a confidence
 interval for the normalization of a Gaussian.
 
 ::
-
-  import numpy as np
-  import matplotlib.pylab as plt
-  from PyAstronomy import funcFit as fuf
-  
-  # Set up a Gaussian model
-  # and create some "data"
-  x = np.linspace(0,2,100)
-  gf = fuf.GaussFit1d()
-  gf["A"] = 0.87
-  gf["mu"] = 1.0
-  gf["sig"] = 0.2
-  y = gf.evaluate(x)
-  y += np.random.normal(0.0, 0.1, len(x))
-  
-  # Thaw parameters, which are to be fitted. Note
-  # that those parameters will also be fitted during
-  # the stepping; no further parameters will be thawed.
-  gf.thaw(["A", "mu", "sig"])
-  # ... and "disturb" starting values a little.
-  gf["A"] = gf["A"] + np.random.normal(0.0, 0.1)
-  gf["mu"] = gf["mu"] + np.random.normal(0.0, 0.1)
-  gf["sig"] = gf["sig"] + np.random.normal(0.0, 0.03)
-  # Find the best fit solution
-  gf.fit(x, y, yerr=np.ones(len(x))*0.1)
-  
-  # Step the amplitude (area of the Gaussian) through
-  # the range 0.8 to 0.95 in 20 steps. Note that the
-  # last part of `ranges` ('lin') is optional. You may
-  # also use `log`; in this case, the stepping would be
-  # equidistant in the logarithm.
-  # In each step of `A`, "mu" and "sig" will be fitted,
-  # because they had been thawed earlier.
-  sp = gf.steppar("A", ranges={"A":[0.8, 0.95, 20, 'lin']})
-  # Extract the values for the Gaussian normalization
-  # (amplitude) ...
-  As = list(map(lambda x:x[0], sp))
-  # ... and chi square.
-  chis = list(map(lambda x:x[1], sp))
-  
-  # Find minimum chi square
-  cmin = min(chis)
-  
-  # Plot A vs. chi square
-  plt.title('A vs. $\chi^2$ with 68% and 90% confidence levels')
-  plt.xlabel("A")
-  plt.ylabel("$\chi^2$")
-  plt.plot(As, chis, 'bp-')
-  plt.plot(As, [cmin+1.0]*len(As), 'k--')
-  plt.plot(As, [cmin+2.706]*len(As), 'k:')
-  plt.show()
-
-
-
-The next example demonstrates how to step two parameters
-through given ranges and plot the resulting confidence
-contours.
-
-::
-
-  import numpy as np
-  import matplotlib.pylab as plt
-  from PyAstronomy import funcFit as fuf
-  
-  # Set up a Gaussian model
-  # and create some "data"
-  x = np.linspace(0,2,100)
-  gf = fuf.GaussFit1d()
-  gf["A"] = 0.87
-  gf["mu"] = 1.0
-  gf["sig"] = 0.2
-  y = gf.evaluate(x)
-  y += np.random.normal(0.0, 0.1, len(x))
-  
-  # Thaw parameters, which are to be fitted ...
-  gf.thaw(["A", "mu", "sig"])
-  # ... and "disturb" starting values a little.
-  gf["A"] = gf["A"] + np.random.normal(0.0, 0.1)
-  gf["mu"] = gf["mu"] + np.random.normal(0.0, 0.1)
-  gf["sig"] = gf["sig"] + np.random.normal(0.0, 0.03)
-  # Find the best fit solution
-  gf.fit(x, y, yerr=np.ones(len(x))*0.1)
-  
-  # Step the amplitude (area of the Gaussian) and the
-  # center ("mu") of the Gaussian through the given
-  # ranges.
-  sp = gf.steppar(["A", "mu"], ranges={"A":[0.8, 0.95, 20], \
-                  "mu":[0.96,1.05,15]})
-  
-  # Get the values for `A`, `mu`, and chi-square
-  # from the output of steppar.
-  As = list(map(lambda x:x[0], sp))
-  mus = list(map(lambda x:x[1], sp))
-  chis = list(map(lambda x:x[2], sp))
-  
-  # Create a chi-square array using the
-  # indices contained in the output.
-  z = np.zeros((20, 15))
-  for s in sp:
-    z[s[3]] = s[2]
-  
-  # Find minimum chi-square and define levels
-  # for 68%, 90%, and 99% confidence intervals.
-  cm = min(chis)
-  levels = [cm+2.3, cm+4.61, cm+9.21]
-  
-  # Plot the contours to explore the confidence
-  # interval and correlation.
-  plt.xlabel("mu")
-  plt.ylabel("A")
-  plt.contour(np.sort(np.unique(mus)), np.sort(np.unique(As)), z, \
-              levels=levels)
-  # Plot the input value
-  plt.plot([1.0], [0.87], 'k+', markersize=20)
-  plt.show()
-
-
-Use `errorConfInterval` to determine confidence intervals
------------------------------------------------------------
-
-The `steppar` example shows how confidence intervals may be
-estimated by exploring the behavior of the objective function
-manually. The `errorConfInterval` strives to find the confidence
-interval automatically.
-
-::
-     
-    from __future__ import print_function, division
+    
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
     
     # Set up a Gaussian model
     # and create some "data"
-    x = np.linspace(0,2,100)
+    x = np.linspace(0, 2, 100)
     gf = fuf.GaussFit1d()
     gf["A"] = 0.87
     gf["mu"] = 1.0
@@ -787,7 +661,134 @@ interval automatically.
     # equidistant in the logarithm.
     # In each step of `A`, "mu" and "sig" will be fitted,
     # because they had been thawed earlier.
-    sp = gf.steppar("A", ranges={"A":[0.8, 0.95, 20, 'lin']})
+    sp = gf.steppar("A", ranges={"A": [0.8, 0.95, 20, 'lin']})
+    # Extract the values for the Gaussian normalization
+    # (amplitude) ...
+    As = list(map(lambda x: x[0], sp))
+    # ... and chi square.
+    chis = list(map(lambda x: x[1], sp))
+    
+    # Find minimum chi square
+    cmin = min(chis)
+    
+    # Plot A vs. chi square
+    plt.title('A vs. $\chi^2$ with 68% and 90% confidence levels')
+    plt.xlabel("A")
+    plt.ylabel("$\chi^2$")
+    plt.plot(As, chis, 'bp-')
+    plt.plot(As, [cmin+1.0]*len(As), 'k--')
+    plt.plot(As, [cmin+2.706]*len(As), 'k:')
+    plt.show()
+
+
+
+The next example demonstrates how to step two parameters
+through given ranges and plot the resulting confidence
+contours.
+
+::
+    
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit as fuf
+    
+    # Set up a Gaussian model
+    # and create some "data"
+    x = np.linspace(0, 2, 100)
+    gf = fuf.GaussFit1d()
+    gf["A"] = 0.87
+    gf["mu"] = 1.0
+    gf["sig"] = 0.2
+    y = gf.evaluate(x)
+    y += np.random.normal(0.0, 0.1, len(x))
+    
+    # Thaw parameters, which are to be fitted ...
+    gf.thaw(["A", "mu", "sig"])
+    # ... and "disturb" starting values a little.
+    gf["A"] = gf["A"] + np.random.normal(0.0, 0.1)
+    gf["mu"] = gf["mu"] + np.random.normal(0.0, 0.1)
+    gf["sig"] = gf["sig"] + np.random.normal(0.0, 0.03)
+    # Find the best fit solution
+    gf.fit(x, y, yerr=np.ones(len(x))*0.1)
+    
+    # Step the amplitude (area of the Gaussian) and the
+    # center ("mu") of the Gaussian through the given
+    # ranges.
+    sp = gf.steppar(["A", "mu"], ranges={"A": [0.8, 0.95, 20],
+                                         "mu": [0.96, 1.05, 15]})
+    
+    # Get the values for `A`, `mu`, and chi-square
+    # from the output of steppar.
+    As = list(map(lambda x: x[0], sp))
+    mus = list(map(lambda x: x[1], sp))
+    chis = list(map(lambda x: x[2], sp))
+    
+    # Create a chi-square array using the
+    # indices contained in the output.
+    z = np.zeros((20, 15))
+    for s in sp:
+        z[s[3]] = s[2]
+    
+    # Find minimum chi-square and define levels
+    # for 68%, 90%, and 99% confidence intervals.
+    cm = min(chis)
+    levels = [cm+2.3, cm+4.61, cm+9.21]
+    
+    # Plot the contours to explore the confidence
+    # interval and correlation.
+    plt.xlabel("mu")
+    plt.ylabel("A")
+    plt.contour(np.sort(np.unique(mus)), np.sort(np.unique(As)), z,
+                levels=levels)
+    # Plot the input value
+    plt.plot([1.0], [0.87], 'k+', markersize=20)
+    plt.show()
+
+
+Use `errorConfInterval` to determine confidence intervals
+-----------------------------------------------------------
+
+The `steppar` example shows how confidence intervals may be
+estimated by exploring the behavior of the objective function
+manually. The `errorConfInterval` strives to find the confidence
+interval automatically.
+
+::
+    
+    from __future__ import print_function, division
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit as fuf
+    
+    # Set up a Gaussian model
+    # and create some "data"
+    x = np.linspace(0, 2, 100)
+    gf = fuf.GaussFit1d()
+    gf["A"] = 0.87
+    gf["mu"] = 1.0
+    gf["sig"] = 0.2
+    y = gf.evaluate(x)
+    y += np.random.normal(0.0, 0.1, len(x))
+    
+    # Thaw parameters, which are to be fitted. Note
+    # that those parameters will also be fitted during
+    # the stepping; no further parameters will be thawed.
+    gf.thaw(["A", "mu", "sig"])
+    # ... and "disturb" starting values a little.
+    gf["A"] = gf["A"] + np.random.normal(0.0, 0.1)
+    gf["mu"] = gf["mu"] + np.random.normal(0.0, 0.1)
+    gf["sig"] = gf["sig"] + np.random.normal(0.0, 0.03)
+    # Find the best fit solution
+    gf.fit(x, y, yerr=np.ones(len(x))*0.1)
+    
+    # Step the amplitude (area of the Gaussian) through
+    # the range 0.8 to 0.95 in 20 steps. Note that the
+    # last part of `ranges` ('lin') is optional. You may
+    # also use `log`; in this case, the stepping would be
+    # equidistant in the logarithm.
+    # In each step of `A`, "mu" and "sig" will be fitted,
+    # because they had been thawed earlier.
+    sp = gf.steppar("A", ranges={"A": [0.8, 0.95, 20, 'lin']})
     # Extract the values for the Gaussian normalization
     # (amplitude) ...
     As = [x[0] for x in sp]
@@ -811,7 +812,7 @@ interval automatically.
     plt.ylabel("$\chi^2$")
     plt.plot(As, chis, 'bp-')
     # Indicate confidence levels by vertical lines
-    plt.plot(As, [cfi90["OFMin"] +1.0]*len(As), 'g:')
+    plt.plot(As, [cfi90["OFMin"] + 1.0]*len(As), 'g:')
     plt.plot(As, [cfi90["OFMin"]+2.706]*len(As), 'g:')
     # PLot lines to indicate confidence intervals
     plt.plot([cfi90["limits"][0]]*2, [min(chis), max(chis)], 'k--')
@@ -832,7 +833,7 @@ how to apply a custom objective function, in this case, we simply use the linear
 model and data (weighted by the error) to define the fit quality. 
 
 ::
-
+    
     from __future__ import print_function, division
     # Import numpy and matplotlib
     from numpy import arange, exp, random, ones, sum, abs
@@ -848,7 +849,7 @@ model and data (weighted by the error) to define the fit quality.
     
     # Calculate fake data set
     x = arange(100)
-    y = A*exp(-(x-t0)/tau) * (x>t0) + off
+    y = A*exp(-(x-t0)/tau) * (x > t0) + off
     y += random.normal(0., 0.1, 100)
     yerr = ones(100)*0.01
     
@@ -858,9 +859,9 @@ model and data (weighted by the error) to define the fit quality.
     # Define free quantities
     edf.thaw(["A", "tau", "off", "t0"])
     # Let the amplitude be positive
-    edf.setRestriction({"A":[0.0,None]})
+    edf.setRestriction({"A": [0.0, None]})
     # Define initial guess
-    edf.assignValue({"A":1.0, "tau": 15., "off":0.2, "t0":50.})
+    edf.assignValue({"A": 1.0, "tau": 15., "off": 0.2, "t0": 50.})
     
     # Do not use chi square, but the linear deviation from model
     # to evaluate quality of fit.
@@ -868,22 +869,23 @@ model and data (weighted by the error) to define the fit quality.
     # function. This decorator takes the fitting object as an
     # argument. The function has to accept two arguments: the
     # fitting object and the list of free parameters.
+    
+    
     @fuf.MiniFunc(edf)
     def mini(edf, P):
-      m = sum(abs(edf.model - edf.y)/edf.yerr)
-      print("mini - current parameters: ", P, ", value is: ", m)
-      return m
+        m = sum(abs(edf.model - edf.y)/edf.yerr)
+        print("mini - current parameters: ", P, ", value is: ", m)
+        return m
+    
     
     # Carry out fit WITH SELF-DEFINED OBJECTIVE FUNCTION
     edf.fit(x, y, yerr=yerr, miniFunc=mini)
     
     # Show parameter values and plot best-fit model.
     edf.parameterSummary()
-    plt.errorbar(x,y,yerr)
+    plt.errorbar(x, y, yerr)
     plt.plot(x, edf.model, 'r-')
     plt.show()
-
-
 Some points may be highlighted in this example:
   * You may have noticed that although the parameter `P` is given to the *mini* function, it is not
     used there. You cannot leave it out, however, because the decorator, in fact, creates a more complex
@@ -905,7 +907,7 @@ The *turnIntoRebin* method of funcFit provides a convenient way to work with
 such "overbinned" models; a demonstration is given in the example below.
 
 ::
-
+    
     from __future__ import print_function, division
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -915,7 +917,7 @@ such "overbinned" models; a demonstration is given in the example below.
     
     # Creating a Gaussian with some noise
     # Choose some parameters...
-    gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
+    gPar = {"A": -5.0, "sig": 10.0, "mu": 10.0, "off": 1.0, "lin": 0.0}
     # Calculate profile
     x = arange(20)/20.0 * 100.0 - 50.0
     y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
@@ -960,7 +962,7 @@ such "overbinned" models; a demonstration is given in the example below.
     
     # Let us assume that we know that the amplitude is negative, i.e.,
     # no lower boundary (None) and 0.0 as upper limit.
-    gf.setRestriction({"A":[None,0.0]})
+    gf.setRestriction({"A": [None, 0.0]})
     
     # Now start the fit
     gf.fit(x, y, yerr=ones(x.size)*0.01)
@@ -973,13 +975,13 @@ such "overbinned" models; a demonstration is given in the example below.
     # which point are averaged to obtain a point in the binned
     # model.
     for k, v in gf.rebinIdent.items():
-      c = "y"
-      if k % 2 == 0: c = "k"
-      plt.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
+        c = "y"
+        if k % 2 == 0:
+            c = "k"
+        plt.plot(gf.rebinTimes[v], gf.unbinnedModel[v], c+'.')
     
     # Show the data and the best fit model
     plt.show()
-
 
 This example is very similar to the very first one. Some differences shall, however, be
 emphasized:
@@ -1016,17 +1018,17 @@ x-axes simultaneously.
     gauss = fuf.GaussFit1d()
     calor = fuf.CauchyLorentz1d()
     # and assign parameters.
-    gauss.assignValue({"A":0.02, "sig":0.1, "mu":0.0, "off":1.0, "lin":0.0})
-    calor.assignValue({"A":0.07, "g":0.1, "mu":0.2, "off":1.0, "lin":0.0})
+    gauss.assignValue({"A": 0.02, "sig": 0.1, "mu": 0.0, "off": 1.0, "lin": 0.0})
+    calor.assignValue({"A": 0.07, "g": 0.1, "mu": 0.2, "off": 1.0, "lin": 0.0})
     
     # Create noisy data.
     y1 = gauss.evaluate(x1) + numpy.random.normal(0., 0.01, 100)
     y2 = calor.evaluate(x2) + numpy.random.normal(0., 0.01, 150)
     
     # Plot the noisy data.
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.errorbar(x1, y1, yerr=numpy.ones(100)*0.01)
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.errorbar(x2, y2, yerr=numpy.ones(150)*0.01)
     
     # Now, get ready two fit the data sets simultaneously.
@@ -1064,11 +1066,11 @@ x-axes simultaneously.
     
     # Randomize starting values.
     for fp in sf.freeParamNames():
-      sf[fp] = sf[fp] + numpy.random.normal(0., 0.05)
+        sf[fp] = sf[fp] + numpy.random.normal(0., 0.05)
     
     # Set up the data appropriately.
-    data = {gaussCno:[x1, y1], calorCno:[x2, y2]}
-    yerr = {gaussCno: numpy.ones(100)*0.01, \
+    data = {gaussCno: [x1, y1], calorCno: [x2, y2]}
+    yerr = {gaussCno: numpy.ones(100)*0.01,
             calorCno: numpy.ones(150)*0.01}
     
     # Start the fit.
@@ -1080,9 +1082,9 @@ x-axes simultaneously.
     sf.parameterSummary()
     
     # Plot the best-fit model(s).
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.plot(x1, sf.models[gaussCno], 'r--')
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     plt.plot(x2, sf.models[calorCno], 'r--')
     
     plt.show()

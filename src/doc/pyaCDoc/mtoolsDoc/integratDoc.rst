@@ -12,12 +12,12 @@ Example
 ~~~~~~~~~
 
 ::
-
+    
     from __future__ import print_function
     from PyAstronomy.pyaC import mtools
     import numpy as np
     
-    x = np.arange(-2.,2.01,0.1)
+    x = np.arange(-2., 2.01, 0.1)
     y = x**3 + 1.7
     
     x0 = -1.375

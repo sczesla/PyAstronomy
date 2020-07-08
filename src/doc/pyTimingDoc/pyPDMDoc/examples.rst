@@ -12,7 +12,7 @@ This example demonstrates the use of the *Scanner* class.
 
 .. IsPyAExample
 ::
-
+    
     from __future__ import print_function, division
     # Import PDM module
     from PyAstronomy.pyTiming import pyPDM
@@ -22,7 +22,7 @@ This example demonstrates the use of the *Scanner* class.
     # Print the periods covered by the scanner
     print("Periods: ", end=' ')
     for period in scanner:
-      print(period, end=' ')
+        print(period, end=' ')
 
 
 Carry out a PDM analysis
@@ -32,7 +32,7 @@ Here we demonstrate how to use the pyPDM class to carry out a
 PDM analysis.
 
 ::
-
+    
     import numpy
     import matplotlib.pylab as plt
     from PyAstronomy.pyTiming import pyPDM

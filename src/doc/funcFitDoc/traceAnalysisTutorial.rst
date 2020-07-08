@@ -66,18 +66,18 @@ the Markov-Chain**, which will later be analyzed.
     
     
     ##############################################################
-    ### Using pymc for sampling, for emcee see below
+    # Using pymc for sampling, for emcee see below
     ##############################################################
     
     # Now we specify the limits within which the individual parameters
     # can be varied. Actually, you specify the limits of uniform priors
     # here.
-    lims = {"A":[-1.0,0.0], "al":[0.0,3.], "ad":[0.0,3.0], "mu":[5495., 5505.]}
+    lims = {"A": [-1.0, 0.0], "al": [0.0, 3.], "ad": [0.0, 3.0], "mu": [5495., 5505.]}
     
     # Provide a guess for the proposal step widths.
     # Try to guess the scale of the problem in the individual
     # parameters.
-    steps = {"A":0.02, "al":0.01, "ad":0.01, "mu":0.05}
+    steps = {"A": 0.02, "al": 0.01, "ad": 0.01, "mu": 0.05}
     
     # Start the sampling. The resulting Marchov-Chain will be written
     # to the file 'mcmcTA.tmp'. In default configuration, pickle
@@ -85,21 +85,21 @@ the Markov-Chain**, which will later be analyzed.
     # To save the chain to a compressed 'hdf5'
     # file, you have to specify the dbArgs keyword; e.g., use:
     #   dbArgs = {"db":"hdf5", "dbname":"mcmcExample.hdf5"}
-    vp.fitMCMC(x, y, X0, lims, steps, yerr=yerr, \
-               iter=2500, burn=0, thin=1, \
+    vp.fitMCMC(x, y, X0, lims, steps, yerr=yerr,
+               iter=2500, burn=0, thin=1,
                dbfile="mcmcTA.tmp")
     
     ##############################################################
-    ### Uncomment to use emcee for sampling
-    ##############################################################           
-               
-    #priors = {"al":fuf.FuFPrior("limuniform", lower=0.0, upper=100.), \
-              #"ad":fuf.FuFPrior("limuniform", lower=0.0, upper=100.)}
+    # Uncomment to use emcee for sampling
+    ##############################################################
     
-    ## Note that the filename should end in .emcee. Substitute this filename
-    ## in the following examples.
-    #vp.fitEMCEE(x, y, yerr=yerr, sampleArgs={"iters":2500}, \
-                #dbfile="mcmcTA.emcee", priors=priors)
+    # priors = {"al":fuf.FuFPrior("limuniform", lower=0.0, upper=100.), \
+    # "ad":fuf.FuFPrior("limuniform", lower=0.0, upper=100.)}
+    
+    # Note that the filename should end in .emcee. Substitute this filename
+    # in the following examples.
+    # vp.fitEMCEE(x, y, yerr=yerr, sampleArgs={"iters":2500}, \
+    # dbfile="mcmcTA.emcee", priors=priors)
 
 Investigate convergence behavior using the "deviance"
 ------------------------------------------------------

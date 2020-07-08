@@ -28,42 +28,42 @@ x,y-position measurements at a number of times.
 Furthermore, all x and y measurements have an error.
 
 ::
-
-  import numpy as np
-  import matplotlib.pylab as plt
-  from PyAstronomy import funcFit as fuf
-  
-  # Get the circular model and assign
-  # parameter values
-  c = fuf.Circle2d()
-  c["r"] = 1.0
-  c["t0"] = 0.0
-  c["per"] = 3.0
-  
-  # Evaluate the model at a number of
-  # time stamps
-  t = np.linspace(0.0, 10.0, 20)
-  pos = c.evaluate(t)
-  
-  # Add some error to the "measurement"
-  pos += np.reshape(np.random.normal(0.0, 0.2, pos.size), pos.shape)
-  err = np.reshape(np.ones(pos.size), pos.shape) * 0.2
-  
-  # Define free parameters and fit the model
-  c.thaw(["r", "t0", "per"])
-  c.fit(t, pos, yerr=err)
-  c.parameterSummary()
-  
-  # Evaluate the model at a larger number of
-  # points for plotting
-  tt = np.linspace(0.0, 10.0, 200)
-  model = c.evaluate(tt)
-  
-  # Plot the result
-  plt.errorbar(pos[::,0], pos[::,1], yerr=err[::,1], \
-               xerr=err[::,0], fmt='bp')
-  plt.plot(model[::,0], model[::,1], 'r--')
-  plt.show()
+    
+    import numpy as np
+    import matplotlib.pylab as plt
+    from PyAstronomy import funcFit as fuf
+    
+    # Get the circular model and assign
+    # parameter values
+    c = fuf.Circle2d()
+    c["r"] = 1.0
+    c["t0"] = 0.0
+    c["per"] = 3.0
+    
+    # Evaluate the model at a number of
+    # time stamps
+    t = np.linspace(0.0, 10.0, 20)
+    pos = c.evaluate(t)
+    
+    # Add some error to the "measurement"
+    pos += np.reshape(np.random.normal(0.0, 0.2, pos.size), pos.shape)
+    err = np.reshape(np.ones(pos.size), pos.shape) * 0.2
+    
+    # Define free parameters and fit the model
+    c.thaw(["r", "t0", "per"])
+    c.fit(t, pos, yerr=err)
+    c.parameterSummary()
+    
+    # Evaluate the model at a larger number of
+    # points for plotting
+    tt = np.linspace(0.0, 10.0, 200)
+    model = c.evaluate(tt)
+    
+    # Plot the result
+    plt.errorbar(pos[::, 0], pos[::, 1], yerr=err[::, 1],
+                 xerr=err[::, 0], fmt='bp')
+    plt.plot(model[::, 0], model[::, 1], 'r--')
+    plt.show()
 
 .. note:: The only difference between the "normal" one-dimensional case and that
           exemplified here, is the dimension of the `y` and error arrays.
@@ -86,21 +86,21 @@ gives the physical coordinates for every array index.
           both use cases.
 
 ::
-
+    
     from __future__ import print_function, division
     from PyAstronomy import funcFit as fuf
     import numpy as np
     
     # Constructing the two individual coordinate axes
-    x = np.linspace(-2.,2.,50)
-    y = np.linspace(-2.,2.,50)
+    x = np.linspace(-2., 2., 50)
+    y = np.linspace(-2., 2., 50)
     
     # Applying funcFit's "coordinateGrid" helper function
     # to built appropriate array-index -> coordinate mapping
     # needed for nD fitting.
     g = fuf.coordinateGrid(x, y)
     
-    print("(x, y) coordinates at index (11, 28): ", g[11,28])
+    print("(x, y) coordinates at index (11, 28): ", g[11, 28])
 
 
 
@@ -133,48 +133,48 @@ coordinate array, and the example below demonstrates how to use it.
           shown to illustrate the use of the coordinate array.
 
 ::
-
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  import matplotlib.pylab as plt
-  
-  # Constructing the individual coordinate axes
-  x = np.linspace(-2.,2.,50)
-  y = np.linspace(-2.,2.,50)
-  # Applying funcFit's "coordinateGrid" helper function
-  # to built appropriate array-index -> coordinate mapping
-  # needed for nD fitting.
-  g = fuf.coordinateGrid(x, y)
-  
-  # Create the 2d-Gaussian model and assign
-  # some model parameters.
-  gf = fuf.GaussFit2d()
-  gf["sigx"] = 0.75
-  gf["sigy"] = 0.4
-  gf["A"] = 1.0
-  gf["rho"] = 0.4
-  
-  # Get the "data" by evaluating the model
-  # and adding some noise. Note that the coordinate
-  # mapping (array g) is passed to evaluate here.
-  im = gf.evaluate(g)
-  im += np.reshape(np.random.normal(0.0, 0.1, 2500), (50,50))
-  err = np.ones((50,50))*0.1
-  
-  # Thaw parameters and fit
-  gf.thaw(["A", "rho"])
-  gf.fit(g, im, yerr=err)
-  
-  # Show the resulting parameter values ...
-  gf.parameterSummary()
-  
-  # ... and plot the result.
-  plt.title("Image data")
-  plt.imshow(np.transpose(im), origin="lower")
-  plt.show()
-  plt.title("Residuals")
-  plt.imshow(np.transpose(im - gf.evaluate(g)), origin="lower")
-  plt.show()
+    
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    # Constructing the individual coordinate axes
+    x = np.linspace(-2., 2., 50)
+    y = np.linspace(-2., 2., 50)
+    # Applying funcFit's "coordinateGrid" helper function
+    # to built appropriate array-index -> coordinate mapping
+    # needed for nD fitting.
+    g = fuf.coordinateGrid(x, y)
+    
+    # Create the 2d-Gaussian model and assign
+    # some model parameters.
+    gf = fuf.GaussFit2d()
+    gf["sigx"] = 0.75
+    gf["sigy"] = 0.4
+    gf["A"] = 1.0
+    gf["rho"] = 0.4
+    
+    # Get the "data" by evaluating the model
+    # and adding some noise. Note that the coordinate
+    # mapping (array g) is passed to evaluate here.
+    im = gf.evaluate(g)
+    im += np.reshape(np.random.normal(0.0, 0.1, 2500), (50, 50))
+    err = np.ones((50, 50))*0.1
+    
+    # Thaw parameters and fit
+    gf.thaw(["A", "rho"])
+    gf.fit(g, im, yerr=err)
+    
+    # Show the resulting parameter values ...
+    gf.parameterSummary()
+    
+    # ... and plot the result.
+    plt.title("Image data")
+    plt.imshow(np.transpose(im), origin="lower")
+    plt.show()
+    plt.title("Residuals")
+    plt.imshow(np.transpose(im - gf.evaluate(g)), origin="lower")
+    plt.show()
 
 
 The `evaluate` method of the `GaussFit2d` class has the following from:
@@ -217,44 +217,44 @@ use numpy's `meshgrid` function to create coordinate mapping similar
 to the one used before.
 
 ::
-
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  import matplotlib.pylab as plt
-  
-  # Constructing the individual coordinate axes
-  x = np.linspace(-2.,2.,50)
-  y = np.linspace(-2.,2.,50)
-  
-  # Create the 2d-Gaussian model and assign
-  # some model parameters.
-  gf = fuf.GaussFit2dTuple()
-  gf["sigx"] = 0.75
-  gf["sigy"] = 0.4
-  gf["A"] = 1.0
-  gf["rho"] = 0.4
-  
-  # Get the "data" by evaluating the model
-  # and adding some noise. Note that the coordinate
-  # mapping (array g) is passed to evaluate here.
-  im = gf.evaluate((x,y))
-  im += np.reshape(np.random.normal(0.0, 0.1, 2500), (50,50))
-  err = np.ones((50,50))*0.1
-  
-  # Thaw parameters and fit
-  gf.thaw(["A", "rho"])
-  gf.fit((x,y), im, yerr=err)
-  
-  # Show the resulting parameter values ...
-  gf.parameterSummary()
-  
-  # ... and plot the result.
-  plt.title("Image data")
-  plt.imshow(np.transpose(im), origin="lower")
-  plt.show()
-  plt.title("Residuals")
-  plt.imshow(np.transpose(im - gf.evaluate((x,y))), origin="lower")
-  plt.show() 
+    
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    # Constructing the individual coordinate axes
+    x = np.linspace(-2., 2., 50)
+    y = np.linspace(-2., 2., 50)
+    
+    # Create the 2d-Gaussian model and assign
+    # some model parameters.
+    gf = fuf.GaussFit2dTuple()
+    gf["sigx"] = 0.75
+    gf["sigy"] = 0.4
+    gf["A"] = 1.0
+    gf["rho"] = 0.4
+    
+    # Get the "data" by evaluating the model
+    # and adding some noise. Note that the coordinate
+    # mapping (array g) is passed to evaluate here.
+    im = gf.evaluate((x, y))
+    im += np.reshape(np.random.normal(0.0, 0.1, 2500), (50, 50))
+    err = np.ones((50, 50))*0.1
+    
+    # Thaw parameters and fit
+    gf.thaw(["A", "rho"])
+    gf.fit((x, y), im, yerr=err)
+    
+    # Show the resulting parameter values ...
+    gf.parameterSummary()
+    
+    # ... and plot the result.
+    plt.title("Image data")
+    plt.imshow(np.transpose(im), origin="lower")
+    plt.show()
+    plt.title("Residuals")
+    plt.imshow(np.transpose(im - gf.evaluate((x, y))), origin="lower")
+    plt.show()
 
 The associated `evaluate` method looks like this:
 

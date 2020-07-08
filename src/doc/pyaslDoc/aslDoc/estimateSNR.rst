@@ -51,12 +51,12 @@ Quick start
 Estimating the noise contribution in a data set x, y:
 
 ::
-
+    
     from __future__ import print_function
     from PyAstronomy import pyasl
     import numpy as np
     
-    # Set up artificial data set 
+    # Set up artificial data set
     x = np.linspace(0., 1., 200)
     y = 10.2 + x + 4 * x**2
     # Add some independent, Gaussian noise

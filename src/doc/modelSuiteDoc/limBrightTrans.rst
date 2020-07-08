@@ -25,15 +25,15 @@ Example code - Calculate model light curve
 ------------------------------------------
 
 ::
-
-  
+    
+    
     # Import some unrelated modules
     import matplotlib.pylab as mpl
     from numpy import arange
     # ... and now the LimBrightTrans module
     from PyAstronomy.modelSuite import LimBrightTrans
-  
-  
+    
+    
     # Create LimBrightTransit object
     lbt = LimBrightTrans()
     # Set parameters
@@ -42,11 +42,11 @@ Example code - Calculate model light curve
     lbt["i"] = 87.84
     lbt["T0"] = 4.0
     lbt["per"] = 10.
-  
+    
     # Choose some time axis and calculate model
-    time=arange(3.,5.,0.001)
+    time = arange(3., 5., 0.001)
     y = lbt.evaluate(time)
-  
+    
     # Let's see what happened...
     mpl.ylabel("Relative Flux")
     mpl.xlabel("Time")

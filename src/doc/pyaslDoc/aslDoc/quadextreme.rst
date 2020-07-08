@@ -30,14 +30,14 @@ Example
     # Find the maximum, use a wider range for the
     # parabolic fit.
     print("Using 5 points to each side of the maximum")
-    epos, mi = pyasl.quadExtreme(x, y, mode="max", dp=(5,5))
+    epos, mi = pyasl.quadExtreme(x, y, mode="max", dp=(5, 5))
     print("Maximum found at index: ", mi, ", value at maximum: ", y[mi])
     print("Maximum found by parabolic fit: ", epos)
     print()
     
     # Do as above, but get the full output
     print("Using 2 points to each side of the maximum")
-    epos, mi, xb, yb, p = pyasl.quadExtreme(x, y, mode="max", dp=(2,2), fullOutput=True)
+    epos, mi, xb, yb, p = pyasl.quadExtreme(x, y, mode="max", dp=(2, 2), fullOutput=True)
     # Evaluate polynomial at a number of points.
     # Note that, internally, the x-value of the extreme point has
     # been subtracted before the fit. Therefore, we need to re-shift

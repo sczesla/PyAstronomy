@@ -70,8 +70,8 @@ Example: Evaluating and fitting model using MCMC
     data = model + np.random.normal(0., 0.5, model.size)
     # Plot the resulting "data"
     plt.title("Kepler Ellipse Model --- Example")
-    plt.errorbar(data[0::2], data[1::2], xerr=np.ones(20)*0.5, \
-                  yerr=np.ones(20)*0.5, fmt="bp")
+    plt.errorbar(data[0::2], data[1::2], xerr=np.ones(20)*0.5,
+                 yerr=np.ones(20)*0.5, fmt="bp")
     
     # Use MCMC to sample from the posterior
     # Specify free parameters
@@ -80,13 +80,13 @@ Example: Evaluating and fitting model using MCMC
     X0 = {}
     steps = {}
     for p in kem.freeParameters():
-      X0[p] = kem[p]
-      steps[p] = kem[p] / 20.
+        X0[p] = kem[p]
+        steps[p] = kem[p] / 20.
     
-    lims = {"a":[5.,10.], "per":[10.,15.], "e":[0.,1.], "tau":[0.5,1.], \
-            "Omega":[0.,360.], "w":[-5.,5.], "i":[90., 95.]}
+    lims = {"a": [5., 10.], "per": [10., 15.], "e": [0., 1.], "tau": [0.5, 1.],
+            "Omega": [0., 360.], "w": [-5., 5.], "i": [90., 95.]}
     
-    kem.fitMCMC(time, data, X0, lims, steps, yerr=np.ones(len(data))*0.5, \
+    kem.fitMCMC(time, data, X0, lims, steps, yerr=np.ones(len(data))*0.5,
                 iter=500, dbfile="kemExample.tmp")
     
     # Plot the lowest deviance model
@@ -148,7 +148,7 @@ The example demonstrates how to fit a radial velocity curve and posterior-based 
     # the estimates.
     krvm.parameterSummary(sorting="ps")
     
-    # We specify some guess parameters. 
+    # We specify some guess parameters.
     krvm["per1"] = 37.0
     krvm["K1"] = 1.0
     krvm["e1"] = 0.0
@@ -164,7 +164,7 @@ The example demonstrates how to fit a radial velocity curve and posterior-based 
     kmo = krvm.evaluate(jd)
     
     # What about chi-square and RMS?
-    chi = np.sum( (rv - krvm.model)**2 / rverr**2 )
+    chi = np.sum((rv - krvm.model)**2 / rverr**2)
     # Reduced chi-square
     rchi = chi / (len(rv) - len(krvm.freeParameters()))
     print("chi-square and reduced chi-square: %6.3f, %6.3f" % (chi, rchi))
@@ -177,21 +177,20 @@ The example demonstrates how to fit a radial velocity curve and posterior-based 
     plt.show()
     
     
-    
     # Now let us do some posterior-based error analysis using MCMC
     
     # Say, we want 20 burn-in iterations and, thereafter,
     # 50 further iterations (per walker).
-    sampleArgs = {"iters":50, "burn":100}
+    sampleArgs = {"iters": 50, "burn": 100}
     
     # Specify a bounded uniform prior on the eccentricity. Note that restrictions are not
     # automatically converted into priors (they may not ne uniform). Potentially further prior,
     # e.g., on per1 may be required to prevent wandering into 'forbidden territory'.
-    priors = {"e1":fuf.FuFPrior("limuniform", upper=1, lower=0)}
+    priors = {"e1": fuf.FuFPrior("limuniform", upper=1, lower=0)}
     
     # Start the sampling (ps could be used to continue the sampling)
-    ps = krvm.fitEMCEE(jd, rv, yerr=rverr, sampleArgs=sampleArgs, scales={"e":0.05}, dbfile="chain1.emcee", \
-        priors=priors)
+    ps = krvm.fitEMCEE(jd, rv, yerr=rverr, sampleArgs=sampleArgs, scales={"e": 0.05}, dbfile="chain1.emcee",
+                       priors=priors)
     
     
     # Have a look at the posterior
@@ -205,6 +204,7 @@ The example demonstrates how to fit a radial velocity curve and posterior-based 
     ta.plotTraceHist("e1")
     print("Expectation value for eccentricity: ", ta.mean("e1"))
     print("90% HPD for eccentricity: ", ta.hpd("e1", cred=0.9))
+    ta.show()
     ta.show()
 
 

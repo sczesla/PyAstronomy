@@ -29,7 +29,7 @@ Example: A string length analysis
     tps = (0.5, 4.5, 200)
     
     # Calculate string length
-    p , sl = pyt.stringlength_dat(x, y, tps)
+    p, sl = pyt.stringlength_dat(x, y, tps)
     
     # Show the string length. An alias at the double period
     # (half frequency) is obvious.

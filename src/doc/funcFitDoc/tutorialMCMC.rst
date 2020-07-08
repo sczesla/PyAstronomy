@@ -61,11 +61,11 @@ pymc, we refer the reader to their web page (PyMC_).
     
     # Creating a Gaussian with some noise
     # Choose some parameters...
-    gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
+    gPar = {"A": -5.0, "sig": 10.0, "mu": 10.0, "off": 1.0, "lin": 0.0}
     # Calculate profile
     x = arange(100) - 50.0
     y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
-    * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
+        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
     # Add some noise
     y += random.normal(0.0, 0.01, x.size)
     
@@ -87,28 +87,28 @@ pymc, we refer the reader to their web page (PyMC_).
     gf.thaw(["A", "sig", "off", "mu"])
     
     # Now start a simplex fit
-    gf.fit(x,y,yerr=ones(x.size)*0.01)
+    gf.fit(x, y, yerr=ones(x.size)*0.01)
     
     # Obtain the best-fit values derived by the simplex fit.
     # They are to be used as start values for the MCMC sampling.
     # Note that 'A' is missing - we will introduce this later.
-    X0 = {"sig":gf["sig"], "off":gf["off"], "mu":gf["mu"]}
+    X0 = {"sig": gf["sig"], "off": gf["off"], "mu": gf["mu"]}
     
     # Now we specify the limits within which the individual parameters
     # can be varied (for those parameters listed in the 'X0' dictionary).
-    Lims = {"sig":[-20.,20.], "off":[0.,2.], "mu":[5.,15.]}
+    Lims = {"sig": [-20., 20.], "off": [0., 2.], "mu": [5., 15.]}
     
     # For the parameters contained in 'X0', define the step widths, which
     # are to be used by the MCMC sampler. The steps are specified using
     # the same scale/units as the actual parameters.
-    steps = {"A":0.01, "sig":0.1, "off":0.1, "mu":0.1}
+    steps = {"A": 0.01, "sig": 0.1, "off": 0.1, "mu": 0.1}
     
     # In this example, we wish to define our ``own'' PyMC variable for the parameter
     # 'A'. This can be useful, if nonstandard behavior is desired. Note that this
     # is an optional parameter and you could simply include the parameter 'A' into
     # The framework of X0, Lims, and steps.
     ppa = {}
-    ppa["A"] = pymc.Uniform("A", value=gf["A"], lower=-20., \
+    ppa["A"] = pymc.Uniform("A", value=gf["A"], lower=-20.,
                             upper=10.0, doc="Amplitude")
     
     # Start the sampling. The resulting Marchov-Chain will be written
@@ -117,9 +117,9 @@ pymc, we refer the reader to their web page (PyMC_).
     # To save the chain to a compressed 'hdf5'
     # file, you have to specify the dbArgs keyword; e.g., use:
     #   dbArgs = {"db":"hdf5", "dbname":"mcmcExample.hdf5"}
-    gf.fitMCMC(x, y, X0, Lims, steps, yerr=ones(x.size)*0.01, \
-                pymcPars=ppa, iter=2500, burn=0, thin=1, \
-                dbfile="mcmcExample.tmp")
+    gf.fitMCMC(x, y, X0, Lims, steps, yerr=ones(x.size)*0.01,
+               pymcPars=ppa, iter=2500, burn=0, thin=1,
+               dbfile="mcmcExample.tmp")
     
     # Reload the database (here, this is actually not required, but it is
     # if the Marchov chain is to be analyzed later).
@@ -166,7 +166,7 @@ cut. However, be warned:
     import numpy as np
     import matplotlib.pylab as plt
     
-    x = np.linspace(0,30,1000)
+    x = np.linspace(0, 30, 1000)
     gauss = fuf.GaussFit1d()
     gauss["A"] = 1
     gauss["mu"] = 23.
@@ -175,7 +175,7 @@ cut. However, be warned:
     yerr = np.random.normal(0., 0.05, len(x))
     y = gauss.evaluate(x) + yerr
     # Thaw the parameters A, mu, and sig
-    gauss.thaw(["A","mu","sig"])
+    gauss.thaw(["A", "mu", "sig"])
     
     # Define the ranges, which are used to construct the
     # uniform priors and step sizes.
@@ -184,7 +184,7 @@ cut. However, be warned:
     # be constructed as [m0-1.5, m0+1.5], where m0 is the
     # starting value interpreted as the current value of
     # mu (23. in this case).
-    ranges = {"A":[0,10],"mu":3, "sig":[0.1,1.0]}
+    ranges = {"A": [0, 10], "mu": 3, "sig": [0.1, 1.0]}
     # Generate default input for X0, lims, and steps
     X0, lims, steps = gauss.MCMCautoParameters(ranges)
     
@@ -208,39 +208,39 @@ You may even shorten the short-cut by using the `autoFitMCMC` method.
 **However, note that the same warning remains valid here.**
 
 ::
-
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  import matplotlib.pylab as plt
-  
-  x = np.linspace(0,30,1000)
-  gauss = fuf.GaussFit1d()
-  gauss["A"] = 1
-  gauss["mu"] = 23.
-  gauss["sig"] = 0.5
-  # Generate some "data" to fit
-  yerr = np.random.normal(0., 0.05, len(x))
-  y = gauss.evaluate(x) + yerr
-  
-  # Define the ranges, which are used to construct the
-  # uniform priors and step sizes.
-  # Note that for "sig", we give only a single value.
-  # In this case, the limits for the uniform prior will
-  # be constructed as [m0-1.5, m0+1.5], where m0 is the
-  # starting value interpreted as the current value of
-  # mu (23. in this case).
-  ranges = {"A":[0,10],"mu":3, "sig":[0.1,1.0]}
-  
-  # Call the auto-sampler
-  # Note that we set picky to False here. In this case, the
-  # parameters specified in ranges will be thawed automatically.
-  # All parameters not mentioned there, will be frozen.
-  gauss.autoFitMCMC(x, y, ranges, yerr=yerr, picky=False, iter=1000)
-  
-  # and plot the results
-  plt.plot(x, y, 'k+')
-  plt.plot(x, gauss.evaluate(x), 'r--')
-  plt.show()
+    
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    import matplotlib.pylab as plt
+    
+    x = np.linspace(0, 30, 1000)
+    gauss = fuf.GaussFit1d()
+    gauss["A"] = 1
+    gauss["mu"] = 23.
+    gauss["sig"] = 0.5
+    # Generate some "data" to fit
+    yerr = np.random.normal(0., 0.05, len(x))
+    y = gauss.evaluate(x) + yerr
+    
+    # Define the ranges, which are used to construct the
+    # uniform priors and step sizes.
+    # Note that for "sig", we give only a single value.
+    # In this case, the limits for the uniform prior will
+    # be constructed as [m0-1.5, m0+1.5], where m0 is the
+    # starting value interpreted as the current value of
+    # mu (23. in this case).
+    ranges = {"A": [0, 10], "mu": 3, "sig": [0.1, 1.0]}
+    
+    # Call the auto-sampler
+    # Note that we set picky to False here. In this case, the
+    # parameters specified in ranges will be thawed automatically.
+    # All parameters not mentioned there, will be frozen.
+    gauss.autoFitMCMC(x, y, ranges, yerr=yerr, picky=False, iter=1000)
+    
+    # and plot the results
+    plt.plot(x, y, 'k+')
+    plt.plot(x, gauss.evaluate(x), 'r--')
+    plt.show()
 
 
 Sampling with Gaussian and uniform priors
@@ -252,73 +252,73 @@ be included in the sampling. We note, however, that some kind of prior
 is implicitly assumed for all parameters; in this case, a uniform one.
 
 ::
-
-  from PyAstronomy import funcFit as fuf
-  import numpy as np
-  import matplotlib.pylab as plt
-  import pymc
-  
-  # Create a Gauss-fit object
-  gf = fuf.GaussFit1d()
-  
-  # Choose some parameters
-  gf["A"] = -0.65
-  gf["mu"] = 1.0
-  gf["lin"] = 0.0
-  gf["off"] = 1.1
-  gf["sig"] = 0.2
-  
-  # Simulate data with noise
-  x = np.linspace(0., 2., 100)
-  y = gf.evaluate(x)
-  y += np.random.normal(0, 0.05, len(x))
-  
-  gf.thaw(["A", "off", "mu", "sig"])
-  
-  # Set up a normal prior for the offset parameter
-  # Note!---The name (first parameter) must correspond to that
-  #         of the parameter.
-  # The expectation value us set to 0.9 while the width is given
-  # as 0.01 (tau = 1/sigma**2). The starting value is specified
-  # as 1.0.
-  offPar = pymc.Normal("off", mu=0.9, tau=(1./0.01)**2, value=1.0)
-  # Use a uniform prior for mu.
-  muPar = pymc.Uniform("mu", lower=0.95, upper=0.97, value=0.96)
-  
-  # Collect the "extra"-variables in a dictionary using
-  # their names as keys
-  pymcPars = {"mu":muPar, "off":offPar}
-  
-  # Specify starting values, X0, and limits, lims, for
-  # those parameter distributions not given specifically.
-  X0 = {"A":gf["A"], "sig":gf["sig"]}
-  lims = {"A":[-1.0,0.0], "sig":[0., 1.0]}
-  # Still, the steps dictionary has to contain all
-  # parameter distributions.
-  steps = {"A":0.02, "sig":0.02, "mu":0.01, "off":0.01}
-  
-  # Carry out the MCMC sampling
-  gf.fitMCMC(x, y, X0, lims, steps, yerr=np.ones(len(x))*0.05, \
-             pymcPars=pymcPars, burn=1000, iter=3000)
-  
-  # Setting parameters to mean values
-  for p in gf.freeParameters():
-    gf[p] = gf.MCMC.trace(p)[:].mean()
-  
-  # Show the "data" and model in the upper panel
-  plt.subplot(2,1,1)
-  plt.title("Data and model")
-  plt.errorbar(x, y, yerr=np.ones(len(x))*0.05, fmt="bp")
-  # Plot lowest deviance solution
-  plt.plot(x, gf.evaluate(x), 'r--')
-  
-  # Show the residuals in the lower panel
-  plt.subplot(2,1,2)
-  plt.title("Residuals")
-  plt.errorbar(x, y-gf.evaluate(x), yerr=np.ones(len(x))*0.05, fmt="bp")
-  plt.plot([min(x), max(x)], [0.0,0.0], 'r-')
-  
-  plt.show()
+    
+    from PyAstronomy import funcFit as fuf
+    import numpy as np
+    import matplotlib.pylab as plt
+    import pymc
+    
+    # Create a Gauss-fit object
+    gf = fuf.GaussFit1d()
+    
+    # Choose some parameters
+    gf["A"] = -0.65
+    gf["mu"] = 1.0
+    gf["lin"] = 0.0
+    gf["off"] = 1.1
+    gf["sig"] = 0.2
+    
+    # Simulate data with noise
+    x = np.linspace(0., 2., 100)
+    y = gf.evaluate(x)
+    y += np.random.normal(0, 0.05, len(x))
+    
+    gf.thaw(["A", "off", "mu", "sig"])
+    
+    # Set up a normal prior for the offset parameter
+    # Note!---The name (first parameter) must correspond to that
+    #         of the parameter.
+    # The expectation value us set to 0.9 while the width is given
+    # as 0.01 (tau = 1/sigma**2). The starting value is specified
+    # as 1.0.
+    offPar = pymc.Normal("off", mu=0.9, tau=(1./0.01)**2, value=1.0)
+    # Use a uniform prior for mu.
+    muPar = pymc.Uniform("mu", lower=0.95, upper=0.97, value=0.96)
+    
+    # Collect the "extra"-variables in a dictionary using
+    # their names as keys
+    pymcPars = {"mu": muPar, "off": offPar}
+    
+    # Specify starting values, X0, and limits, lims, for
+    # those parameter distributions not given specifically.
+    X0 = {"A": gf["A"], "sig": gf["sig"]}
+    lims = {"A": [-1.0, 0.0], "sig": [0., 1.0]}
+    # Still, the steps dictionary has to contain all
+    # parameter distributions.
+    steps = {"A": 0.02, "sig": 0.02, "mu": 0.01, "off": 0.01}
+    
+    # Carry out the MCMC sampling
+    gf.fitMCMC(x, y, X0, lims, steps, yerr=np.ones(len(x))*0.05,
+               pymcPars=pymcPars, burn=1000, iter=3000)
+    
+    # Setting parameters to mean values
+    for p in gf.freeParameters():
+        gf[p] = gf.MCMC.trace(p)[:].mean()
+    
+    # Show the "data" and model in the upper panel
+    plt.subplot(2, 1, 1)
+    plt.title("Data and model")
+    plt.errorbar(x, y, yerr=np.ones(len(x))*0.05, fmt="bp")
+    # Plot lowest deviance solution
+    plt.plot(x, gf.evaluate(x), 'r--')
+    
+    # Show the residuals in the lower panel
+    plt.subplot(2, 1, 2)
+    plt.title("Residuals")
+    plt.errorbar(x, y-gf.evaluate(x), yerr=np.ones(len(x))*0.05, fmt="bp")
+    plt.plot([min(x), max(x)], [0.0, 0.0], 'r-')
+    
+    plt.show()
 
 Clearly, the plot shows that the solution does not fit well in a Chi-square sense,
 because the prior information has a significant influence on the outcome.
@@ -341,7 +341,7 @@ The following example shows a basic application of fitEMCEE. By default,
 the resulting Markov chain is saved to a file called 'chain.emcee'.
 
 ::
-
+    
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -357,7 +357,7 @@ the resulting Markov chain is saved to a file called 'chain.emcee'.
     # Creating a Gaussian with some noise
     # Choose some parameters...
     gf = fuf.GaussFit1d()
-    gf.assignValues({"A":-5.0, "sig":2.5, "mu":10.0, "off":1.0, "lin":0.0})
+    gf.assignValues({"A": -5.0, "sig": 2.5, "mu": 10.0, "off": 1.0, "lin": 0.0})
     # Calculate profile
     x = arange(100) - 50.0
     y = gf.evaluate(x)
@@ -372,7 +372,7 @@ the resulting Markov chain is saved to a file called 'chain.emcee'.
     
     # Say, we want 200 burn-in iterations and, thereafter,
     # 1000 further iterations (per walker).
-    sampleArgs = {"iters":1000, "burn":200}
+    sampleArgs = {"iters": 1000, "burn": 200}
     
     # Start the sampling (ps could be used to continue the sampling)
     ps = gf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
@@ -381,9 +381,9 @@ the resulting Markov chain is saved to a file called 'chain.emcee'.
     # NOTE: the order of the parameters in the chain object is the same
     #       as the order of the parameters returned by freeParamNames()
     for i, p in enumerate(gf.freeParamNames()):
-      plt.subplot(len(gf.freeParamNames()), 1, i+1)
-      plt.hist(gf.emceeSampler.flatchain[::,i], label=p)
-      plt.legend()
+        plt.subplot(len(gf.freeParamNames()), 1, i+1)
+        plt.hist(gf.emceeSampler.flatchain[::, i], label=p)
+        plt.legend()
     plt.show()
     
   
@@ -399,7 +399,7 @@ Second, we introduce (strong) prior information and repeat the sampling.
 A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     
 ::    
-
+    
     from __future__ import print_function, division
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -434,7 +434,7 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     
     # Say, we want 200 burn-in iterations and, thereafter,
     # 2500 further iterations (per walker).
-    sampleArgs = {"iters":2500, "burn":200}
+    sampleArgs = {"iters": 2500, "burn": 200}
     
     # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs)
@@ -443,15 +443,15 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     # Plot the distributions of the chains
     # NOTE: the order of the parameters in the chain object is the same
     #       as the order of the parameters returned by freeParamNames()
-    h = plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
+    h = plt.hist(pf.emceeSampler.flatchain[::, 0], label="c0", normed=True)
     # Construct "data points" in the middle of the bins
     xhist = (h[1][1:] + h[1][0:-1]) / 2.0
     yhist = h[0]
     
     # Fit the histogram using a Gaussian
     gf = fuf.GaussFit1d()
-    gf.assignValues({"A":1.0, "mu":c, "sig":1.0/snr/np.sqrt(npoint)})
-    # First fitting only "mu" is simply quite stable 
+    gf.assignValues({"A": 1.0, "mu": c, "sig": 1.0/snr/np.sqrt(npoint)})
+    # First fitting only "mu" is simply quite stable
     gf.thaw("mu")
     gf.fit(xhist, yhist)
     gf.thaw(["A", "sig"])
@@ -459,9 +459,9 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     
     print()
     print("  --- Sampling results ---")
-    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]))
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::, 0]))
     print("Nominal error of the mean: ", 1.0/snr/np.sqrt(npoint))
-    print("Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::,0]), end=' ')
+    print("Estimate from Markov chain: ", np.std(pf.emceeSampler.flatchain[::, 0]), end=' ')
     print(" and from Gaussian fit to distribution: ", gf["sig"])
     
     # Evaluate best-fit model ...
@@ -479,17 +479,17 @@ A number of ready-to-use priors are implemented here: :ref:`emceePriors`
     # that the estimate will lie in the middle between 7 and 10. Here we
     # exploit symmetry and make the prior information as strong as the
     # information contained in the likelihood function.
-    priors = {"c0":fuf.FuFPrior("gaussian", sig=1.0/snr/np.sqrt(npoint), mu=7.0)}
+    priors = {"c0": fuf.FuFPrior("gaussian", sig=1.0/snr/np.sqrt(npoint), mu=7.0)}
     
     # Start the sampling (ps could be used to continue the sampling)
     ps = pf.fitEMCEE(x, y, yerr=ones(x.size)/snr, sampleArgs=sampleArgs, priors=priors)
     
     print()
     print("  --- Sampling results with strong prior information ---")
-    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::,0]), end=' ')
-    print(" +/-", np.std(pf.emceeSampler.flatchain[::,0]))
+    print("Posterior estimate of constant: ", np.mean(pf.emceeSampler.flatchain[::, 0]), end=' ')
+    print(" +/-", np.std(pf.emceeSampler.flatchain[::, 0]))
     
-    plt.hist(pf.emceeSampler.flatchain[::,0], label="c0", normed=True)
+    plt.hist(pf.emceeSampler.flatchain[::, 0], label="c0", normed=True)
     plt.show()
     
 
@@ -516,10 +516,11 @@ a Gaussian probability distribution. Of course there are more advantageous ways 
     from PyAstronomy import funcFit as fuf
     import matplotlib.pylab as plt
     
+    
     def lfGauss(v, sigma, mu):
         """
         Gaussian density
-        
+    
         Parameters
         ----------
         v : dictionary
@@ -527,7 +528,7 @@ a Gaussian probability distribution. Of course there are more advantageous ways 
         mus, sigma : float
             Mean and standard deviation of the Gaussian. Specified via
             the `largs` argument.
-        
+    
         Returns
         -------
         lp : float
@@ -538,15 +539,16 @@ a Gaussian probability distribution. Of course there are more advantageous ways 
         result += -0.5*np.log(2.*np.pi*sigma**2) - (v["x"] - mu)**2/(2.*sigma**2)
         return result
     
+    
     # Sampling arguments
     # burn: Number of burn-in steps per walker
-    # iters: Number of iterations per walker 
-    sa = {"burn":1000, "iters":5000}
+    # iters: Number of iterations per walker
+    sa = {"burn": 1000, "iters": 5000}
     
     # Starting values
-    fv0 = {"x":0.5}
+    fv0 = {"x": 0.5}
     # Specify standard deviation and mean of Gaussian
-    la = {"mu":0.5, "sigma":0.25}
+    la = {"mu": 0.5, "sigma": 0.25}
     
     # Sample from distribution
     ps = fuf.sampleEMCEE(["x"], fv0, lfGauss, largs=la, sampleArgs=sa, nwalker=4, dbfile="gauss.emcee")
@@ -566,8 +568,6 @@ a Gaussian probability distribution. Of course there are more advantageous ways 
     yy = 1./np.sqrt(2.*np.pi*la["sigma"]**2) * np.exp(-(xx - la["mu"])**2/(2.*la["sigma"]**2))
     plt.plot(xx, yy, 'r--')
     plt.show()
-    
-
 Estimate mean and STD from Gaussian sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -581,17 +581,18 @@ from a sample of Gaussian data using :py:func:`sampleEMCEE`.
     import numpy as np
     from PyAstronomy import funcFit as fuf
     
+    
     def lfGaussMS(v, x=None):
         """
         Gaussian posterior with 1/sigma prior on sigma.
-        
+    
         Parameters
         ----------
         v : dictionary
             Holds current values of "sigma" and "mu"
         x : array
             The 'data' observed. Will be specified by the `largs` keyword.
-        
+    
         Returns
         -------
         lp : float
@@ -608,22 +609,23 @@ from a sample of Gaussian data using :py:func:`sampleEMCEE`.
         result += np.sum(-0.5*np.log(2.*np.pi*v["sigma"]**2) - (x - v["mu"])**2/(2.*v["sigma"]**2))
         return result
     
+    
     # Sampling arguments
     # burn: Number of burn-in steps per walker
-    # iters: Number of iterations per walker 
-    sa = {"burn":1000, "iters":5000}
+    # iters: Number of iterations per walker
+    sa = {"burn": 1000, "iters": 5000}
     
     # Starting values
-    fv0 = {"sigma":1., "mu":1.}
+    fv0 = {"sigma": 1., "mu": 1.}
     # 'Observed' data
-    la = {"x":np.random.normal(0.,1.,1000)}
+    la = {"x": np.random.normal(0., 1., 1000)}
     
     print("Mean of 'data': ", np.mean(la["x"]))
     print("Standard deviation of 'data': ", np.std(la["x"]))
     
     # Scale width for distributing the walkers
-    s = {"mu":0.01, "sigma":0.5}
-    ps = fuf.sampleEMCEE(["mu", "sigma"], fv0, lfGaussMS, largs=la, sampleArgs=sa, nwalker=4, \
+    s = {"mu": 0.01, "sigma": 0.5}
+    ps = fuf.sampleEMCEE(["mu", "sigma"], fv0, lfGaussMS, largs=la, sampleArgs=sa, nwalker=4,
                          scales=s, dbfile="musig.emcee")
     print()
     
@@ -636,4 +638,3 @@ from a sample of Gaussian data using :py:func:`sampleEMCEE`.
     
     ta.plotTraceHist('sigma')
     ta.show()
-

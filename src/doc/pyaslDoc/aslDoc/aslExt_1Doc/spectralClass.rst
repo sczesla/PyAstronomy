@@ -29,7 +29,7 @@ Example: Teff and luminosity as a function of spectral type
 --------------------------------------------------------------
 
 ::
-
+    
     from __future__ import print_function
     from PyAstronomy import pyasl
     import matplotlib.pylab as plt
@@ -54,16 +54,16 @@ Example: Teff and luminosity as a function of spectral type
             if (t == "O") and (n == 0):
                 # Skip the invalid "O0" type
                 continue
-              
+    
             # Save the spectral type
             spts.append(t + str(n))
-        
+    
             # Get log10 of luminosity and effective temperature
             ll, lt = sdj.lumAndTeff(spts[-1], lk)
             # and save to lists
             llums.append(ll)
             lteffs.append(lt)
-        
+    
             # Save location (i.e., number in the list) and
             # spectral for annotating the abscissa
             if (n == 0) or (n == 5):
@@ -71,16 +71,16 @@ Example: Teff and luminosity as a function of spectral type
                 xtl.append(spts[-1])
     
     
-    ax1 = plt.subplot(2,1,1)
+    ax1 = plt.subplot(2, 1, 1)
     # Plot log10(effective temperature)
     plt.plot(lteffs)
     plt.ylabel("$\log_{10}$(T$_{eff}$)")
-    plt.setp(ax1, xticks=xt,xticklabels=xtl)
-    ax2 = plt.subplot(2,1,2)
+    plt.setp(ax1, xticks=xt, xticklabels=xtl)
+    ax2 = plt.subplot(2, 1, 2)
     # Plot log10(luminosity)
     plt.plot(llums)
     plt.ylabel("$\log_{10}$($L/L_{\odot}$)")
-    plt.setp(ax2, xticks=xt,xticklabels=xtl)
+    plt.setp(ax2, xticks=xt, xticklabels=xtl)
     plt.xlabel("Spectral type")
     plt.show()
 

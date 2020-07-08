@@ -12,7 +12,7 @@ Example
 ~~~~~~~~~
 
 ::
-  
+    
     from PyAstronomy import modelSuite as ms
     import numpy as np
     import matplotlib.pylab as plt
@@ -27,7 +27,7 @@ Example
     v["gamma"] = 2e-9
     
     # Generate wavelength axis ...
-    wvl = np.linspace(1212.,1216.,200)
+    wvl = np.linspace(1212., 1216., 200)
     # ... and evaluate model
     m = v.evaluate(wvl)
     
@@ -56,7 +56,7 @@ Example: Adding instrumental resolution
     v["gamma"] = 2e-9
     
     # Generate wavelength axis ...
-    wvl = np.linspace(1212.,1216.,200)
+    wvl = np.linspace(1212., 1216., 200)
     # ... and evaluate model
     m = v.evaluate(wvl)
     

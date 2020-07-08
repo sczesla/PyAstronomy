@@ -30,8 +30,8 @@ Example:
     print(pyasl.hadec2altaz(ha, dec, lat))
     
     # List of coordinates
-    ha = np.arange(0.,20.,5.)
-    dec = np.arange(30.,50.,5.)
+    ha = np.arange(0., 20., 5.)
+    dec = np.arange(30., 50., 5.)
     lat = np.zeros(dec.size)+53.48
     print()
     print("Get altitude and azimuth for a list of objects from same observer latitude")
@@ -73,18 +73,18 @@ Example:
     
     print()
     print("From a list of Julian dates ...")
-    jds = np.arange(jd,jd+1,.2)
+    jds = np.arange(jd, jd+1, .2)
     ras = np.zeros(jds.size) + ra
     decs = np.zeros(jds.size) + dec
     alt, az, ha = pyasl.eq2hor(jds, ras, decs, lon=-70.4042, lat=-24.6272, alt=2635.)
     
     for i in range(alt.size):
-      print("JD = %g : alt = % g,  az = % g,  ha = % g" % (jds[i], alt[i], az[i], ha[i]))
+        print("JD = %g : alt = % g,  az = % g,  ha = % g" % (jds[i], alt[i], az[i], ha[i]))
     
     
     print()
     print("For one object and different times at the VLT...")
-    jds = np.arange(jd-.25,jd+.25,.01)
+    jds = np.arange(jd-.25, jd+.25, .01)
     ras = np.zeros(jds.size) + 130.
     decs = np.zeros(jds.size) - 30.
     res = pyasl.eq2hor(jds, ras, decs, lon=-70.4042, lat=-24.6272, alt=2635.)

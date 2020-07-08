@@ -55,7 +55,7 @@ Example
 ~~~~~~~~
 
 ::
-
+    
     from __future__ import print_function
     from PyAstronomy import pyasl
     import numpy as np
@@ -70,6 +70,6 @@ Example
     print("R-band flux density [erg/cm**2/s/A]: ", fd_lam)
     
     print("Effective wavelength of filter [A]: ", le)
-    print("Convert f_nu into f_lam [erg/cm**2/s/A] by multiplication with (c/lam**2): ", \
-        fd_nu * (299792458e2/(le/1e8)**2) / 1e8 )
+    print("Convert f_nu into f_lam [erg/cm**2/s/A] by multiplication with (c/lam**2): ",
+          fd_nu * (299792458e2/(le/1e8)**2) / 1e8)
 
