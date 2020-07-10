@@ -1,51 +1,49 @@
-Installation of PyAstronomy
-==============================
+Installation and source code of PyAstronomy
+================================================
 
-PyAstronomy is most easily obtained from the `PYthon Package Index (PYPI) <https://pypi.org/project/PyAstronomy/>`_ using pip.
-Alternatively, it can be obtained as a source package.
+PyAstronomy is available from the `Python Package Index (PyPI) <https://pypi.org/project/PyAstronomy/>`_ using pip.
 
-Installation using PYPI and pip
+Sources, bug tracking, and opportunities for contributions are available on
+`github <https://github.com/sczesla/PyAstronomy>`_.
+
+Installation with PyPI and pip
 ---------------------------------
 
-The easiest way to install PyAstronomy is by using pip (numpy may be left out; if already
-installed the command triggers, if anything, an update of numpy).
+PyAstronomy can be installed via pip
 
 .. note:: Depending on the setup of your Python installation, you may need administrator (root)
           privileges to install a package. 
 
 ::
 
-    pip install numpy PyAstronomy
+    pip install PyAstronomy
+
+or (if non-Python dependencies are required)
+
+::    
+
+    pip install PyAstronomy[occult]
 
 
-It is advisable to install a few other packages to work more efficiently with PyAstronomy
-(and python). All these packages can also be obtained from PYPI. They can be installed using
-the command
 
-::
+Installation from github via pip
+-----------------------------------
 
-    
-    pip install scipy matplotlib quantities emcee
-
-
-Note that any package may be left out. The overhead of having more package installed is, however, rather
-small.
-
-Occasionally, PyAstronomy (and other packages) are updated. To obtain the latest version use
+The current development branch can be installed from `github <https://github.com/sczesla/PyAstronomy>`_ via
 
 ::
 
-    pip install --upgrade PyAstronomy
+    pip install git+https://github.com/sczesla/PyAstronomy.git#egg=PyAstronomy[occult]
+
 
 Installing from source code
 -------------------------------
 
-PyAstronomy (PyA) uses numpy's distutils to support installation.
-Start by downloading the source distribution, which is most easily obtained from
-`github <https://github.com/sczesla/PyAstronomy>`_.
-Save it to whatever place
-you prefer on your system, extract the files, and change into the thus created
-directory; on linux use:
+PyAstronomy can be installed from the source.
+Source distributions can be obtained from
+`github <https://github.com/sczesla/PyAstronomy/releases>`_.
+Save it to whatever place you prefer on your system, extract the files, and change into the thus created
+directory; on linux use, e.g.,:
 
 ::
   
@@ -62,8 +60,7 @@ This script will do the work of installing the package for you. Execute it by ty
   python setup.py [--with-ext] install
 
 .. note:: **--with-ext** is an optional flag. If specified, the installer will try to build
-          non-Python extension. As of version 0.4.0, this only comprises the transit modeling
-          routines from Mandel and Agol.  Building the extensions requires a fortran compiler. 
+          non-Python extension. Building the extensions requires a fortran compiler. 
 
 .. note:: Depending on the setup of your Python installation, you may need administrator (root)
           privileges to install a package. The default path for installing packages is the
@@ -75,8 +72,8 @@ This script will do the work of installing the package for you. Execute it by ty
 Building the documentation
 -----------------------------
 
-PyAstronomy is distributed including documentation. Note that the most convenient way to access the
-latest documentation is via `readthedocs <https://pyastronomy.readthedocs.io/en/latest/index.html>`_.
+PyAstronomy is distributed including documentation. The
+latest documentation is available via `readthedocs <https://pyastronomy.readthedocs.io/en/latest/index.html>`_.
 To build the documentation yourself, change
 into the directory where you installed (or unpacked) PyA. Change into the subdirectory named *doc*
 (may not be the first level). In this directory, you find a Makefile, which is responsible for

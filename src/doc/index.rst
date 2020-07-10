@@ -1,7 +1,8 @@
 Welcome to PyAstronomy
 =======================================
 
-PyAstronomy (PyA) is a collection of astronomy related packages.
+PyAstronomy (PyA) is a collection of astronomy related packages
+hosted on `github <https://github.com/sczesla/PyAstronomy>`_.
 
 About PyAstronomy
 -------------------
