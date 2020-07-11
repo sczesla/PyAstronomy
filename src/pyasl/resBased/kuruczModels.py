@@ -202,11 +202,17 @@ class KuruczModels:
     Provides access to the Kurucz models.
     """
 
+    def getListOfGridsFN(self):
+        """
+        Get filename for list of grids
+        """
+        return os.path.join("pyasl", "resBased", "kuruczMG.dat.gz")
+
     def _getListOfModelGrids(self):
         """
         Get list of available grids from http://kurucz.harvard.edu/grids.html
         """
-        gridFile = os.path.join("pyasl", "resBased", "kuruczMG.dat.gz")
+        gridFile = self.getListOfGridsFN()
         if not self._fs.fileExists(gridFile):
             # Grid file has to be created
             try:
@@ -239,6 +245,7 @@ class KuruczModels:
                             continue
                         # <img src="/icons/blank.gif" alt="[   ]" width="20" height="20"> <a href="am40ak2odfnew.dat">am40ak2odfnew.dat</a>          13-Apr-2011 15:07  4.2M
                         fns = re.findall('<a href=\"(.*)\">', gfs)
+                        # Search for grid files in order of preference
                         # First check for .datcd file
                         gfn = None
                         for fn in fns:
@@ -308,6 +315,10 @@ class KuruczModels:
         result += str(met)
         return result
 
+    def _gridFN(self, name):
+        gfn = os.path.join("pyasl", "resBased", name + ".dat.gz")
+        return gfn
+
     def _downloadGrid(self, name):
         """
         Download a model-grid file from the Kurucz page.
@@ -325,7 +336,7 @@ class KuruczModels:
         gfn : string
             The (relative) name of the (downloaded) file.
         """
-        gfn = os.path.join("pyasl", "resBased", name + ".dat.gz")
+        gfn = self._gridFN(name)
         if self._fs.fileExists(gfn):
             return gfn
         print("Downloading model data...")
@@ -395,6 +406,14 @@ class KuruczModels:
             The names of all available model grids.
         """
         return list(self.grids.keys())
+
+    def listGridLinks(self):
+        """
+        List links to available grids
+        """
+        print("List of grids stored in file:", self.getListOfGridsFN())
+        for k,v in self.grids.items():
+            print("%20s  " % k, v)
 
     def __init__(self):
         self._fs = pp.PyAFS()
