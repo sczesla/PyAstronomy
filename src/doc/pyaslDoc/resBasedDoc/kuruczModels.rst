@@ -9,6 +9,8 @@ The classes and functions available here provide access
 to the model grids made available by Robert L. Kurucz
 on: http://kurucz.harvard.edu/grids.html
 
+.. note:: Model grids are downloaded on first request and stored in PyA's data path. 
+
 Example: Get access to the models
 ---------------------------------
 
@@ -40,10 +42,23 @@ Example: Get access to the models
     model = pyasl.getKuruczModel(4250, 4.5, 0.1)
 
 
+Purge data
+------------
+
+If required, e.g., to initiate a re-download, the Kurucz data stored in
+PyA's data directory can be deleted.
+
+::
+
+    from PyAstronomy import pyasl
+    pyasl.purgeKuruczData()
+
+
 Classes and functions
 -----------------------
 
 .. autofunction:: getKuruczModel
+.. autofunction:: purgeKuruczData
 .. autoclass:: KuruczModels
    :members:
 .. autoclass:: KuruczMT

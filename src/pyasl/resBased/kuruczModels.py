@@ -248,15 +248,16 @@ class KuruczModels:
                         # Search for grid files in order of preference
                         # First check for .datcd file
                         gfn = None
-                        for fn in fns:
-                            r = re.match("^a.*k2.*\.datcd$", fn)
-                            if r is not None:
-                                gfn = fn
-                                break
                         if gfn is None:
                             # Check for .dat file (with k2)
                             for fn in fns:
                                 r = re.match("^a.*k2.*\.dat$", fn)
+                                if r is not None:
+                                    gfn = fn
+                                    break
+                        if gfn is None:
+                            for fn in fns:
+                                r = re.match("^a.*k2.*\.datcd$", fn)
                                 if r is not None:
                                     gfn = fn
                                     break
@@ -418,6 +419,20 @@ class KuruczModels:
     def __init__(self):
         self._fs = pp.PyAFS()
         self._getListOfModelGrids()
+
+
+def purgeKuruczData():
+    """
+    Remove downloaded Kurucz data from PyA's data directory
+    """
+    km = KuruczModels()
+    gfn = km.getListOfGridsFN()
+    fns = km._fs.globglob(os.path.join("pyasl", "resBased"), "GRID*.dat.gz" )
+    print("Deleting grid compilation: ", gfn)
+    km._fs.removeFile(gfn)
+    for fn in fns:
+        print("Deleting grid file: ", fn)
+        km._fs.removeFile(fn)
 
 
 def getKuruczModel(teff, logg, met, nameadd=""):
