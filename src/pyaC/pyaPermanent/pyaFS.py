@@ -5,6 +5,7 @@ from PyAstronomy.pyaC import _ic
 from .pyaConfig import *
 import six.moves.urllib as urllib
 from six.moves.urllib.error import URLError
+import glob
  
 if _ic.check["ssl"]:
     import ssl
@@ -308,6 +309,43 @@ class PyAFS:
             f = self.requestFile(fullName, 'w')
             f.close()
         return
+
+    def getFullPath(self, rpath):
+        """
+        Return full path for relative path
+        
+        Parameters
+        ----------
+        rpath : string or list of strings
+            Relative path in PyA data directory or individual
+            constituents of path
+        
+        Returns
+        -------
+        Path : string
+            Absolute path
+        """
+        return os.path.join(self.dpath, rpath)
+
+    def globglob(self, rpath, ge):
+        """
+        Apply glob.glob on relative path
+        
+        Parameters
+        ----------
+        rpath : string
+            Relative path
+        ge : string
+            Glob expression (e.g., *.*)
+        
+        Returns
+        -------
+        Fns : list of strings
+            Glob results (relative paths)
+        """
+        fns = glob.glob(os.path.join(self.dpath, rpath, ge))
+        fns = [os.path.relpath(p, start=self.dpath) for p in fns]
+        return fns
 
     def __init__(self):
         self.conf = PyAConfig()
