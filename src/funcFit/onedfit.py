@@ -1855,7 +1855,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 widgets=widgets, maxval=sampleArgs["iters"]).start()
 
         n = 0
-        for pos, prob, state in self.emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+        
+        # Manage emcee 2/3 incompatibility
+        try:
+            sit = self.emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True)
+        except TypeError:
+            # emcee 3
+            sit = self.emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, store=True)
+        
+        for pos, prob, state in sit:
             n += 1
             if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
                 if ic.check["progressbar"]:
