@@ -63,21 +63,35 @@ class SWEETCat(pp.PyAUpdateCycle):
         """
         Download SWEETCAT and write it to file
         """
-        url = 'https://www.astro.up.pt/resources/sweet-cat/download.php'
+        urls = ['https://www.astro.up.pt/resources/sweet-cat/download.php', \
+                "https://raw.githubusercontent.com/iastro-pt/SWEET-Cat/master/WEBSITE_online_EU.rdb"]
         dfn = self._fs.composeFilename(self.dataFileName)
-        try:
-            # The next two lines by-pass certificate verification
-            context = ssl._create_unverified_context()
-            self._fs.downloadToFile(url, dfn, clobber=True, verbose=False, openMethod=gzip.open,
-                                    context=context)
-        except AttributeError:
-            # Python version does not support ssl._create_unverified_context()
-            self._fs.downloadToFile(
-                url, dfn, clobber=True, verbose=False, openMethod=gzip.open)
-        except Exception as e:
-            # "Handle" unexpected error
+        success = False
+        ex = []
+        for url in urls:
+            try:
+                # The next two lines by-pass certificate verification
+                context = ssl._create_unverified_context()
+                self._fs.downloadToFile(url, dfn, clobber=True, verbose=False, openMethod=gzip.open,
+                                        context=context)
+                success = True
+            except AttributeError:
+                # Python version does not support ssl._create_unverified_context()
+                self._fs.downloadToFile(
+                    url, dfn, clobber=True, verbose=False, openMethod=gzip.open)
+                success = True
+            except Exception as e:
+                # "Handle" unexpected error
+                ex.append((url,e))
+            if success:
+                break
+        
+        if not success:
             raise(PE.PyANetworkError(
-                "Could not download SWEET-Cat data. The following error was raised: " + str(e)))
+                    "Could not download SWEET-Cat data. Received the following errors:\n\n" + \
+                    ''.join(["URL: "+x[0]+"\n"+str(x[1])+"\n\n" for x in ex]) ))
+
+        self.source_url = url
 
     def _read_sweetcat(self):
         """
