@@ -6,6 +6,7 @@ from .pyaConfig import *
 import six.moves.urllib as urllib
 from six.moves.urllib.error import URLError
 import glob
+from PyAstronomy.pyaC.pyaPermanent import pyaRC
  
 if _ic.check["ssl"]:
     import ssl
@@ -136,6 +137,11 @@ class PyAFS:
         Online flag : boolean
             True if network could be reached.
         """
+        if not pyaRC.supposedOnline():
+            PE.warn(PE.PyANetworkError("Internet connection disallowed by pyaRC.", \
+                                       solution="Use 'goOnline' method in pyaRC."))
+            return False
+        
         online = True
         try:
             _ = urllib.request.urlopen(url)
@@ -199,6 +205,11 @@ class PyAFS:
             SSL context parameter handed to urlopen.
         """
         if self.fileExists(fn) and (clobber == False):
+            return
+        
+        if not pyaRC.supposedOnline():
+            PE.warn(PE.PyANetworkError("Internet connection disallowed by pyaRC.", \
+                                       solution="Use 'goOnline' method in pyaRC."))
             return
 
         def download(url, context, nocontext=False):

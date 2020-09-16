@@ -2,7 +2,7 @@ from __future__ import print_function
 from .PyA_Version import PyA_Version
 import os
 import importlib
-
+from PyAstronomy.pyaC import pyaPermanent
 
 class PyAIS:
     """
@@ -46,6 +46,7 @@ def importCheck():
     p = PyAIS()
     p.showStatus()
 
+pyaRC = pyaPermanent.pyaRC
 
 # Check for the presence of six
 try:

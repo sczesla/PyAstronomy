@@ -4,6 +4,25 @@ from PyAstronomy.pyaC import pyaErrors as PE
 import six.moves.configparser as ConfigParser
 import six.moves as smo
 
+class PyARC(object):
+    """
+    """
+    
+    def __init__(self):
+        self.rc = ConfigParser.RawConfigParser()
+        self.rc.add_section("pyaRC")
+        # By default, keep online access on
+        self.goOnline()
+    
+    def takeOffline(self):
+        self.rc.set("pyaRC", "onlineKillSwitch", 1)
+    def goOnline(self):
+        self.rc.set("pyaRC", "onlineKillSwitch", 0)
+    def supposedOnline(self):
+        return (not self.rc["pyaRC"]["onlineKillSwitch"])
+       
+pyaRC = PyARC() 
+
 
 class PyAConfig(object):
     """
@@ -104,17 +123,24 @@ class PyAConfig(object):
                       "'? Please provide a valid input (y/n).")
                 print()
 
+    def _locateHomeDirectory(self):
+        """ Try to locate HOME directory and return if possible (else return None) """
+        hd = None
+        hd = os.getenv("HOME")
+        if hd is None:
+            # Try alternative solution
+            self.homeDir = os.path.expanduser("~")
+        return hd
+        
     def __init__(self):
         self.dpath = None
         # Try to locate home directory via environment variable
-        self.homeDir = os.getenv("HOME")
-        if self.homeDir is None:
-            # Try alternative solution
-            self.homeDir = os.path.expanduser("~")
+        self.homeDir = self._locateHomeDirectory()
         if self.homeDir is None:
             PE.warn(PE.PyAValError("Could not find a home directory. Data directory cannot be set up.",
                                    solution="Set 'HOME' environment variable."))
             return
+
         # Hard-coded name of file, which will only contain path to "real" configuration.
         # This is done, because at one point, information must be stored, which can be
         # found without any extra information.
@@ -245,6 +271,7 @@ class PyAConfig(object):
                                                  "of the data directory."]))
                 self.dpath = None
                 return
+        # Create cfg file unless it already exists
         self.__createConfigStub()
         # Open the "root" configuration file for later access
         if PyAConfig._rootConfig is None:
@@ -283,3 +310,6 @@ class PyAConfig(object):
         """
         PyAConfig._rootConfig.remove_section(section)
         self.saveConfigToFile()
+
+
+
