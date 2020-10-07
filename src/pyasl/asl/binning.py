@@ -107,6 +107,9 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     if x0 > np.max(x):
         raise(PE.PyAValError("The starting point, `x0`, is larger than the end time of the data.",
                              solution="Use a smaller value."))
+    if np.any(np.isfinite(x) == False):
+        raise(PE.PyAValError("X axis contains invalid values (NaN or inf).", \
+                             solution="Remove invalid values from input."))
 
     # Use arrays in calculation. Only copy if conversion to numpy array
     # is required
