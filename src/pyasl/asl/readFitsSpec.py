@@ -51,7 +51,7 @@ def read1dFitsSpec(fn, hdu=0, fullout=False, CRPIX1=None, keymap={}):
                                    solution="Install pyfits: http://www.stsci.edu/institute/software_hardware/pyfits"))
 
     if not os.path.isfile(fn):
-        raise(PE.PyAFileError("File " + str(fn) + "does not exist.",
+        raise(PE.PyAFileError(fn, "ne",
                               where="read1dFitsSpec",
                               solution="Check file name."))
 
