@@ -37,7 +37,7 @@ def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=No
         Flux errors. If given, the error will be stored in an additional extension.
     header : dict, optional
         Dictionary with header information to be transfered to the new file.
-        Note that the wavelength information will be overwritten by the information
+        Note that the wavelength information will be overwritten
         by the information given to this routine.
         If both, a reference file to clone the header from and the header parameters
         are given, the cloned header from the reference file will be overwritten and
