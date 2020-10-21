@@ -109,12 +109,15 @@ class PyAFileError(PyaErrTemplate):
             Name of the file in question.
         mode : string, {no, ne}
             - "no": File could not be opened.
-            - "ne": File does not exist 
+            - "ne": File does not exist
+            - "ae": File already exists
         """
         if mode == "no":
             what = "File '" + str(fn) + "' could not be opened."
         elif mode == "ne":
             what = "File '" + str(fn) + "' does not exist."
+        elif mode == "ae":
+            what = "File '" + str(fn) + "' already exists."
         PyaErrTemplate.__init__(self, what, "PyA file error", **keys)
 
 
