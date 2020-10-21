@@ -80,7 +80,7 @@ def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=No
                                            "Consider passing wavelength information via `waveParams`."]))
 
     if os.path.isfile(fn) and not clobber:
-        raise(PE.PyAFileError("File " + str(fn) + "already exists.",
+        raise(PE.PyAFileError(fn, "ae",
                               where="write1dFitsSpec",
                               solution="File exists; set clobber=True to overwrite."))
 
@@ -97,7 +97,7 @@ def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=No
         # If the is a reference file, its header will be used to populate
         # the header of the file to be written.
         if not os.path.isfile(refFileName):
-            raise(PE.PyAFileError("File " + str(refFileName) + "does not exist.",
+            raise(PE.PyAFileError(str(refFileName), "ne",
                                   where="write1dFitsSpec",
                                   solution="Check file name."))
         ff = pyfits.open(refFileName)[refFileExt]
@@ -147,7 +147,7 @@ def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=No
                                      solution="Check content of \'waveParams\' so that only one value for " + k +
                                      " is provided (including lower/upper case and presence of a trailing \'1\'."))
         if count < 3:
-            raise(PE.PyAFileError("You provided an incomplete set of waveParams.",
+            raise(PE.PyAValError("You provided an incomplete set of waveParams.",
                                   where="write1dFitsSpec",
                                   solution="Required keywords are CRPIX, CRVAL, and CDELT."))
 
@@ -165,4 +165,4 @@ def write1dFitsSpec(fn, flux, wvl=None, waveParams=None, fluxErr=None, header=No
     else:
         hdulist = pyfits.HDUList([hdu])
 
-    hdulist.writeto(fn, clobber=clobber)
+    hdulist.writeto(fn, overwrite=clobber)
