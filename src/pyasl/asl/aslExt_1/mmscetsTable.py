@@ -33,6 +33,14 @@ class MMSCETSTable(pp.PyAUpdateCycle):
   """
   
   def __init__(self, skipUpdate=False, forceUpdate=False):
+      """
+      Initialize the config file.
+
+      Args:
+          self: (todo): write your description
+          skipUpdate: (list): write your description
+          forceUpdate: (todo): write your description
+      """
     
     if not _ic.check["astropy"]:
       raise(PE.PyARequiredImport("The 'astropy' package is not installed. astropy is required to read VO tables.", \

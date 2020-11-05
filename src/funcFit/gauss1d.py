@@ -23,6 +23,12 @@ class GaussFit1d(OneDFit):
   """
   
   def __init__(self):
+      """
+      Initializes the internal state.
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self, ["A", "mu", "sig", "off", "lin"])
     self.setRootName("Gaussian")
 
@@ -61,6 +67,13 @@ class MultiGauss1d(OneDFit):
   """
   
   def __init__(self, n):
+      """
+      Initialize the nparams
+
+      Args:
+          self: (todo): write your description
+          n: (int): write your description
+      """
     self.n = n
     params = ["off", "lin"]
     for i in range(n):

@@ -4,9 +4,21 @@ import unittest
 class SanityOfBaraffe98Tracks(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example(self):
@@ -45,9 +57,21 @@ class SanityOfBaraffe98Tracks(unittest.TestCase):
 class SanityOfNasaExoplanetArchive(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example(self):
@@ -78,9 +102,21 @@ class SanityOfNasaExoplanetArchive(unittest.TestCase):
 class SanityOfNasaExoplanetEU(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example(self):
@@ -147,9 +183,21 @@ class SanityOfNasaExoplanetEU(unittest.TestCase):
 class SanityOfNasaExoplanetsOrg(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example(self):
@@ -178,9 +226,21 @@ class SanityOfNasaExoplanetsOrg(unittest.TestCase):
 class SanityOfFIP(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example(self):
@@ -220,9 +280,21 @@ class SanityOfFIP(unittest.TestCase):
 class SanityOfKurucz(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass   
    
   def sanity_exmaple(self):

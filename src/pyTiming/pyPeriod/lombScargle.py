@@ -34,6 +34,12 @@ class LombScargle(periodBase.PeriodBase):
   """
 
   def __calcPeriodogram(self):
+      """
+      Calculate the mean of the model.
+
+      Args:
+          self: (todo): write your description
+      """
 
     ofac=int(self.ofac); hifac=float(self.hifac)
 
@@ -80,6 +86,14 @@ class LombScargle(periodBase.PeriodBase):
     self.N = len(self.y)
 
   def __buildFreq(self,ofac,hifac):
+      """
+      Builds the waveform
+
+      Args:
+          self: (todo): write your description
+          ofac: (int): write your description
+          hifac: (todo): write your description
+      """
     nout = int(ofac*hifac*len(self.t)/2.)
     xdif = max(self.t)-min(self.t)
     pnow = 1./(xdif*ofac)
@@ -88,6 +102,15 @@ class LombScargle(periodBase.PeriodBase):
     return 0
 
   def __init__(self, lc, ofac, hifac):
+      """
+      Initialize the simulation.
+
+      Args:
+          self: (todo): write your description
+          lc: (int): write your description
+          ofac: (float): write your description
+          hifac: (float): write your description
+      """
 
     self.freq=None
     self.power=None

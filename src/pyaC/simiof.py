@@ -37,6 +37,13 @@ class SimIOF:
     self.file.write(*args, **kwargs)
   
   def __init__(self, origin, *args, **kwargs):
+      """
+      Initialize a origin.
+
+      Args:
+          self: (todo): write your description
+          origin: (todo): write your description
+      """
     self.origin = origin
     self.file = open(*args, **kwargs)
     if self.file.mode in ['w', 'wt']:
@@ -47,6 +54,12 @@ class SimIOF:
       self._readProps()
 
   def __del__(self):
+      """
+      Closes the file.
+
+      Args:
+          self: (todo): write your description
+      """
     self.file.close()
 
   def _readProps(self):
@@ -138,8 +151,21 @@ class SimIOF:
     self.write("\n")
     
   def __getattr__(self, attr):
+      """
+      Returns the attribute of an object.
+
+      Args:
+          self: (todo): write your description
+          attr: (str): write your description
+      """
     return getattr(self.file, attr)
   
   def __iter__(self):
+      """
+      Iterate over all the file.
+
+      Args:
+          self: (todo): write your description
+      """
     return iter(self.file)
   

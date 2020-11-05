@@ -213,6 +213,14 @@ class PyAFS:
             return
 
         def download(url, context, nocontext=False):
+            """
+            Download a file from a url.
+
+            Args:
+                url: (str): write your description
+                context: (list): write your description
+                nocontext: (str): write your description
+            """
             if not nocontext:
                 # Use context
                 response = urllib.request.urlopen(url, context=context)
@@ -359,6 +367,12 @@ class PyAFS:
         return fns
 
     def __init__(self):
+        """
+        Initialize the configuration
+
+        Args:
+            self: (todo): write your description
+        """
         self.conf = PyAConfig()
         # The next call will throw exception, if there is
         # no valid date directory.

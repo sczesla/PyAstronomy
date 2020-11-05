@@ -29,13 +29,33 @@ class ModelNameIdentBase:
   """
   
   def __init__(self, rootName=""):
+      """
+      Create a new component
+
+      Args:
+          self: (todo): write your description
+          rootName: (str): write your description
+      """
     self._root = rootName
     self.componentCounter = 0
   
   def setComponentCounter(self, c):
+      """
+      Sets the stimulus.
+
+      Args:
+          self: (todo): write your description
+          c: (int): write your description
+      """
     self.componentCounter = c
   
   def getComponentCounter(self):
+      """
+      Return the component of this isComponent of this component
+
+      Args:
+          self: (todo): write your description
+      """
     return self.componentCounter
     
   def setRootName(self, root):

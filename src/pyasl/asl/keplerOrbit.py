@@ -753,16 +753,44 @@ class KeplerEllipse(object):
             return (t2, t1)
 
     def _setPer(self, per):
+        """
+        Set the per unit.
+
+        Args:
+            self: (todo): write your description
+            per: (todo): write your description
+        """
         self._per = per
         self._n = 2.0 * pi / self._per
 
     def _seti(self, i):
+        """
+        Set the i - th value.
+
+        Args:
+            self: (todo): write your description
+            i: (str): write your description
+        """
         self._i = i / 180. * pi
 
     def _setw(self, w):
+        """
+        Sets the w.
+
+        Args:
+            self: (todo): write your description
+            w: (str): write your description
+        """
         self._w = w / 180. * pi
 
     def _setOmega(self, omega):
+        """
+        Set the hyperbolic score.
+
+        Args:
+            self: (todo): write your description
+            omega: (str): write your description
+        """
         self._Omega = omega / 180. * pi
 
     per = property(lambda self: self._per, _setPer, doc="The orbital period.")
@@ -771,6 +799,21 @@ class KeplerEllipse(object):
     Omega = property(lambda self: self._Omega / pi * 180, _setOmega)
 
     def __init__(self, a, per, e=0, tau=0, Omega=0, w=0, i=0, ks=MarkleyKESolver):
+        """
+        Initialize eigenvalue
+
+        Args:
+            self: (todo): write your description
+            a: (int): write your description
+            per: (int): write your description
+            e: (int): write your description
+            tau: (todo): write your description
+            Omega: (float): write your description
+            w: (int): write your description
+            i: (int): write your description
+            ks: (int): write your description
+            MarkleyKESolver: (todo): write your description
+        """
         # i, w, Omega are properties so that the numbers can be given in
         # deg always. The underscored attributes are in rad.
         self.i = i

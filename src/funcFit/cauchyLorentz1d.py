@@ -16,6 +16,12 @@ class CauchyLorentz1d(OneDFit):
   """
 
   def __init__(self):
+      """
+      Initializes the internal state.
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self, ["A", "g", "mu", "off", "lin"])
     self.setRootName("CauLor")
 

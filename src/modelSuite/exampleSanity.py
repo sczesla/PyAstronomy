@@ -6,9 +6,21 @@ import os
 class ModSuiteSanity(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down file
+
+        Args:
+            self: (todo): write your description
+        """
         # Clean up example output from KeplerEllipseModel example
         if os.path.isfile("kemExample.tmp"):
             os.remove("kemExample.tmp")
@@ -157,6 +169,12 @@ class ModSuiteSanity(unittest.TestCase):
                                    str(r2.parameters()))
 
     def sanity_SinRadVel(self):
+        """
+        Sanitizes the fit of the fit.
+
+        Args:
+            self: (todo): write your description
+        """
         # Import some unrelated modules
         from numpy import arange, random, ones
         import matplotlib.pylab as plt
@@ -198,6 +216,12 @@ class ModSuiteSanity(unittest.TestCase):
 #     plt.show()
 
     def sanity_KeplerEllipseModel(self):
+        """
+        Sanity model.
+
+        Args:
+            self: (todo): write your description
+        """
         from PyAstronomy.modelSuite import KeplerEllipseModel
         import numpy as np
         import matplotlib.pylab as plt
@@ -620,9 +644,21 @@ class ModSuiteSanity(unittest.TestCase):
 class VoigtAstroPSanity(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
     
     def sanity_normalization(self):

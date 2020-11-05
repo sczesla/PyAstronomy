@@ -27,6 +27,15 @@ class PyAUpdateCycle:
     """
 
     def __init__(self, fn, section, updateCycle=7):
+        """
+        Initialize a new section.
+
+        Args:
+            self: (todo): write your description
+            fn: (int): write your description
+            section: (todo): write your description
+            updateCycle: (todo): write your description
+        """
         self._config = CP.RawConfigParser()
         self._fs = PyAFS()
         self._fn = fn

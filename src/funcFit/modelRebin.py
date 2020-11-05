@@ -54,6 +54,12 @@ def turnIntoRebin(CO):
         """
 
         def __init__(self, *args, **kwargs):
+            """
+            Initialize binning.
+
+            Args:
+                self: (todo): write your description
+            """
             CO.__init__(self, *args, **kwargs)
             self.rebinTimes = None
             self.rebinIdent = None
@@ -132,6 +138,12 @@ def turnIntoRebin(CO):
 
 class _DummyModel:
     def evaluate(self):
+        """
+        Evaluate the function.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
 

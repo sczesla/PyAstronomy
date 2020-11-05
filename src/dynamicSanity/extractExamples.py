@@ -13,6 +13,12 @@ class CandidateBlock:
     minLength = 10
 
     def __init__(self):
+        """
+        Initialize the text
+
+        Args:
+            self: (todo): write your description
+        """
         self.lines = []
         # The starting line (in the file) of the example
         self.startLine = None
@@ -48,6 +54,12 @@ class CandidateBlock:
             self.isExample = True
 
     def commentShow(self):
+        """
+        Return the next comment.
+
+        Args:
+            self: (todo): write your description
+        """
         for i in range(len(self.lines)):
             r = re.match("(\s*)([^#]*\.show().*)", self.lines[i])
             if r is not None:
@@ -55,6 +67,14 @@ class CandidateBlock:
                 return
 
     def format(self, indentLevel=4, commentShow=True):
+        """
+        Return the formatted string representation of the current line.
+
+        Args:
+            self: (todo): write your description
+            indentLevel: (int): write your description
+            commentShow: (bool): write your description
+        """
         if commentShow:
             self.commentShow()
         result = []
@@ -78,6 +98,13 @@ class CandidateBlock:
         return result
 
     def executeBlock(self, fn="tmp.py"):
+        """
+        Execute a function.
+
+        Args:
+            self: (todo): write your description
+            fn: (todo): write your description
+        """
         self.commentShow()
         f = open(fn, 'w')
         for l in self.lines:
@@ -139,10 +166,22 @@ class FileBlocks:
             self.blocks.append(block)
 
     def _characterizeBlocks(self):
+        """
+        Characterize the character
+
+        Args:
+            self: (todo): write your description
+        """
         for i in range(len(self.blocks)):
             self.blocks[i].characterize()
 
     def noOfExamples(self):
+        """
+        Return the number of blocks in the block.
+
+        Args:
+            self: (todo): write your description
+        """
         i = 0
         for b in self.blocks:
             if b.isExample:
@@ -160,11 +199,23 @@ class FileBlocks:
         print()
 
     def executeExamples(self):
+        """
+        Execute all blocks.
+
+        Args:
+            self: (todo): write your description
+        """
         for i in range(len(self.blocks)):
             if self.blocks[i].isExample:
                 self.blocks[i].executeBlock()
 
     def __checkCreateTestDir(self):
+        """
+        Check if the directory exists.
+
+        Args:
+            self: (todo): write your description
+        """
         if os.path.isdir(self.snDir):
             return
         os.mkdir(self.snDir)
@@ -237,6 +288,14 @@ class FileBlocks:
         f.close()
 
     def __init__(self, fn, snDir="sanityies"):
+        """
+        Initialize the file.
+
+        Args:
+            self: (todo): write your description
+            fn: (int): write your description
+            snDir: (str): write your description
+        """
 
         if not os.path.isfile(fn):
             print("No such file: ", fn)
@@ -255,10 +314,24 @@ class FileBlocks:
 class Walker:
 
     def __init__(self, rootPath="../", fnRegex=".*\.rst"):
+        """
+        Initialize the root path.
+
+        Args:
+            self: (todo): write your description
+            rootPath: (str): write your description
+            fnRegex: (dict): write your description
+        """
         self.rootPath = rootPath
         self.fnRegex = fnRegex
 
     def walk(self):
+        """
+        Walk through all files recursively.
+
+        Args:
+            self: (todo): write your description
+        """
         for root, dirs, files in os.walk(self.rootPath):
             for fn in files:
                 if re.match(self.fnRegex, fn) is not None:

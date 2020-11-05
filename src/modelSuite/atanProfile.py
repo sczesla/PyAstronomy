@@ -36,6 +36,12 @@ class AtanProfile(fuf.OneDFit):
   """
 
   def __init__(self):
+      """
+      Initialize the instance
+
+      Args:
+          self: (todo): write your description
+      """
     fuf.OneDFit.__init__(self, ["scale", "sig", "mu", "A", "off", "lin"])
 
   def evaluate(self, x):
@@ -119,6 +125,12 @@ class AtanProfileDamped(fuf.OneDFit):
   """
 
   def __init__(self):
+      """
+      Initialize the class
+
+      Args:
+          self: (todo): write your description
+      """
     fuf.OneDFit.__init__(self, ["scale", "sig", "mu", "A", "off", "lin", "tau"])
 
   def evaluate(self, x):

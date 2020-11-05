@@ -10,6 +10,12 @@ import six.moves as smo
 
 
 def equal(dependsOn):
+    """
+    Return a list of all the dependencies.
+
+    Args:
+        dependsOn: (str): write your description
+    """
     return dependsOn
 
 
@@ -189,6 +195,13 @@ class Params:
                     self.conditionalRestrictions[name][0][i] = new
 
     def __init__(self, paramNames):
+        """
+        Initialize the parameters
+
+        Args:
+            self: (todo): write your description
+            paramNames: (str): write your description
+        """
         i = 0
         # Define instance properties
         self.__params = {}

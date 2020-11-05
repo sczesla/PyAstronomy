@@ -35,6 +35,16 @@ class FFModelPlotFit:
     """
 
     def __init__(self, x, y, yerr=None, withResiduals=False):
+        """
+        Initialize the fit
+
+        Args:
+            self: (todo): write your description
+            x: (int): write your description
+            y: (int): write your description
+            yerr: (str): write your description
+            withResiduals: (str): write your description
+        """
         self.x = x
         self.y = y
         self.yerr = yerr
@@ -170,6 +180,15 @@ class FFModelPlotFit:
 class SetToDialog(tk.Toplevel):
 
     def __init__(self, parent, oldVal, pname):
+        """
+        Initialize widget
+
+        Args:
+            self: (todo): write your description
+            parent: (todo): write your description
+            oldVal: (todo): write your description
+            pname: (str): write your description
+        """
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
         self.parent = parent
@@ -205,6 +224,12 @@ class SetToDialog(tk.Toplevel):
         self.wait_window(self)
 
     def _okClicked(self, *args):
+        """
+        Returns true if ok ok
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             mf = float(self.inputVal.get())
         except ValueError:
@@ -215,6 +240,12 @@ class SetToDialog(tk.Toplevel):
         self._cancelClicked()
 
     def _cancelClicked(self, *args):
+        """
+        Cancels the focus.
+
+        Args:
+            self: (todo): write your description
+        """
         self.parent.focus_set()
         self.destroy()
 
@@ -222,6 +253,14 @@ class SetToDialog(tk.Toplevel):
 class ShowParameterSummary(tk.Toplevel):
 
     def __init__(self, parent, odf):
+        """
+        Initialize window
+
+        Args:
+            self: (todo): write your description
+            parent: (todo): write your description
+            odf: (todo): write your description
+        """
         tk.Toplevel.__init__(self, parent)
         self.wm_title("Parameter Summary")
         self.parent = parent
@@ -268,6 +307,14 @@ class ValueSetSummary(tk.Toplevel):
     """
 
     def __init__(self, parent, odf):
+        """
+        Initialize widget
+
+        Args:
+            self: (todo): write your description
+            parent: (todo): write your description
+            odf: (todo): write your description
+        """
         tk.Toplevel.__init__(self, parent)
         self.wm_title("Value set code")
         self.parent = parent
@@ -301,6 +348,12 @@ class ValueSetSummary(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self._windowClosed)
 
     def _updateModelName(self, *args):
+        """
+        Updates the name of the model
+
+        Args:
+            self: (todo): write your description
+        """
         self.updateInfo(self.odf)
 
     def updateInfo(self, odf):
@@ -326,6 +379,12 @@ class ValueSetSummary(tk.Toplevel):
         self.showText.config(state=tk.DISABLED)
 
     def _copyToClipboard(self):
+        """
+        Copy text to clipboard
+
+        Args:
+            self: (todo): write your description
+        """
         self.clipboard_clear()
         text = self.showText.get("1.0", tk.END)
         self.clipboard_append(text)
@@ -352,6 +411,14 @@ class FFModelExplorerList:
     """
 
     def __init__(self, odf, plotter):
+        """
+        Initialize widget
+
+        Args:
+            self: (todo): write your description
+            odf: (todo): write your description
+            plotter: (todo): write your description
+        """
         self.f = Figure()
 
         # Save reference to the model
@@ -409,7 +476,18 @@ class FFModelExplorerList:
 
         # Closures around the functions adapting thaw/freeze
         def frozenChanged(k):
+            """
+            Determine if the k has changed
+
+            Args:
+                k: (todo): write your description
+            """
             def change():
+                """
+                Change the parameters
+
+                Args:
+                """
                 if self.singleParameterFree[k].get() == True:
                     self.odf.thaw(k)
                 else:
@@ -419,7 +497,18 @@ class FFModelExplorerList:
 
         # define what happens when a value is set to the entered parameter (closures)
         def hitReturn(k):
+            """
+            Return a new hitset with the selected parameters.
+
+            Args:
+                k: (todo): write your description
+            """
             def change(*args):
+                """
+                Change the current parameter
+
+                Args:
+                """
                 self.selectedPar.set(k)
                 self.odf[k] = float(self.singleParameterVar[k].get())
                 self._parameterValueChanged()
@@ -427,7 +516,18 @@ class FFModelExplorerList:
 
         # defines what happens when a parameter's value is changed, but not set yet, i.e., not current (closures)
         def parameterValueChanged(k):
+            """
+            Determines the parameter value
+
+            Args:
+                k: (todo): write your description
+            """
             def valueChanged(*args):
+                """
+                Callback called when a new parameter is changed
+
+                Args:
+                """
                 pp, ll = str(self.singleParameterVar[k].get()).find(
                     "."), len(str(self.singleParameterVar[k].get()))
                 if round(self.odf[k], ll - pp - 1) != round(self.singleParameterVar[k].get(), ll - pp - 1):
@@ -598,6 +698,11 @@ class FFModelExplorerList:
         self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         def _quit():
+            """
+            Closes the connection.
+
+            Args:
+            """
             # stops main loop
             self.root.quit()
             # this is necessary on Windows to prevent
@@ -618,9 +723,22 @@ class FFModelExplorerList:
             self.root.bind("<MouseWheel>", self._onWheel)  # for OS X
 
     def _parameterActivated(self, *args):
+        """
+        Prints a list of a list of arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         print(args)
 
     def _mouseButtonClicked(self, event):
+        """
+        Displays the mouseed button.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+        """
         # print "mouse Button Clicked: ",event
         if event.button != 2:
             return
@@ -646,6 +764,12 @@ class FFModelExplorerList:
             self._fitRangeChanged()
 
     def _fitRangeChanged(self, *args):
+        """
+        Updates the fit fit to fit the fit
+
+        Args:
+            self: (todo): write your description
+        """
             # print "fitRangeChanged", args
             # print self.fit_lo.get(), self.fit_hi.get()
 
@@ -677,10 +801,22 @@ class FFModelExplorerList:
         self.f.canvas.draw()
 
     def _updateDof(self):
+        """
+        Updates the plotter
+
+        Args:
+            self: (todo): write your description
+        """
         self.dofValue.set(len(self.plotter.fitIdx) -
                           len(self.odf.freeParameters()) - 1)
 
     def _updateChi2(self):
+        """
+        Name :
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             if self.plotter.chi2 > 1e-3 and self.plotter.chi2 < 1e4:
                 self.chi2value.set("%8.3f" % self.plotter.chi2)
@@ -736,12 +872,24 @@ class FFModelExplorerList:
         self._parameterValueChanged(allFree=True)
 
     def _modModeChangedAdd(self, *args):
+        """
+        Called when the selected modusus
+
+        Args:
+            self: (todo): write your description
+        """
         self.modProps[self.selectedPar.get(
         )]["modValAdd"] = self.modEntryTextAdd.get()
         self.modProps[self.selectedPar.get()]["modus"] = "add"
         self.modModus.set("add")
 
     def _modModeChangedMul(self, *args):
+        """
+        Modify selected modus modus
+
+        Args:
+            self: (todo): write your description
+        """
         self.modProps[self.selectedPar.get(
         )]["modValMul"] = self.modEntryTextMul.get()
         self.modProps[self.selectedPar.get()]["modus"] = "mul"
@@ -797,6 +945,13 @@ class FFModelExplorerList:
         self.f.canvas.draw()
 
     def _onWheel(self, event):
+        """
+        Callback for selected events
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+        """
         val = self.odf[self.selectedPar.get()]
         pname = self.selectedPar.get()
         try:

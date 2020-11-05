@@ -25,9 +25,22 @@ import scipy.special as ss
 class SampCorr(object):
 
     def __init__(self):
+        """
+        Initialize the object
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def getak(self, N):
+        """
+        Get the nth binning
+
+        Args:
+            self: (todo): write your description
+            N: (todo): write your description
+        """
         # Calculate the required coefficients (a_k)
         ak = np.zeros(N + 2)
         for k in smo.range(N + 2):
@@ -35,6 +48,13 @@ class SampCorr(object):
         return ak
 
     def get_rhok(self, N):
+        """
+        R calculate the rho operator
+
+        Args:
+            self: (todo): write your description
+            N: (str): write your description
+        """
         ak = self.getak(N)
         rho = np.zeros(len(ak))
         a = np.concatenate((ak, np.zeros(len(ak))))
@@ -46,6 +66,14 @@ class SampCorr(object):
         return rho
 
     def get_r(self, N, ss=None):
+        """
+        Compute nth rk )
+
+        Args:
+            self: (todo): write your description
+            N: (todo): write your description
+            ss: (todo): write your description
+        """
         rk = self.get_rhok(N)
         if ss is None:
             # Sample size not given
@@ -72,6 +100,13 @@ class SampCorr(object):
         return nb, onb
 
     def get_nvr(self, N):
+        """
+        Returns the nvrok
+
+        Args:
+            self: (todo): write your description
+            N: (int): write your description
+        """
         rho = self.get_rhok(N)
         rf = np.sum(rho**2)
         return rf
@@ -83,6 +118,12 @@ class BSBase(object):
     """
 
     def __init__(self):
+        """
+        Initialize the velocities.
+
+        Args:
+            self: (todo): write your description
+        """
         # Factor to convert MAD into std estimate (0.67448975019608171)
         self._madfac = np.sqrt(2.) * ss.erfinv(2. * 0.75 - 1.)
 
@@ -299,6 +340,12 @@ class BSArbSamp(BSBase):
     """
 
     def __init__(self):
+        """
+        Initialize sys.
+
+        Args:
+            self: (todo): write your description
+        """
         super(BSArbSamp, self).__init__()
         self.betaSample = None
         self.betaSig, self.stdBetaSig = None, None
@@ -550,6 +597,12 @@ class BSArbSamp(BSBase):
 class BSEqSamp(BSBase):
 
     def __init__(self):
+        """
+        Initializes beta beta.
+
+        Args:
+            self: (todo): write your description
+        """
         super(BSEqSamp, self).__init__()
         self.betaSample = None
         self.betaSig, self.stdBetaSig = None, None

@@ -50,6 +50,14 @@ def updateFitsHeader(model, hdr, clobber=False, conf=0.9):
     return hdr 
 
 def restoreFromFits(filename,ext=1, verbose=1):
+    """
+    Restores a fits file.
+
+    Args:
+        filename: (str): write your description
+        ext: (str): write your description
+        verbose: (bool): write your description
+    """
     if not ic.check["pyfits"]:
       raise(PE.PyARequiredImport("pyfits required to use fits file.", where="Params::updateFitsHeader"))
       return

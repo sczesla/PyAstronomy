@@ -8,6 +8,13 @@ import six.moves as smo
 class _FDs:
   
   def __init__(self, fn):
+      """
+      Init dds file.
+
+      Args:
+          self: (todo): write your description
+          fn: (int): write your description
+      """
     self.fds = {}
     with open(fn) as f:
       for line in f:

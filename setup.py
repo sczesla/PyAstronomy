@@ -47,6 +47,30 @@ class Extension(old_Extension):
                  module_dirs=None,
                  optional=False
                  ):
+        """
+        Initialize a module.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            sources: (list): write your description
+            include_dirs: (str): write your description
+            define_macros: (str): write your description
+            undef_macros: (str): write your description
+            library_dirs: (str): write your description
+            libraries: (list): write your description
+            runtime_library_dirs: (str): write your description
+            extra_objects: (str): write your description
+            extra_compile_args: (str): write your description
+            extra_link_args: (str): write your description
+            export_symbols: (str): write your description
+            swig_opts: (int): write your description
+            depends: (int): write your description
+            language: (str): write your description
+            f2py_options: (dict): write your description
+            module_dirs: (str): write your description
+            optional: (todo): write your description
+        """
         old_Extension.__init__(self, name, [],
                                include_dirs,
                                define_macros,
@@ -75,12 +99,24 @@ class Extension(old_Extension):
         return
 
     def has_cxx_sources(self):
+        """
+        Return true if the list of the sources are available
+
+        Args:
+            self: (todo): write your description
+        """
         for source in self.sources:
             if cxx_ext_re(str(source)):
                 return True
         return False
 
     def has_f2py_sources(self):
+        """
+        Returns true if any of the source files in the python 2.
+
+        Args:
+            self: (todo): write your description
+        """
         for source in self.sources:
             if fortran_pyf_ext_re(source):
                 return True
@@ -159,12 +195,30 @@ class WithExtCommand(Command):
     user_options = []
 
     def initialize_options(self):
+        """
+        Initializes the options.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def finalize_options(self):
+        """
+        Finalize options. options. options.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def run(self):
+        """
+        Run the command
+
+        Args:
+            self: (todo): write your description
+        """
         print("Version: ", PyA_Version())
 
 

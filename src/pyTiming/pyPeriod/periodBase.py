@@ -29,9 +29,22 @@ class PeriodBase:
   """
 
   def __calcPeriodogram(self):
+      """
+      Calculate the value.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
 
   def prob(self,Pn):
+      """
+      Evaluates the probability.
+
+      Args:
+          self: (todo): write your description
+          Pn: (int): write your description
+      """
     raise(PE.PyANotImplemented("`prob` is not yet implemented."))
 
   def plot(self, *args,**kwargs):
@@ -109,6 +122,13 @@ class PeriodBase:
     return prob
   
   def probInv(self, Prob):
+      """
+      Raise a prob|
+
+      Args:
+          self: (todo): write your description
+          Prob: (todo): write your description
+      """
     raise(PE.PyANotImplemented("`probInv` is not yet implemented."))
   
   def powerLevel(self, FAPlevel):
@@ -166,6 +186,15 @@ class TimeSeries:
   """
 
   def __init__(self, time, flux, error=None):
+      """
+      Initialize the flux.
+
+      Args:
+          self: (todo): write your description
+          time: (int): write your description
+          flux: (todo): write your description
+          error: (str): write your description
+      """
     self.time = numpy.array(time)
     self.flux = numpy.array(flux)
     self.error = error

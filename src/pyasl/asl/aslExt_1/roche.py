@@ -20,6 +20,12 @@ def _checkq(q):
                              solution="Check masses. Perhaps exchange m1 and m2 so that m1 >= m2."))
 
 def _checkm(m):
+    """
+    Check if the stack exists in the stack
+
+    Args:
+        m: (todo): write your description
+    """
     if not m in [1,2]:
         raise(PE.PyAValError("Invalid m(ass). Current value is '" + str(m) + "'", \
                              where=inspect.stack()[1][3], \

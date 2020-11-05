@@ -38,10 +38,24 @@ class _Case:
     """
 
     def __init__(self, s, c):
+        """
+        Initialize the next step.
+
+        Args:
+            self: (todo): write your description
+            s: (int): write your description
+            c: (int): write your description
+        """
         self.step = s
         self.case = c
 
     def _str_(self):
+        """
+        Returns a string representation of the step.
+
+        Args:
+            self: (todo): write your description
+        """
         return "Step: " + str(self.step) + "  case: " + str(self.case)
 
 
@@ -78,6 +92,12 @@ class PalLC(_ZList, fuf.OneDFit):
     """
 
     def __init__(self):
+        """
+        Initialize all the imported
+
+        Args:
+            self: (todo): write your description
+        """
         _ZList.__init__(self, "circular")
         fuf.OneDFit.__init__(
             self, ["p", "a", "i", "linLimb", "quadLimb", "T0", "per", "b"])
@@ -142,46 +162,137 @@ class PalLC(_ZList, fuf.OneDFit):
         return result
 
     def _ci(self, z, a):
+        """
+        Calculate of the z - axis
+
+        Args:
+            self: (todo): write your description
+            z: (array): write your description
+            a: (array): write your description
+        """
         return 2 / (9.0 * numpy.pi * numpy.sqrt(1.0 - a))
 
     def _cik(self, z, a, b):
+        """
+        Name :
+
+        Args:
+            self: (todo): write your description
+            z: (array): write your description
+            a: (array): write your description
+            b: (array): write your description
+        """
         return 1.0 - 5.0 * z**2.0 + self["p"]**2.0 + a * b
 
     def _cie(self, z, a):
+        """
+        Return the cie for the cie
+
+        Args:
+            self: (todo): write your description
+            z: (array): write your description
+            a: (array): write your description
+        """
         return (z**2.0 + 7 * self["p"]**2.0 - 4.0) * (1.0 - a)
 
     def _cipi(self, z):
+        """
+        Convert cipi. cipi )
+
+        Args:
+            self: (todo): write your description
+            z: (todo): write your description
+        """
         return -3.0 * (self["p"] + z) / (self["p"] - z)
 
     def _cg(self, z):
+        """
+        Name : _cggggg )
+
+        Args:
+            self: (todo): write your description
+            z: (array): write your description
+        """
         return 1.0 / (9.0 * numpy.pi * numpy.sqrt(self["p"] * z))
 
     def _cgk(self, z):
+        """
+        Name : _cgkkkkk purpose : evaluate the z - vertical height input : r - cgk - cg
+
+        Args:
+            self: (todo): write your description
+            z: (todo): write your description
+        """
         return 3.0 - 6.0 * (1.0 - self["p"] * self["p"])**2.0 - 2.0 * self["p"] * z * (z * z + 7 * self["p"] * self["p"] - 4.0 + 5.0 * self["p"] * z)
 
     def _cge(self, z):
+        """
+        Name : _cge purpose : evaluate the cylindrical z ) input : cge )
+
+        Args:
+            self: (todo): write your description
+            z: (todo): write your description
+        """
         return 4.0 * self["p"] * z * (z * z + 7.0 * self["p"] * self["p"] - 4.0)
 
     def _cgpi(self, z):
+        """
+        Return the z - z - z - z - z - z - z - z - z - z - z - z - z - z -
+
+        Args:
+            self: (todo): write your description
+            z: (todo): write your description
+        """
         return -3.0 * (self["p"] + z) / (self["p"] - z)
 
     def _ti(self, z):
+        """
+        Name : _ti_ti purpose : evaluate the azimuth height.
+
+        Args:
+            self: (todo): write your description
+            z: (int): write your description
+        """
         phat = numpy.sqrt(self["p"] * (1.0 - self["p"]))
         return 2.0 / (3.0 * numpy.pi) * numpy.arccos(1.0 - 2.0 * self["p"]) - 4.0 / (9.0 * numpy.pi) * (3.0 + 2.0 * self["p"] - 8.0 * self["p"]**2.0) * phat
 
     def _g0(self, z):
+        """
+        Name : _g0 purpose : evaluate the azimuthal force for this potential input : z - cylindrical radius z -
+
+        Args:
+            self: (todo): write your description
+            z: (int): write your description
+        """
         k0 = numpy.arccos(
             (self["p"]**2.0 + z**2.0 - 1.0) / (2.0 * self["p"] * z))
         k1 = numpy.arccos((z**2.0 + 1.0 - self["p"]**2.0) / (2.0 * z))
         return (self["p"] * self["p"] * k0 + k1 - numpy.sqrt(z * z - 0.25 * (1 + z * z - self["p"] * self["p"])**2.0)) / numpy.pi
 
     def _g2(self, z, a, b):
+        """
+        Name : _g2 purpose : evaluate the vertical height input : z - cylindrical galactocentric cylindrical radius z
+
+        Args:
+            self: (todo): write your description
+            z: (int): write your description
+            a: (int): write your description
+            b: (int): write your description
+        """
         k0 = numpy.arccos(
             (self["p"]**2.0 + z**2.0 - 1.0) / (2.0 * self["p"] * z))
         k1 = numpy.arccos((z**2.0 + 1.0 - self["p"]**2.0) / (2.0 * z))
         return (k1 + self["p"] * self["p"] * (self["p"] * self["p"] + 2.0 * z * z) * k0 - 0.25 * (1.0 + 5.0 * self["p"] * self["p"] + z * z) * numpy.sqrt((1.0 - a) * (b - 1.0))) / (2.0 * numpy.pi)
 
     def _returnCoeff(self, step, z):
+        """
+        Returns :
+
+        Args:
+            self: (todo): write your description
+            step: (int): write your description
+            z: (todo): write your description
+        """
         a = (self["p"] - z) * (self["p"] - z)
         b = (self["p"] + z) * (self["p"] + z)
         if (step == 1):
@@ -408,6 +519,14 @@ class PalLCKep(PalLC):
     """
 
     def __init__(self, ke=None, collisionCheck=False):
+        """
+        Initialize a list
+
+        Args:
+            self: (todo): write your description
+            ke: (str): write your description
+            collisionCheck: (todo): write your description
+        """
         _ZList.__init__(self, "keplerian", collisionCheck)
         fuf.OneDFit.__init__(self, ["p", "a", "i", "linLimb", "quadLimb", "tau", "per", "b",
                                     "w", "Omega", "e"])
@@ -443,12 +562,25 @@ class PalLCKep(PalLC):
                                        solution="Use 'tau' instead of 'T0pa'.")
 
         def getitem(specifier, **kwargs):
+            """
+            Return a : class : param specifier : : param kwargs : : return :
+
+            Args:
+                specifier: (todo): write your description
+            """
             if specifier == "T0pa":
                 PE.warn(T0paE)
             return PalLC.__getitem__(self, specifier, **kwargs)
         self.__getitem__ = getitem
 
         def setitem(specifier, value):
+            """
+            Sets the value of an item.
+
+            Args:
+                specifier: (str): write your description
+                value: (str): write your description
+            """
             if specifier == "T0pa":
                 PE.warn(T0paE)
             PalLC.__setitem__(self, specifier, value)

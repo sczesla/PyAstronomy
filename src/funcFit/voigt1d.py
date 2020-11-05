@@ -53,6 +53,12 @@ class Voigt1d(OneDFit):
     """
 
     def __init__(self):
+        """
+        Initializes the internal state of this class.
+
+        Args:
+            self: (todo): write your description
+        """
         OneDFit.__init__(self, ["A", "al", "ad", "mu", "lin", "off"])
         self.setRestriction({"al": [0.0, None], "ad": [0.0, None]})
         self.setRootName("Voigt")
@@ -119,6 +125,13 @@ class MultiVoigt1d(OneDFit):
     """
 
     def __init__(self, n):
+        """
+        Initialize the n times
+
+        Args:
+            self: (todo): write your description
+            n: (int): write your description
+        """
         # Number of components
         self.n = n
         # Building parameter list

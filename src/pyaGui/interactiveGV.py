@@ -19,6 +19,13 @@ import six
 class Point():
   
   def __init__(self, event=None):
+      """
+      Initialize the plot
+
+      Args:
+          self: (todo): write your description
+          event: (todo): write your description
+      """
     self.xdata = 0.0
     self.ydata = 0.0
     self.mplLine = None
@@ -106,6 +113,17 @@ class IAGVFit:
   """
   
   def __init__(self, x, y, yerr=None, mode="gauss", config=None):
+      """
+      Initialize the model
+
+      Args:
+          self: (todo): write your description
+          x: (int): write your description
+          y: (int): write your description
+          yerr: (str): write your description
+          mode: (todo): write your description
+          config: (todo): write your description
+      """
     self.windowTitle = "PyA interactive GV"
     self.f = Figure()
     self.a = self.f.add_subplot(111)
@@ -280,6 +298,11 @@ class IAGVFit:
     self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def _quit():
+        """
+        Closes the connection.
+
+        Args:
+        """
       # stops main loop
       self.root.quit()
       # this is necessary on Windows to prevent

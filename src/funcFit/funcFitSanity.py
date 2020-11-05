@@ -7,12 +7,30 @@ import six
 class FuncFitSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def parameterAssignment1_sanity(self):
+      """
+      R compute the upper and : math : math : lf.
+
+      Args:
+          self: (todo): write your description
+      """
     gf = fuf.GaussFit1d()
     origVars = ["A", "mu", "sig", "off", "lin"]
     vals     = [1.0, 2.0,  3.0,   4.0,    5.0]
@@ -24,6 +42,12 @@ class FuncFitSanity(unittest.TestCase):
     self.assertEquals(numpy.sum(list(gf.parameters().values())), 0.0)
   
   def combine1_sanity(self):
+      """
+      Combines a random gff gff.
+
+      Args:
+          self: (todo): write your description
+      """
     gf = fuf.GaussFit1d()
     gff = gf + gf + gf
     for p in six.iterkeys(gff.parameters()):
@@ -50,9 +74,21 @@ class FuncFitSanity(unittest.TestCase):
 class MultiVoigtSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def oneVsMulti_sanity(self):

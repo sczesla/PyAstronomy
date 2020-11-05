@@ -36,6 +36,13 @@ class SecPalLC(fuf.OneDFit):
   """
   
   def __init__(self, subtractOne=True):
+      """
+      Initialize the palette
+
+      Args:
+          self: (todo): write your description
+          subtractOne: (todo): write your description
+      """
     fuf.OneDFit.__init__(self, ["p", "a", "i", "T0", "per", "brat"  ,"b"])
     self.freeze(["p", "a", "i", "T0", "per", "b", "brat"])
     self.pal = pal.PalLC()

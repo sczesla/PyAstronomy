@@ -4,12 +4,30 @@ import unittest
 class PyPeriodExSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_FourierSpec(self):
+      """
+      Perform a function that fourier transform.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy
     import matplotlib.pylab as plt
     # Import pyTiming
@@ -31,6 +49,12 @@ class PyPeriodExSanity(unittest.TestCase):
 #     plt.show()
   
   def sanity_ErrorWeightLS(self):
+      """
+      Perform the spectrum.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy
     import matplotlib.pylab as plt
     from PyAstronomy.pyTiming import pyPeriod
@@ -100,9 +124,21 @@ class PyPeriodExSanity(unittest.TestCase):
 class PyPeriodGLSSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example1(self):

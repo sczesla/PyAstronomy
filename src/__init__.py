@@ -10,6 +10,12 @@ class PyAIS:
     """
 
     def findpackages(self):
+        """
+        Recursively.
+
+        Args:
+            self: (todo): write your description
+        """
         for root, dirs, fns in os.walk(__path__[0]):
             for dir in dirs:
                 if os.path.isfile(os.path.join(__path__[0], dir, "__init__.py")):
@@ -17,6 +23,12 @@ class PyAIS:
             break
 
     def showStatus(self):
+        """
+        Print status information about the status
+
+        Args:
+            self: (todo): write your description
+        """
         print()
         print("        Results of PyAIS import check:")
         print("-----------------------------------------------------")
@@ -43,6 +55,11 @@ class PyAIS:
 
 
 def importCheck():
+    """
+    Imports a module
+
+    Args:
+    """
     p = PyAIS()
     p.showStatus()
 

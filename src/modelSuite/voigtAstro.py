@@ -39,6 +39,12 @@ class VoigtAstroP(fuf.OneDFit):
     """
 
     def __init__(self):
+        """
+        Initialize the profile.
+
+        Args:
+            self: (todo): write your description
+        """
         fuf.OneDFit.__init__(
             self, ["w0", "b", "gamma", "f", "lin", "off", "R"], rootName="VoigtAstroP")
         self._profile = fuf.Voigt1d()

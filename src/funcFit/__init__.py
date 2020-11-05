@@ -47,12 +47,23 @@ else:
 
 
 def __question(tf):
+    """
+    Returns the question question.
+
+    Args:
+        tf: (todo): write your description
+    """
     if tf:
         return "yes"
     return "no"
 
 
 def status():
+    """
+    Display the status of the pymcc
+
+    Args:
+    """
     print("Status of funcFit:")
     print("--------------------------")
     print("Is scipy.optimize available? ", __question(_scoImport))

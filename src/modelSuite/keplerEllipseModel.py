@@ -46,6 +46,14 @@ class KeplerEllipseModel(fuf.OneDFit):
     """
 
     def __init__(self, relevantAxes="xyz", mode="pos"):
+        """
+        Initialize the axes.
+
+        Args:
+            self: (todo): write your description
+            relevantAxes: (todo): write your description
+            mode: (todo): write your description
+        """
         self.ke = KeplerEllipse(1.0, 1.0)
         fuf.OneDFit.__init__(self, ["a", "per", "e", "tau", "Omega", "w", "i"])
         self["a"] = 1.0
@@ -147,6 +155,17 @@ class KeplerRVModel(fuf.OneDFit):
     """
 
     def __init__(self, mp=1, deg=0, msun=1.988547e30, mJ=1898.6e24, au=1.49597870700e11):
+        """
+        This function initial parameters for a vector
+
+        Args:
+            self: (todo): write your description
+            mp: (float): write your description
+            deg: (todo): write your description
+            msun: (todo): write your description
+            mJ: (int): write your description
+            au: (int): write your description
+        """
         self._msun = msun
         self._mJ = mJ
         self._au = au
@@ -186,6 +205,13 @@ class KeplerRVModel(fuf.OneDFit):
         return d/180.*np.pi
     
     def evaluate(self, t):
+        """
+        Evaluate the solution at time t.
+
+        Args:
+            self: (todo): write your description
+            t: (todo): write your description
+        """
         if self["mstar"] == 0.0:
             raise(PE.PyAValError("Stellar mass has to be specified before evaluation.", \
                                  where="KeplerRVModel"))

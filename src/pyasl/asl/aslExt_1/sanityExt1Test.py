@@ -6,9 +6,21 @@ from PyAstronomy import pyasl
 class SanityOfPyaslExt1(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_pizzolatoExample(self):

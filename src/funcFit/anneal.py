@@ -21,6 +21,12 @@ _double_max = numpy.finfo(float).max
 
 class base_schedule(object):
     def __init__(self):
+        """
+        Initialize the network
+
+        Args:
+            self: (todo): write your description
+        """
         self.dwell = 20
         self.learn_rate = 0.5
         self.lower = -10
@@ -33,6 +39,13 @@ class base_schedule(object):
         self.T = None
 
     def init(self, **options):
+        """
+        Initialize the data.
+
+        Args:
+            self: (todo): write your description
+            options: (dict): write your description
+        """
         self.__dict__.update(options)
         self.lower = asarray(self.lower)
         self.lower = where(self.lower == numpy.NINF, -_double_max, self.lower)
@@ -78,6 +91,13 @@ class base_schedule(object):
         return best_state.x
 
     def accept_test(self, dE):
+        """
+        Return a random test.
+
+        Args:
+            self: (todo): write your description
+            dE: (todo): write your description
+        """
         T = self.T
         self.tests += 1
         if dE < 0:
@@ -90,9 +110,23 @@ class base_schedule(object):
         return 0
 
     def update_guess(self, x0):
+        """
+        Update the guess of x0.
+
+        Args:
+            self: (todo): write your description
+            x0: (array): write your description
+        """
         pass
 
     def update_temp(self, x0):
+        """
+        Update the temp temp temp file.
+
+        Args:
+            self: (todo): write your description
+            x0: (array): write your description
+        """
         pass
 
 
@@ -100,6 +134,13 @@ class base_schedule(object):
 class fast_sa(base_schedule):
   
     def init(self, **options):
+        """
+        Initialize the device.
+
+        Args:
+            self: (todo): write your description
+            options: (dict): write your description
+        """
         self.__dict__.update(options)
         if self.m is None:
             self.m = 1.0
@@ -108,6 +149,13 @@ class fast_sa(base_schedule):
         self.c = self.m * exp(-self.n * self.quench)
 
     def update_guess(self, x0):
+        """
+        Update x0 of x0.
+
+        Args:
+            self: (todo): write your description
+            x0: (array): write your description
+        """
         x0 = np.asarray(x0)
         u = np.squeeze(np.random.uniform(0.0, 1.0, size=self.dims))
         T = self.T
@@ -117,12 +165,25 @@ class fast_sa(base_schedule):
         return xnew
 
     def update_temp(self):
+        """
+        Update the kernel matrix.
+
+        Args:
+            self: (todo): write your description
+        """
         self.T = self.T0*exp(-self.c * self.k**(self.quench))
         self.k += 1
         return
 
 class cauchy_sa(base_schedule):
     def update_guess(self, x0):
+        """
+        Update x0.
+
+        Args:
+            self: (todo): write your description
+            x0: (array): write your description
+        """
         x0 = asarray(x0)
         numbers = squeeze(random.uniform(-pi/2, pi/2, size=self.dims))
         xc = self.learn_rate * self.T * tan(numbers)
@@ -130,6 +191,12 @@ class cauchy_sa(base_schedule):
         return xnew
 
     def update_temp(self):
+        """
+        Calculate temperature
+
+        Args:
+            self: (todo): write your description
+        """
         self.T = self.T0/(1+self.k)
         self.k += 1
         return
@@ -158,6 +225,17 @@ class boltzmann_sa(base_schedule):
 class PyASASBase:
   
   def __init__(self, fo, T0, Tf, dwell, pdscale=None):
+      """
+      Initialize t0 from t0.
+
+      Args:
+          self: (todo): write your description
+          fo: (todo): write your description
+          T0: (int): write your description
+          Tf: (int): write your description
+          dwell: (todo): write your description
+          pdscale: (str): write your description
+      """
     self._fo = fo
     # Assign starting temperature, "running" temperature,
     # and final temperature
@@ -182,6 +260,12 @@ class PyASASBase:
     self.rejected = 0
   
   def updateGuess(self):
+      """
+      Determine operator.
+
+      Args:
+          self: (todo): write your description
+      """
     raise(PE.PyANotImplemented("The 'updateGuess' is not implemented.", \
           solution="Use another scheduler class (e.g., 'BoltzmannSAS') or implement the method."))
 
@@ -203,10 +287,23 @@ class PyASASBase:
     return False
 
   def updateTemperature(self):
+      """
+      Updates the internal method.
+
+      Args:
+          self: (todo): write your description
+      """
     raise(PE.PyANotImplemented("The 'updateTemperature' is not implemented.", \
           solution="Use another scheduler class (e.g., 'BoltzmannSAS') or implement the method."))
 
   def acceptanceTest(self, dE):
+      """
+      Accepts an operator of the : math : class :.
+
+      Args:
+          self: (todo): write your description
+          dE: (todo): write your description
+      """
     raise(PE.PyANotImplemented("The 'acceptanceTest' is not implemented.", \
           solution="Use another scheduler class (e.g., 'BoltzmannSAS') or implement the method."))
 
@@ -226,6 +323,17 @@ class BoltzmannSAS(PyASASBase):
   """
   
   def __init__(self, fo, T0, pdscale=None, dwell=20, Tf=None):
+      """
+      Initialize tf
+
+      Args:
+          self: (todo): write your description
+          fo: (todo): write your description
+          T0: (int): write your description
+          pdscale: (str): write your description
+          dwell: (todo): write your description
+          Tf: (int): write your description
+      """
     PyASASBase.__init__(self, fo, T0, Tf, dwell, pdscale)
      
   def updateGuess(self):
@@ -290,6 +398,17 @@ class CauchySAS(PyASASBase):
   """
   
   def __init__(self, fo, T0, pdscale=None, dwell=20, Tf=None):
+      """
+      Initialize tf
+
+      Args:
+          self: (todo): write your description
+          fo: (todo): write your description
+          T0: (int): write your description
+          pdscale: (str): write your description
+          dwell: (todo): write your description
+          Tf: (int): write your description
+      """
     PyASASBase.__init__(self, fo, T0, Tf, dwell, pdscale)
   
   
@@ -297,6 +416,12 @@ class CauchySAS(PyASASBase):
 
 class _state(object):
     def __init__(self):
+        """
+        Initialize the gradient
+
+        Args:
+            self: (todo): write your description
+        """
         self.x = None
         self.cost = None
 
@@ -309,6 +434,13 @@ class _state(object):
 class PyAAnneal:
   
   def __init__(self, fo):
+      """
+      Initialize the consumer
+
+      Args:
+          self: (todo): write your description
+          fo: (todo): write your description
+      """
     self._fo = fo
     self.scheduler = None
     self.states = {"current":{}, "last":{}, "current":{}}

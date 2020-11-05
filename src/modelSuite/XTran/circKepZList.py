@@ -103,6 +103,14 @@ class _ZList:
         self._zlist[self._intrans] = z[self._intrans]
 
     def __init__(self, orbit, cc=True):
+        """
+        Initialize orbit.
+
+        Args:
+            self: (todo): write your description
+            orbit: (int): write your description
+            cc: (todo): write your description
+        """
         if orbit == "circular":
             self._calcZList = self._zlistCirc
         elif orbit == "keplerian":

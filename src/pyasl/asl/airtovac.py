@@ -270,6 +270,12 @@ def _iocon(inp):
     return out, lambda x:x
   else:
     def recover(x):
+        """
+        Recover x.
+
+        Args:
+            x: (todo): write your description
+        """
       try:
         result = float(x)
       except Exception as e:
@@ -471,6 +477,13 @@ class RefractiveIndexAV:
     return rec(lvac)
   
   def __init__(self, mode="ciddor"):
+      """
+      Initialize the reference.
+
+      Args:
+          self: (todo): write your description
+          mode: (todo): write your description
+      """
     
     if mode == "edlen53":
       self.refractiveIndex = self._edlen53

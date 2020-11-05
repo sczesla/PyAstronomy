@@ -274,6 +274,14 @@ class TraceAnalysis:
         return self._emceedat["chain"].shape[0]
 
     def __init__(self, resource, db="pickle"):
+        """
+        Initialize database.
+
+        Args:
+            self: (todo): write your description
+            resource: (str): write your description
+            db: (todo): write your description
+        """
         if isinstance(resource, six.string_types):
             # Resource is a filename
             if not os.path.isfile(resource):
@@ -484,6 +492,14 @@ class TraceAnalysis:
             plt.plot(self[pars], self["deviance"], '.')
 
     def plotHists(self, parsList=None, **histArgs):
+        """
+        Plots the histogram
+
+        Args:
+            self: (todo): write your description
+            parsList: (todo): write your description
+            histArgs: (tuple): write your description
+        """
         print("TraceAnalysis::plotHists() - Warning! This function is deprecated. Use plotHist() instead.")
         self.plotHist(parsList, **histArgs)
 

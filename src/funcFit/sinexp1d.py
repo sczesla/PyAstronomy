@@ -17,6 +17,12 @@ class SinusFit1d(OneDFit):
     """
 
     def __init__(self):
+        """
+        Initialize the internal state.
+
+        Args:
+            self: (todo): write your description
+        """
         OneDFit.__init__(self, ["A", "nu", "phi", "off"])
         self.setRootName("Sine")
 
@@ -47,6 +53,12 @@ class ExpDecayFit1d(OneDFit):
     """
 
     def __init__(self):
+        """
+        Initialize the internal state.
+
+        Args:
+            self: (todo): write your description
+        """
         OneDFit.__init__(self, ["A", "tau", "t0", "off"])
         self.setRootName("ExpDecay")
 
