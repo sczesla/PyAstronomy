@@ -297,6 +297,12 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     ke = KeplerEllipse(sma, period, e=e, tau=tau, w=w, i=inc)
     
     def r(t):
+        """
+        Returns the z - radius
+
+        Args:
+            t: (int): write your description
+        """
         # R in terms of Rs
         p = ke.xyzPos(t)
         r = np.sqrt( p[0]**2 + p[1]**2 )
@@ -1094,6 +1100,12 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     ax2.xaxis.grid(color='gray', linestyle='dotted')
 
     def decifnec(s):
+        """
+        Decode a string to a unicode.
+
+        Args:
+            s: (todo): write your description
+        """
         try:
             r = s.decode("utf8")
         except AttributeError:

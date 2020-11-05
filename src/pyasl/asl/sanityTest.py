@@ -21,9 +21,21 @@ from PyAstronomy.pyaC import pyaErrors as PE
 class SanityOfPyasl(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_airtovacExample1(self):
@@ -540,9 +552,21 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
 class SanityOfMoonpos(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_exampleMoonposition(self):
@@ -592,9 +616,21 @@ class SanityOfMoonpos(unittest.TestCase, SaniBase):
 class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example1(self):
@@ -673,9 +709,21 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
 class SanityOfBinnin(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example_binningx0dt(self):
@@ -814,9 +862,21 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
 class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_fluxConversion(self):
@@ -858,9 +918,21 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
 class SanityOfFolding(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_foldAtExample(self):
@@ -921,9 +993,21 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
 class SanityOfDopplerShift(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_backAndForth(self):
@@ -982,9 +1066,21 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
 class SanityOfrotBroad(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -1101,9 +1197,21 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
 class SanityOfBaryvel(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -1167,9 +1275,21 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
 class SanityOfSVD(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_deltaExample(self):
@@ -1253,9 +1373,21 @@ class SanityOfSVD(unittest.TestCase, SaniBase):
 class SanityOfUnred(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -1285,9 +1417,21 @@ class SanityOfUnred(unittest.TestCase, SaniBase):
 class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -1325,9 +1469,21 @@ class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
 class SanityOfOutlier(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_ESDexample(self):
@@ -1509,9 +1665,21 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
 class SanityOfMagnitudes(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_absMagToPowerExample(self):
@@ -1554,9 +1722,21 @@ class SanityOfMagnitudes(unittest.TestCase, SaniBase):
 class SanityOfSunpos(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_sunposExample(self):
@@ -1594,9 +1774,21 @@ class SanityOfSunpos(unittest.TestCase, SaniBase):
 class SanityOfNutation(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_nutationExample(self):
@@ -1667,9 +1859,21 @@ class SanityOfNutation(unittest.TestCase, SaniBase):
 class SanityOfAberration(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_aberrationExample(self):
@@ -1710,9 +1914,21 @@ class SanityOfAberration(unittest.TestCase, SaniBase):
 class SanityOfAltitude(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_altitudeExample(self):
@@ -1759,9 +1975,21 @@ class SanityOfAltitude(unittest.TestCase, SaniBase):
 class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_hadec2altazExample(self):
@@ -1841,9 +2069,21 @@ class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
 class SanityOfObservatory(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -1865,9 +2105,21 @@ class SanityOfObservatory(unittest.TestCase, SaniBase):
 class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -1886,9 +2138,21 @@ class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
 class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_checkNumbers(self):
@@ -1921,9 +2185,21 @@ class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
 class SanityOfTwilight(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_checkNumbers(self):
@@ -1941,9 +2217,21 @@ class SanityOfTwilight(unittest.TestCase, SaniBase):
 class SanityOfAngDist(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_checkExample(self):
@@ -1963,9 +2251,21 @@ class SanityOfAngDist(unittest.TestCase, SaniBase):
 class SanityOfTransit(unittest.TestCase, SaniBase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_transitDurationExample(self):
@@ -2215,9 +2515,21 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
 class SanityOfAirmass(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_airmassSphericalExample(self):
@@ -2257,9 +2569,21 @@ class SanityOfAirmass(unittest.TestCase):
 class SanityOfTransitTimes(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -2339,9 +2663,21 @@ class SanityOfTransitTimes(unittest.TestCase):
 class SanityOfDecimalYear(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -2389,9 +2725,21 @@ class SanityOfDecimalYear(unittest.TestCase):
 class SanityOfBroad(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -2579,9 +2927,21 @@ class SanityOfBroad(unittest.TestCase):
 class SanityOfCrosscor(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_example(self):
@@ -2702,9 +3062,21 @@ class SanityOfCrosscor(unittest.TestCase):
 class SanityOfQuadExtreme(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_quadextreme(self):
@@ -2800,9 +3172,21 @@ class SanityOfQuadExtreme(unittest.TestCase):
 class SanityOfPositionAngle(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_Example(self):
@@ -2837,9 +3221,21 @@ class SanityOfPositionAngle(unittest.TestCase):
 class SanityOfSMW_RHK(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_ExampleConversion(self):
@@ -2894,9 +3290,21 @@ class SanityOfSMW_RHK(unittest.TestCase):
 class SanityOfAtomicNo(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_Example(self):
@@ -2940,9 +3348,21 @@ class SanityOfAtomicNo(unittest.TestCase):
 class SanityOfFitsSpec(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Removes the tear tear
+
+        Args:
+            self: (todo): write your description
+        """
         import os
         os.remove("test1.fits")
         os.remove("test2.fits")
@@ -2970,9 +3390,21 @@ class SanityOfFitsSpec(unittest.TestCase):
 class SanityOftgal_uvw(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
     
     def sanity_example(self):
@@ -3024,9 +3456,21 @@ class SanityOftgal_uvw(unittest.TestCase):
 class SanityOfProperMotion(unittest.TestCase):
 
     def setUp(self):
+        """
+        Sets the result of this thread.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def tearDown(self):
+        """
+        Tear down the next callable.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def sanity_pm(self):

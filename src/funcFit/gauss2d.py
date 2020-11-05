@@ -29,6 +29,12 @@ class GaussFit2d(OneDFit):
   """
   
   def __init__(self):
+      """
+      Initializes the internal state
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self, ["A", "mux", "muy", "sigx", "sigy", "rho"])
     self.setRootName("Gaussian2d")
 
@@ -86,6 +92,13 @@ class MultiGauss2d(OneDFit):
   """
   
   def __init__(self, n):
+      """
+      Initialize a n - grams
+
+      Args:
+          self: (todo): write your description
+          n: (int): write your description
+      """
     params = ["off"]
     for i in range(n):
       p = str(i+1)
@@ -151,6 +164,12 @@ class GaussFit2dTuple(OneDFit):
   """
   
   def __init__(self):
+      """
+      Initializes the internal state
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self, ["A", "mux", "muy", "sigx", "sigy", "rho"])
     self.setRootName("Gaussian2d")
 

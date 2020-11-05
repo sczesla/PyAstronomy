@@ -113,6 +113,15 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
     """
 
     def __init__(self, orbit="circular", ld="quad", collCheck=True):
+        """
+        Initialize the orbit.
+
+        Args:
+            self: (todo): write your description
+            orbit: (int): write your description
+            ld: (int): write your description
+            collCheck: (todo): write your description
+        """
         if not orbit in ["circular", "keplerian"]:
             raise(PE.PyAValError("Invalid option for orbit: " + str(orbit),
                                  soltuion="Use either 'circular' or 'keplerian'."))

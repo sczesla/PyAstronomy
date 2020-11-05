@@ -4,12 +4,30 @@ import unittest
 class PyPDMExSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_Scanner(self):
+      """
+      Sanity checksumner.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import PDM module
     from PyAstronomy.pyTiming import pyPDM
     
@@ -21,6 +39,12 @@ class PyPDMExSanity(unittest.TestCase):
       print(period, end=' ')
   
   def sanity_PDMAna(self):
+      """
+      Sanity.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy
     import matplotlib.pylab as plt
     from PyAstronomy.pyTiming import pyPDM

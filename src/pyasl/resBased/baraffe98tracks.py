@@ -39,6 +39,12 @@ class Baraffe98Tracks:
         self._models[(metals[i[0]], ys[i[1]], ls[i[2]], masses[i[3]])] = indi.copy()
   
   def __init__(self):
+      """
+      Initialize a pfs file.
+
+      Args:
+          self: (todo): write your description
+      """
     pfs = pp.pyaFS.PyAFS()
     dfn = os.path.join("pyasl", "resBased", "baraffe98tracks.dat.gz")
     pfs.downloadToFile("ftp://cdsarc.u-strasbg.fr/pub/cats/J/A+A/337/403/tab1-3.dat.gz", \

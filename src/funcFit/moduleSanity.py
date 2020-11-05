@@ -7,13 +7,31 @@ import numpy as np
 class FuncFitSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down file
+
+      Args:
+          self: (todo): write your description
+      """
     if os.path.isfile("saveState.tmp"):
       os.remove("saveState.tmp")
   
   def saveState_sanity(self):
+      """
+      Save the current state of this class.
+
+      Args:
+          self: (todo): write your description
+      """
     gf = fuf.GaussFit1d()
     gf.assignValue({"A":1, "mu":2, "off":3, "sig":4, "lin":5.0})
     gf.setRestriction({"A":[0,10], "off":[None, 7.8]})
@@ -32,6 +50,12 @@ class FuncFitSanity(unittest.TestCase):
     self.assertEqual(gf2.frozenParameters(), gf.frozenParameters())
   
   def coordinateGrid_sanity(self):
+      """
+      Sanity of the ellipse.
+
+      Args:
+          self: (todo): write your description
+      """
     x = np.arange(5)
     y = np.arange(10) + 10.
     z = np.arange(2) + 100.

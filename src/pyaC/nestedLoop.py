@@ -18,6 +18,13 @@ class Counter:
   """
 
   def __init__(self, minmax):
+      """
+      Initialize the next instance.
+
+      Args:
+          self: (todo): write your description
+          minmax: (int): write your description
+      """
     self.mini, self.maxi = minmax
     self.maxmimin = self.maxi - self.mini
     self.status = 0
@@ -57,6 +64,14 @@ class NestedLoop:
   """
 
   def __init__(self, limits, lowerLimits=None):
+      """
+      Initialize the network interface.
+
+      Args:
+          self: (todo): write your description
+          limits: (dict): write your description
+          lowerLimits: (todo): write your description
+      """
     self.limits = limits[:]
     if lowerLimits is None:
       self.lowerLimits = [0]*len(limits)

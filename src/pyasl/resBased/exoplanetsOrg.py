@@ -77,6 +77,14 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
                                 openMethod=gzip.open)
 
     def __init__(self, skipUpdate=False, verbose=False):
+        """
+        Initialize the table
+
+        Args:
+            self: (todo): write your description
+            skipUpdate: (list): write your description
+            verbose: (bool): write your description
+        """
         self.data = None
         self._verbose = verbose
         self.dataFileName = os.path.join("pyasl", "resBased", "eporg.csv.gz")

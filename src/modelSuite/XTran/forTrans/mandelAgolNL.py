@@ -45,6 +45,12 @@ class MandelAgolNLLC(_ZList, fuf.OneDFit):
   """
   
   def __init__(self):
+      """
+      Stub
+
+      Args:
+          self: (todo): write your description
+      """
     _ZList.__init__(self, "circular")
     if not _importOccultnl:
         raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",\

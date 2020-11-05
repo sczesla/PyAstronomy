@@ -68,6 +68,15 @@ class ContinuumInteractive:
     """
 
     def __init__(self, x, y, config=None):
+        """
+        Initialize the plot.
+
+        Args:
+            self: (todo): write your description
+            x: (array): write your description
+            y: (array): write your description
+            config: (todo): write your description
+        """
 
         dconfig = {"specPlotStyle": "b.--",
                    "astyle": "ro",
@@ -167,6 +176,11 @@ class ContinuumInteractive:
         self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         def _quit():
+            """
+            Destroy the connection.
+
+            Args:
+            """
             if self._normalizedDataShown:
                 self._quitWin()
             # stops main loop
@@ -256,6 +270,15 @@ class ContinuumInteractive:
 
         class Event:
             def __init__(self, xd, yd, inax):
+                """
+                Initialize xdata.
+
+                Args:
+                    self: (todo): write your description
+                    xd: (float): write your description
+                    yd: (float): write your description
+                    inax: (todo): write your description
+                """
                 self.button = 2
                 self.inaxes = inax
                 self.xdata = xd
@@ -292,6 +315,12 @@ class ContinuumInteractive:
         self.normCanvas.draw()
 
     def _quitWin(self):
+        """
+        Destroy the window.
+
+        Args:
+            self: (todo): write your description
+        """
         self._normalizedDataShown = False
         if not self._normaLineRef is None:
             self.norma.lines.pop(self.norma.lines.index(self._normaLineRef))

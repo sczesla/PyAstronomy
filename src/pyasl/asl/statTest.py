@@ -6,10 +6,22 @@ from PyAstronomy.pyaC import pyaErrors as PE
 
 
 def chi2test():
+    """
+    Returns the test is a test
+
+    Args:
+    """
     pass
 
 
 def bayesFactors(model1, model2):
+    """
+    R calculate model2 model2 model.
+
+    Args:
+        model1: (todo): write your description
+        model2: (todo): write your description
+    """
     raise(PE.PyAUnclassifiedError(
         "The function 'bayesFactors' has moved to funcFit.utils."))
 
@@ -167,6 +179,13 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
 
     # Convert probability into Gaussian 'sigmas'
     def err(n, prob):
+        """
+        Return the error.
+
+        Args:
+            n: (todo): write your description
+            prob: (todo): write your description
+        """
         return erf(n / numpy.sqrt(2)) - prob
     sigmalvl = float(fsolve(err, 1.0, args=(prob,)))
 

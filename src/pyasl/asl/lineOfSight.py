@@ -22,6 +22,13 @@ class LineOfSight:
   """
   
   def __init__(self, los='-z'):
+      """
+      Initialize the fifta.
+
+      Args:
+          self: (todo): write your description
+          los: (todo): write your description
+      """
 
     if isinstance(los, six.string_types):
       # The input is a string. Check the content.

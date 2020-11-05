@@ -38,6 +38,15 @@ class LyaTransmission(fuf.OneDFit):
   """
   
   def __init__(self, N=0.0, b=10.0, D_fraction=1.5e-5):
+      """
+      Initializes the effect of the equation
+
+      Args:
+          self: (todo): write your description
+          N: (int): write your description
+          b: (int): write your description
+          D_fraction: (todo): write your description
+      """
     fuf.OneDFit.__init__(self, ["N","b", "Dfrac"], rootName="LyaTransmission")
     self["b"] = b
     self["Dfrac"] = D_fraction

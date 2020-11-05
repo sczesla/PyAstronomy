@@ -39,6 +39,12 @@ class RotBroadProfile(fuf.OneDFit):
   """
 
   def __init__(self):
+      """
+      Initialize the properties.
+
+      Args:
+          self: (todo): write your description
+      """
     fuf.OneDFit.__init__(self, ["off", "lin", "xmax", "eps", "A", "mu", "gsig"], rootName="RTB")
     self["A"] = 1.0
     self["xmax"] = 1.0

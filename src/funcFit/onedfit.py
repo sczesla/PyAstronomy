@@ -27,22 +27,57 @@ if ic.check["progressbar"]:
 
 
 def addEval(self, x):
+    """
+    Eval to the current value.
+
+    Args:
+        self: (todo): write your description
+        x: (int): write your description
+    """
     return (self.leftCompo.evaluate(x) + self.rightCompo.evaluate(x))
 
 
 def subEval(self, x):
+    """
+    Evaluates the expression.
+
+    Args:
+        self: (todo): write your description
+        x: (int): write your description
+    """
     return (self.leftCompo.evaluate(x) - self.rightCompo.evaluate(x))
 
 
 def divEval(self, x):
+    """
+    Evaluate x.
+
+    Args:
+        self: (todo): write your description
+        x: (int): write your description
+    """
     return (self.leftCompo.evaluate(x) / self.rightCompo.evaluate(x))
 
 
 def mulEval(self, x):
+    """
+    Evaluate the given x.
+
+    Args:
+        self: (todo): write your description
+        x: (todo): write your description
+    """
     return (self.leftCompo.evaluate(x) * self.rightCompo.evaluate(x))
 
 
 def powEval(self, x):
+    """
+    Evaluate the expression.
+
+    Args:
+        self: (todo): write your description
+        x: (todo): write your description
+    """
     return (self.leftCompo.evaluate(x) ** self.rightCompo.evaluate(x))
 
 
@@ -77,6 +112,12 @@ class MiniFunc:
          - `f` - The user-defined objective function.
         """
         def miniFunc(P):
+            """
+            Pfac p ( p ) pfac
+
+            Args:
+                P: (todo): write your description
+            """
             # Update the parameter values in the 'Params' class instance.
             self.odf.pars.setFreeParams(P)
             # Obtain penalties
@@ -153,6 +194,13 @@ class _PyMCSampler:
                                      solution="Adjust input dictionary."))
 
     def _basicStatMCMCOutput(self, bs):
+        """
+        Prints the output
+
+        Args:
+            self: (todo): write your description
+            bs: (todo): write your description
+        """
         print("Basic statistics of MCMC analysis: ")
         print("-----------------------------------------------------")
         for k in six.iterkeys(bs):
@@ -388,12 +436,37 @@ class _PyMCSampler:
 
     def fitMCMC(self, x, y, X0, Lims, Steps, yerr=None, pymcPars={}, pyy=None,
                 potentials=[], dbfile="mcmcSample.tmp", dbArgs={}, **sampleArgs):
+        """
+        Fits the model
+
+        Args:
+            self: (todo): write your description
+            x: (array): write your description
+            y: (array): write your description
+            X0: (array): write your description
+            Lims: (array): write your description
+            Steps: (int): write your description
+            yerr: (array): write your description
+            pymcPars: (array): write your description
+            pyy: (array): write your description
+            potentials: (bool): write your description
+            dbfile: (str): write your description
+            dbArgs: (todo): write your description
+            sampleArgs: (dict): write your description
+        """
         raise(PE.PyANotImplemented("This method has to be implemented"))
 
 
 class _OndeDFitParBase:
 
     def __init__(self, parList, **kwargs):
+        """
+        Initialize the parameter list.
+
+        Args:
+            self: (todo): write your description
+            parList: (str): write your description
+        """
         self.pars = Params(parList)
         # Set up the propMap (used to create a mapping between "property" (e.g., mu)
         # and variable name (e.g., "mu_1"))
@@ -404,6 +477,13 @@ class _OndeDFitParBase:
         self.naming = ModelNameIdentBase(**kwargs)
 
     def __getitem__(self, specifier, **kwargs):
+        """
+        Return the value of a specifier
+
+        Args:
+            self: (todo): write your description
+            specifier: (todo): write your description
+        """
         name = self.naming.convertSpecifier(specifier)[0]
         if not name in self.propMap:
             if name in self.parameters():
@@ -414,6 +494,14 @@ class _OndeDFitParBase:
         return self.pars.__getitem__(self.propMap[name])
 
     def __setitem__(self, specifier, value):
+        """
+        Set the given value to the given value.
+
+        Args:
+            self: (todo): write your description
+            specifier: (str): write your description
+            value: (str): write your description
+        """
         name = self.naming.convertSpecifier(specifier)[0]
         if not name in self.propMap:
             if name in self.parameters():
@@ -454,6 +542,13 @@ class _OndeDFitParBase:
         return self.pars.assignValue(self.naming.specifierToName(specval))
 
     def assignValues(self, specval):
+        """
+        Assign a new * valvalval * valval.
+
+        Args:
+            self: (todo): write your description
+            specval: (todo): write your description
+        """
         return self.assignValue(specval)
     assignValues.__doc__ = assignValue.__doc__
 
@@ -548,54 +643,134 @@ class _OndeDFitParBase:
         return self.pars.getRelationsOf(self.naming.specifierToName(specifier))
 
     def freeParameters(self):
+        """
+        Returns a list of parameters.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.freeParameters()
     freeParameters.__doc__ = Params.freeParameters.__doc__
 
     def frozenParameters(self):
+        """
+        Return a list of all parameters.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.frozenParameters()
     frozenParameters.__doc__ = Params.frozenParameters.__doc__
 
     def freeParamNames(self):
+        """
+        Returns a list of free names.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.freeParamNames()
     freeParamNames.__doc__ = Params.freeParamNames.__doc__
 
     def numberOfFreeParams(self):
+        """
+        Returns the number of params.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.numberOfFreeParams()
     numberOfFreeParams.__doc__ = Params.numberOfFreeParams.__doc__
 
     def getRestrictions(self):
+        """
+        Returns a list of all the reuses.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.getRestrictions()
     getRestrictions.__doc__ = Params.getRestrictions.__doc__
 
     def delRestriction(self, parName):
+        """
+        Delete a parameter from the parameter
+
+        Args:
+            self: (todo): write your description
+            parName: (str): write your description
+        """
         return self.pars.delRestriction(parName)
     delRestriction.__doc__ = Params.delRestriction.__doc__
 
     def availableParameters(self):
+        """
+        Return a list of the parameters.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.availableParameters()
     availableParameters.__doc__ = Params.availableParameters.__doc__
 
     def parameters(self):
+        """
+        The parameters of the parameters.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.parameters()
     parameters.__doc__ = Params.parameters.__doc__
 
     def saveState(self, *args, **kwargs):
+        """
+        Creates the state of the current state.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.saveState(*args, **kwargs)
     saveState.__doc__ = Params.saveState.__doc__
 
     def restoreState(self, resource):
+        """
+        Restore the state of the given resource.
+
+        Args:
+            self: (todo): write your description
+            resource: (todo): write your description
+        """
         self.pars.restoreState(resource)
     restoreState.__doc__ = Params.restoreState.__doc__
 
     def addConditionalRestriction(self, *args):
+        """
+        Adds a new l { p } to this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.addConditionalRestriction(*args)
     addConditionalRestriction.__doc__ = Params.addConditionalRestriction.__doc__
 
     def removeConditionalRestriction(self, *args):
+        """
+        Removes an array of arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.removeConditionalRestriction(*args)
     removeConditionalRestriction.__doc__ = Params.removeConditionalRestriction.__doc__
 
     def showConditionalRestrictions(self, **kwargs):
+        """
+        Fetches information for this integration
+
+        Args:
+            self: (todo): write your description
+        """
         return self.pars.showConditionalRestrictions(**kwargs)
     showConditionalRestrictions.__doc__ = Params.showConditionalRestrictions.__doc__
 
@@ -606,6 +781,12 @@ class IFitterBase:
     """
 
     def __init__(self):
+        """
+        Initialize the object.
+
+        Args:
+            self: (todo): write your description
+        """
         self._objfval = None
 
     def fit(self, minifunc, x0):
@@ -674,6 +855,12 @@ class ScipyFMIN(IFitterBase):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the init
+
+        Args:
+            self: (todo): write your description
+        """
         IFitterBase.__init__(self)
         self._allowedKWs = ["xtol", "ftol", "maxiter",
                             "maxfun", "disp", "retall", "callback"]
@@ -693,6 +880,12 @@ class ScipyFMIN(IFitterBase):
 class FuFNM(IFitterBase):
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the module.
+
+        Args:
+            self: (todo): write your description
+        """
         IFitterBase.__init__(self)
         self._allowedKWs = ["initDelta", "maxIter", "callback", "nmCritLim"]
         self.name = "funcFit NM65"
@@ -743,11 +936,31 @@ class FuFPrior(object):
     """
 
     def _uniform(self, **kwargs):
+        """
+        Reverse the uniform distribution.
+
+        Args:
+            self: (todo): write your description
+        """
         def uniform(ps, n, **rest):
+            """
+            Uniform a uniform.
+
+            Args:
+                ps: (float): write your description
+                n: (float): write your description
+                rest: (todo): write your description
+            """
             return 0.0
         return uniform
 
     def _uniformLimit(self, **kwargs):
+        """
+        Return uniform uniform uniform distribution.
+
+        Args:
+            self: (todo): write your description
+        """
         if kwargs["upper"] < kwargs["lower"]:
             raise(PE.PyAValError("upper needs to be larger than lower",
                                  where="FuFPrior (limited uniform distribution)",
@@ -755,6 +968,14 @@ class FuFPrior(object):
         p = np.log(1.0 / (kwargs["upper"] - kwargs["lower"]))
 
         def unilimit(ps, n, **rest):
+            """
+            Unilimit ( n )
+
+            Args:
+                ps: (todo): write your description
+                n: (todo): write your description
+                rest: (todo): write your description
+            """
             if (ps[n] >= kwargs["lower"]) and (ps[n] <= kwargs["upper"]):
                 return p
             else:
@@ -762,14 +983,42 @@ class FuFPrior(object):
         return unilimit
 
     def _jeffreyPoissonScale(self, **kwargs):
+        """
+        Compute the jpsreyreyrey of a jpsrey.
+
+        Args:
+            self: (todo): write your description
+        """
         def jps(ps, n, **rest):
+            """
+            R calculate the jps.
+
+            Args:
+                ps: (array): write your description
+                n: (array): write your description
+                rest: (todo): write your description
+            """
             return -0.5 * np.log(ps[n])
         return jps
 
     def _gaussian(self, **kwargs):
+        """
+        Return a gaussian distribution.
+
+        Args:
+            self: (float): write your description
+        """
         r = -0.5 * np.log(2.0 * np.pi * kwargs["sig"]**2)
 
         def gaussianPrior(ps, n, **rest):
+            """
+            R calculate a gaussian distribution.
+
+            Args:
+                ps: (float): write your description
+                n: (float): write your description
+                rest: (todo): write your description
+            """
             return r - (ps[n] - kwargs["mu"])**2 / (2.0 * kwargs["sig"]**2)
         return gaussianPrior
 
@@ -778,9 +1027,22 @@ class FuFPrior(object):
         raise(PE.PyANotImplemented("_callDelegator is not implemented."))
 
     def __call__(self, *args, **kwargs):
+        """
+        Call a call () call.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._callDelegator(*args, **kwargs)
 
     def __init__(self, lnp, **kwargs):
+        """
+        Initialize the gradient.
+
+        Args:
+            self: (todo): write your description
+            lnp: (todo): write your description
+        """
         if isinstance(lnp, six.string_types):
             if lnp == "uniform":
                 self._callDelegator = self._uniform(**kwargs)
@@ -896,6 +1158,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     """
 
     def __init__(self, parList, **kwargs):
+        """
+        Initialize the widget parameters.
+
+        Args:
+            self: (todo): write your description
+            parList: (str): write your description
+        """
         _OndeDFitParBase.__init__(self, parList, **kwargs)
         # Left and right compo(nent) are necessary for combining models
         self.leftCompo = None
@@ -912,6 +1181,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         TBD
         """
         def walk(c, refs):
+            """
+            Walk the given c { c } object.
+
+            Args:
+                c: (todo): write your description
+                refs: (str): write your description
+            """
             refs.append(c)
             if c.leftCompo is not None:
                 walk(c.leftCompo, refs)
@@ -995,6 +1271,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         """
 
         def extendCoDat(coDat, c):
+            """
+            Extend c : class : class
+
+            Args:
+                coDat: (str): write your description
+                c: (todo): write your description
+            """
             ident = c.naming.getRoot()
             if not ident in coDat:
                 coDat[ident] = [c]
@@ -1048,6 +1331,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                         break
 
         def renameIfNecessary(c, baseComponent):
+            """
+            Rename a variable
+
+            Args:
+                c: (todo): write your description
+                baseComponent: (todo): write your description
+            """
             # Rename all variables according to standard naming rules
             for prop in six.iterkeys(c.propMap):
                 # Compose new name using "standard conventions"
@@ -1113,6 +1403,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def __add__(self, right):
+        """
+        Adds a new result to the result.
+
+        Args:
+            self: (todo): write your description
+            right: (bool): write your description
+        """
         result = self.__combineFittingObjects(right)
         # For a discussion about bound instance methods see
         # https://stackoverflow.com/questions/972/adding-a-method-to-an-existing-object-instance
@@ -1122,6 +1419,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def __sub__(self, right):
+        """
+        Perform the right operator.
+
+        Args:
+            self: (todo): write your description
+            right: (bool): write your description
+        """
         result = self.__combineFittingObjects(right)
         result.evaluate = types.MethodType(subEval, result)
         # Save the 'operator' relating left and right component
@@ -1129,6 +1433,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def __mul__(self, right):
+        """
+        Combines two mulers.
+
+        Args:
+            self: (todo): write your description
+            right: (bool): write your description
+        """
         result = self.__combineFittingObjects(right)
         result.evaluate = types.MethodType(mulEval, result)
         # Save the 'operator' relating left and right component
@@ -1136,6 +1447,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def __div__(self, right):
+        """
+        Divide the right type into a right type.
+
+        Args:
+            self: (todo): write your description
+            right: (bool): write your description
+        """
         result = self.__combineFittingObjects(right)
         result.evaluate = types.MethodType(divEval, result)
         # Save the 'operator' relating left and right component
@@ -1143,6 +1461,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def __pow__(self, right):
+        """
+        Compute the result operator.
+
+        Args:
+            self: (todo): write your description
+            right: (bool): write your description
+        """
         result = self.__combineFittingObjects(right)
         result.evaluate = types.MethodType(powEval, result)
         # Save the 'operator' relating left and right component
@@ -1150,24 +1475,63 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def __sqrDiff(self):
+        """
+        Compute the residual function
+
+        Args:
+            self: (todo): write your description
+        """
         @MiniFunc(self)
         def miniSqrDiff(odf, P):
+            """
+            Compute the log likelihood
+
+            Args:
+                odf: (array): write your description
+                P: (array): write your description
+            """
             # Calculate squared difference
             chi = np.sum((self._fufDS.y - self.model)**2)
             return chi
         return miniSqrDiff
 
     def __chiSqr(self):
+        """
+        Compute theta function.
+
+        Args:
+            self: (todo): write your description
+        """
         @MiniFunc(self)
         def miniChiSqr(odf, P):
+            """
+            Compute the fuf function
+
+            Args:
+                odf: (array): write your description
+                P: (array): write your description
+            """
             # Calculate chi^2 and apply penalty if boundaries are violated.
             chi = np.sum(((self._fufDS.y - self.model) / self._fufDS.yerr)**2)
             return chi
         return miniChiSqr
 
     def __cash79(self):
+        """
+        Calculate the gaussian model.
+
+        Args:
+            self: (todo): write your description
+        """
         @MiniFunc(self)
         def miniCash79(odf, P):
+            """
+            R compute the log - likelihood.
+
+            Args:
+                odf: (todo): write your description
+                P: (array): write your description
+            """
             # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
             c = -2.0 * np.sum(self._fufDS.y * np.log(self.model) - self.model)
             return c
@@ -1527,6 +1891,12 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
         # This function is used to update the model
         def getModel(**vals):
+            """
+            Return a list of the model
+
+            Args:
+                vals: (str): write your description
+            """
             self.assignValue(vals)
             self.updateModel()
             return self.model
@@ -1752,11 +2122,24 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         chisqr = self.__chiSqr()
 
         def likeli(names, vals):
+            """
+            R returns the likelihood.
+
+            Args:
+                names: (str): write your description
+                vals: (todo): write your description
+            """
             # The likelihood function
             likeli = -0.5 * chisqr(vals)
             return likeli
 
         def lnpostdf(values):
+            """
+            Calculate the probability of the pdf.
+
+            Args:
+                values: (str): write your description
+            """
             # Parameter-Value dictionary
             ps = dict(zip(fpns, values))
             # Check prior information

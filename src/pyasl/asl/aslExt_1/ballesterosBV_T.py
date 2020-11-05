@@ -11,6 +11,12 @@ class BallesterosBV_T:
   """
   
   def __init__(self):
+      """
+      Initialize the data
+
+      Args:
+          self: (todo): write your description
+      """
     self._a = 0.92
     self._b = 1.7
     self._c = 0.62
@@ -60,12 +66,24 @@ class BallesterosBV_T:
     
     
 def bv2T_Ballesteros(bv):
+    """
+    Convert t_2 t_Ball to t_Ball
+
+    Args:
+        bv: (todo): write your description
+    """
   b = BallesterosBV_T()
   return b.bv2T(bv)
 bv2T_Ballesteros.__doc__ = BallesterosBV_T.bv2T.__doc__
 
 
 def t2bv_Ballesteros(T):
+    """
+    Convert t2bv to t2
+
+    Args:
+        T: (array): write your description
+    """
   b = BallesterosBV_T()
   return b.t2bv(T)
 t2bv_Ballesteros.__doc__ = BallesterosBV_T.t2bv.__doc__

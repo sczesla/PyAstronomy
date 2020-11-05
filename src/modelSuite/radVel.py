@@ -19,6 +19,12 @@ class SinRadVel(OneDFit):
   """
 
   def __init__(self):
+      """
+      Initialize the internal state.
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self,["P", "T0", "K", "rv0"])
     self.setRootName("SinRV")
 

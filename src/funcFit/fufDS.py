@@ -19,6 +19,15 @@ class FufDS:
   """
   
   def __init__(self, x, y, yerr=None):
+      """
+      Initialize a new data.
+
+      Args:
+          self: (todo): write your description
+          x: (array): write your description
+          y: (array): write your description
+          yerr: (array): write your description
+      """
     if not isinstance(y, np.ndarray):
       raise(PE.PyAValError("`y` must be a numpy.ndarray. Current type is '" + str(type(y)) + "'.", \
             solution="Make `y` a numpy array."))

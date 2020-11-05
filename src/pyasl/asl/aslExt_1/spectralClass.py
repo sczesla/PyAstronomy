@@ -29,6 +29,12 @@ class SpecTypeDeJager(object):
   """
   
   def __init__(self):
+      """
+      Initialize the data
+
+      Args:
+          self: (todo): write your description
+      """
     self._typeLetter = ["O", "B", "A", "F", "G", "K", "M"]
     # Generate all valid types (without LK)
     self._types = [l+str(n) for l in self._typeLetter for n in list(smo.range(10))]

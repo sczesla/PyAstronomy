@@ -192,6 +192,13 @@ class KuruczMT:
         return self.models[(teff, logg, met)][::]
 
     def __init__(self, fn):
+        """
+        Initialize the model.
+
+        Args:
+            self: (todo): write your description
+            fn: (int): write your description
+        """
         if not os.path.isfile(fn):
             raise(PE.PyAValError("No such file: " + str(fn)))
         self._readModelTable(fn)
@@ -317,6 +324,13 @@ class KuruczModels:
         return result
 
     def _gridFN(self, name):
+        """
+        Generate grid file name
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         gfn = os.path.join("pyasl", "resBased", name + ".dat.gz")
         return gfn
 
@@ -417,6 +431,12 @@ class KuruczModels:
             print("%20s  " % k, v)
 
     def __init__(self):
+        """
+        Initialize the internal list.
+
+        Args:
+            self: (todo): write your description
+        """
         self._fs = pp.PyAFS()
         self._getListOfModelGrids()
 

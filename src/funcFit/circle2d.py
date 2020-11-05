@@ -19,6 +19,12 @@ class Circle2d(OneDFit):
   """
   
   def __init__(self):
+      """
+      Resetches a new instance of this function.
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self, ["r", "per", "t0"])
     self.setRootName("Circle2d")
 

@@ -64,6 +64,12 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
                                 openMethod=gzip.open)
 
     def __init__(self):
+        """
+        Initialize the data
+
+        Args:
+            self: (todo): write your description
+        """
         self.data = None
         self.dataFileName = os.path.join("pyasl", "resBased", "NEXA.csv.gz")
         configFileName = os.path.join("pyasl", "resBased", "NEXA.cfg")

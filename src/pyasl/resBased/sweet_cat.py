@@ -107,6 +107,13 @@ class SWEETCat(pp.PyAUpdateCycle):
             ffn, sep='\t', names=self.names, na_values=['~'])
 
     def __init__(self, skipUpdate=False):
+        """
+        Initialize the database
+
+        Args:
+            self: (todo): write your description
+            skipUpdate: (list): write your description
+        """
         self.dataFileName = os.path.join(
             "pyasl", "resBased", "sweetcat.csv.gz")
         configFilename = os.path.join("pyasl", "resBased", "sweetcat.cfg")

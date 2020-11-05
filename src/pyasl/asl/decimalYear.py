@@ -23,6 +23,12 @@ def decimalYear(date):
         Decimal representation of the date.
     """
     def s(date):
+        """
+        Return the given date object.
+
+        Args:
+            date: (todo): write your description
+        """
       # returns seconds since epoch
       return (date - dt(1900,1,1)).total_seconds()
 
@@ -63,6 +69,12 @@ def decimalYearGregorianDate(date, form="datetime"):
         In case of an invalid format, None is returned.
   """
   def s(date):
+      """
+      Return the given date object.
+
+      Args:
+          date: (todo): write your description
+      """
     # returns seconds since epoch
     return (date - dt(1900,1,1)).total_seconds()
   

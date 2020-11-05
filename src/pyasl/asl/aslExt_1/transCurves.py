@@ -309,6 +309,13 @@ class TransmissionCurves:
         self.addPassband(bn, dat[::, 0], dat[::, 1], snc=True)
 
     def __init__(self, fn="default"):
+        """
+        Initialize the directory.
+
+        Args:
+            self: (todo): write your description
+            fn: (int): write your description
+        """
         self._fs = PP.PyAFS()
         self._readData(os.path.join(
             os.path.dirname(__file__), "transCurves.dat"))

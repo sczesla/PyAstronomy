@@ -207,6 +207,14 @@ class PyAConstants:
     
   
   def __init__(self, fn=None, unitSystem="cgs"):
+      """
+      Initialize inventory
+
+      Args:
+          self: (todo): write your description
+          fn: (int): write your description
+          unitSystem: (todo): write your description
+      """
     if fn is None:
       # Use default file.
       fn = os.path.join(os.path.dirname(_PyA.__file__), "constants/cdat.dat")

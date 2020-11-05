@@ -389,6 +389,12 @@ class Ramirez2005:
       raiser = PE.warn
     else:
       def throw(x):
+          """
+          Return the first argument of x.
+
+          Args:
+              x: (todo): write your description
+          """
         raise(x)
       raiser = throw
     
@@ -443,4 +449,10 @@ class Ramirez2005:
     return self._bands[:]
   
   def __init__(self):
+      """
+      Initialize the data.
+
+      Args:
+          self: (todo): write your description
+      """
     self._readData(os.path.join(os.path.dirname(__file__), "ramirez2005tables.dat"))

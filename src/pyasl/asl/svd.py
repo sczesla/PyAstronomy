@@ -13,6 +13,12 @@ class SVD:
   """
   
   def __init__(self):
+      """
+      Initialize the data
+
+      Args:
+          self: (todo): write your description
+      """
     self.w = None
     self.des = None
     self.bn = None

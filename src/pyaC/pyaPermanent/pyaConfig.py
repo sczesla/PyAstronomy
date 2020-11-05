@@ -9,16 +9,40 @@ class PyARC(object):
     """
     
     def __init__(self):
+        """
+        Initialize the configuration.
+
+        Args:
+            self: (todo): write your description
+        """
         self.rc = ConfigParser.RawConfigParser()
         self.rc.add_section("pyaRC")
         # By default, keep online access on
         self.goOnline()
     
     def takeOffline(self):
+        """
+        ! \ ~ /. setrc.
+
+        Args:
+            self: (todo): write your description
+        """
         self.rc.set("pyaRC", "onlineKillSwitch", 1)
     def goOnline(self):
+        """
+        Go to the target.
+
+        Args:
+            self: (todo): write your description
+        """
         self.rc.set("pyaRC", "onlineKillSwitch", 0)
     def supposedOnline(self):
+        """
+        Returns true if this node is the same result.
+
+        Args:
+            self: (todo): write your description
+        """
         return (not self.rc["pyaRC"]["onlineKillSwitch"])
        
 pyaRC = PyARC() 
@@ -133,6 +157,12 @@ class PyAConfig(object):
         return hd
         
     def __init__(self):
+        """
+        Initialize the home directory.
+
+        Args:
+            self: (todo): write your description
+        """
         self.dpath = None
         # Try to locate home directory via environment variable
         self.homeDir = self._locateHomeDirectory()

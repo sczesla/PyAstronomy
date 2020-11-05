@@ -38,24 +38,58 @@ class RmcL(OneDFit):
     """
 
     def __init__(self):
+        """
+        Initialize a call todo.
+
+        Args:
+            self: (todo): write your description
+        """
         OneDFit.__init__(self, ["epsilon", "gamma", "P",
                                 "T0", "i", "Is", "Omega", "lambda", "a"])
         self.setRootName("Ohta05")
 
     def planetDistance(self, f):
+        """
+        Returns the distance between self.
+
+        Args:
+            self: (todo): write your description
+            f: (todo): write your description
+        """
         return self["a"]
 
     def W1(self, rho):
+        """
+        R calculates of the two - phase for a given angle
+
+        Args:
+            self: (todo): write your description
+            rho: (int): write your description
+        """
         result = sqrt(1.0 - rho**2) - self["gamma"]**2 * \
             (2.0 - rho**2) / (8.0 * (1.0 - rho**2)**(3.0 / 2.0))
         return result
 
     def W2(self, rho):
+        """
+        Equation angle for a^2
+
+        Args:
+            self: (todo): write your description
+            rho: (todo): write your description
+        """
         result = sqrt(1.0 - rho**2) - self["gamma"]**2 * (
             4.0 - 3.0 * rho**2) / (8.0 * (1.0 - rho**2)**(3.0 / 2.0))
         return result
 
     def XpVec(self, f):
+        """
+        Evaluate fourier transform
+
+        Args:
+            self: (todo): write your description
+            f: (array): write your description
+        """
         result = np.zeros(3)
         result[0] = -cos(self["lambda"]) * sin(f) - \
             sin(self["lambda"]) * cos(self["i"]) * cos(f)
@@ -66,54 +100,148 @@ class RmcL(OneDFit):
         return result
 
     def Xp(self, f):
+        """
+        Evaluate the function
+
+        Args:
+            self: (todo): write your description
+            f: (int): write your description
+        """
         result = -cos(self["lambda"]) * sin(f) - \
             sin(self["lambda"]) * cos(self["i"]) * cos(f)
         result *= self.planetDistance(f)
         return result
 
     def Zp(self, f):
+        """
+        Compute the z - axis
+
+        Args:
+            self: (todo): write your description
+            f: (int): write your description
+        """
         result = sin(self["lambda"]) * sin(f) - \
             cos(self["lambda"]) * cos(self["i"]) * cos(f)
         result *= self.planetDistance(f)
         return result
 
     def etap(self, Xp, Zp):
+        """
+        Calculate the gamma
+
+        Args:
+            self: (todo): write your description
+            Xp: (todo): write your description
+            Zp: (todo): write your description
+        """
         return sqrt(Xp**2 + Zp**2) - 1.0
 
     def zeta(self, etap):
+        """
+        Returns the zeta z - zeta z - z - zeta )
+
+        Args:
+            self: (todo): write your description
+            etap: (todo): write your description
+        """
         result = (2.0 * etap + self["gamma"]**2 +
                   etap**2) / (2.0 * (1.0 + etap))
         return result
 
     def rhoFromVec(self, XpVec):
+        """
+        Compute the inverse of this vector.
+
+        Args:
+            self: (todo): write your description
+            XpVec: (array): write your description
+        """
         return sqrt(XpVec[0]**2 + XpVec[2]**2)
 
     def rho(self, Xp, Zp):
+        """
+        Computes the rho
+
+        Args:
+            self: (todo): write your description
+            Xp: (todo): write your description
+            Zp: (int): write your description
+        """
         return sqrt(Xp**2 + Zp**2)
 
     def trueAnomaly(self, time):
+        """
+        Calculate the true true true false and false.
+
+        Args:
+            self: (todo): write your description
+            time: (float): write your description
+        """
         result = ((time - self["T0"]) / self["P"] -
                   np.floor((time - self["T0"]) / self["P"])) * 2.0 * np.pi
         return result
 
     def z0(self, etap, indi):
+        """
+        Return z0 z0 z0 z0 z0
+
+        Args:
+            self: (todo): write your description
+            etap: (float): write your description
+            indi: (todo): write your description
+        """
         result = np.zeros(etap.size)
         result[indi] = sqrt((self["gamma"]**2 - etap[indi]**2) * ((etap[indi] + 2.0)**2 - self["gamma"]**2)) / \
             (2.0 * (1.0 + etap[indi]))
         return result
 
     def x0(self, etap):
+        """
+        Compute x0 ( x0 )
+
+        Args:
+            self: (todo): write your description
+            etap: (float): write your description
+        """
         return 1.0 - (self["gamma"]**2 - etap**2) / (2.0 * (1.0 + etap))
 
     def g(self, x, e, g, x0):
+        """
+        Evaluate the gamma function
+
+        Args:
+            self: (todo): write your description
+            x: (int): write your description
+            e: (int): write your description
+            g: (int): write your description
+            x0: (array): write your description
+        """
         result = (1.0 - x**2) * asin(sqrt((g**2 - (x - 1.0 - e)**2) / (1.0 - x**2))) + \
             sqrt(2.0 * (1.0 + e) * (x0 - x) * (g**2 - (x - 1.0 - e)**2))
         return result
 
     def xc(self, zeta, x0):
+        """
+        Compute the z - zeta z - z0
+
+        Args:
+            self: (todo): write your description
+            zeta: (float): write your description
+            x0: (array): write your description
+        """
         return x0 + (zeta - self["gamma"]) / 2.0
 
     def W3(self, x0, zeta, xc, etap):
+        """
+        Name :
+
+        Args:
+            self: (todo): write your description
+            x0: (array): write your description
+            zeta: (float): write your description
+            xc: (int): write your description
+            etap: (float): write your description
+        """
         result = pi / 6.0 * (1.0 - x0)**2 * (2.0 + x0) + \
             pi / 2.0 * self["gamma"] * (self["gamma"] - zeta) * \
             self.g(xc, etap, self["gamma"], x0) / self.g((1.0 - self["gamma"]), -self["gamma"], self["gamma"], x0) * \
@@ -121,6 +249,16 @@ class RmcL(OneDFit):
         return result
 
     def W4(self, x0, zeta, xc, etap):
+        """
+        Name :
+
+        Args:
+            self: (todo): write your description
+            x0: (array): write your description
+            zeta: (float): write your description
+            xc: (int): write your description
+            etap: (float): write your description
+        """
         result = pi / 8. * (1.0 - x0)**2 * (1.0 + x0)**2 + \
             pi / 2. * self["gamma"] * (self["gamma"] - zeta) * xc * \
             self.g(xc, etap, self["gamma"], x0) / self.g((1.0 - self["gamma"]), -self["gamma"], self["gamma"], x0) * \
@@ -213,6 +351,12 @@ class RmcLell(OneDFit):
     """
 
     def __init__(self):
+        """
+        Initializes all the pyas declarations
+
+        Args:
+            self: (todo): write your description
+        """
         OneDFit.__init__(self, ["epsilon", "gamma", "P",
                                 "tau", "i", "Is", "Omega", "lambda", "a", "e", "w"])
         self.setRootName("OhtaELL05")
@@ -333,15 +477,36 @@ class RmcL_Hirano(OneDFit):
         self.setRootName("Hira10")
 
     def planetDistance(self, f):
+        """
+        Returns the distance between self.
+
+        Args:
+            self: (todo): write your description
+            f: (todo): write your description
+        """
         return self["a"]
 
     def Xp(self, f):
+        """
+        Evaluate the function
+
+        Args:
+            self: (todo): write your description
+            f: (int): write your description
+        """
         result = -cos(self["lambda"]) * sin(f) - \
             sin(self["lambda"]) * cos(self["i"]) * cos(f)
         result *= self.planetDistance(f)
         return result
 
     def trueAnomaly(self, time):
+        """
+        Calculate the true true true false and false.
+
+        Args:
+            self: (todo): write your description
+            time: (float): write your description
+        """
         result = ((time - self["T0"]) / self["P"] -
                   np.floor((time - self["T0"]) / self["P"])) * 2.0 * np.pi
         return result

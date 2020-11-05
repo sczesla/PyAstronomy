@@ -5,9 +5,21 @@ import unittest
 class SanityOfSWEETCat(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example(self):

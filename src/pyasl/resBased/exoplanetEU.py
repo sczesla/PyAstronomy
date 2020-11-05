@@ -171,6 +171,13 @@ class ExoplanetEU(pp.PyAUpdateCycle):
         self._update(self._download)
 
     def __init__(self, skipUpdate=False):
+        """
+        Initialize the table.
+
+        Args:
+            self: (todo): write your description
+            skipUpdate: (list): write your description
+        """
         configFilename = os.path.join("pyasl", "resBased", "epeu.cfg")
         pp.PyAUpdateCycle.__init__(self, configFilename, "ExoUpdate")
         self.dataFileName = os.path.join("pyasl", "resBased", "epeu.csv.gz")
@@ -584,6 +591,14 @@ class ExoplanetEU2(pp.PyAUpdateCycle):
         return self.vot.to_pandas()
 
     def __init__(self, skipUpdate=False, forceUpdate=False):
+        """
+        Initialize the configuration.
+
+        Args:
+            self: (todo): write your description
+            skipUpdate: (list): write your description
+            forceUpdate: (todo): write your description
+        """
 
         if not _ic.check["astropy"]:
             raise(PE.PyARequiredImport("The 'astropy' package is not installed. astropy is required to read VO tables.",

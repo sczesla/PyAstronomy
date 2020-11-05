@@ -26,6 +26,12 @@ class Fourier(periodBase.PeriodBase):
   """
 
   def __calcPeriodogram(self):
+      """
+      Calculate the frequency.
+
+      Args:
+          self: (todo): write your description
+      """
 
     dt=self.t[1:]-self.t[0:-1]
     if numpy.max(dt) > 1.1 * numpy.min(dt):
@@ -45,6 +51,14 @@ class Fourier(periodBase.PeriodBase):
     self.M = len(self.freq)
 
   def __init__(self, lc, norm="Leahy"):
+      """
+      Initialize the simulation.
+
+      Args:
+          self: (todo): write your description
+          lc: (int): write your description
+          norm: (todo): write your description
+      """
     self.freq = None
     self.power = None
     self.t = lc.time

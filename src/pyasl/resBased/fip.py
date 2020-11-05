@@ -90,6 +90,12 @@ class FirstIonizationPot:
     
 
   def __init__(self):
+      """
+      Initialize the pyAst.
+
+      Args:
+          self: (todo): write your description
+      """
     self._fip = {}
     # Build FIP-data dictionary. Uses elemental number as key
     # and, for each, holds a tuple composed of value, error, a flag

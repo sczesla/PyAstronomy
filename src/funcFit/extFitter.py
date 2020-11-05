@@ -47,6 +47,15 @@ class NelderMead:
     """
 
     def __init__(self, abg=(1.0, 0.5, 2.0), isw=0.05, critlim=1e-8):
+        """
+        Initialize the gradient.
+
+        Args:
+            self: (todo): write your description
+            abg: (todo): write your description
+            isw: (int): write your description
+            critlim: (todo): write your description
+        """
         # Best guesses after NM 1965
         self.alpha, self.beta, self.gamma = abg
         # Step-width factor for initial simplex (if not specified otherwise)

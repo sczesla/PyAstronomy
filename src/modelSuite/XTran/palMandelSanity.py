@@ -5,12 +5,32 @@ import numpy as np
 class palMandelSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def _rr(self, low, high):
+      """
+      Generate a random array.
+
+      Args:
+          self: (todo): write your description
+          low: (todo): write your description
+          high: (float): write your description
+      """
     return (np.random.random()*(high - low) + low)
   
   def sanity_comapare(self):

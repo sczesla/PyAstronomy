@@ -28,6 +28,12 @@ class Scanner:
     self.mode = mode
   
   def __iter__(self):
+      """
+      Return an iterator over the rows.
+
+      Args:
+          self: (todo): write your description
+      """
     self.curVal = self.minVal
     while self.curVal <= self.maxVal:
       yield self.curVal

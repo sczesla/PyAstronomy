@@ -127,6 +127,24 @@ class Gls:
     norms = ['ZK', 'Scargle', 'HorneBaliunas', 'Cumming', 'wrms', 'chisq', 'lnL', 'dlnL']
 
     def __init__(self, lc, fbeg=None, fend=None, Pbeg=None, Pend=None, ofac=10, hifac=1, freq=None, norm="ZK", ls=False, fast=False, verbose=False, **kwargs):
+        """
+        Initialize mesh
+
+        Args:
+            self: (todo): write your description
+            lc: (int): write your description
+            fbeg: (int): write your description
+            fend: (int): write your description
+            Pbeg: (int): write your description
+            Pend: (int): write your description
+            ofac: (float): write your description
+            hifac: (float): write your description
+            freq: (float): write your description
+            norm: (todo): write your description
+            ls: (array): write your description
+            fast: (str): write your description
+            verbose: (bool): write your description
+        """
 
         self.freq = freq
         self.fbeg = fbeg
@@ -157,9 +175,22 @@ class Gls:
             self.info()
 
     def _sete_y(self, ey):
+        """
+        Sets the y - axis.
+
+        Args:
+            self: (todo): write your description
+            ey: (str): write your description
+        """
         self.yerr = ey
     
     def _gete_y(self):
+        """
+        Get the y - axis.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.yerr
 
     """ Treat e_y and yerr synonymously for backward compatibility """
@@ -242,6 +273,12 @@ class Gls:
         self.M = (self.fend-self.fbeg) * self.tbase
 
     def _calcPeriodogram(self):
+        """
+        Calculate the eigenvalue.
+
+        Args:
+            self: (todo): write your description
+        """
 
         if self.e_y is None:
             w = np.ones(self.N)

@@ -16,6 +16,13 @@ import pickle
 class Point():
 
     def __init__(self, event=None):
+        """
+        Initialize the plot
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+        """
         self.xdata = 0.0
         self.ydata = 0.0
         self.mplLine = None
@@ -75,6 +82,13 @@ class Picker:
             pickle.dump(self.points, open(self.saveFile, 'w'))
 
     def __init__(self, saveFile=None):
+        """
+        Initialize a widget
+
+        Args:
+            self: (todo): write your description
+            saveFile: (str): write your description
+        """
         self.windowTitle = "PyA Picker"
         self.f = Figure()
         self.a = self.f.add_subplot(111)
@@ -126,6 +140,11 @@ class Picker:
         self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         def _quit():
+            """
+            Closes the connection.
+
+            Args:
+            """
             # stops main loop
             self.root.quit()
             # this is necessary on Windows to prevent
@@ -141,6 +160,11 @@ class Picker:
         Creates a new window containing a copy-and-paste aware list of the points.
         """
         def _quitWin():
+            """
+            Destroy the window.
+
+            Args:
+            """
             win.destroy()
         win = tk.Tk()
         text = tk.Text(master=win)

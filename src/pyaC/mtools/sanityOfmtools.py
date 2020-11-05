@@ -5,9 +5,21 @@ import os
 class SanityOfmtools(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down file
+
+      Args:
+          self: (todo): write your description
+      """
     if os.path.isfile("test.tmp"):
       os.remove("test.tmp")
   

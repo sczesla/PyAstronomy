@@ -35,6 +35,12 @@ class LimBrightTrans(_ZList, OneDFit):
   """
 
   def __init__(self):
+      """
+      Initializes the list
+
+      Args:
+          self: (todo): write your description
+      """
     _ZList.__init__(self, "circular")
     OneDFit.__init__(self, ["p", "a", "i", "T0", "per"])
     self.freeze(["p", "a", "i", "T0", "per"])

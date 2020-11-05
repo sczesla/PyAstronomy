@@ -4,12 +4,30 @@ import unittest
 class ConstantsExampleSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_example1(self):
+      """
+      Print summary of the summary summary.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import constants as c
     
     # Print a summary of available constants
@@ -61,6 +79,12 @@ class ConstantsExampleSanity(unittest.TestCase):
     print("G with feet [ft**3/(kg * s**2)]: ", G_InFeet)
 
   def sanity_example2(self):
+      """
+      Sanity example
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy.constants import PyAConstants
     
     c = PyAConstants()

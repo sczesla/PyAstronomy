@@ -49,6 +49,12 @@ class MiniFuncSync:
        - `f` - The user-defined objective function.
     """
     def miniFunc(P):
+        """
+        Parses a p ( p ( p ( p )
+
+        Args:
+            P: (todo): write your description
+        """
       # Update the parameter values in the 'Params' class instance.
       self.odf.pars.setFreeParams(P)
       # Update self.model to hold the evaluated function.
@@ -127,8 +133,21 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       self.evaluate(self.data[c][0], component=c)
   
   def __chiSqr(self):
+      """
+      R compute the probability of the model.
+
+      Args:
+          self: (todo): write your description
+      """
     @MiniFuncSync(self)
     def miniChiSqr(odf, P):
+        """
+        Calculate the probability function
+
+        Args:
+            odf: (array): write your description
+            P: (array): write your description
+        """
       # Calculate chi^2 and apply penalty if boundaries are violated.
       chi = 0.0
       for k in six.iterkeys(self._compos):
@@ -137,8 +156,21 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     return miniChiSqr
   
   def __sqrDiff(self):
+      """
+      Compute the sum of all models.
+
+      Args:
+          self: (todo): write your description
+      """
     @MiniFuncSync(self)
     def minisqr(odf, P):
+        """
+        R minisqr ( p.
+
+        Args:
+            odf: (array): write your description
+            P: (array): write your description
+        """
       # Calculate squared difference
       sqr = 0.0
       for k in six.iterkeys(self._compos):
@@ -147,8 +179,21 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     return minisqr
 
   def __cash79(self):
+      """
+      Calculate the sum of a list of the models.
+
+      Args:
+          self: (todo): write your description
+      """
       @MiniFuncSync(self)
       def miniCash79(odf, P):
+          """
+          R compute the p ( p p.
+
+          Args:
+              odf: (todo): write your description
+              P: (array): write your description
+          """
         # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
         cc = 0
         for k in six.iterkeys(self._compos):
@@ -157,8 +202,21 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       return miniCash79
   
   def __chiSqrRobust(self):
+      """
+      R compute the probability function.
+
+      Args:
+          self: (todo): write your description
+      """
     @MiniFuncSync(self)
     def miniChiSqr(odf, P):
+        """
+        Compute the probability p ( p - value
+
+        Args:
+            odf: (array): write your description
+            P: (array): write your description
+        """
       # Calculate chi^2 and apply penalty if boundaries are violated.
       chi = 0.0
       for k in six.iterkeys(self._compos):
@@ -167,8 +225,21 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     return miniChiSqr
   
   def __sqrDiffRobust(self):
+      """
+      Calculate the cumulative distribution.
+
+      Args:
+          self: (todo): write your description
+      """
     @MiniFuncSync(self)
     def minisqr(odf, P):
+        """
+        Minisqr p.
+
+        Args:
+            odf: (array): write your description
+            P: (array): write your description
+        """
       # Calculate squared difference
       sqr = 0.0
       for k in six.iterkeys(self._compos):
@@ -177,8 +248,21 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     return minisqr
 
   def __cash79Robust(self):
+      """
+      Calculate the number of the models.
+
+      Args:
+          self: (todo): write your description
+      """
       @MiniFuncSync(self)
       def miniCash79(odf, P):
+          """
+          R p ( p ( p.
+
+          Args:
+              odf: (todo): write your description
+              P: (array): write your description
+          """
         # Calculate Cash statistics according to Cash 1979 (ApJ 228, 939)
         cc = 0
         for k in six.iterkeys(self._compos):
@@ -214,6 +298,14 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       self.relate(ps[i], [ps[0]], equal)
   
   def parameterSummary(self, toScreen=True, prefix=""):
+      """
+      Return a list of all parameters in a list of the parameter
+
+      Args:
+          self: (todo): write your description
+          toScreen: (str): write your description
+          prefix: (str): write your description
+      """
     lines = []
     for k, v in six.iteritems(self._compos):
       lines.append(prefix)
@@ -437,6 +529,11 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
       pymcPars[par] = pymc.Uniform(par, lower=Lims[par][0], upper=Lims[par][1], value=X0[par], doc="Automatically assigned parameter.")
     
     def getConcatenatedModel():
+        """
+        Returns a list of models.
+
+        Args:
+        """
       result = None
       for k in six.iterkeys(self._compos):
         if result is None:
@@ -447,6 +544,12 @@ class SyncFitContainer(_PyMCSampler, _OndeDFitParBase):
     
     # This function is used to update the model
     def getModel(**vals):
+        """
+        Return the value of the model
+
+        Args:
+            vals: (str): write your description
+        """
       self.assignValue(vals)
       self.updateModel()
       return getConcatenatedModel()

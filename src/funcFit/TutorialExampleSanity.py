@@ -5,12 +5,30 @@ import os
 class ExampleSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
 
   def sanity_firstExample(self):
+      """
+      This function isExample of the first 2d.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -93,6 +111,12 @@ class ExampleSanity(unittest.TestCase):
       """
     
       def __init__(self):
+          """
+          Initialize the instance.
+
+          Args:
+              self: (todo): write your description
+          """
         fuf.OneDFit.__init__(self, ["off", "lin"])
     
       def evaluate(self, x):
@@ -141,6 +165,12 @@ class ExampleSanity(unittest.TestCase):
       """
     
       def __init__(self):
+          """
+          Initialize the instance.
+
+          Args:
+              self: (todo): write your description
+          """
         fuf.OneDFit.__init__(self, ["off", "lin"])
     
       def evaluate(self, x):
@@ -157,6 +187,12 @@ class ExampleSanity(unittest.TestCase):
     # Create a function, which defines the relation.
     
     def getLinearRelation(factor):
+        """
+        Return a factor of the given factor.
+
+        Args:
+            factor: (float): write your description
+        """
       def linOffRel(off):
         """
           Function used to relate parameters "lin" and "off".
@@ -198,6 +234,12 @@ class ExampleSanity(unittest.TestCase):
 #     plt.show()
   
   def sanity_CombiningModels(self):
+      """
+      Generate a set of - 2 matrices.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -283,6 +325,12 @@ class ExampleSanity(unittest.TestCase):
 #     plt.show()
 
   def sanity_CustomObjectiveFunctions(self):
+      """
+      Generate a set of cumulative model.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import numpy and matplotlib
     from numpy import arange, exp, random, ones, sum, abs
     import matplotlib.pylab as plt
@@ -319,6 +367,13 @@ class ExampleSanity(unittest.TestCase):
     # fitting object and the list of free parameters.
     @fuf.MiniFunc(edf)
     def mini(edf, P):
+        """
+        Computes the model
+
+        Args:
+            edf: (todo): write your description
+            P: (array): write your description
+        """
       m = sum(abs(edf.model - edf.y)/edf.yerr)
       print("mini - current parameters: ", P, ", value is: ", m)
       return m
@@ -333,6 +388,12 @@ class ExampleSanity(unittest.TestCase):
 #     plt.show()
 
   def sanity_Overbinning(self):
+      """
+      Perform a 2d plot of - gaussian.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -407,6 +468,12 @@ class ExampleSanity(unittest.TestCase):
 #     plt.show()
 
   def sanity_simultaneousFit(self):
+      """
+      Sanity function. _simultaneomy.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy
     import matplotlib.pylab as plt
@@ -491,6 +558,12 @@ class ExampleSanity(unittest.TestCase):
 #     plt.show()
 
   def sanity_2dCircularFit(self):
+      """
+      Perform a 2d gaussian model.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -528,6 +601,12 @@ class ExampleSanity(unittest.TestCase):
 #    plt.show()
 
   def sanity_2dGaussFit(self):
+      """
+      Perform a 2d gaussian.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -571,6 +650,12 @@ class ExampleSanity(unittest.TestCase):
 #    plt.show()
 
   def sanity_2gGaussFitTupleExample(self):
+      """
+      Perform a 2d 2d gaussian.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -610,6 +695,12 @@ class ExampleSanity(unittest.TestCase):
 #    plt.show()
 
   def sanity_coordinateGridExample(self):
+      """
+      Sanitizes the grid of the horizontal coordinates.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy as np
     
@@ -625,6 +716,12 @@ class ExampleSanity(unittest.TestCase):
     print("(x, y) coordinates at index (11, 28): ", g[11,28])
 
   def sanity_CashStatisticsExample(self):
+      """
+      Sanitizes a 2d function.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -659,6 +756,12 @@ class ExampleSanity(unittest.TestCase):
 #    plt.show()
   
   def sanity_steppar1(self):
+      """
+      Perform a 2dppar1.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -712,6 +815,12 @@ class ExampleSanity(unittest.TestCase):
 #    plt.show() 
 
   def sanity_steppar2(self):
+      """
+      Sanitizes a 2d gaussian.
+
+      Args:
+          self: (todo): write your description
+      """
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -912,9 +1021,21 @@ class ExampleSanity(unittest.TestCase):
 class MCMCExampleSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down tear tear
+
+      Args:
+          self: (todo): write your description
+      """
     try:
       os.remove("mcmcExample.tmp")
     except:
@@ -941,6 +1062,12 @@ class MCMCExampleSanity(unittest.TestCase):
       print("Could not remove file: musig.emcee")
 
   def sanity_MCMCSampler(self):    
+      """
+      Sanitizes a random linear interpolation.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import some required modules
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -1020,6 +1147,12 @@ class MCMCExampleSanity(unittest.TestCase):
 
 
   def sanity_MCMCPriorExample(self):
+      """
+      Perform a 2.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -1088,6 +1221,12 @@ class MCMCExampleSanity(unittest.TestCase):
     #plt.show()
     
   def sanity_autoMCMCExample1(self):
+      """
+      Perform a gaussians.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -1131,6 +1270,12 @@ class MCMCExampleSanity(unittest.TestCase):
 
 
   def sanity_autoMCMCExample2(self):
+      """
+      Sanity to - dimensional 2d gaussian.
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -1392,6 +1537,12 @@ class MCMCExampleSanity(unittest.TestCase):
 #     plt.show()
 
   def sanity_EMCEEfirstexample(self):
+      """
+      Plots a random example of a 2d distribution.
+
+      Args:
+          self: (todo): write your description
+      """
 
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -1439,6 +1590,12 @@ class MCMCExampleSanity(unittest.TestCase):
 
 
   def sanity_EMCEEpriorexample(self):
+      """
+      Sanity function toilxample.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -1532,6 +1689,12 @@ class MCMCExampleSanity(unittest.TestCase):
 
 
   def sanity_InstatiatePrior(self):
+      """
+      Sanity ( uv ) of the cvron function
+
+      Args:
+          self: (todo): write your description
+      """
     from PyAstronomy import funcFit as fuf
     
     # Instantiate prior

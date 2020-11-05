@@ -3,12 +3,30 @@ import unittest
 class ForTransExampleSanity(unittest.TestCase):
   
   def setUp(self):
+      """
+      Sets the result of this thread.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def tearDown(self):
+      """
+      Tear down the next callable.
+
+      Args:
+          self: (todo): write your description
+      """
     pass
   
   def sanity_calcModel_1(self):
+      """
+      Calculate the mean and standard deviation.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import some unrelated modules
     import numpy as np
     import matplotlib.pylab as plt
@@ -44,6 +62,12 @@ class ForTransExampleSanity(unittest.TestCase):
     #plt.show()
 
   def sanity_calcModel_2(self):
+      """
+      Calculate the model of the model.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import some unrelated modules
     import numpy as np
     import matplotlib.pylab as plt
@@ -81,6 +105,12 @@ class ForTransExampleSanity(unittest.TestCase):
     #plt.show()
 
   def sanity_CompareLDLaws(self):
+      """
+      Sanity laws model as a function of model.
+
+      Args:
+          self: (todo): write your description
+      """
     # Import some modules
     import numpy as np
     import matplotlib.pylab as plt

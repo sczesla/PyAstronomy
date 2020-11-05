@@ -65,6 +65,18 @@ class LLGauss(fuf.OneDFit):
   """
 
   def __init__(self, lineList, uniSig=None, modelBinsize=0.005, useFastRB=True, verbose=False, onlyAbs=True):
+      """
+      Initialize the model
+
+      Args:
+          self: (todo): write your description
+          lineList: (array): write your description
+          uniSig: (todo): write your description
+          modelBinsize: (int): write your description
+          useFastRB: (str): write your description
+          verbose: (bool): write your description
+          onlyAbs: (bool): write your description
+      """
     
     if not ic.check["scipy"]:
       raise(PE.PyARequiredImport("Could not import scipy.", \

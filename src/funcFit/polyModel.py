@@ -18,6 +18,14 @@ class PolyFit1d(OneDFit):
   """
   
   def __init__(self, degree, xoff=0.0):
+      """
+      Initialize the coefficients.
+
+      Args:
+          self: (todo): write your description
+          degree: (int): write your description
+          xoff: (float): write your description
+      """
     coeffs = []
     self.degree = degree
     self.xoff = xoff
@@ -61,6 +69,12 @@ class ConstantFit1d(OneDFit):
       - `c` - The constant.
   """
   def __init__(self):
+      """
+      Resetches the internal state.
+
+      Args:
+          self: (todo): write your description
+      """
     OneDFit.__init__(self, ["c"])
     self.setRootName("Constant")
   

@@ -29,6 +29,13 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.p = p
 
   def getData(self, fn):
+      """
+      Get the data from a file
+
+      Args:
+          self: (todo): write your description
+          fn: (todo): write your description
+      """
     if not os.path.isfile(self.tddir+"/"+fn):
       print("Could not find test data file: ", fn)
       print("  Use test.pro (create_test_data) to generate test data.")
@@ -36,6 +43,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     return [True, numpy.loadtxt(self.tddir+"/"+fn)]
 
   def test_bprecess(self):
+      """
+      Calculate bprecessing
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "bprecess.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -103,6 +116,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
   def test_premat(self):
+      """
+      Calculate the data.
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "premat.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -119,6 +138,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
   def test_precess(self):
+      """
+      Determine the precessing
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "precess.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -139,6 +164,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
 
 
   def test_precess_xyz(self):
+      """
+      Precessing and set of points
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "precess_xyz.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -172,6 +203,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
   def test_xyz(self):
+      """
+      Calculate mean and standard deviation.
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "xyz.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -189,6 +226,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
   def test_helio_jd(self):
+      """
+      Calculate jd ( jd ).
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "helio_jd.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -204,6 +247,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
   def test_daycnv(self):
+      """
+      Calculates the day of the day.
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "daycnv.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -220,6 +269,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
   
   def test_aitoff(self):
+      """
+      Test the test test.
+
+      Args:
+          self: (todo): write your description
+      """
     fn = "aitoff.test"
     good, dat = self.getData(fn)
     self.assertEqual(good, True)
@@ -234,6 +289,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
   def test_inverseAitoff(self):
+      """
+      Test if the solution is inverse of the solution.
+
+      Args:
+          self: (todo): write your description
+      """
     err = 0
     for i in smo.range(1000):
       l = numpy.random.random() * 360.0 - 180.0
@@ -247,6 +308,12 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
   
   def test_baryvel(self):
+      """
+      Calculate bary
+
+      Args:
+          self: (todo): write your description
+      """
     dat = numpy.loadtxt("testPro/baryvel.test")
     err = 0
     for i in range(10000):
@@ -292,6 +359,13 @@ class IDLTests(unittest.TestCase):
     self.p = p
 
   def getData(self, fn):
+      """
+      Get the data from a file
+
+      Args:
+          self: (todo): write your description
+          fn: (todo): write your description
+      """
     if not os.path.isfile(self.tddir+"/"+fn):
       print("Could not find test data file: ", fn)
       print("  Use test.pro (create_test_data) to generate test data.")
@@ -311,6 +385,12 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(oblt, dat[i,4], delta=self.p)
 
   def test_nutate(self):
+      """
+      Calculate data
+
+      Args:
+          self: (todo): write your description
+      """
     dat = self.getData("nutate.test")[1]
     for i in smo.range(len(dat[::,0])):
       l, o = eq2hor.nutate(dat[i,0])
@@ -318,6 +398,12 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(o*3600.0, dat[i,2], delta=self.p)   
     
   def test_co_nutate(self):
+      """
+      Perform test coefficients.
+
+      Args:
+          self: (todo): write your description
+      """
     dat = self.getData("co_nutate.test")[1]
     for i in smo.range(len(dat[::,0])):
       dra, ddec, o, dl, do = eq2hor.co_nutate(dat[i,0], dat[i,1], dat[i,2], full_output=True)
@@ -328,6 +414,12 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(do*3600./dat[i,7], 1.0, delta=self.p)
 
   def test_co_aberration(self):
+      """
+      Calculate the coefficients of the coefficients.
+
+      Args:
+          self: (todo): write your description
+      """
     dat = self.getData("co_aberration.test")[1]
     for i in smo.range(len(dat[::,0])):
       dra, ddec = eq2hor.co_aberration(dat[i,0], dat[i,1], dat[i,2])
@@ -335,12 +427,24 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(ddec*3600./dat[i,4], 1.0, delta=self.p)
 
   def test_co_refract_forward(self):
+      """
+      Test forward coefficients.
+
+      Args:
+          self: (todo): write your description
+      """
     dat = self.getData("co_refract_forward.test")[1]
     for i in smo.range(len(dat[::,0])):
       r = eq2hor.co_refract_forward(dat[i,0], pressure=dat[i,1], temperature=dat[i,2]-273.15)
       self.assertAlmostEqual(r,dat[i,3], delta=self.p)
 
   def test_co_refract(self):
+      """
+      Calculate coefficients.
+
+      Args:
+          self: (todo): write your description
+      """
     dat = self.getData("co_refract.test")[1]
     for i in smo.range(len(dat[::,0])):
       aout, p, t = eq2hor.co_refract(dat[i,0], observer_alt=dat[i,1], pressure=dat[i,2], \
@@ -348,6 +452,12 @@ class IDLTests(unittest.TestCase):
       self.assertAlmostEqual(aout/dat[i,4], 1.0, delta=self.p)
 
   def test_hadec2altaz(self):
+      """
+      Calculate azimuthal altitude.
+
+      Args:
+          self: (todo): write your description
+      """
     dat = self.getData("hadec2altaz.test")[1]
     for i in smo.range(len(dat[::,0])):
       alt, az = eq2hor.hadec2altaz(dat[i,0], dat[i,1], dat[i,2])
