@@ -1,5 +1,5 @@
 funcFit2 - A convenient fitting interface
-===========================================
+=========================================
 
 funcFit2 is a successor to funcFit, with the goal to resolve the main problems encountered with the original
 implementation and maintaining what was convenient about it.
@@ -11,4 +11,4 @@ implementation and maintaining what was convenient about it.
 
    Tutorial <tutorial1.rst>
       
-   Reasoning behind fuf2 <fuf2philo.rst>
+   Philosophy <fuf2philo.rst>

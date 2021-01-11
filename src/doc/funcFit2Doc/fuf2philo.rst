@@ -1,11 +1,13 @@
-The reasoning behind fuf2
-=================================
+Some philosophy behind funcFit2
+===============================
 
-Below, a brief overview of why a new model class and funcFit is desirable and why the goals
-cannot be achieved through an extension of the existing material.
+FuncFit2 is thought to be a mostly independent successor of the original
+funcFit implementation. A redesign of funcFit had become necessary because
+of structural problems in funcFit, arising from early design decisions and
+the scope of target problems. A number of related issued are discussed below.
 
-Why have a successor to OneDFit?
-------------------------------------
+Why have a successor to OneDFit from the original funcFit?
+----------------------------------------------------------
 
 The model class of funcFit is OneDFit. The central element of OneDFit
 is the `evaluate` method, which relates the vector of model parameters values, :math:`P`,
@@ -40,7 +42,7 @@ To handle such situations more efficiently and embed the model in a natural Baye
 environment, a new model class is therefore quite desirable.
 
 How to remedy the shortcomings?
-----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many of the above-mentioned inconveniences can be alleviated by a slight shift in paradigm,
 in particular, by making the objective function a central element of the model class
@@ -54,10 +56,11 @@ rather than model evaluation.
 This change naturally allows to more clearly separate optimization from the actual model class.
 While the incorporation of the fitting (and sampling) into the model class was often convenient,
 it also helped to create those structural problems, which ultimately led to the redesign of the
-model class. Delegating optimization to convenience functions helps to maintain greater flexibility.
+model class. Delegating optimization to convenience functions helps to maintain greater flexibility
+and eases the incorporation with the infrastructure of libraries such as SciPy. 
 
-In contrast,
-one particular element of OneDFit, which stood the test of time is its concept
+One element of OneDFit, which stood the test of time, is its concept
 of parameter management. This involves addressing the parameters by 'name',
 freeze and thaw them in the fitting (and sampling) process, restrict their ranges,
-and so on. This design tenet is therefore worth to be preserved.
+and so on. One of the goals is, therefore, to preserve this design tenet.
+
