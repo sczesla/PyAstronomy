@@ -689,7 +689,8 @@ def chisqrobjf(self, pars, *args, **kwargs):
     return np.sum( (m-y)**2/yerr**2 )
     
 
-class MBO2(object):
+
+class MBO(object):
     """
     Model Base Object
     
@@ -713,7 +714,7 @@ class MBO2(object):
         self.objfnlogL()
         
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
-        self._imap = self.pars.copy()
+#         self._imap = self.pars.copy()
         self.priors = []
         
         self.rootName = rootName
@@ -727,50 +728,18 @@ class MBO2(object):
         Parameters
         ----------
         right : MBO2 instance
-            Right side of the operation
+            MBO object on the right hand side of the operation
+        
+        Returns
+        -------
+        combination : MBO2
         """
-        r = MBO2([], rootName="combined")
+        r = MBO([], rootName="combined")
         r.pars = PyABaSoS.combine(self.pars, right.pars)
         r.leftCompo = self
         r.rightCompo = right
         return r
      
-    def __add__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) + self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __sub__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) - self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __mul__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) * self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __div__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __truediv__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-
-    def __pow__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) ** self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-
     def parameterSummary(self, toScreen=True, prefix=""):
         """
         Parameter summary
@@ -811,9 +780,6 @@ class MBO2(object):
             print("-" * mll)
         return lines
         
-    def evaluate(self, *args, **kwargs):
-        pass
-
     def relate(self, dv, idv, func=None):
         self.pars.relate(dv, idv, func)
     
@@ -853,12 +819,20 @@ class MBO2(object):
     def _pex(self, pns):
         """
         Apply unix filename-like pattern matching and return updated list of parameters
+        
+        Returns
+        -------
+        updated list : list of strings
+            Possibly expanded list of parameter names. For parameter names without expansion (and
+            possibly without match in the list of model parameter names), the input string is returned.
         """
+        # Ensure it is a list of strings
         if isinstance(pns, six.string_types):
             pns = [pns]
         r = []
         for p in pns:
-            r.extend(fnmatch.filter(list(self.parameters()), p))
+            e = fnmatch.filter(list(self.parameters()), p) 
+            r.extend(e if len(e)>0 else [p])
         return r
        
     def thaw(self, pns):
@@ -968,6 +942,9 @@ The likelihood function calculates the (natural) logarithm of the likelihood for
 current set of parameter values. It takes no obligatory arguments. Usually, however,
 it requires a data set as input.
         """))
+
+    def evaluate(self, *args, **kwargs):
+        pass
 
     def logPrior(self, *args, **kwargs):
         """ Returns natural logarithm of prior for current parameter values """
@@ -1240,6 +1217,92 @@ it requires a data set as input.
 
 
 
+class MBOEv(MBO):
+    """
+    Model Base Object with evaluate method and chi square as default objective function
+    """
+    
+    def __init__(self, pars=None, rootName="", **kwargs):
+        
+        if pars is None:
+            raise(PE.PyAValError("You need to specify the parameter names via 'pars'.", \
+                                 where="MBOEv", \
+                                 solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
+        
+        # Use likelihood based on Gaussian errors with std yerr
+        self.setlogL("1dgauss")
+        # Set objective function to chi square
+        self.objfnChiSquare()
+        # Define chisqr as an alias to the objective function
+        self.chisqr = self.objf
+        
+        self.pars = (PyABaSoS(PyABPS(pars, rootName)))
+        self._imap = self.pars.copy()
+        self.priors = []
+        
+        self.rootName = rootName
+        self.leftCompo = None
+        self.rightCompo = None
+    
+    def _combineMBOs(self, right):
+        """
+        Combine two MBOs into a new one
+
+        Parameters
+        ----------
+        right : MBO2 instance
+            MBO object on the right hand side of the operation
+        
+        Returns
+        -------
+        combination : MBO2
+        """
+        r = MBOEv([], rootName="combined")
+        r.pars = PyABaSoS.combine(self.pars, right.pars)
+        r.leftCompo = self
+        r.rightCompo = right
+        return r
+     
+    def __add__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) + self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __sub__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) - self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __mul__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) * self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __div__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __truediv__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+
+    def __pow__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) ** self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+        
+
+
+
+
 
 def _introdefarg(f, **kwargs):
     """
@@ -1270,9 +1333,9 @@ def _introdefarg(f, **kwargs):
     return defargs, odefargs
 
 
-def fitfmin1d(m, x, y, yerr=None, **kwargs):
+def fitfmin(m, x, y, yerr=None, **kwargs):
     """
-    Use scipy's fmin to fit 1d model.
+    Use scipy's fmin to fit model.
     """
     # Get keywords and default arguments
     defargs, _ = _introdefarg(sco.fmin, **kwargs)
@@ -1289,9 +1352,9 @@ def fitfmin1d(m, x, y, yerr=None, **kwargs):
     return fr
 
 
-def fitfmin_cobyla1d(m, x, y, yerr=None, cons=None, **kwargs):
+def fitfmin_cobyla(m, x, y, yerr=None, cons=None, **kwargs):
     """
-    Use scipy's fitfmin_cobyla to fit 1d model.
+    Use scipy's fitfmin_cobyla to fit model.
     """
     # Get keywords and default arguments
     defargs, _ = _introdefarg(sco.fmin_cobyla, **kwargs)
@@ -1336,9 +1399,9 @@ def fitfmin_cobyla1d(m, x, y, yerr=None, cons=None, **kwargs):
     return fr
 
 
-def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
+def fitfmin_powell(m, x, y, yerr=None, **kwargs):
     """
-    Use scipy's fmin_powell to fit 1d model.
+    Use scipy's fmin_powell to fit model.
     """
     # Get keywords and default arguments
     defargs, _ = _introdefarg(sco.fmin_powell, **kwargs)
@@ -1355,9 +1418,9 @@ def fitfmin_powell1d(m, x, y, yerr=None, **kwargs):
     return fr
 
 
-def fitfmin_l_bfgs_b1d(m, x, y, yerr=None, **kwargs):
+def fitfmin_l_bfgs_b(m, x, y, yerr=None, **kwargs):
     """
-    Use scipy's fmin_l_bfgs_b to fit 1d model.
+    Use scipy's fmin_l_bfgs_b to fit model.
     
     Parameters
     ----------
@@ -1578,11 +1641,11 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
     
 def _fuf2ModelFactory(odc, rn):
     
-    class F2M(MBO2):
+    class F2M(MBOEv):
     
         def __init__(self, *args, **kwargs):
             self._odm = odc(*args, **kwargs)
-            MBO2.__init__(self, pars=list(self._odm.parameters()), rootName=rn)
+            MBOEv.__init__(self, pars=list(self._odm.parameters()), rootName=rn)
             self.setlogL("1dgauss")
  
         def evaluate(self, *args, **kwargs):
@@ -1611,105 +1674,105 @@ for m in _ml:
     setattr(_fbo2module, m[0], _fuf2ModelFactory(m[1], m[2]) )
 
 
-
-# class GF1d(MBO2):
-#     
+# 
+# # class GF1d(MBO2):
+# #     
+# #     def __init__(self):
+# #         self._gf = GaussFit1d()
+# #         MBO2.__init__(self, pars=list(self._gf.parameters()), rootName=GF1d)
+# #         self.setLogL("1dgauss")
+# #     
+# #     def evaluate(self, t):
+# #         self._gf.assignValues(self.parameters())
+# #         return self._gf.evaluate(t)
+# #     
+# # 
+# #     
+# class Poly2(MBO2):
+# 
 #     def __init__(self):
-#         self._gf = GaussFit1d()
-#         MBO2.__init__(self, pars=list(self._gf.parameters()), rootName=GF1d)
-#         self.setLogL("1dgauss")
+#         MBO2.__init__(self, pars=["c0", "c1", "c2"], rootName="Poly2")
+#         self.setlogL("1dgauss")
 #     
-#     def evaluate(self, t):
-#         self._gf.assignValues(self.parameters())
-#         return self._gf.evaluate(t)
+#     def evaluate(self, x, **kwargs):
+#         s = self._imap
+#         return s["c0"] + s["c1"]*x + s["c2"]*x**2
 #     
 # 
+# class CeleriteModel(MBO2):
 #     
-class Poly2(MBO2):
-
-    def __init__(self):
-        MBO2.__init__(self, pars=["c0", "c1", "c2"], rootName="Poly2")
-        self.setlogL("1dgauss")
-    
-    def evaluate(self, x, **kwargs):
-        s = self._imap
-        return s["c0"] + s["c1"]*x + s["c2"]*x**2
-    
-
-class CeleriteModel(MBO2):
-    
-    def _nc(self, s):
-        """
-        Adjust parameter names
-        
-        Parameters
-        ----------
-        s : string
-            Parameter name from celerite
-        
-        Returns
-        -------
-        name : string
-            Adjusted name (here, 'kernel: ' removed)
-        """
-        s = s.replace("kernel:", "")
-        return s
-    
-    def __init__(self, gp, nc=None):
-        
-        # Name conversion
-        if nc is None:
-            # Use default naming convention
-            nc = self._nc
-        
-        # Save reference to GP
-        self.gp = gp
-        # Save parameter names (and the order)
-        self._pns = [nc(n) for n in gp.get_parameter_names(include_frozen=True)]
-        
-        MBO2.__init__(self, self._pns, rootName="celmo", logl=None)
-        
-        vals = gp.get_parameter_vector(include_frozen=True)
-        for i, n in enumerate(self._pns):
-            self[n] = vals[i]
-        
-        for i, b in enumerate(self.gp.get_parameter_bounds(include_frozen=True)):
-            self.setRestriction({self._pns[i]:b})
-        
-    def _updateGPParams(self):
-        """ Assign current model parameters """
-        pv = np.zeros(len(self._pns))
-        for i, _ in enumerate(self.gp.get_parameter_names()):
-            pv[i] = self[self._pns[i]]
-        self.gp.set_parameter_vector(pv, include_frozen=True)
-    
-    def logL(self, *args, **kwargs):
-        """ Likelihood function for celerite GP """
-        self._updateGPParams()
-        ll = self.gp.log_likelihood(args[1])
-        return ll
-    
-    def evaluate(self, x):
-        return None
-    
-    def predict(self, px, y):
-        """
-        Get predicted mean and variance of GP
-        
-        Parameters
-        ----------
-        px : array
-            Position at which to evaluate the prediction
-        y : array
-            The data
-        
-        Returns
-        -------
-        mean, variance, std : arrays
-            Prediction
-        """
-        self._updateGPParams()
-        pred_mean, pred_var = self.gp.predict(y, px, return_var=True)
-        return pred_mean, pred_var, np.sqrt(pred_var)
-
-    
+#     def _nc(self, s):
+#         """
+#         Adjust parameter names
+#         
+#         Parameters
+#         ----------
+#         s : string
+#             Parameter name from celerite
+#         
+#         Returns
+#         -------
+#         name : string
+#             Adjusted name (here, 'kernel: ' removed)
+#         """
+#         s = s.replace("kernel:", "")
+#         return s
+#     
+#     def __init__(self, gp, nc=None):
+#         
+#         # Name conversion
+#         if nc is None:
+#             # Use default naming convention
+#             nc = self._nc
+#         
+#         # Save reference to GP
+#         self.gp = gp
+#         # Save parameter names (and the order)
+#         self._pns = [nc(n) for n in gp.get_parameter_names(include_frozen=True)]
+#         
+#         MBO2.__init__(self, self._pns, rootName="celmo", logl=None)
+#         
+#         vals = gp.get_parameter_vector(include_frozen=True)
+#         for i, n in enumerate(self._pns):
+#             self[n] = vals[i]
+#         
+#         for i, b in enumerate(self.gp.get_parameter_bounds(include_frozen=True)):
+#             self.setRestriction({self._pns[i]:b})
+#         
+#     def _updateGPParams(self):
+#         """ Assign current model parameters """
+#         pv = np.zeros(len(self._pns))
+#         for i, _ in enumerate(self.gp.get_parameter_names()):
+#             pv[i] = self[self._pns[i]]
+#         self.gp.set_parameter_vector(pv, include_frozen=True)
+#     
+#     def logL(self, *args, **kwargs):
+#         """ Likelihood function for celerite GP """
+#         self._updateGPParams()
+#         ll = self.gp.log_likelihood(args[1])
+#         return ll
+#     
+#     def evaluate(self, x):
+#         return None
+#     
+#     def predict(self, px, y):
+#         """
+#         Get predicted mean and variance of GP
+#         
+#         Parameters
+#         ----------
+#         px : array
+#             Position at which to evaluate the prediction
+#         y : array
+#             The data
+#         
+#         Returns
+#         -------
+#         mean, variance, std : arrays
+#             Prediction
+#         """
+#         self._updateGPParams()
+#         pred_mean, pred_var = self.gp.predict(y, px, return_var=True)
+#         return pred_mean, pred_var, np.sqrt(pred_var)
+# 
+#     
