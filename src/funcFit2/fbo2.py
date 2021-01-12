@@ -1657,18 +1657,26 @@ def _fuf2ModelFactory(odc, rn):
 
 # Transform OneDFit objects into MBOs
 # List gives tuples with fuf2-name, fuf-class, and root name to be assigned
-_ml = [("GaussFit1d", _fuf.GaussFit1d, "GF1d"), \
-       ("MultiGaussFit1d", _fuf.MultiGauss1d, "MGF1d"),
-       ("CauchyLorentz1d", _fuf.CauchyLorentz1d, "CauchyLorentz1d"), \
-       ("Voigt1d", _fuf.voigt1d, "Voigt1d"), \
-       ("MultiVoigt1d", _fuf.MultiVoigt1d, "MultiVoigt1d"), \
-       ("SinusFit1d", _fuf.SinusFit1d, "SinusFit1d"), \
-       ("ExpDecayFit1d", _fuf.ExpDecayFit1d, "ExpDecayFit1d"), \
-       ("PolyFit1d", _fuf.PolyFit1d, "PolyFit1d"), \
-       ("ConstantFit1d", _fuf.ConstantFit1d, "ConstantFit1d"), \
+_ml = [("GaussFit1d", _fuf.GaussFit1d, "GF"), \
+       ("MultiGaussFit1d", _fuf.MultiGauss1d, "MGF"),
+       ("CauchyLorentz1d", _fuf.CauchyLorentz1d, "CauchyLorentz"), \
+       ("Voigt1d", _fuf.voigt1d, "Voigt"), \
+       ("MultiVoigt1d", _fuf.MultiVoigt1d, "MultiVoigt"), \
+       ("SinusFit1d", _fuf.SinusFit1d, "SinusFit"), \
+       ("ExpDecayFit1d", _fuf.ExpDecayFit1d, "ExpDecayFit"), \
+       ("PolyFit1d", _fuf.PolyFit1d, "PolyFit"), \
+       ("ConstantFit1d", _fuf.ConstantFit1d, "ConstantFit"), \
        ("GaussFit2d", _fuf.GaussFit2d, "GaussFit2d"), \
        ("MultiGauss2d", _fuf.MultiGauss2d, "MultiGauss2d"), \
        ("Circle2d", _fuf.Circle2d, "Circle2d")]
+
+# Provide versions/names without the 1d ending
+_eml = []
+for m in _ml:
+    if m[0].endswith("1d"):
+        _eml.append( (m[0][0:-2], m[1], m[2]) )
+_ml.extend(_eml)
+        
 
 for m in _ml:
     setattr(_fbo2module, m[0], _fuf2ModelFactory(m[1], m[2]) )

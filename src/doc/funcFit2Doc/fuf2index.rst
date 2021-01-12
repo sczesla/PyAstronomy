@@ -12,3 +12,5 @@ implementation and maintaining what was convenient about it.
    Tutorial <tutorial1.rst>
       
    Philosophy <fuf2philo.rst>
+   
+   gaussfit1

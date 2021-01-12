@@ -41,10 +41,10 @@ extensions = []
 try:
     import numpydoc
     extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo',
-                  mathext, 'numpydoc', 'sphinx.ext.autosummary']
+                  mathext, 'numpydoc', 'sphinx.ext.autosummary', 'nbsphinx']
 except:
     extensions = ['sphinx.ext.autodoc',
-                  'sphinx.ext.todo', mathext]
+                  'sphinx.ext.todo', mathext, 'nbsphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
