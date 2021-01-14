@@ -7,14 +7,28 @@ class VoigtAstroP(fuf.OneDFit):
     Astronomical parameterization of Voigt profile.
 
     This class provides a convenient parameterization of the Voigt
-    profile, as it is frequently used in astronomy. In particular,
+    profile, frequently used in astronomy. In particular,
     the line is parameterized in terms of wavelength,
     Doppler parameter, damping width, and oscillator strength.
     
-    The velocity dispersion is the standard deviation of the
-    velocity distribution. For zero damping width (gamma), the
-    resulting model line is a Gaussian with a standard
-    deviation of b/sqrt(2) in velocity units.
+    If the velocity components of the constituents follow
+    independent Gaussian distributions with standard deviation
+    :math:`\\sigma` in all three dimensions of space
+    
+    .. math::
+        
+        v_{x,y,z} \\sim N(0,\sigma^2) \; ,
+        
+    the mode of the distribution of absolute velocity,
+    :math:`v_a = \\sqrt{v_x^2 + v_y^2 + v_z^2}`
+    is given by :math:`v_{mode} = \sqrt{2}\\sigma`. This is
+    the velocity referred to as the Doppler parameter, b.
+    Consequently, the velocity dispersion in any individual dimension,
+    i.e., the standard deviation of the Gaussian velocity distribution,
+    is related to the Doppler parameter by :math:`\\sigma = b/\\sqrt{2}`.
+    For zero damping width (gamma),
+    the resulting model line is, therefore, a Gaussian with a standard
+    deviation of :math:`\\sigma = b/\\sqrt{2}` in velocity units.
     
     Instrumental resolution can be applied via the parameter R.
     The instrumental profile is assumed to be a Gaussian with
