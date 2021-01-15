@@ -25,6 +25,8 @@ for mod_name in MOCK_MODULES:
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
+nbsphinx_input_prompt = 'In [%s]:'
+
 # generate autosummary pages
 autosummary_generate = True
 
