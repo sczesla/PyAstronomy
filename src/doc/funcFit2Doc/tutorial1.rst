@@ -49,16 +49,14 @@ Depending on your installation the output should look like:
 Example: Fitting a Gaussian
 ---------------------------
 
-.. toctree::
-   :maxdepth: 1
-
-   gaussfit1
-    
+* :doc:`ex_gaussfit1` :download:`(Download notebook) <ex_gaussfit1.ipynb>`
 
 On the objective function
 -------------------------
 
-The objective function is the function, the vaue of which is minimized.
+The objective function is the function, the value of which is to be minimized.
+Models can but do not have to have a predefined objective function. For example, the
+GaussFit model uses chi square as a default objective functions. 
 
 ::
 
@@ -80,25 +78,28 @@ Whose answer reads:
           
 
 
-Restrictions
-------------
+Restrictions of parameter ranges
+--------------------------------
 
-A *restriction* limits the valid range of values of a parameter. Restrictions are common in modeling
-and problems of optimization. 
-For example, the width (standard deviation) of a Gaussian should be positive or certain spectral
+A *restriction* limits the valid range of values of a parameter. Restrictions are common as boundary
+conditions in modeling and problems of optimization. 
+For example, the width (standard deviation) of a Gaussian must be positive or certain spectral
 lines must only occur in absorption or emission for physical reasons.
 
-Restrictions can be handled in many ways:
+Restrictions can be handled in many ways. The possibilities include to implement restrictions include:
 
-- The restriction can be absorbed in the definition of the model, e.g., by using the absolute value of the
-  standard deviation in calculating a Gaussian curve.
-- Some optimization algorithm allow to specify boundaries (or more general constraints) for the parameter
-  values. One example of such an algorithm is scipy's "fmin_l_bfgs_b".
-- Restrictions can be implemented by penalizing the objective function when the boundaries are violated.
+- **Parameter transformations**
+  The restriction can be absorbed in the definition of the model, e.g., by using the absolute value of the
+  standard deviation in calculating a Gaussian curve. Also mapping of the real number onto a finite range
+  such as the `sigmoid function <https://en.wikipedia.org/wiki/Sigmoid_function>`_ can be used.
+- **Optimization algorithms** Some optimization algorithm allow to specify boundaries (or more general constraints)
+  for the parameter values. One example of such an algorithm is scipy's
+  `fmin_l_bfgs_b <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html>`_.
+- **Penalty functions** Restrictions can be implemented by penalizing the objective function when the
+  boundaries are violated.
   If combined with an optimization algorithm based on gradient descent, it is often helpful to implement
   "soft edges" for penalty, i.e., a strong but finite gradient in the objective, which allows the algorithm
   to "find its way back".
-- In a Bayesian analysis, restrictions are naturally absorbed in the priors, when the posterior is the objective.
 
 
 Algorithm allowing boundary conditions (fmin_l_bfgs_b)
@@ -386,109 +387,10 @@ Relations define functional dependences between different parameter values.
 Custom models
 -------------
 
-Straight line
-~~~~~~~~~~~~~
+Using custom models is easy.
 
-::
-
-    from __future__ import print_function, division
-    import numpy as np
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    class LinMod(fuf2.MBO2):
-        """ Linear model with additional jitter """
-        
-        def __init__(self):
-            # 'pars' specifies parameter names in the model
-            fuf2.MBO2.__init__(self, pars=["const", "slope"], rootName="LinMod")
-            # Use likelihood based on Gaussian errors with std yerr
-            self.setlogL("1dgauss")
-        
-        def evaluate(self, x):
-            """ Evaluate line """
-            return self["const"] + x * self["slope"]
-    
-    
-    # Instantiate model
-    lm = LinMod()
-    lm["slope"] = 1.1
-    lm["const"] = -0.5
-    
-    # Get some 'data' and add Gaussian noise with STD 10
-    x = np.arange(15.)
-    y = lm.evaluate(x) + np.random.normal(0,1,len(x))
-    yerr = np.ones_like(x)
-    
-    lm.thaw(["slope", "const"])
-    
-    fr = sco.fmin(lm.objf, x0=lm.freeParamVals(), args=(x,y,yerr))
-    lm.setFreeParamVals(fr)
-    
-    lm.parameterSummary()
-    
-    plt.errorbar(x, y, yerr=yerr, fmt='b+')
-    plt.plot(x, lm.evaluate(x), 'r--')
-    plt.show()
-
-
-
-Straight line with jitter
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A linear model with custom specification of the likelihood, which allows to take into account
-an additional contribution to the uncertainty of the data (jitter). The jitter can be treated
-as a free parameter in the fit. 
-
-::
-
-    from __future__ import print_function, division
-    import numpy as np
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    class LinMod(fuf2.MBO2):
-        """ Linear model with additional jitter """
-        
-        def __init__(self):
-            fuf2.MBO2.__init__(self, pars=["const", "slope", "jitter"], rootName="LinMod")
-        
-        def evaluate(self, x):
-            """ Evaluate line """
-            return self["const"] + x * self["slope"]
-    
-        def logL(self, x, y, yerr, **kwargs):
-            """ ln(Likelihood) with jitter as additional term """
-            yr = np.sqrt(yerr**2 + self["jitter"]**2)
-            m = self.evaluate(x)
-            lnl = -len(x)/2.0*np.log(2.*np.pi) - np.sum(np.log(yr)) - 0.5 * np.sum((m-y)**2/(yr**2))
-            return lnl
-    
-    # Instantiate model
-    lm = LinMod()
-    lm["slope"] = 1.1
-    lm["const"] = -0.5
-    
-    # Get some 'data' and add Gaussian noise with STD 10
-    x = np.arange(150.)
-    y = lm.evaluate(x) + np.random.normal(0,10,len(x))
-    # Nominal error has STD 1
-    yerr = np.ones_like(x)
-    
-    lm.thaw(["slope", "const", "jitter"])
-    
-    fr = sco.fmin(lm.objf, x0=lm.freeParamVals(), args=(x,y,yerr))
-    lm.setFreeParamVals(fr)
-    
-    lm.parameterSummary()
-    
-    plt.errorbar(x, y, yerr=yerr, fmt='b+')
-    plt.plot(x, lm.evaluate(x), 'r--')
-    plt.show()
+* :doc:`ex_linmod1` :download:`(Download notebook) <ex_linmod1.ipynb>`
+* :doc:`ex_linmod_jit` :download:`(Download notebook) <ex_linmod_jit.ipynb>`
 
 
 Combine models

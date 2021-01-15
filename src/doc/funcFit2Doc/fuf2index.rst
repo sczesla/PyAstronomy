@@ -13,4 +13,3 @@ implementation and maintaining what was convenient about it.
       
    Philosophy <fuf2philo.rst>
    
-   ex_gaussfit1
