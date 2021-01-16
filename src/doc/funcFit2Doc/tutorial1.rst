@@ -15,6 +15,10 @@ Some knowledge of numpy, SciPy, and matplotlib is helpful to dive in.
 .. _XSPEC: http://heasarc.nasa.gov/xanadu/xspec/
 .. _emcee: http://dan.iel.fm/emcee/current/
 
+.. note:: Please mind the citation request for use of the scipy algorithms explained
+          `here <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html>`_.
+  
+
 Prerequisites
 -------------
 To run the example in this tutorial you need to have installed the following packages:
@@ -81,12 +85,12 @@ Whose answer reads:
 Restrictions of parameter ranges
 --------------------------------
 
-A *restriction* limits the valid range of values of a parameter. Restrictions are common as boundary
+A *restriction* in funcFit2 limits the valid range of values of a parameter. Restrictions are common as boundary
 conditions in modeling and problems of optimization. 
 For example, the width (standard deviation) of a Gaussian must be positive or certain spectral
 lines must only occur in absorption or emission for physical reasons.
 
-Restrictions can be handled in many ways. The possibilities include to implement restrictions include:
+Restrictions can be handled in many ways. The possibilities to implement restrictions include:
 
 - **Parameter transformations**
   The restriction can be absorbed in the definition of the model, e.g., by using the absolute value of the
@@ -102,166 +106,35 @@ Restrictions can be handled in many ways. The possibilities include to implement
   to "find its way back".
 
 
+Use penalties to enforce restrictions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Penalties are funcFit2's default mechanism to account for restrictions. A restriction is specified
+by a two-valued list with a lower and an upper limit for the parameter range. None can be used to
+indicate that no boundary applies on one (or both) sides. Restrictions can be added
+to parameters via the `setRestriction` method.
+
+If a parameter value violates the specified boundary restrictions by some margin x, a value of
+abs(x)*penaltyFactor is added to the value of the objective function. The default value of
+penaltyFactor is 1e20.
+
+* :doc:`ex_restrictviapenalties` :download:`(Download notebook) <ex_restrictviapenalties.ipynb>`
+
+
 Algorithm allowing boundary conditions (fmin_l_bfgs_b)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here directly invoke the
 `fmin_l_bfgs_b <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html>`_
-as implemented in scipy to carry out an optimization with boundary conditions.
+as implemented in scipy to carry out an optimization with boundary conditions
 
-.. note:: Please mind the citation request for use of the algorithm explained
-          `here <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html>`_.
-  
-::
-    
-    from __future__ import print_function, division
-    from numpy import arange, sqrt, exp, pi, random, ones_like
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    # Creating a Gaussian with some noise
-    # Choose some parameters...
-    gPar = {"A":-5.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-    # Calculate profile
-    x = arange(100) - 50.0
-    y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
-        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-    # Add some noise...
-    y += random.normal(0.0, 0.01, x.size)
-    # ...and save the error bars
-    yerr = ones_like(x)*0.01
-    # Let us see what we have done...
-    plt.plot(x, y, 'bp')
-    
-    # Create a model object
-    gf = fuf2.GaussFit1d()
-    
-    # Set guess values for the parameters
-    gf.assignValues({"A":-3, "sig":10.77, "off":0.96, "mu":10.5})
-    
-    # 'Thaw' those (the order is irrelevant)
-    gf.thaw(["mu", "sig", "off", "A"])
-    
-    # We need the order to get the order of bounds right
-    # This is not necessarily the order in which they are thawed!
-    print("Free parameter names and their order: ", gf.freeParamNames())
-    
-    # Use fmin_l_bfgs_b with amplitude restricted to the (-2,0) interval
-    fr = sco.fmin_l_bfgs_b(gf.objf, gf.freeParamVals(), args=(x,y,yerr), bounds=((-2.,0), (None,None), (None,None), (None,None)), approx_grad=True)
-    # Set the parameter values to best-fit
-    gf.setFreeParamVals(fr[0])
-    
-    gf.parameterSummary()
-    plt.plot(x, gf.evaluate(x), 'r--')
-    plt.show()
+* :doc:`ex_algorestrict` :download:`(Download notebook) <ex_algorestrict.ipynb>`
 
+Use a convenience function to automatically channel the restrictions from the model to the
+algorithm 
 
-Built-in restrictions with convenience function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :doc:`ex_algorestrict_con` :download:`(Download notebook) <ex_algorestrict_con.ipynb>`
 
-Convenience functions can automatically grab the restrictions from the model
-and hand them to the minimization algorithm.
-
-::
-    
-    from __future__ import print_function, division
-    from numpy import arange, sqrt, exp, pi, random, ones_like
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    # Creating a Gaussian with some noise
-    # Choose some parameters...
-    gPar = {"A":1.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-    # Calculate profile
-    x = arange(100) - 50.0
-    y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
-        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-    # Add some noise...
-    y += random.normal(0.0, 0.002, x.size)
-    # ...and save the error bars
-    yerr = ones_like(x)*0.002
-    # Let us see what we have done...
-    plt.plot(x, y, 'bp')
-    
-    # Create a model object
-    gf = fuf2.GaussFit1d()
-    
-    # Set guess values for the parameters
-    gf.assignValues({"A":3, "sig":3.77, "off":0.96, "mu":10.5})
-    
-    # 'Thaw' those (the order is irrelevant)
-    gf.thaw(["mu", "sig", "off", "A"])
-    
-    # Restrict the valid range for sigma
-    gf.setRestriction({"sig":[0,5]})
-    
-    # The convenience function 'fitfmin_l_bfgs_b1d' automatically channels
-    # the restrictions from the model to the algorithm.
-    fuf2.fitfmin_l_bfgs_b1d(gf, x, y, yerr=yerr)
-    
-    gf.parameterSummary()
-    plt.plot(x, gf.evaluate(x), 'r--')
-    plt.show()
-
-
-Use penalties for boundary violations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Penalties can be used to implement restrictions. Here we use `objfPenalize`
-to add penalties to the objective function.
-
-::
-    
-    from __future__ import print_function, division
-    from numpy import arange, sqrt, exp, pi, random, ones_like
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    # Creating a Gaussian with some noise
-    # Choose some parameters...
-    gPar = {"A":1.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-    # Calculate profile
-    x = arange(100) - 50.0
-    y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
-        * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-    # Add some noise...
-    y += random.normal(0.0, 0.002, x.size)
-    # ...and save the error bars
-    yerr = ones_like(x)*0.002
-    # Let us see what we have done...
-    plt.plot(x, y, 'bp')
-    
-    # Create a model object
-    gf = fuf2.GaussFit1d()
-    
-    # Set guess values for the parameters
-    gf.assignValues({"A":3, "sig":3.77, "off":0.96, "mu":9.5})
-    
-    # 'Thaw' those (the order is irrelevant)
-    gf.thaw(["mu", "sig", "off", "A"])
-    
-    # Restrict parameter ranges
-    gf.setRestriction({"sig":[0,7]})
-    
-    # Use chi-square is objective
-    gf.objfnChiSquare()
-    # Apply penalties for violating boundaries
-    gf.objfPenalize()
-    
-    # Use a minimization algorithm not accounting for boundaries
-    # with penalties
-    fr = fuf2.fitfmin1d(gf, x, y, yerr=yerr)
-    print("Fit result: ", fr)
-    
-    gf.parameterSummary()
-    plt.plot(x, gf.evaluate(x), 'r--')
-    plt.show()
 
 
 Use a custom objective function

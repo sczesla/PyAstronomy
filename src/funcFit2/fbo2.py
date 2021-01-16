@@ -717,6 +717,9 @@ class MBO(object):
 #         self._imap = self.pars.copy()
         self.priors = []
         
+        # Penalty factor used in objective function
+        self._pf = 1e20
+        
         self.rootName = rootName
         self.leftCompo = None
         self.rightCompo = None
@@ -880,6 +883,14 @@ class MBO(object):
                         self.addUniformPrior(k, lower=v[0], upper=v[1])
                     else:
                         self.addSmoothUniformPrior(k, lower=v[0], upper=v[1], scale=sscale)
+    
+    def getPenaltyFactor(self):
+        return self._pf
+    
+    def setPenaltyFactor(self, pf):
+        if pf < 0:
+            raise(PE.PyAValError("Penalty factor must not be negative."))
+        self._pf = pf
             
     def getRestrictions(self):
         return self.pars.getRestrictions()
@@ -1121,6 +1132,7 @@ it requires a data set as input.
             v = f(self, *args, **kwargs)
             if not np.isfinite(v):
                 PE.PyAValError("Infinite value encountered in objective function for parameters: " + str(args[0]) + ", free parameters : " + ",".join(self.freeParamNames()))
+            v += self.getRPenalty()
             return v
         
         objf.__doc__ = f.__doc__
@@ -1144,7 +1156,7 @@ it requires a data set as input.
             return -self.logL(*args[1:], **kwargs)
         self.objf = nln
         
-    def getRPenalty(self, pf=1e20):
+    def getRPenalty(self):
         """
         Get penalty for violating restrictions
         
@@ -1160,27 +1172,29 @@ it requires a data set as input.
         Penalty : float
             Penalty for current restrictions and parameter values
         """
+        if self._pf == 0:
+            return 0.0
         x = 0.0
         for p, r in six.iteritems(self.getRestrictions()):
             if (not r[0] is None) and (self[p] < r[0]):
-                x += pf*abs(self[p]-r[0])
+                x += self._pf*abs(self[p]-r[0])
                 continue
             if (not r[1] is None) and (self[p] > r[1]):
-                x += pf*abs(self[p]-r[1])
+                x += self._pf*abs(self[p]-r[1])
                 continue
         return x
     
-    def objfPenalize(self, pf=1e20):
-        """
-        Add restriction penalties to objective function
-        """
-        self._nonpenobjf = self.getSPLikeObjf()
-        def pobj(self, *args, **kwargs):
-            x = self._nonpenobjf(*args, **kwargs)
-            x += self.getRPenalty()
-            return x
-        pobj.__doc__ = self._nonpenobjf.__doc__ + " (penalized)"
-        self.objf = pobj
+#     def objfPenalize(self, pf=1e20):
+#         """
+#         Add restriction penalties to objective function
+#         """
+#         self._nonpenobjf = self.getSPLikeObjf()
+#         def pobj(self, *args, **kwargs):
+#             x = self._nonpenobjf(*args, **kwargs)
+#             x += self.getRPenalty()
+#             return x
+#         pobj.__doc__ = self._nonpenobjf.__doc__ + " (penalized)"
+#         self.objf = pobj
         
     def objfnlogPost(self):
         """
@@ -1228,6 +1242,8 @@ class MBOEv(MBO):
             raise(PE.PyAValError("You need to specify the parameter names via 'pars'.", \
                                  where="MBOEv", \
                                  solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
+        
+        MBO.__init__(self, pars, rootName, **kwargs)
         
         # Use likelihood based on Gaussian errors with std yerr
         self.setlogL("1dgauss")
