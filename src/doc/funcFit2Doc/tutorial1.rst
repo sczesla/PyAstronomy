@@ -147,55 +147,10 @@ Custom objective functions can be specified for any model.
 Applying relations
 ------------------
 
-Relations define functional dependences between different parameter values.
+Relations define functional dependences between different parameter values (e.g.,
+it may be desirable sometimes to treat to parameters as equal).
 
-::
-    
-    from __future__ import print_function, division
-    import numpy as np
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    # Creating a Gaussian with some noise
-    # Choose some parameters...
-    gPar = {"A":1.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-    # Calculate profile
-    x = np.arange(100) - 50.0
-    y = gPar["off"] + gPar["A"] / np.sqrt(2*np.pi*gPar["sig"]**2) \
-        * np.exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-    # Add some noise...
-    y += np.random.normal(0.0, 0.002, x.size)
-    # ...and save the error bars
-    yerr = np.ones_like(x)*0.002
-    # Let us see what we have done...
-    plt.plot(x, y, 'bp')
-    
-    # Create a model object
-    gf = fuf2.GaussFit1d()
-    
-    # Set guess values for the parameters
-    gf.assignValues({"A":3, "sig":3.77, "off":0.96, "mu":9.5})
-    
-    # 'Thaw' those (the order is irrelevant)
-    gf.thaw(["mu", "sig", "off", "A"])
-    
-    def relat(sig, off):
-        """ Combine values of sig and off """
-        return 0.1*sig - off
-    
-    # 'A' is a function of 'sig' and 'off'.
-    gf.relate("A", ["sig", "off"], func=relat)
-    
-    fr = sco.fmin(gf.objf, gf.freeParamVals(), args=(x,y))
-    print("Fit result: ", fr)
-    # Set the parameter values to best-fit
-    gf.setFreeParamVals(fr)
-    
-    gf.parameterSummary()
-    plt.plot(x, gf.evaluate(x), 'r--')
-    plt.show()
+* :doc:`ex_apply_relation` :download:`(Download notebook) <ex_apply_relation.ipynb>`
 
 
 Custom models
