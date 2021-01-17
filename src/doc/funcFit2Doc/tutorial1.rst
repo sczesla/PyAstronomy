@@ -162,49 +162,14 @@ Using custom models is easy.
 * :doc:`ex_linmod_jit` :download:`(Download notebook) <ex_linmod_jit.ipynb>`
 
 
-Combine models
---------------
+Arithmetic combination of models
+--------------------------------
 
-::
-        
-    from __future__ import print_function, division
-    import numpy as np
-    import matplotlib.pylab as plt
-    # ... and now the funcFit package
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    # Instantiate Gaussian model objects
-    gf1 = fuf2.GaussFit1d()
-    gf2 = fuf2.GaussFit1d()
-    # Sum the models (refers to their 'evaluate' methods)
-    # Any of +-*/ and ** can be used
-    gf = gf1 + gf2
-    # Use the Gaussian likelihood
-    gf.setlogL("1dgauss")
-    
-    gf.parameterSummary()
-    
-    gf["A_GF1d(1)"] = 1
-    gf["A_GF1d(2)"] = 2
-    gf["mu_GF1d(1)"] = 0.0
-    gf["mu_GF1d(2)"] = 3.0
-    gf["sig_GF1d(1)"] = 1.0
-    gf["sig_GF1d(2)"] = 1.0
-    
-    # Evaluate model and add noise
-    x = np.linspace(-4., 6., 200)
-    y = gf.evaluate(x) + np.random.normal(0, 0.02, len(x))
-    
-    # Re-fit model
-    # Use filename-like pattern matching to thaw parameters
-    gf.thaw(["A_*", "sig_*", "mu_*"])
-    fuf2.fitfmin_l_bfgs_b1d(gf, x, y, yerr=0.02)
-    
-    gf.parameterSummary()
-    
-    plt.errorbar(x, y, yerr=0.02, fmt="b+")
-    plt.plot(x, gf.evaluate(x), 'r--')
-    plt.show()
-    
+Models can be combined by adding, subtracting, multiplying, or dividing them using the
+conventional arithmetic operators. In funcFit2, the operation is actually applied to
+the result of the 'evaluate' method of the models. This can be useful in many cases, but
+it may fail if, e.g., the calling sequences of the evaluate methods differ or the model
+does not have any such method.  
+
+* :doc:`ex_adding_two_gaussians` :download:`(Download notebook) <ex_adding_two_gaussian.ipynb>`
 
