@@ -140,68 +140,9 @@ algorithm
 Use a custom objective function
 -------------------------------
 
-::
-    
-    from __future__ import print_function, division
-    import numpy as np
-    import matplotlib.pylab as plt
-    from PyAstronomy import funcFit2 as fuf2
-    import scipy.optimize as sco
-    
-    
-    # Creating a Gaussian with some noise
-    # Choose some parameters...
-    gPar = {"A":1.0, "sig":10.0, "mu":10.0, "off":1.0, "lin":0.0}
-    # Calculate profile
-    x = np.arange(100) - 50.0
-    y = gPar["off"] + gPar["A"] / np.sqrt(2*np.pi*gPar["sig"]**2) \
-        * np.exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
-    # Add some noise...
-    y += np.random.normal(0.0, 0.002, x.size)
-    # ...and save the error bars
-    yerr = np.ones_like(x)*0.002
-    # Let us see what we have done...
-    plt.plot(x, y, 'bp')
-    
-    # Create a model object
-    gf = fuf2.GaussFit1d()
-    
-    # Set guess values for the parameters
-    gf.assignValues({"A":3, "sig":3.77, "off":0.96, "mu":9.5})
-    
-    # 'Thaw' those (the order is irrelevant)
-    gf.thaw(["mu", "sig", "off", "A"])
-    
-    
-    def myobjf(m, pars, x, y, **kwargs):
-        """
-        Calculate the absolute distance between model and data points and area of the Gaussian
-        """
-        model = m.evaluate(x)
-        r = np.sum(np.abs(model - y))
-        # Weird dependence on A
-        r += 0.1*np.abs(m["A"])
-        # Some informative output
-        fpv = tuple(zip((m.freeParamNames(), m.freeParamVals())))
-        print("Parameter values: ", fpv)
-        print("    identical to those received: ", pars)
-        print("Objective: ", r)
-        return r
-    
-    # Assign objective function. As a result of this assignment,
-    # the parameter values of the model will be set to those handed
-    # to the objective function prior to call
-    gf.objf = myobjf
-    
-    fr = sco.fmin(gf.objf, gf.freeParamVals(), args=(x,y))
-    print("Fit result: ", fr)
-    # Set the parameter values to best-fit
-    gf.setFreeParamVals(fr)
-    
-    gf.parameterSummary()
-    plt.plot(x, gf.evaluate(x), 'r--')
-    plt.show()
+Custom objective functions can be specified for any model. 
 
+* :doc:`ex_custom_objfct1` :download:`(Download notebook) <ex_custom_objfct1.ipynb>`
 
 Applying relations
 ------------------
