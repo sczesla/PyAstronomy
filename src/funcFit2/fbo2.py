@@ -743,6 +743,42 @@ class MBO(object):
         r.rightCompo = right
         return r
      
+    def __add__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) + self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __sub__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) - self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __mul__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) * self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __div__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+    
+    def __truediv__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+
+    def __pow__(self, right):
+        result = self._combineMBOs(right)
+        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
+                                           self.leftCompo.evaluate(*args, **kwargs) ** self.rightCompo.evaluate(*args, **kwargs), result)
+        return result
+             
     def parameterSummary(self, toScreen=True, prefix=""):
         """
         Parameter summary
@@ -1279,42 +1315,6 @@ class MBOEv(MBO):
         r.rightCompo = right
         return r
      
-    def __add__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) + self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __sub__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) - self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __mul__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) * self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __div__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-    
-    def __truediv__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) / self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-
-    def __pow__(self, right):
-        result = self._combineMBOs(right)
-        result.evaluate = types.MethodType(lambda self, *args, **kwargs: \
-                                           self.leftCompo.evaluate(*args, **kwargs) ** self.rightCompo.evaluate(*args, **kwargs), result)
-        return result
-        
 
 
 
