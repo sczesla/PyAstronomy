@@ -1,5 +1,5 @@
-The funcFit2 tutorial
-=====================
+The funcFit2 introduction and tutorial
+======================================
 
 This tutorial is supposed to enable you to exploit the funcFit2 functionality
 by presenting an anthology of examples.
@@ -50,9 +50,11 @@ Depending on your installation the output should look like:
       Version:  2.2.1
 
 
-Example: Fitting a Gaussian
----------------------------
+Models, parameter, and basic fitting
+------------------------------------
 
+* :doc:`ex_parameter_access_1` :download:`(Download notebook) <ex_parameter_access_1.ipynb>`
+* :doc:`ex_model_evaluation` :download:`(Download notebook) <ex_model_evaluation.ipynb>`
 * :doc:`ex_gaussfit1` :download:`(Download notebook) <ex_gaussfit1.ipynb>`
 
 On the objective function
