@@ -826,7 +826,9 @@ class MBO(object):
         return self.pars[n]
     
     def __setitem__(self, n, v):
-        self.pars[n] = v
+        nns = self._pex(n)
+        for nn in nns: 
+            self.pars[nn] = v
     
     def getPRef(self, n):
         return self.pars.getPRef(n)
