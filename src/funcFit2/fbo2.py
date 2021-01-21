@@ -15,6 +15,7 @@ import scipy.optimize as sco
 import inspect
 import sys
 import fnmatch
+from PyAstronomy import modelSuite as _ms
 
 _fbo2module = sys.modules[__name__]
 
@@ -1694,7 +1695,23 @@ for m in _ml:
     if m[0].endswith("1d"):
         _eml.append( (m[0][0:-2], m[1], m[2]) )
 _ml.extend(_eml)
-        
+       
+# Add models from modelSuite
+_ml.extend([("PalLC", _ms.palTrans.PalLC, "PalLC"), \
+            ("PalLCKep", _ms.palTrans.PalLCKep, "PalLCKep"), \
+            ("MandelAgolLC", _ms.forTrans.MandelAgolLC, "MandelAgolLC"), \
+            ("MandelAgolNLLC", _ms.forTrans.MandelAgolNLLC, "MandelAgolNLLC"), \
+            ("LimBrightTrans", _ms.LimBrightTrans, "LimBrightTrans"), \
+            ("RmcL", _ms.RmcL, "RMcL"), \
+            ("RmcLell", _ms.RmcLell, "RmcLell"), \
+            ("SinRadVel", _ms.SinRadVel, "SinRadVel"), \
+            ("KeplerEllipseModel", _ms.keplerEllipseModel, "KeplerEllipseModel"), \
+            ("KeplerRVModel", _ms.KeplerRVModel, "KeplerRVModel"), \
+            ("LLGauss", _ms.LLGauss, "LLGauss"), \
+            ("VoigtAstroP", _ms.VoigtAstroP, "VoigtAstroP"), \
+            ("LyaTransmission", _ms.LyaTransmission, "LyaTransmission"), \
+            ("RotBroadProfile", _ms.RotBroadProfile, "RotBroadProfile") 
+     ])
 
 for m in _ml:
     setattr(_fbo2module, m[0], _fuf2ModelFactory(m[1], m[2]) )
