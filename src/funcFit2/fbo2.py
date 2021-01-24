@@ -715,7 +715,6 @@ class MBO(object):
         self.objfnlogL()
         
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
-#         self._imap = self.pars.copy()
         self.priors = []
         
         # Penalty factor used in objective function
@@ -1290,14 +1289,6 @@ class MBOEv(MBO):
         self.objfnChiSquare()
         # Define chisqr as an alias to the objective function
         self.chisqr = self.objf
-        
-        self.pars = (PyABaSoS(PyABPS(pars, rootName)))
-        self._imap = self.pars.copy()
-        self.priors = []
-        
-        self.rootName = rootName
-        self.leftCompo = None
-        self.rightCompo = None
     
     def _combineMBOs(self, right):
         """
