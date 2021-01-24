@@ -677,7 +677,7 @@ def chisqrobjf(self, pars, *args, **kwargs):
     if len(args) == 2:
         x, y = args[0], args[1]
         yerr = 1.0
-    elif len(args) == 3:
+    elif len(args) >= 3:
         x, y, yerr = args[0], args[1], args[2]
     else:
         raise(PE.PyAValError("Invalid call to _chisqr. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
@@ -685,7 +685,7 @@ def chisqrobjf(self, pars, *args, **kwargs):
     if "_currentModel" in kwargs:
         m = kwargs["_currentModel"]
     else:
-        m = self.evaluate(x)
+        m = self.evaluate(*args, **kwargs)
     
     return np.sum( (m-y)**2/yerr**2 )
     
@@ -1289,6 +1289,16 @@ class MBOEv(MBO):
         self.objfnChiSquare()
         # Define chisqr as an alias to the objective function
         self.chisqr = self.objf
+    
+    def evaluate(self, *args, **kwargs):
+        """
+        Evaluate model
+        
+        Parameters
+        ----------
+        
+        """
+        pass
     
     def _combineMBOs(self, right):
         """
