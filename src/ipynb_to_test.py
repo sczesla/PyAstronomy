@@ -46,6 +46,8 @@ for i, fn in enumerate(fns,1):
 print()
 
 for fn in fns:
+    if str(fn).find("_build") != -1:
+        continue
     c = ''.join(open(str(fn), 'rt').readlines())
     nb = nbformat.reads(c, as_version=4)
     se = ScriptExporter()

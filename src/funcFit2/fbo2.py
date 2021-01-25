@@ -1670,7 +1670,7 @@ def _fuf2ModelFactory(odc, rn):
  
         def evaluate(self, *args, **kwargs):
             self._odm.assignValues(self.parameters())
-            return self._odm.evaluate(*args, **kwargs)       
+            return self._odm.evaluate(args[0])       
         
     return F2M
        
