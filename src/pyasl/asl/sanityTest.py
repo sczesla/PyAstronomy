@@ -917,6 +917,18 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
         t2 = T0 + (e+p)*per
         self.assertFalse(np.any(np.abs(t2 - t) > 1e-5), msg="foldAt back and forth: Bad conversion!")
 
+    def sanity_foldAtSort(self):
+        """ Sort and centralzero test """
+        from PyAstronomy.pyasl import foldAt
+        import numpy as np
+        np.random.seed(1237)
+        t = np.linspace(-10, 10, 137)
+        per = 2.35
+        T0 = -1.55
+        p, e = foldAt(t, per, T0=T0, getEpoch=True, sortphase=True, centralzero=True)
+        self.assertFalse(np.any(np.diff(p) < 0), msg="foldAt phase sorting does not work!")
+        self.assertFalse(np.any((p < -0.5) | (p > 0.5)), msg="foldAt central zero does not work!")
+
 
 class SanityOfDopplerShift(unittest.TestCase, SaniBase):
 

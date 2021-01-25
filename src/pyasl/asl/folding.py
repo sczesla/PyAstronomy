@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def foldAt(time, period, T0=0.0, getEpoch=False):
+def foldAt(time, period, T0=0.0, sortphase=False, centralzero=False, getEpoch=False):
     """
     Fold time series with a particular period.
 
@@ -35,6 +35,10 @@ def foldAt(time, period, T0=0.0, getEpoch=False):
     T0 : float
         Time reference point. The point T0 as well as all points T0+n*period with
         integer n are mapped to phase zero. Default is 0.0.
+    sortphase : boolean, optional
+        If True, return values will be sorted w.r.t. phase
+    centralzero: boolean, optional
+        If True, phase will be between -0.5 and +0.5 instead of 0 to 1. 
     getEpoch : boolean, optional
         If True, an array holding the epoch for every point
         in time will be returned; the default is False.
@@ -44,6 +48,7 @@ def foldAt(time, period, T0=0.0, getEpoch=False):
     -------
     Phases : array
         The (unsorted) phase array pertaining to the input time axis.
+        Sorted if `sortphase` is set True.
     Epoch : array, optional
         An array holding the epoch for every given point in time.
         The counting starts at zero. Only returned if `getEpoch`
@@ -51,6 +56,15 @@ def foldAt(time, period, T0=0.0, getEpoch=False):
     """
     epoch = np.floor((time - T0) / period)
     phase = (time - T0) / period - epoch
+    
+    if centralzero:
+        indi = np.where(phase >= 0.5)[0]
+        phase[indi] -= 1.0
+    
+    if sortphase:
+        indi = np.argsort(phase)
+        phase, epoch = phase[indi], epoch[indi]
+    
     if getEpoch:
         return phase, epoch
     return phase
