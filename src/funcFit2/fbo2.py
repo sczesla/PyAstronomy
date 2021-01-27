@@ -1175,6 +1175,30 @@ it requires a data set as input.
         
         objf.__doc__ = f.__doc__
         self._objf = types.MethodType(objf, self)
+ 
+    def addSPLikeObjf(self, f, name):
+        """
+        Set SciPy (SP) like objective function.
+        
+        Parameters
+        ----------
+        f : callable
+            The scipy-like objective function to be assigned. A scipy-like objective function is one
+            which takes as its first argument an array holding the values of the free parameters. The
+            function may take any number of additional arguments and keywords.
+        """
+        
+        def objf(self, *args, **kwargs):
+            # Make sure the current parameters are assigned
+            self.setFreeParamVals(args[0])
+            v = f(self, *args, **kwargs)
+            if not np.isfinite(v):
+                PE.PyAValError("Infinite value encountered in objective function for parameters: " + str(args[0]) + ", free parameters : " + ",".join(self.freeParamNames()))
+            v += self.getRPenalty()
+            return v
+        
+        objf.__doc__ = f.__doc__
+        setattr(self, name, types.MethodType(objf, self))
         
     def getSPLikeObjf(self):
         """ Get the SciPy-like objective function """
@@ -1319,8 +1343,6 @@ class MBOEv(MBO):
         r.rightCompo = right
         return r
      
-
-
 
 
 
