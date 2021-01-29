@@ -711,9 +711,6 @@ class MBO(object):
                                  where="MBO2", \
                                  solution="Specify something along the lines of 'pars = ['pn1', 'pn2', ...]'."))
         
-        # Set objective function to negative likelihood
-        self.objfnlogL()
-        
         self.pars = (PyABaSoS(PyABPS(pars, rootName)))
         self.priors = []
         
@@ -1152,41 +1149,33 @@ it requires a data set as input.
         kwargs["alllogs"] = True
         return self.logPost(*args[1:], **kwargs)
   
-    def setSPLikeObjf(self, f):
-        """
-        Set SciPy (SP) like objective function.
-        
-        Parameters
-        ----------
-        f : callable
-            The scipy-like objective function to be assigned. A scipy-like objective function is one
-            which takes as its first argument an array holding the values of the free parameters. The
-            function may take any number of additional arguments and keywords.
-        """
-        
-        def objf(self, *args, **kwargs):
-            # Make sure the current parameters are assigned
-            self.setFreeParamVals(args[0])
-            v = f(self, *args, **kwargs)
-            if not np.isfinite(v):
-                PE.PyAValError("Infinite value encountered in objective function for parameters: " + str(args[0]) + ", free parameters : " + ",".join(self.freeParamNames()))
-            v += self.getRPenalty()
-            return v
-        
-        objf.__doc__ = f.__doc__
-        self._objf = types.MethodType(objf, self)
- 
     def addSPLikeObjf(self, f, name):
         """
-        Set SciPy (SP) like objective function.
+        Add a SciPy-Like (SPL) objective function to the instance.
         
         Parameters
         ----------
-        f : callable
+        f : callable or string
             The scipy-like objective function to be assigned. A scipy-like objective function is one
             which takes as its first argument an array holding the values of the free parameters. The
             function may take any number of additional arguments and keywords.
         """
+        
+        if isinstance(f, six.string_types):
+            if f == "-logl":
+                def nln(self, *args, **kwargs):
+                    """ -natural_log(Likelihood) """
+                    return -self.logL(*args[1:], **kwargs)
+                f = nln
+            elif f == "-logpost":
+                def nln(self, *args, **kwargs):
+                    """ -natural_log(Posterior) """
+                    return -self.logPost(*args[1:], **kwargs)
+                f = nln
+            elif f == "chisqr":
+                f = chisqrobjf
+            else:
+                raise(PE.PyAValError("Unknown objective function string: '"+f+"'"))
         
         def objf(self, *args, **kwargs):
             # Make sure the current parameters are assigned
@@ -1199,25 +1188,10 @@ it requires a data set as input.
         
         objf.__doc__ = f.__doc__
         setattr(self, name, types.MethodType(objf, self))
-        
-    def getSPLikeObjf(self):
-        """ Get the SciPy-like objective function """
-        return self._objf
-    
-    objf = property(getSPLikeObjf, setSPLikeObjf)
 
     def grad(self, *args, **kwargs):
         raise(PE.PyANotImplemented("To use derivatives, implement the 'grad' function."))
-
-    def objfnlogL(self):
-        """
-        Use the negative (natural) logarithm of the likelihood as objective function
-        """
-        def nln(self, *args, **kwargs):
-            """ -ln(Likelihood) """
-            return -self.logL(*args[1:], **kwargs)
-        self.objf = nln
-        
+      
     def getRPenalty(self):
         """
         Get penalty for violating restrictions
@@ -1258,40 +1232,6 @@ it requires a data set as input.
 #         pobj.__doc__ = self._nonpenobjf.__doc__ + " (penalized)"
 #         self.objf = pobj
         
-    def objfnlogPost(self):
-        """
-        Use the negative (natural) logarithm of the likelihood as objective function
-        """
-        def nln(self, *args, **kwargs):
-            """ -ln(Posterior) """
-            return -self.logPost(*args[1:], **kwargs)
-        self.objf = nln
-
-    def objfnChiSquare(self):
-        """
-        Use chi square (or squared distance if uncertainty not given) as objective function
-        """
-        def csq(self, *args, **kwargs):
-            """ chi-square """
-            return chisqrobjf(self, *args, **kwargs)
-        self.objf = csq
-
-    def objfInfo(self):
-        """
-        Information on objective function
-        
-        Returns
-        -------
-        Info : string or None
-            If assigned, the docstring of the objective function and None
-            otherwise.
-        """
-        oi = None
-        if hasattr(self, "objf"):
-            oi = self.objf.__doc__
-        return oi
-
-
 
 class MBOEv(MBO):
     """
@@ -1309,10 +1249,7 @@ class MBOEv(MBO):
         
         # Use likelihood based on Gaussian errors with std yerr
         self.setlogL("1dgauss")
-        # Set objective function to chi square
-        self.objfnChiSquare()
-        # Define chisqr as an alias to the objective function
-        self.chisqr = self.objf
+        self.addSPLikeObjf("chisqr", "chisqr")
     
     def evaluate(self, *args, **kwargs):
         """
@@ -1375,7 +1312,7 @@ def _introdefarg(f, **kwargs):
     return defargs, odefargs
 
 
-def fitfmin(m, x, y, yerr=None, **kwargs):
+def fitfmin(m, objf, x, y, yerr=None, **kwargs):
     """
     Use scipy's fmin to fit model.
     """
@@ -1389,12 +1326,12 @@ def fitfmin(m, x, y, yerr=None, **kwargs):
     
     defargs["full_output"] = True
     
-    fr = sco.fmin(m.objf, m.freeParamVals(), **defargs)
+    fr = sco.fmin(objf, m.freeParamVals(), **defargs)
     m.setFreeParamVals(fr[0])
     return fr
 
 
-def fitfmin_cobyla(m, x, y, yerr=None, cons=None, **kwargs):
+def fitfmin_cobyla(m, objf, x, y, yerr=None, cons=None, **kwargs):
     """
     Use scipy's fitfmin_cobyla to fit model.
     """
@@ -1436,12 +1373,12 @@ def fitfmin_cobyla(m, x, y, yerr=None, cons=None, **kwargs):
     # 'args' as the objective function
     defargs["consargs"] = ()
     
-    fr = sco.fmin_cobyla(m.objf, m.freeParamVals(), **defargs)
+    fr = sco.fmin_cobyla(objf, m.freeParamVals(), **defargs)
     m.setFreeParamVals(fr)
     return fr
 
 
-def fitfmin_powell(m, x, y, yerr=None, **kwargs):
+def fitfmin_powell(m, objf, x, y, yerr=None, **kwargs):
     """
     Use scipy's fmin_powell to fit model.
     """
@@ -1455,12 +1392,12 @@ def fitfmin_powell(m, x, y, yerr=None, **kwargs):
     
     defargs["full_output"] = True
     
-    fr = sco.fmin_powell(m.objf, m.freeParamVals(), **defargs)
+    fr = sco.fmin_powell(objf, m.freeParamVals(), **defargs)
     m.setFreeParamVals(fr[0])
     return fr
 
 
-def fitfmin_l_bfgs_b(m, x, y, yerr=None, **kwargs):
+def fitfmin_l_bfgs_b(m, objf, x, y, yerr=None, **kwargs):
     """
     Use scipy's fmin_l_bfgs_b to fit model.
     
@@ -1496,7 +1433,7 @@ def fitfmin_l_bfgs_b(m, x, y, yerr=None, **kwargs):
     defargs["bounds"] = bounds
     defargs["approx_grad"] = True
     
-    fr = sco.fmin_l_bfgs_b(m.objf, m.freeParamVals(), **defargs)
+    fr = sco.fmin_l_bfgs_b(objf, m.freeParamVals(), **defargs)
     m.setFreeParamVals(fr[0])
     return fr
 
