@@ -64,24 +64,6 @@ The objective function is the function, the value of which is to be minimized.
 Models can but do not have to have a predefined objective function. For example, the
 GaussFit model uses chi square as a default objective functions. 
 
-::
-
-    from __future__ import print_function, division
-    from PyAstronomy import funcFit2 as fuf2
-    
-    # Create a model object
-    gf = fuf2.GaussFit()
-    
-    print("Information on the objective function:")
-    print("    ", gf.objfInfo())
-
-Whose answer reads:
-
-::
-
-    Information on the objective function:
-        chi-square 
-          
 
 
 Restrictions of parameter ranges
