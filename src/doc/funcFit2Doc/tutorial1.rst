@@ -60,10 +60,11 @@ Models, parameter, and basic fitting
 On the objective function
 -------------------------
 
-The objective function is the function, the value of which is to be minimized.
-Models can but do not have to have a predefined objective function. For example, the
-GaussFit model uses chi square as a default objective functions. 
-
+The objective function as the function, the value of which is to be minimized.
+Generally, the objective function needs to be specified when a minimization is intended.
+Models can but do not have to define objective functions. For example, the
+GaussFit model defines a chi square objective functions, which is often useful, but
+does not have to be used. 
 
 
 Restrictions of parameter ranges

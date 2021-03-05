@@ -1235,7 +1235,7 @@ it requires a data set as input.
 
 class MBOEv(MBO):
     """
-    Model Base Object with evaluate method and chi square as default objective function
+    Model Base Object with an evaluate method and a predefined chi square objective function
     """
     
     def __init__(self, pars=None, rootName="", **kwargs):
