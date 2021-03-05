@@ -1,5 +1,7 @@
+.. _modelSuite:
+
 The PyA model suite
-========================
+===================
 
 The PyAstronomy model suite is a set of implementations of physical models like,
 for example, a transit light-curve model. The models are supposed to provide an

@@ -10,6 +10,7 @@ implementation and maintaining what was convenient about it.
    :maxdepth: 2
 
    Tutorial <tutorial1.rst>
-      
+
+   Models <models.rst>
+         
    Philosophy <fuf2philo.rst>
-   
