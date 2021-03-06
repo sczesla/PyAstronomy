@@ -1,11 +1,11 @@
 Welcome to PyAstronomy
-=======================================
+======================
 
 PyAstronomy (PyA) is a collection of astronomy related packages
 hosted on `github <https://github.com/sczesla/PyAstronomy>`_.
 
 About PyAstronomy
--------------------
+-----------------
 
 .. toctree::
    :maxdepth: 1
@@ -19,7 +19,7 @@ About PyAstronomy
    pyaCDoc/cont.rst
 
 PyAstronomy's sub-packages
-----------------------------
+--------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -30,7 +30,7 @@ PyAstronomy's sub-packages
    Timing --- Tools for timing analysis such as Lomb-Scargle periodograms <pyTimingDoc/index.rst>
    
 Model fitting
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
    
 .. toctree::
    :maxdepth: 1
@@ -38,9 +38,13 @@ Model fitting
    funcFit --- A convenient fitting interface <funcFitDoc/index.rst>
    Model suite --- A collection of ready-to-use models for funcFit <modelSuiteDoc/index.rst>
 
+.. toctree::
+   :maxdepth: 1
+
+   funcFit2 --- A new convenient fitting interface (beta) <funcFit2Doc/fuf2index.rst>
 
 Spotlights
-----------------
+----------
 
 .. toctree::
    :maxdepth: 1
@@ -49,7 +53,7 @@ Spotlights
 
 
 PyAstronomy core
--------------------
+----------------
 
 .. toctree::
    :maxdepth: 2

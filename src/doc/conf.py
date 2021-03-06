@@ -25,6 +25,8 @@ for mod_name in MOCK_MODULES:
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
+nbsphinx_input_prompt = 'In [%s]:'
+
 # generate autosummary pages
 autosummary_generate = True
 
@@ -41,10 +43,10 @@ extensions = []
 try:
     import numpydoc
     extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo',
-                  mathext, 'numpydoc', 'sphinx.ext.autosummary']
+                  mathext, 'numpydoc', 'sphinx.ext.autosummary', 'nbsphinx']
 except:
     extensions = ['sphinx.ext.autodoc',
-                  'sphinx.ext.todo', mathext]
+                  'sphinx.ext.todo', mathext, 'nbsphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

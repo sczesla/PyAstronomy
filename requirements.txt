@@ -5,4 +5,5 @@ numpydoc>=0.4
 mock==1.0.1
 six>=1.10.0
 Sphinx
+nbsphinx
 scipy>=0.12.0
