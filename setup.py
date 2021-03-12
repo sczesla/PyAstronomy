@@ -107,6 +107,7 @@ if withExt:
 packages = ['PyAstronomy',
             'PyAstronomy.funcFit',
             'PyAstronomy.funcFit.utils',
+            'PyAstronomy.funcFit2',
             'PyAstronomy.pyasl',
             'PyAstronomy.pyasl.asl',
             'PyAstronomy.pyasl.asl.aslExt_1',
