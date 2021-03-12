@@ -2,7 +2,7 @@ from PyAstronomy import pyaC
 from PyAstronomy.pyasl import _moduleImportStatus
 
 _modules = ["baraffe98tracks", "nasaExoplanetArchive", "exoplanetEU", \
-           "exoplanetsOrg", "kuruczModels", "fip", "sweet_cat"]
+           "exoplanetsOrg", "kuruczModels", "fip", "sweet_cat", "spectralLib"]
 
 for m in _modules:
   _moduleImportStatus[(__name__, m)] = pyaC.pyaimportallfrom(m, "PyAstronomy.pyasl.resBased", globals())

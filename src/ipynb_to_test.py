@@ -20,6 +20,7 @@ def del_future(s):
         if l.find("from __future__") != -1:
             s.pop(i)
             return s
+    return s
 
 
 def sanitize(s, name="example"):

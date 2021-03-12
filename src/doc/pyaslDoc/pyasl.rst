@@ -1,5 +1,5 @@
 Python AstroLib
-==========================
+===============
 
 .. _AstroLib : http://idlastro.gsfc.nasa.gov/
 
@@ -20,7 +20,7 @@ Below, you find a list of available functionality roughly sorted
 by category.
 
 General algorithms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. currentModule:: PyAstronomy.pyasl
 
@@ -39,7 +39,7 @@ General algorithms
    aslDoc/aslExt_1Doc/roche.rst
 
 General data analysis
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
@@ -54,7 +54,7 @@ General data analysis
    aslDoc/svd.rst
 
 Spectral routines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
@@ -73,7 +73,7 @@ Spectral routines
 
 
 Coordinates, time, and observation tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
@@ -98,7 +98,7 @@ Coordinates, time, and observation tools
    aslDoc/gal_uvw.rst
 
 Transit and planet routines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
@@ -109,7 +109,7 @@ Transit and planet routines
    aslDoc/planetPhase.rst
 
 Statistics
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
@@ -118,7 +118,7 @@ Statistics
    aslDoc/aslExt_1Doc/expCorrRN.rst
 
 Resource based helpers
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
@@ -131,11 +131,11 @@ Resource based helpers
    resBasedDoc/kuruczModels.rst
    resBasedDoc/fip.rst
    aslDoc/aslExt_1Doc/mmscetsTable.rst
-   
+   resBasedDoc/specLib.rst
 
    
 License note
-----------------
+------------
 The "IDL Astronomy User's Library" is released in "public domain". That means that nobody holds the
 copyright and, thus, nobody has the right to sublicense it (not even the authors).
 As we remain as close as possible in code
