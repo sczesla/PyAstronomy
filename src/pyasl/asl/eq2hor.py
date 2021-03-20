@@ -913,7 +913,7 @@ def co_refract_forward(alt, pressure=1010., temperature=10.0):
 
 
 def co_refract(alt, observer_alt=0.0, pressure=None, temperature=None, epsilon=0.25,
-               convert_to_observed=False, full_output=True):
+               convert_to_observed=False, full_output=True, maxiter=10000):
     """
     Convert between apparent (real) altitude and observed altitude.
 
@@ -958,6 +958,9 @@ def co_refract(alt, observer_alt=0.0, pressure=None, temperature=None, epsilon=0
     full_output : boolean, optional
         If True (default), pressure and temperature used in the calculation
         will be returned as well.
+    maxiter : int, optional
+        The maximum number of iterations in the calculation. Throws PyAAlgorithmFailure
+        if exceeded. Prevents endless loop. Default is 10000.
 
     Returns
     -------
@@ -1139,13 +1142,19 @@ def co_refract(alt, observer_alt=0.0, pressure=None, temperature=None, epsilon=0
                 old_alt[i], pressure=pres[i], temperature=temper[i]-273.15)
             # Guess of observed location
             cur = old_alt[i] + dr
+            niter = 0
             while True:
+                niter += 1
                 last = cur.copy()
                 dr = co_refract_forward(
                     cur, pressure=pres[i], temperature=temper[i]-273.15)
                 cur = old_alt[i] + dr
                 if np.abs(last - cur)*3600. < epsilon:
                     break
+                if niter > maxiter:
+                    raise(PE.PyAAlgorithmFailure("Maximum number of iterations exceeded.", \
+                                                 where="co_refract", \
+                                                 solution=["Try to change 'epsilon'", "Raise maxiter"]))
             altout[i] = cur.copy()
 
     if full_output:
