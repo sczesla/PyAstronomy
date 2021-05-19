@@ -1,5 +1,5 @@
 Roche potential
-======================
+===============
 
 .. p23ready
 
@@ -42,8 +42,11 @@ we write
     
 where :math:`\Phi_n` is the dimensionless Roche potential.
 
+Note that moving material in the rotating frame is also subject to Coriolis forces, which are non-conservative
+and, therefore, cannot be incorporated into the scalar Roche potential. 
+
 Example of usage
--------------------
+----------------
 
 ::
     
@@ -96,7 +99,7 @@ Example of usage
     plt.show()
 
 Functionality and API
------------------------------------
+---------------------
 
     - :ref:`rlpot`
     - :ref:`rlpade`
@@ -107,7 +110,7 @@ Functionality and API
 .. _rlpot:
 
 Roche lobe potential
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: rochepot_dl
 .. autofunction:: rochepot
@@ -115,7 +118,7 @@ Roche lobe potential
 .. _rlpade:
 
 Partial derivatives
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: ddx_rochepot_dl
 .. autofunction:: ddy_rochepot_dl
@@ -124,7 +127,7 @@ Partial derivatives
 .. _rlvol:
 
 Roche lobe volume and radius
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: roche_lobe_radius_eggleton
 .. autofunction:: roche_vol_MC
@@ -133,7 +136,7 @@ Roche lobe volume and radius
 .. _rllps:
 
 Lagrange points
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. autofunction:: get_lagrange_1
 .. autofunction:: get_lagrange_2
@@ -141,5 +144,8 @@ Lagrange points
 .. autofunction:: get_lagrange_4
 .. autofunction:: get_lagrange_5
 
+Coriolis force
+~~~~~~~~~~~~~~
 
+.. autofunction:: coriolisAcceleration
 

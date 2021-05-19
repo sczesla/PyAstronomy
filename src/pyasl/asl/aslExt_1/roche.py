@@ -394,4 +394,39 @@ def rochepot(x, y, z, m1, m2, a):
     M = m1 + m2
     return -(G*M)/(2*a) * rochepot_dl(x/a, y/a, z/a, m2/m1)
     
+def coriolisAcceleration(omega,v):
+    """
+    Get Coriolis acceleration
+    
+    In the rotating frame, moving material is subject to the Coriolis
+    force, determined by the circular frequency (vector) of the rotating frame
+    and the velocity vector within it.
+    
+    .. math::
+    
+        a_C = -2 \\vec{\omega} \\times \\vec{v}
+    
+    Parameters
+    ----------
+    omega : float or 3-element 1d array
+        Circular frequency. If float is given, vector assumed to be omega*(0,0,1).
+    v : array
+        Either 3-element 1d array with velocity vector in corotating frame
+        or array with shape (nv, 3) with nv velocity vectors (i.e., [::,0] gives all
+        x components of velocity)
+    
+    Returns
+    -------
+    Coriolis acceleration : array
+        Either 3-element array or [vn,3] array, depending in input shape of v (units
+        determined by input).
+    """
+    if isinstance(omega, float):
+        omvec = np.array([0,0,omega]) 
+    else:
+        omvec = omega
+    c = -2*np.cross(omvec, v)
+    return c
+    
+    
     
