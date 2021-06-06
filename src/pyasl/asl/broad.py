@@ -2,6 +2,7 @@ from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import funcFit as fuf
+import scipy.interpolate as sci
 
 
 def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
@@ -70,7 +71,7 @@ def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
     return result
 
 
-def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False, maxsig=None):
+def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False, maxsig=None, equid=False):
     """
     Apply Gaussian instrumental broadening. 
 
@@ -102,7 +103,11 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False,
         standard deviations. By default, the Gaussian broadening
         kernel will be extended over the entire given spectrum,
         which can cause slow evaluation in the case of large spectra.
-        A reasonable choice could, e.g., be five.  
+        A reasonable choice could, e.g., be five.
+    equid : boolean, optional
+        If True, linear interpolation will be used to obtain an
+        intermediate spectrum with uniformly sampled wavelength grid
+        to carry out the broadening.
 
     Returns
     -------
@@ -115,15 +120,26 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False,
     """
     # Check whether wvl axis is linear
     dwls = wvl[1:] - wvl[0:-1]
-    if abs(max(dwls) - min(dwls)) > np.mean(dwls) * 1e-6:
+    if (abs(max(dwls) - min(dwls)) > np.mean(dwls) * 1e-6) and (not equid):
         raise(PE.PyAValError("The wavelength axis is not equidistant, which is required.",
-                             where="instrBroadGaussFast"))
+                             where="instrBroadGaussFast", \
+                             solution=["Define equidistant wavelength axis", "Set 'equid' to True"]))
+    elif (abs(max(dwls) - min(dwls)) > np.mean(dwls) * 1e-6) and equid:
+        # Define an equidistant wavelength grid
+        wvlorig = wvl
+        wvl = np.linspace(wvl[0], wvl[-1], 2*len(wvl))
+        flux = sci.interp1d(wvlorig, flux)(wvl)
+        
     meanWvl = np.mean(wvl)
     fwhm = 1.0 / float(resolution) * meanWvl
     sigma = fwhm / (2.0 * np.sqrt(2. * np.log(2.)))
 
     result = broadGaussFast(
         wvl, flux, sigma, edgeHandling=edgeHandling, maxsig=maxsig)
+
+    if equid:
+        # Recover wvl grid
+        result = sci.interp1d(wvl, result)(wvlorig)
 
     if not fullout:
         return result
