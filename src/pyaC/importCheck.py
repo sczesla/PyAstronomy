@@ -82,10 +82,11 @@ class ImportCheck:
         self.fail = []
 
         self.check = {}
+        self.versions = {}
         for module in modules:
             self.check[module] = True
             try:
-                __import__(module)
+                mi = __import__(module)
             except ImportError:
                 self.check[module] = False
                 self.fail.append(module)
@@ -96,6 +97,13 @@ class ImportCheck:
                 # In fact, any error prevents import
                 self.check[module] = False
                 self.fail.append(module)
+
+            self.versions[module] = "undefined"
+            if self.check[module]:
+                try:
+                    self.versions[module] = mi.__version__
+                except:
+                    pass
 
             if (not self.check[module]) and (module in required):
                 self.requiredFail.append(module)
