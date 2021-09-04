@@ -3,7 +3,7 @@ import scipy.interpolate as sci
 import gzip
 
 import matplotlib
-matplotlib.use('TkAgg')
+# matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 try:
     from matplotlib.backends.backend_tkagg import NavigationToolbar2TkAgg
