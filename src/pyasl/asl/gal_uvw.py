@@ -13,7 +13,7 @@ def gal_uvw(ra, dec, pmra, pmdec, distance, vrad, lsr=None):
     ra, dec : float or array
         Position in degrees
     pmra, pmdec : float or array
-        Proper motion in arcsec/yr
+        Proper motion in mas/yr
     distance : float or array
         Distance in pc
     vrad : float or array
@@ -120,7 +120,7 @@ def gal_uvw(ra, dec, pmra, pmdec, distance, vrad, lsr=None):
                     [0.8734370902, -0.4448296300, -0.1980763734], \
                     [0.4838350155, 0.74698224450, +0.4559837762]])
 
-    # Parallax
+    # Parallax [mas]
     plx = 1e3 / distance
     
     vec1 = vrad
