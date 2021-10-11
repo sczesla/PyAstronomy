@@ -51,9 +51,9 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
     def _downloadData(self):
         """
         Download data and store it to file in PyA's data directory.
-        """
+        """        
         urlRoot = "http://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?"
-        table = "&table=exoplanets"
+        table = "&table=PS"
         select = "&select="
         for v in six.itervalues(self._columns):
             select = ''.join([select, ',', v[0]])
@@ -71,7 +71,7 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
         # Define columns to select
         # Column name, Description, Unit
         self._columns = {}
-        self._columns[0] = ["pl_hostname", "Name of host star", "", "U15"]
+        self._columns[0] = ["hostname", "Name of host star", "", "U15"]
         self._columns[1] = ["pl_name", "Name of the planet", "", "U15"]
         self._columns[2] = ["pl_letter",
                             "Planet letter (e.g., b, c, d, etc.)", "", "U2"]
@@ -89,16 +89,13 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
         self._columns[12] = ["pl_orbincl",
                              "Orbital inclination of planet", "deg", np.float]
         self._columns[13] = ["st_rad", "Stellar radii", "Solar", np.float]
-        self._columns[14] = ["st_dist", "Distance to star", "pc", np.float]
+        self._columns[14] = ["sy_dist", "Distance to star", "pc", np.float]
         self._columns[15] = ["st_mass", "Stellar mass", "Solar", np.float]
         self._columns[16] = ["st_teff",
                              "Effective temperature of star", "K", np.float]
-        self._columns[17] = ["st_vsini", "Stellar vsin(i)", "km/s", np.float]
-        self._columns[18] = ["st_logg",
+        self._columns[17] = ["st_logg",
                              "Stellar surface gravity", "cm/s**2", np.float]
-        self._columns[19] = ["st_acts", "Stellar S-Index", "", np.float]
-        self._columns[20] = [
-            "st_vj", "Stellar V-band brightness", "mag", np.float]
+        self._columns[18] = ["sy_vmag", "Stellar V-band brightness", "mag", np.float]
         # Check whether data file exists
         self._fs = pp.PyAFS()
 
