@@ -41,10 +41,10 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
     st_dist       Distance to star                     pc
     st_mass       Stellar mass                         Solar
     st_teff       Effective temperature of star        K    
-    st_vsini      Stellar vsin(i)                      km/s 
-    st_logg       Stellar surface gravity              cm/s**2
-    st_acts       Stellar S-Index                           
-    st_vj         Stellar V-band brightness            mag
+    st_vsin       Stellar vsin(i)                      km/s 
+    st_logg       Stellar surface gravity              cm/s**2   
+    sy_vmag       Stellar V-band brightness            mag
+    sy_kmag       Stellar Ks-band brightness           mag 
     ===========   ===================================  ======
     """
 
@@ -96,6 +96,8 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
         self._columns[17] = ["st_logg",
                              "Stellar surface gravity", "cm/s**2", np.float]
         self._columns[18] = ["sy_vmag", "Stellar V-band brightness", "mag", np.float]
+        self._columns[19] = ["st_vsin", "Projected stellar rotation speed (vsini)", "km/s", np.float]
+        self._columns[20] = ["sy_kmag", "Stellar Ks-band brightness", "mag", np.float]
         # Check whether data file exists
         self._fs = pp.PyAFS()
 
