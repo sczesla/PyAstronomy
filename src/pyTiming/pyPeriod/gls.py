@@ -220,8 +220,6 @@ class Gls:
         self.f = self.freq
 
         if self.freq is None:
-            if self.fast:
-                raise(ValueError("freq and fast cannot be used together."))
             # Build frequency array if not present.
             if self.fbeg is None:
                 self.fbeg = self.fstep if self.Pend is None else 1 / self.Pend
@@ -234,6 +232,8 @@ class Gls:
 
             self.freq = arange(self.fbeg, self.fend, self.fstep)
         else:
+            if self.fast:
+                raise(ValueError("freq and fast cannot be used together."))
             self.fbeg, self.fend = np.min(self.freq), np.max(self.freq)
 
         self.nf = len(self.freq)
