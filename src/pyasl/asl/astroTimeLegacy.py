@@ -34,7 +34,7 @@ def weekday(date):
 
 def daycnv(xjd, mode="idl"):
     """
-    Converts Julian dates to Gregorian calendar dates. 
+    Converts Julian dates into Gregorian calendar dates. 
 
     Handles both individual floats as xjd and iterables such as
     lists and arrays. In the latter case, the result is returned
@@ -887,7 +887,11 @@ def xyz(date, velocity=False, equinox=1950.0):
 
 def helio_jd(date, ra, dec, B1950=False, TIME_DIFF=False):
     """
-    Convert geocentric (reduced) Julian date to heliocentric Julian date
+    Convert geocentric (reduced) Julian date into heliocentric Julian date
+
+    .. note:: The heliocentric julian date (HJD) differs from the barycentric julian date (BJD)
+              by +/- 4 s (e.g., Eastman et al. 2010, PASP 122, 935). See also the
+              :ref:`timescales`.
 
     Parameters
     ----------

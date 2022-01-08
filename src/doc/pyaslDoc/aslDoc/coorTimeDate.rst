@@ -3,20 +3,52 @@ Julian/calendar date and heliocentric correction
 
 .. p23ready
 
-Below you find the documentation of the following routines:
+Below you find the documentation of the following (mostly legacy) routines,
+which provide several conversions involving Gregorian and
+Julian dates as well as a heliocentric correction.
 
- * :py:func:`daycnv <PyAstronomy.pyasl.asl.astroTimeLegacy.daycnv>`
- * :py:func:`bprecess <PyAstronomy.pyasl.asl.astroTimeLegacy.bprecess>`
- * :py:func:`premat <PyAstronomy.pyasl.asl.astroTimeLegacy.premat>`
- * :py:func:`precess <PyAstronomy.pyasl.asl.astroTimeLegacy.precess>`
- * :py:func:`precess_xyz <PyAstronomy.pyasl.asl.astroTimeLegacy.precess_xyz>`
- * :py:func:`xyz <PyAstronomy.pyasl.asl.astroTimeLegacy.xyz>`
- * :py:func:`helio_jd <PyAstronomy.pyasl.asl.astroTimeLegacy.helio_jd>`
- * :py:func:`jdcnv <PyAstronomy.pyasl.asl.astroTimeLegacy.jdcnv>`
- * :py:func:`get_juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.get_juldate>`
- * :py:func:`juldate <PyAstronomy.pyasl.asl.astroTimeLegacy.juldate>`
- * :py:func:`localTime <PyAstronomy.pyasl.asl.localTime>`
+ * :py:func:`daycnv (Convert Julian into Gregorian dates) <PyAstronomy.pyasl.asl.astroTimeLegacy.daycnv>`
+ * :py:func:`jdcnv (Convert Gregorian into Julian dates) <PyAstronomy.pyasl.asl.astroTimeLegacy.jdcnv>`
+ * :py:func:`xyz (Geocentric 3d solar velocity and position) <PyAstronomy.pyasl.asl.astroTimeLegacy.xyz>`
+ * :py:func:`helio_jd (heliocentric correction) <PyAstronomy.pyasl.asl.astroTimeLegacy.helio_jd>`
+ * :py:func:`get_juldate (Current Julian date) <PyAstronomy.pyasl.asl.astroTimeLegacy.get_juldate>`
+ * :py:func:`juldate (Compute RJD) <PyAstronomy.pyasl.asl.astroTimeLegacy.juldate>`
+ * :py:func:`localTime (Approximation of local time) <PyAstronomy.pyasl.asl.localTime>`
  * :py:func:`weekday <PyAstronomy.pyasl.asl.astroTimeLegacy.weekday>`
+ * :py:func:`bprecess (coordinate precession) <PyAstronomy.pyasl.asl.astroTimeLegacy.bprecess>`
+ * :py:func:`premat (Precession matrix) <PyAstronomy.pyasl.asl.astroTimeLegacy.premat>`
+ * :py:func:`precess (coordinate precession) <PyAstronomy.pyasl.asl.astroTimeLegacy.precess>`
+ * :py:func:`precess_xyz (precess rectengular coordinates) <PyAstronomy.pyasl.asl.astroTimeLegacy.precess_xyz>`
+
+
+.. _timescales:
+
+Notes on timescales in astronomy
+----------------------------------
+
+Accurate representation of time requires to specify the time scale.
+An overview about astronomical time scales is given by the IAU in the context of
+their SOFA collection (`see <https://www.iausofa.org/current_C.html#Documents>`_); see particularly
+their cookbook on *Time Scale and Calendar Tools*. Also Eastman et al. 2010 (PASP 122, 935) present
+a comprehensive summary. 
+Modern IAU definitions of time systems are based on
+General Relativity (GR) considerations. 
+Below is a very informal presentation of some frequently encountered terms.
+
+The main aspects of GR relevant here are:
+(a) Sitting in a gravitational well dilates time, (b) relative motion dilates time. This means that the notion if time
+depends on one's location in the potential well of the Earth, Sun, etc.. 
+
+	* TAI : Atomic time (enumerates constant seconds ticking on surface of Earth). This is (almost) proper time on the surface of the Earth.
+	* TT : ``Terrestial time'' = TAI + 32.184 s (convention).
+	* UTC : Essentially TAI **but** with leap seconds introduced to adjust to variable rotation of Earth (solar time). JD is **not** a unique representation of UTC because of leap seconds (days may be longer or shorter). 
+	* TCG : ``Geocentric coordinate time'' is time, which would be recorded in the *Geocentric celestial reference system*, a metric (spacetime) comoving with the Earth but nonrotating and without the potential well of the Earth. Time ticks a bit faster here than TT and the relation is linear. 
+	* TCB : ``Barycentric coordinate time'' is time, which would be recorded in the *barycentric celestial reference system*, a metric (spacetime) comoving with the barycenter of the solar system but without its potential wells (no Sun, no planets). Time ticks again a bit faster here and relation to TCG is complex.
+	* TDB : ``Barycentric dynamical time'' is essentially TCB but slowed down by a linear transformation to make it (on average) go in step with TT.
+
+.. note:: Despite the name ``barycentric'' in TCB and TDB, the scale has nothing to do with light travel time corrections. In fact,
+		  BJD, HJD, or geocentric Julian Dates can be expressed in any timescale.
+
 
 Example: Convert from JD into calendar date (daycnv)
 --------------------------------------------------------------
