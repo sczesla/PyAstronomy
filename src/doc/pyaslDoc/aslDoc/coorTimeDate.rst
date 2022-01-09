@@ -46,8 +46,15 @@ depends on one's location in the potential well of the Earth, Sun, etc..
 	* TCB : ``Barycentric coordinate time'' is time, which would be recorded in the *barycentric celestial reference system*, a metric (spacetime) comoving with the barycenter of the solar system but without its potential wells (no Sun, no planets). Time ticks again a bit faster here and relation to TCG is complex.
 	* TDB : ``Barycentric dynamical time'' is essentially TCB but slowed down by a linear transformation to make it (on average) go in step with TT.
 
+To change the timescale, `astropy.time <https://docs.astropy.org/en/stable/time/index.html>`_ provides all the necessary tools
+in Python, ultimately based on the IAU's SOFA routines.
+
+*Which timescale to use?* The answer naturally depends on your needs. For event outside of the solar system TDB is a common choice.
+At any rate, try to get rid of UTC's leap second discontinuity nightmare asap unless it is specifically required.
+
 .. note:: Despite the name ``barycentric'' in TCB and TDB, the scale has nothing to do with light travel time corrections. In fact,
 		  BJD, HJD, or geocentric Julian Dates can be expressed in any timescale.
+		  
 
 
 Example: Convert from JD into calendar date (daycnv)
