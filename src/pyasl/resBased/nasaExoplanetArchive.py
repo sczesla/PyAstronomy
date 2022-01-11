@@ -52,20 +52,20 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
         """
         Download data and store it to file in PyA's data directory.
         """        
-        urlRoot = "http://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?"
-        table = "&table=PS"
-        select = "&select="
-        for v in six.itervalues(self._columns):
-            select = ''.join([select, ',', v[0]])
-        outformat = "&format=csv"
+        urlRoot = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query="
+        select = "select+"
+        v0s = [v[0] for v in six.itervalues(self._columns)]
+        select += ','.join(v0s)
+        select += "+from+ps"
 
-        url = ''.join((urlRoot, table + select, outformat))
+        url = ''.join((urlRoot, select))
+        print("Requesting URL: ", url)
         self._fs.downloadToFile(url, self.dataFileName, clobber=True, verbose=False,
                                 openMethod=gzip.open)
 
     def __init__(self):
         self.data = None
-        self.dataFileName = os.path.join("pyasl", "resBased", "NEXA.csv.gz")
+        self.dataFileName = os.path.join("pyasl", "resBased", "NEXA.vo.gz")
         configFileName = os.path.join("pyasl", "resBased", "NEXA.cfg")
         pp.PyAUpdateCycle.__init__(self, configFileName, "NEXA")
         # Define columns to select
@@ -117,25 +117,26 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
         Trigger download of data.
         """
         self._update(self._downloadData)
-
+     
     def _readData(self):
         """
         Read the data from local file into numpy recarray.
         """
-        r = csv.DictReader(self._fs.requestFile(
-            self.dataFileName, 'rt', gzip.open), delimiter=',')
-        for nplanets, x in enumerate(r):
-            pass
-        r = csv.DictReader(self._fs.requestFile(
-            self.dataFileName, 'rt', gzip.open), delimiter=',')
+        try:
+            from astropy.io.votable import parse
+        except ImportError as e:
+            PE.PyAImportFailure("Could not import astropy.io.votable to read VO table", \
+                                solution="Please install astropy (e.g., via pip install astropy)")
+        if not self._fs.fileExists(self.dataFileName):
+            print("Could not find data file. Initiating download.")
+            self._update(self._downloadData)
+        self.pstable = parse(self._fs.requestFile(
+            self.dataFileName, 'rb', gzip.open)).get_first_table()
+        
         dtype = [(self._columns[x][0], self._columns[x][3])
                  for x in range(len(self._columns))]
-        self.data = np.recarray((nplanets + 1,), dtype=dtype)
-        for i, x in enumerate(r):
-            for k, v in six.iteritems(x):
-                if len(v) == 0:
-                    v = None
-                self.data[k][i] = v
+        
+        self.data = np.rec.array(self.pstable.array)
 
     def availableColumns(self, verbose=True):
         """
