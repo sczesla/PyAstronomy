@@ -9,3 +9,4 @@ nbsphinx
 scipy>=0.12.0
 bidict
 docutils<0.18
+ipython
