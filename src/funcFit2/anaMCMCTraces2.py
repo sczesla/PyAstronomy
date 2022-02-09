@@ -12,10 +12,6 @@ from PyAstronomy import pyaC as PC
 import six
 import six.moves as smo
 
-try:
-    import pymc
-except ImportError:
-    pass
 
 try:
     import matplotlib.pylab as plt
@@ -34,11 +30,8 @@ class TraceAnalysis2:
 
     Parameters
     ----------
-    resource : string or pymc database object
-        If string, it assumed to be the filename of the
-        Markov Chain file. Otherwise, it is supposed
-        to be a pymc database object. If the filename is
-        of the form "*.emcee", it is assumed to be
+    resource : string
+        A filename of the form "*.emcee", assumed to be
         a trace produced by emcee. 
 
     Attributes
@@ -100,9 +93,6 @@ class TraceAnalysis2:
         if not fn is None:
             self._emceedat = np.load(fn)
         self.emceepnames = list(self._emceedat["pnames"]) + ["lnpost", "lnprior", "lnl"]
-        # Dummy tracesDic
-        self.tracesDic = dict(
-            zip(self.emceepnames, [None] * len(self.emceepnames)))
         # Build stateDic
         self.stateDic = {"stochastics": dict(zip(list(self.emceepnames), [
                                              None] * len(list(self.emceepnames)))), "sampler": {}}
@@ -144,6 +134,9 @@ class TraceAnalysis2:
         self.stateDic["sampler"]["_iter"] = self.emceechain.shape[0]
         self.stateDic["sampler"]["_burn"] = None
         self.stateDic["sampler"]["_thin"] = None
+        
+        # Populate tracesDic
+        self.tracesDic = {p:self.emceechain[::,self.emceepnames.index(p)]   for p in self.emceepnames}
 
     def _checkPackage(self, p):
         """
@@ -204,7 +197,7 @@ class TraceAnalysis2:
                 "Cannot determine the number of walkers. It appears that no emcee chain was loaded."))
         return self._emceedat["chain"].shape[0]
 
-    def __init__(self, resource, db="pickle"):
+    def __init__(self, resource, db=None):
         if isinstance(resource, six.string_types):
             # Resource is a filename
             if not os.path.isfile(resource):
@@ -218,30 +211,12 @@ class TraceAnalysis2:
             if not (re.match(".*\.emcee", resource) is None):
                 db = "emcee"
 
-            if db == "pickle":
-                self.dbtype = "pymc"
-                self._checkPackage("pymc")
-                self.db = pymc.database.pickle.load(resource)
-                self.stateDic = self.db.getstate()
-                self.tracesDic = self.db._traces
-            elif db == "hdf5":
-                self.dbtype = "pymc"
-                self._checkPackage("pymc")
-                self.db = pymc.database.hdf5.load(resource)
-                self.stateDic = self.db.getstate()
-                self.tracesDic = self.db._traces
-            elif db == "emcee":
+            if db == "emcee":
                 self.dbtype = "emcee"
                 self._loadEMCEEChain(resource)
             else:
                 raise(PE.PyAValError("Database type '" +
                                      db + "' is currently not supported."))
-
-        elif isinstance(resource, pymc.database.base.Database):
-            self.db = resource
-        else:
-            raise(PE.PyAValError(
-                "'resource' must be a filename or a pymc database object.", where="TraceAnalysis::__init__"))
 
         # Set default burn-in and thinning
         self.burn = 0
@@ -265,9 +240,7 @@ class TraceAnalysis2:
             The trace for the parameter.
         """
         self._parmCheck(parm)
-        if self.dbtype == "pymc":
-            return self.tracesDic[parm].gettrace()[self.burn::self.thin]
-        elif self.dbtype == "emcee":
+        if self.dbtype == "emcee":
             index = self.emceepnames.index(parm)
             return self.emceechain[self.burn::self.thin, index]
 
@@ -314,7 +287,7 @@ class TraceAnalysis2:
         """
         Returns a list of available PyMC *Trace* objects
         """
-        return list(self.tracesDic.values())
+        return list(self.tracesDic.keys())
 
     def state(self):
         """

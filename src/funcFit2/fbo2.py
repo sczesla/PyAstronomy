@@ -1581,7 +1581,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
             widgets=widgets, maxval=sampleArgs["iters"]).start()
     
     n = 0
-    for pos, prob, state, blobs in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+    for pos, prob, state, blobs in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1):
         n += 1
         if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
             if ic.check["progressbar"]:
