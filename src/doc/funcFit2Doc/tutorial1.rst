@@ -158,3 +158,8 @@ does not have any such method.
 
 * :doc:`ex_adding_two_gaussians` :download:`(Download notebook) <ex_adding_two_gaussian.ipynb>`
 
+
+MCMC sampling with emcee
+------------------------
+
+* :doc:`ex_emceesample_1` :download:`(Download notebook) <ex_emceesample_1.ipynb>`
