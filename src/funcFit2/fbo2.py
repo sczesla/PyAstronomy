@@ -1454,6 +1454,8 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
     walkerdimfac : int, optional
         Determines the number of walkers. By default, four times the
         number of free parameters is used.
+    pargs : tuple
+        Content of 'args' argument handed to EnsembleSampler
     scales : dictionary, optional
         The scales argument can be used to control the initial distribution
         of the walkers. By default, all walkers are distributed around the
@@ -1589,9 +1591,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
             else:
                 print("EMCEE: Reached iteration ",
                       n, " of ", sampleArgs["iters"])
-    
-    print(emceeSampler.blobs)
-    
+
     # Save the chain to a file
     if not dbfile is None:
         
