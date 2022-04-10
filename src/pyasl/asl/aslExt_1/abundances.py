@@ -27,13 +27,37 @@ class AbundancePatterns:
           - grsa from Grevesse, N. & Sauval, A.J. (1998, Space Science Reviews 85, 161)
           - wilm from Wilms, Allen & McCray (2000, ApJ 542, 914 except for elements not listed which are given zero abundance)
           - lodd from Lodders, K (2003, ApJ 591, 1220)
+          - lgpp from Lodders K., Palme H., Gail H.P. (2009, Landolt-Börnstein, New Series, vol VI/4B) (Photospheric, using Table 4)
+          - lpgs from same as lgpp (Proto-solar, using Table 10)
 
         """
         # elements in the xspec vphabs models
         self.xspecVphabsAbundances = ["He", "C", "N", "O", "Ne", "Na", "Mg", "Al", "Si",
                                       "S", "Cl", "Ar", "Ca", "Cr", "Fe", "Co", "Ni"]
         self._an = PyAstronomy.pyasl.AtomicNo()
-
+        
+        # Atomic weight patterns {Z:atomic weight}
+        self._awps = {}
+        
+        try:
+            from mendeleev import element
+        except ImportError as e:
+            pass
+        else:
+            for z in range(1, 31):
+                self._awps[z] = element(z).atomic_weight
+    
+    def getAtomicWeightPattern(self, awp):
+        """
+        Return atomic weight pattern
+        
+        Returns
+        -------
+        Pattern : dictionary
+            Dictionary mapping atomic number to standard atomic weight.
+        """
+        return self._awps
+            
     def availablePatterns(self):
         """
         Returns the names (abbreviations) of the available abundance patterns.
@@ -119,3 +143,50 @@ class AbundancePatterns:
         else:
             p = self.pattern(pat, form='dict', key="symbol")
         return p[element]
+        
+    def patternByMass(self, name, awp=None, key="symbol"):
+        """
+        Get abundance of element in units of mass.
+        
+        Relative number abundances are converted into mass fractions
+        based on standard atomic weights.
+        
+        Parameters
+        ----------
+        name : string
+            The abbreviation of the abundance pattern.
+        awp : dictionary, optional
+            Atomic weight pattern. Dictionary mapping atomic number to
+            standard atomic weight. If None, data for from the mendeleev
+            package will be used.
+        key : string, {symbol, number}, optional
+            This parameter determines
+            whether the elemental symbol or the atomic number is used
+            as the key in the return dictionary. The default is "symbol".
+
+        Returns
+        -------
+        Pattern : dictionary
+            Dictionary mapping atomic number to the respective fraction of mass
+        """
+        if (len(self._awps) == 0) and (awp is None):
+            raise(PE.PyAValError("No atomic weight pattern available.", \
+                                 where="abundanceByMass", \
+                                 solution=["Provide pattern via awp", "Install mendeleev package"]))
+        
+        p = self.pattern(name, form="dict", key="number")
+        pms = {}
+        for k, v in p.items():
+            pms[k] = p[k]*self._awps[k]
+        tm = sum(pms.values())
+        for k in pms.keys():
+            pms[k] = pms[k]/tm
+        
+        if key == "symbol":
+            r = {self._an.getElSymbol(k):v for k, v in pms.items()}
+            return r
+            
+        return pms 
+        
+
+        
