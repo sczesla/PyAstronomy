@@ -36,6 +36,6 @@ Example of usage
     print("or atomic number")
     print(ap.abundance(8, pat="wilm"))
     
-	print()
-	for el, ab in ap.patternByMass("aspl", key="symbol").items():
-	    print(f"Element: {el} with mass fraction of {ab}")
+    print()
+    for el, ab in ap.patternByMass("aspl", key="symbol").items():
+        print(f"Element: {el} with mass fraction of {ab}")
