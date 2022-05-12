@@ -180,15 +180,26 @@ class Gls:
             The error of the data values.
 
         """
+        def checkvalid(x, m):
+            # Check for NaNs
+            if np.any(~np.isfinite(x)):
+                raise(PE.PyAValError(m + " contains invalid values such as NaN or Inf.", \
+                                    where="GLS", \
+                                    solution="Remove from input (e.g., using np.isfinite)"))                    
+        
         if isinstance(lc, (tuple, list)):
             # t, y[, e_y] were given as list or tuple.
             if len(lc) in (2, 3):
                 self.t = np.ravel(lc[0])
                 self.y = np.ravel(lc[1])
+                # Check for NaNs
+                checkvalid(self.t, "Time input")
+                checkvalid(self.y, "Flux input")
                 self.e_y = None
-                if len(lc) == 3 and lc[2] is not None:
+                if (len(lc) == 3) and (lc[2] is not None):
                     # Error has been specified.
                     self.e_y = np.ravel(lc[2])
+                    checkvalid(self.e_y, "Flux error input")
             else:
                 raise(ValueError("lc is a list or tuple with " + str(len(lc)) + " elements. Needs to have 2 or 3 elements." + \
                                    " solution=Use 2 or 3 elements (t, y[, e_y]) or an instance of TimeSeries"))
@@ -204,6 +215,7 @@ class Gls:
         if (len(self.th) != self.N) or ((self.e_y is not None) and (len(self.e_y) != self.N)):
             raise(ValueError("Incompatible dimensions of input data arrays (time and flux [and error]). Current shapes are: " + \
                              ', '.join(str(np.shape(x)) for x in (self.t, self.y, self.e_y))))
+            
 
     def _buildFreq(self):
         """
