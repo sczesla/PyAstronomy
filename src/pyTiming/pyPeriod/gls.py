@@ -436,29 +436,62 @@ class Gls:
             print("Failed to calculate best-fit sine curve.")
             raise(e)
 
-    def info(self):
+    def info(self, noprint=False):
         """
         Prints some basic statistical output screen.
+        
+        Parameters
+        ----------
+        noprint : boolean
+            If True, printing is suppressed. Default is False.
+        
+        Returns
+        -------
+        Information : dictionary
+            A dictionary with the printed information.
         """
-        print("Generalized LS - statistical output")
-        print("-----------------------------------")
-        print("Number of input points:      %-6d" % self.N)
-        print("Weighted mean of dataset:   % f"  % self._Y)
-        print("Weighted rms of dataset:    % f"  % sqrt(self._YY))
-        print("Time base:                  % f"  % self.tbase)
-        print("Number of frequency points:  %-6d" % self.nf)
-        print()
-        print("Maximum power p [%s]: % f" % (self.norm, self.power.max()))
-        print("RMS of residuals:     % f" % self.rms)
+        
+        info = {"N":self.N, "weighted_mean":self._Y, "weighted_rms":sqrt(self._YY), \
+                "time_base":self.tbase, "no_of_freq_points":self.nf, \
+                "norm":self.norm, "maximum_power":self.power.max(), \
+                "rms_of_residuals":self.rms, \
+                "best_sine_frequency":self.hpstat["fbest"], \
+                "best_sine_frequency_err":self.hpstat["f_err"], \
+                "best_sine_period":1./self.hpstat["fbest"], \
+                "best_sine_period_err":self.hpstat["Psin_err"], \
+                "amplitude":self.hpstat["amp"], \
+                "amplitude_err":self.hpstat["amp_err"], \
+                "phase":self.hpstat["ph"], \
+                "phase_err":self.hpstat["ph_err"], \
+                "phase_t0":self.hpstat["T0"], \
+                "phase_t0_err":self.hpstat["T0_err"], \
+                "offset":self.hpstat["offset"], \
+                "offset_err":self.hpstat["offset_err"]
+            }
         if self.e_y is not None:
-            print("  Mean weighted internal error:  %f" % (sqrt(self.N/sum(1./self.e_y**2))))
-        print("Best sine frequency:  % f +/- % f" % (self.hpstat["fbest"], self.hpstat["f_err"]))
-        print("Best sine period:     % f +/- % f" % (1./self.hpstat["fbest"], self.hpstat["Psin_err"]))
-        print("Amplitude:            % f +/- % f" % (self.hpstat["amp"], self.hpstat["amp_err"]))
-        print("Phase (ph):           % f +/- % f" % (self.hpstat["ph"], self.hpstat["ph_err"]))
-        print("Phase (T0):           % f +/- % f" % (self.hpstat["T0"], self.hpstat["T0_err"]))
-        print("Offset:               % f +/- % f" % (self.hpstat["offset"], self.hpstat["offset_err"]))
-        print("-----------------------------------")
+            info["mean_weighted_internal_error"] = sqrt(self.N/sum(1./self.e_y**2)),
+        
+        if not noprint:
+            print("Generalized LS - statistical output")
+            print("-----------------------------------")
+            print("Number of input points:      %-6d" % self.N)
+            print("Weighted mean of dataset:   % f"  % self._Y)
+            print("Weighted rms of dataset:    % f"  % sqrt(self._YY))
+            print("Time base:                  % f"  % self.tbase)
+            print("Number of frequency points:  %-6d" % self.nf)
+            print()
+            print("Maximum power p [%s]: % f" % (self.norm, self.power.max()))
+            print("RMS of residuals:     % f" % self.rms)
+            if self.e_y is not None:
+                print("  Mean weighted internal error:  %f" % (sqrt(self.N/sum(1./self.e_y**2))))
+            print("Best sine frequency:  % f +/- % f" % (self.hpstat["fbest"], self.hpstat["f_err"]))
+            print("Best sine period:     % f +/- % f" % (1./self.hpstat["fbest"], self.hpstat["Psin_err"]))
+            print("Amplitude:            % f +/- % f" % (self.hpstat["amp"], self.hpstat["amp_err"]))
+            print("Phase (ph):           % f +/- % f" % (self.hpstat["ph"], self.hpstat["ph_err"]))
+            print("Phase (T0):           % f +/- % f" % (self.hpstat["T0"], self.hpstat["T0_err"]))
+            print("Offset:               % f +/- % f" % (self.hpstat["offset"], self.hpstat["offset_err"]))
+            print("-----------------------------------")
+        return info
 
     def plot(self, block=False, period=False):
         """
