@@ -99,7 +99,7 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     if ((not dt is None) + (not nbins is None) + (not reduceBy is None)) != 1:
         raise(PE.PyAParameterConflict(
             "Specify one of `dt`, `nbins`, or `reduceBy`."))
-    if ((not x0 is None) + (not reduceBy is None)) != 1:
+    if ((not x0 is None) + (not reduceBy is None)) > 1:
         raise(PE.PyAParameterConflict("Specify either `x0` or `reduceBy`."))
     if x0 is None:
         # Use first time as starting point
