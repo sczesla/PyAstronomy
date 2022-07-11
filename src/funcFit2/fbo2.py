@@ -1677,6 +1677,37 @@ for m in _ml:
     setattr(_fbo2module, m[0], _fuf2ModelFactory(m[1], m[2]) )
 
 
+class Poly2d(MBOEv):
+    """
+    Bivariate (2d) polynomial model
+    
+    Parameters
+    ----------
+    nx, ny : int
+        Number of coefficients in first and second variable
+    """
+
+    def __init__(self, nx, ny):
+        if (nx < 0) or (ny < 0):
+            raise(PE.PyAValError("nx and ny must be non-negative integers."))
+        self.nx, self.ny = nx, ny
+        pars = []
+        for x in range(nx+1):
+            for y in range(ny+1):
+                pars.append("c%d-%d" % (x,y))
+        # 'pars' specifies parameter names in the model
+        MBOEv.__init__(self, pars=pars, rootName="Poly2d")
+
+    def evaluate(self, x, *args):
+        """
+        Evaluate model at points (x[::,0], x[::,1])
+        """
+        c = np.zeros( (self.nx+1, self.ny+1) )
+        for i in range(self.nx+1):
+            for j in range(self.ny+1):
+                c[i,j] = self["c%d-%d" % (i,j)]
+        return np.polynomial.polynomial.polyval2d(x[::,0], x[::,1], c)
+
 # 
 # # class GF1d(MBO2):
 # #     
