@@ -1,0 +1,208 @@
+import numpy as np
+import matplotlib.pylab as plt
+from PyAstronomy.pyaC import pyaErrors as PE
+
+def sysrem_iter_c(rij, sigij, a):
+    """
+    Estimate 'c'
+    
+    Parameters
+    ----------
+    rij : 2d array
+        Residuals (rij[::,i] = ith of nds observation with nobs data points)
+    sigij : 2d array
+        Uncertainties
+    a : 1d array
+        Current estimate of 'a' (length is nobs)
+    
+    Returns
+    -------
+    c : 1d array
+        Estimate of 'c'
+    """
+    nobs, nds = rij.shape
+    
+    c = np.zeros(nds)
+    for i in range(nds):
+        ss = sigij[::,i]**2 
+        c[i] = np.sum( rij[::,i]*a/ss ) / np.sum( a**2/ss )
+    return c
+
+def sysrem_iter_a(rij, sigij, c):
+    """
+    Estimate 'a'
+    
+    Parameters
+    ----------
+    rij : 2d array
+        Residuals (rij[::,i] = ith of nds observation with nobs data points)
+    sigij : 2d array
+        Uncertainties
+    c : 1d array
+        Current estimate of 'a' (length is nds)
+    
+    Returns
+    -------
+    a : 1d array
+        Estimate of 'a'
+    """
+    nobs, nds = rij.shape
+    
+    a = np.zeros(nobs)
+    for j in range(nobs):
+        ss = sigij[j,::]**2 
+        a[j] = np.sum( rij[j,::]*c / ss ) / np.sum( c**2/ss )
+    return a
+    
+def sysrem_data_prepare(obs, sigs):
+    """
+    Construct data sets for SysRem
+    
+    Parameters
+    ----------
+    obs : list of arrays
+        Observations
+    sigs : list of arrays, optional
+        Uncertainties of the observations
+    
+    Returns
+    -------
+    rij : 2d array
+        The residuals (mean-subtracted observations) so that
+        rij[::,i] gives the i-th observation
+    sm : 2d array
+        The uncertainties in the same format as rij
+    a0 : 1d array
+        A dummy guess for the 'a' vector (linear between 0 and 1)
+    """
+    nds = len(obs)
+    nobs = len(obs[0])
+    # Residuals and STDs
+    rij = np.zeros( (nobs, nds) )
+    sm = np.zeros( (nobs, nds) )
+    
+    if len(obs) != len(sigs):
+        raise(ValueError("Obs and sigs must have the same length."))
+    
+    for n in range(nds):
+        if np.isnan(np.min(obs[n])):
+            raise(PE.PyAValError(f"NaN value found in observations no. {n}. No NaNs admissible."))
+        if np.isnan(np.min(sigs[n])):
+            raise(PE.PyAValError(f"NaN value found in error array no. {n}. No NaNs admissible."))
+    
+    for n in range(nds):
+        rij[::,n] = obs[n] - np.mean(obs[n])
+        sm[::,n] = sigs[n]
+
+    return rij, sm, np.linspace(0,1,nobs)
+    
+    
+def sysrem_update_rij(rij, a, c):
+    """
+    Subtract current model from residuals
+    
+    Returns
+    -------
+    New rij : 2d array
+        Updated residuals
+    """
+    return rij - np.outer(a,c)
+
+
+class SysRem:
+    
+    def __init__(self, obs, sigs, a0=None):
+        """
+        Implementation of the SysRem algorithm.
+        
+        SysRem was described by
+        `Tamuz et al. 2005 (MNRAS 356, 1466) <https://ui.adsabs.harvard.edu/abs/2005MNRAS.356.1466T/abstract>`_
+        in the context of correcting systematic effects in samples of
+        light curves, but has been applied in other areas such as planetary atmospheric
+        spectroscopy.
+        
+        Parameters
+        ----------
+        obs : list of 1d arrays
+            Observations (e.g., light curves)
+        sigs : list of 1d arrays
+            Uncertainties
+        a0 : 1d array, optional
+            Starting values for 'a' parameter (same length as
+            the observations). If not given, values linearly
+            increasing from 0 to 1 are assumed.
+        
+        Attributes
+        ----------
+        rijs : list of 2d arrays
+            List of residual arrays. Each call of the `iterate`
+            method adds an updated residual array to the list.
+        ac : list of tuples of arrays
+            The `a` and `c` parameters used to obtain the updated
+            residual array from the previous one.
+            
+        """
+        self.rij, self.sm, self.a0 = sysrem_data_prepare(obs, sigs)
+        if a0 is not None:
+            self.a0 = a0
+        
+        self.nds = len(obs)
+        self.nobs = len(obs[0])
+    
+        self.rijs = [self.rij]
+        self.ac = [(None,None)]
+    
+    def iterate(self, atol=1e-3, rtol=0, imax=1001):
+        """
+        A single SysRem iteration: Remove linear systematic effect
+        
+        Parameters
+        ----------
+        atol, rtol : float, optional
+            Absolute and relative tolerance for a-c iteration
+            required to stop. The pertinent quantity tested is the
+            difference between consecutive models divided by the
+            uncertainties.
+            By default, relative tolerance is ignored.
+        imax : int
+            Maximum of iterations. Throws exception if convergence
+            is not reached earlier.
+        
+        Returns
+        -------
+        rij : 2d array
+            Updated residual matrix with best-fit model subtracted.
+        a : array
+            Best-fit 'a' values
+        c : array
+            Best-fit 'c' values
+        """
+        a = self.a0
+        # First ac iteration
+        c = sysrem_iter_c(self.rijs[-1], self.sm, a)
+        a = sysrem_iter_a(self.rijs[-1], self.sm, c)
+        m = np.outer(a,c)
+
+        converge = False
+        for i in range(imax):
+            m0 = m.copy()
+            c = sysrem_iter_c(self.rijs[-1], self.sm, a)
+            a = sysrem_iter_a(self.rijs[-1], self.sm, c)
+            m = np.outer(a,c)
+            
+            dm = (m-m0)/self.sm
+            
+            if np.allclose(dm,0,atol=atol,rtol=rtol):
+                converge = True
+                break
+
+        self.last_ac_iterations = i
+
+        if not converge:
+            PE.warn(PE.PyAAlgorithmFailure(f"Iteration (a-c) did not converge with absolute tolerance {atol} and relative tolerance {rtol}. Current value is {np.max(np.abs(dm))}.", \
+                                           where="SysRem (iterate)", \
+                                           solution="Increase `imax` or adapt atol and/or rtol."))
+            
+        self.ac.append((a,c))
+        self.rijs.append(sysrem_update_rij(self.rijs[-1], a, c))
+        return self.rijs[-1], a, c

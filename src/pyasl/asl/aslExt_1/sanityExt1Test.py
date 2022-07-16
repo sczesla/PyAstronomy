@@ -496,9 +496,86 @@ class SanityOfPyaslExt1(unittest.TestCase):
         print("    MC effective radius 2: %6.4f +/- %6.4f" % (mcvol2[2:]))   
         
 #         plt.contour(p, [l5pot*1.02, l3pot, l2pot, l1pot], colors=['g', 'c', 'b', 'r'], extent=[-1.5,2,-1.6,1.6])
-#         plt.text(l1, 0, 'L1', horizontalalignment='center')
-#         plt.text(l2, 0, 'L2', horizontalalignment='center')
-#         plt.text(l3, 0, 'L3', horizontalalignment='center')
-#         plt.text(l4[0], l4[1], 'L4', horizontalalignment='center')
-#         plt.text(l5[0], l5[1], 'L5', horizontalalignment='center')
-#         plt.show()
+
+    def sanity_sysrem_example(self):
+        """
+        Checking SysRem example
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        import matplotlib.pylab as plt
+        
+        # No. of data sets (e.g., light curves)
+        nds = 50
+        # No. of data points per data set
+        nobs = 200
+        
+        obs, sigs = [], []
+        
+        # Generate mock data
+        x = np.linspace(0,1,nobs)-0.5
+        for i in range(nds):
+            # Add noise
+            y = np.random.normal(0,0.01+0.0001*i,nobs)
+            # Add 3rd degree polynomial
+            p = (i, 0.2*i, 0.3*i)
+            y += np.polyval(p,x)
+            # Add moving Gaussian signal
+            y -= 0.02 * np.exp(-(x-(i/nds-0.5))**2/(2*0.02**2))
+            # Add growing but stationary Gaussian signal
+            y -= (i**2*0.05) * np.exp(-x**2/(2*0.06**2))
+            obs.append(y)
+            sigs.append(np.ones_like(y)*0.01+0.0001*i)
+            
+            #plt.plot(x, y, '.-')
+        #plt.title("Mock data")
+        #plt.show()
+        
+        sr = pyasl.SysRem(obs, sigs)
+        # First iteration
+        r, a, c = sr.iterate()
+        #plt.subplot(2,1,1)
+        #plt.title("Residuals after first (top) and second iteration (bottom)")
+        #plt.imshow(r, origin='lower', aspect="auto")
+        # Second iteration
+        r, a, c = sr.iterate()
+        #plt.subplot(2,1,2)
+        #plt.imshow(r, origin='lower', aspect="auto")
+        #plt.show()
+
+    def sanity_sysrem_lindata(self):
+        """
+        Checking SysRem sanity for linear data
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        import matplotlib.pylab as plt
+        
+        np.random.seed(123)
+        
+        # No. of data sets (e.g., light curves)
+        nds = 50
+        # No. of data points per data set
+        nobs = 200
+        
+        obs, sigs = [], []
+        
+        a = np.linspace(0,1,200)
+        c = np.random.random(50)
+        
+        m = np.outer(a,c)
+        
+        # Generate mock data
+        for i in range(nds):
+            obs.append(m[::,i])
+            sigs.append(np.ones_like(a)*0.01+0.0001*i)
+            
+        
+        sr = pyasl.SysRem(obs, sigs)
+        # First iteration
+        print(np.std(m))
+        r, a, c = sr.iterate()
+        print(np.std(r))
+        self.assertAlmostEqual(np.std(r), 0, msg="SysRem problem with linear data", delta=1e-10)
+
+

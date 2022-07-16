@@ -37,6 +37,7 @@ General algorithms
    aslDoc/aslExt_1Doc/stellarAge.rst
    aslDoc/aslExt_1Doc/spectralClass.rst
    aslDoc/aslExt_1Doc/roche.rst
+   aslDoc/aslExt_1Doc/sysrem.rst
 
 General data analysis
 ~~~~~~~~~~~~~~~~~~~~~
