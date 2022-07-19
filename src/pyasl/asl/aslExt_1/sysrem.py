@@ -123,10 +123,11 @@ class SysRem:
         
         Parameters
         ----------
-        obs : list of 1d arrays
-            Observations (e.g., light curves)
-        sigs : list of 1d arrays
-            Uncertainties
+        obs : list of 1d arrays or 2d array
+            List of observations (e.g., light curves) or 2d array such that
+            obs[::,0] is the first observation
+        sigs : list of 1d arrays or 2d array
+            Uncertainties (same format as obs)
         a0 : 1d array, optional
             Starting values for 'a' parameter (same length as
             the observations). If not given, values linearly
@@ -142,6 +143,12 @@ class SysRem:
             residual array from the previous one.
             
         """
+        # Convert into list of arrays if 2d array
+        if isinstance(obs, np.ndarray) and (obs.ndim == 2):
+            obs = [obs[::,i] for i in range(obs.shape[1])]
+        if isinstance(sigs, np.ndarray) and (sigs.ndim == 2):
+            sigs = [sigs[::,i] for i in range(sigs.shape[1])]
+            
         self.rij, self.sm, self.a0 = sysrem_data_prepare(obs, sigs)
         if a0 is not None:
             self.a0 = a0
