@@ -22,10 +22,12 @@ def sysrem_iter_c(rij, sigij, a):
     """
     nobs, nds = rij.shape
     
+    a2 = a**2
+    ss2 = sigij**2
     c = np.zeros(nds)
     for i in range(nds):
-        ss = sigij[::,i]**2 
-        c[i] = np.sum( rij[::,i]*a/ss ) / np.sum( a**2/ss )
+        ss = ss2[::,i]
+        c[i] = np.sum( rij[::,i]*a/ss ) / np.sum( a2/ss )
     return c
 
 def sysrem_iter_a(rij, sigij, c):
@@ -48,10 +50,12 @@ def sysrem_iter_a(rij, sigij, c):
     """
     nobs, nds = rij.shape
     
+    c2 = c**2
+    ss2 = sigij**2
     a = np.zeros(nobs)
     for j in range(nobs):
-        ss = sigij[j,::]**2 
-        a[j] = np.sum( rij[j,::]*c / ss ) / np.sum( c**2/ss )
+        ss = ss2[j,::]
+        a[j] = np.sum( rij[j,::]*c / ss ) / np.sum( c2/ss )
     return a
     
 def sysrem_data_prepare(obs, sigs):
