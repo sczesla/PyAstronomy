@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pylab as plt
 from PyAstronomy.pyaC import pyaErrors as PE
 
-def sysrem_iter_c(rij, sigij, a):
+def sysrem_iter_c(rij, sigij, a, sigij2=None):
     """
     Estimate 'c'
     
@@ -14,6 +14,8 @@ def sysrem_iter_c(rij, sigij, a):
         Uncertainties
     a : 1d array
         Current estimate of 'a' (length is nobs)
+    sigij2 : 2d array, optional
+        Square of uncertainties. If given, sigij will be ignores.
     
     Returns
     -------
@@ -23,14 +25,14 @@ def sysrem_iter_c(rij, sigij, a):
     nobs, nds = rij.shape
     
     a2 = a**2
-    ss2 = sigij**2
+    ss2 = sigij**2 if sigij2 is None else sigij2
     c = np.zeros(nds)
     for i in range(nds):
         ss = ss2[::,i]
         c[i] = np.sum( rij[::,i]*a/ss ) / np.sum( a2/ss )
     return c
 
-def sysrem_iter_a(rij, sigij, c):
+def sysrem_iter_a(rij, sigij, c, sigij2=None):
     """
     Estimate 'a'
     
@@ -42,6 +44,8 @@ def sysrem_iter_a(rij, sigij, c):
         Uncertainties
     c : 1d array
         Current estimate of 'a' (length is nds)
+    sigij2 : 2d array, optional
+        Square of uncertainties. If given, sigij will be ignores.
     
     Returns
     -------
@@ -51,7 +55,7 @@ def sysrem_iter_a(rij, sigij, c):
     nobs, nds = rij.shape
     
     c2 = c**2
-    ss2 = sigij**2
+    ss2 = sigij**2 if sigij2 is None else sigij2
     a = np.zeros(nobs)
     for j in range(nobs):
         ss = ss2[j,::]
@@ -154,6 +158,7 @@ class SysRem:
             sigs = [sigs[::,i] for i in range(sigs.shape[1])]
             
         self.rij, self.sm, self.a0 = sysrem_data_prepare(obs, sigs)
+        self.sm2 = self.sm**2
         if a0 is not None:
             self.a0 = a0
         
@@ -190,15 +195,15 @@ class SysRem:
         """
         a = self.a0
         # First ac iteration
-        c = sysrem_iter_c(self.rijs[-1], self.sm, a)
-        a = sysrem_iter_a(self.rijs[-1], self.sm, c)
+        c = sysrem_iter_c(self.rijs[-1], None, a, sigij2=self.sm2)
+        a = sysrem_iter_a(self.rijs[-1], None, c, sigij2=self.sm2)
         m = np.outer(a,c)
 
         converge = False
         for i in range(imax):
             m0 = m.copy()
-            c = sysrem_iter_c(self.rijs[-1], self.sm, a)
-            a = sysrem_iter_a(self.rijs[-1], self.sm, c)
+            c = sysrem_iter_c(self.rijs[-1], None, a, sigij2=self.sm2)
+            a = sysrem_iter_a(self.rijs[-1], None, c, sigij2=self.sm2)
             m = np.outer(a,c)
             
             dm = (m-m0)/self.sm
