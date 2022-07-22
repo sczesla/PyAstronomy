@@ -6,29 +6,6 @@ Doppler shifting a spectrum
 .. currentmodule:: PyAstronomy.pyasl
 .. autofunction:: dopplerShift
 
-Note on linear interpolation and noise
-------------------------------------------
-
-Linear interpolation can (apparently) affect the noise in the data set.
-Say we start with a number of iid (identically and independently
-distributed) residuals, which obey a Gaussian distribution with some
-fixed standard deviation characterizing the noise. This is what is
-typically and often implicitly assumed in noise estimation.
-Now we generate
-a new data set by averaging adjacent points, i.e., we apply a special case
-of linear interpolation with the new data points half way between the
-initial ones.
-If we now estimate the noise in the new data set under the
-same iid assumption, we will find that it decreased by a factor
-of sqrt(2). Now, it seems unlikely that we can increase the information content
-in our data by interpolation alone. In fact, we must acknowledge that the iid
-assumption does no longer hold, because the information previously contained in
-a single data point is now, by construction, contained in two of the new, interpolated
-data points, so that these points must no longer be considered independent.
-
-While the effect is strongest for the case outlined above, it also holds for the
-more general case, where interpolated data points are not half way between the
-original ones. 
 
 Example
 --------
@@ -67,3 +44,65 @@ Example
     plt.plot(wvl, nflux1, 'r.-')
     plt.plot(wvl, nflux2, 'g.-')
     plt.show()
+    
+  
+Note on linear interpolation and noise
+------------------------------------------
+
+Say, we represent the spectrum by a series of independent random variables,
+:math:`F_i`, normally distributed according to 
+
+.. math::
+
+	F_i \sim N(\mu_i,\sigma_i^2)
+	
+so that the :math:`\mu_i` are the mean values and the
+:math:`\sigma_i` their standard deviations. A measurement of the spectrum with data points
+:math:`f_1 \ldots f_n` is then a realization of these random variables. When we obtain a
+shifted spectrum by linear interpolation between adjacent data points, :math:`f_i` and
+:math:`f_{i+1}`, we obtain updated data points according to
+
+.. math::
+
+	g_i = a_i f_i + (1-a_i) f_{i+1} \sim N(a_i \mu_i + (1-a_i) \mu_{i+1}, a_i^2 \sigma_i^2 + (1-a_i)^2 \sigma_{i+1}^2 )
+	
+where the :math:`a_i` are the interpolation weightings so that :math:`0 \le a \le 1`. The sequence
+:math:`g_i \ldots g_n` is a realization of respective random variables :math:`G_i`.
+If the original spectrum is flat and zero (:math:`\mu_i=\mu=0`) and the noise is the same
+throughout (:math:`\sigma_i=\sigma`), the usual unbiased estimator of the variance of the series
+of data points
+
+.. math::
+
+	E[s^2(f_i \ldots f_n)] = E[F_i^2] = E\left[\frac{1}{N-1} \sum (f_i - \bar{f})^2\right] = \sigma^2
+	
+where :math:`\bar{f}` is the mean value has expectation :math:`\sigma^2`, which is here identical to the
+variance of the individual variables.
+The same
+estimate for the shifted spectrum reads 
+
+.. math::
+
+	E[s^2(g_i \ldots g_n)] = E[G_i] = E\left[a F_i + (1-a) F_{i+1}\right] = (a^2 + (1-a)^2) \sigma^2 \le \sigma^2
+	 
+where we assume equal weights :math:`a_i=a`. The variance would thus be underestimated (using this estimator).
+**Therefore, by shifting a flat spectrum by half a bin, its sample variance is cut in half.**
+The explanation for this behavior is correlation between consecutive data points. The covariance
+between adjacent points reads
+
+.. math::
+
+	COV(G_i, G_{i+1}) &= E[G_i G_{i+1}] = E\left[(a F_i + (1-a) F_{i+1}) (a F_{i+1} + (1-a)F_{i+2}) \right] = a(1-a) \sigma^2 \\
+	COV(G_i, G_{i+j}) &= 0  \;\; \mbox{for} \;\; j > 1. 
+
+Therefore, the autocorrelation function (ACF) of the resulting spectrum is non-zero only for lag one, where
+one finds
+
+.. math::
+
+	\rho_1 = \frac{a(1-a)}{a^2 + (1-a)^2}
+
+
+
+
+
