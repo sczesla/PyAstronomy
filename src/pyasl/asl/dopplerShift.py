@@ -5,7 +5,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 import six.moves as smo
 
 
-def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05):
+def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err=None):
     """
     Doppler shift a given spectrum.
 
@@ -59,6 +59,10 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05):
     vlim : float, optional
         Maximal fraction of the speed of light allowed for Doppler
         shift, v. Default is 0.05.
+    err : array, optional
+        The uncertainties of the data points in the spectrum. If given,
+        updated uncertainties are obtained by linear interpolation of the
+        uncertainties.
 
     Returns
     -------
@@ -66,6 +70,8 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05):
         The shifted flux array at the *old* input locations.
     wlprime : array
         The shifted wavelength axis.
+    err : array, optional
+        Uncertainties of the shifted spectrum.
     """
     # Order check
     if np.any(np.diff(wvl) < 0.0):
@@ -96,23 +102,31 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05):
                                  solution="If you request 'fillValue' as edge handling method, you need to specify the 'fillValue' keyword."))
         fv = fillValue
 
-    f = sci.interp1d(wlprime, flux, bounds_error=False, fill_value=fv)
-    nflux = f(wvl)
+    nflux = sci.interp1d(wlprime, flux, bounds_error=False, fill_value=fv)(wvl)
+    if err is not None:
+        nerr = sci.interp1d(wlprime, err, bounds_error=False, fill_value=fv)(wvl)
 
     if edgeHandling == "firstlast":
         # Not is-NaN
         nin = ~np.isnan(nflux)
         if not nin[0]:
-            # First element in invalid (NaN)
+            # First element is invalid (NaN)
             # Find index of first valid (not NaN) element
             fvindex = np.argmax(nin)
             # Replace leading elements
             nflux[0:fvindex] = nflux[fvindex]
+            if err is not None:
+                nerr[0:fvindex] = nerr[fvindex]
         if not nin[-1]:
             # Last element is invalid
             # Index of last valid element
             lvindex = -np.argmax(nin[::-1])-1
             # Replace trailing elements
             nflux[lvindex+1:] = nflux[lvindex]
+            if err is not None:
+                nerr[lvindex+1:] = nerr[lvindex]
 
-    return nflux, wlprime
+    if err is None:
+        return nflux, wlprime
+    else:
+        return nflux, wlprime, nerr
