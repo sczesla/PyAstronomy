@@ -952,6 +952,24 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
 
         self.assertLess(max(numpy.abs(flux - nflux2)), 1e-5)
 
+    def sanity_uncertainties(self):
+        """
+        Doppler shift -- sanity of errors after shift
+        """
+        from PyAstronomy import pyasl
+        import matplotlib.pylab as plt
+        import numpy as np
+        
+        # Create a "spectrum" with 0.01 A binning ...
+        wvl = np.linspace(6000., 6100., 1000)
+        err = np.ones_like(wvl) * 0.05
+        flux = np.random.normal(0, err, len(wvl))
+        
+        # Shift that spectrum to the blue by 17 km/s including errors
+        nflux1, wlprime1, nerr1 = pyasl.dopplerShift(wvl, flux, -17., edgeHandling="firstlast", err=err)
+        
+        self.assertAlmostEqual(np.mean(err), np.mean(nerr1), msg="Doppler shift: Problem with shifting error", delta=1e-10)
+
     def sanity_checkExample(self):
         """
         Doppler shift -- Checking whether example works
@@ -990,6 +1008,33 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
         plt.plot(wvl, nflux2, 'g.-')
 #     plt.show()
 
+    def sanity_checkExample(self):
+        """
+        Doppler shift -- Checking whether example with uncertainties works
+        """
+        #from __future__ import print_function, division
+        from PyAstronomy import pyasl
+        import matplotlib.pylab as plt
+        import numpy as np
+        
+        # Create a "spectrum" with 0.01 A binning ...
+        wvl = np.linspace(6000., 6100., 1000)
+        # ... and a Gaussian absorption line
+        flux = 1 - 0.7 * np.exp(-(wvl-6050.)**2/(2.*1.5**2))
+        # Add some noise
+        err = np.ones_like(flux) * 0.05
+        # Some points with unusually large error
+        err[500] = 0.3
+        err[[351, 497, 766, 787]] = 0.3
+        flux += np.random.normal(0, err, len(flux))
+        
+        # Shift that spectrum to the blue by 17 km/s including errors
+        nflux1, wlprime1, nerr1 = pyasl.dopplerShift(wvl, flux, -17., edgeHandling="firstlast", err=err)
+        
+        #plt.errorbar(wvl, flux, yerr=err, fmt='b+', label="Original")
+        #plt.errorbar(wvl, nflux1+0.2, yerr=nerr1, fmt='r+', label="Shifted")
+        #plt.legend()
+        #plt.show()
 
 class SanityOfrotBroad(unittest.TestCase, SaniBase):
 

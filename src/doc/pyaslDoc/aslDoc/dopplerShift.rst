@@ -7,8 +7,8 @@ Doppler shifting a spectrum
 .. autofunction:: dopplerShift
 
 
-Example
---------
+Example: Shifting
+----------------------
 
 ::
     
@@ -44,7 +44,38 @@ Example
     plt.plot(wvl, nflux1, 'r.-')
     plt.plot(wvl, nflux2, 'g.-')
     plt.show()
+  
+  
+Example: Including uncertainties
+------------------------------------
     
+::
+    
+	from __future__ import print_function, division
+	from PyAstronomy import pyasl
+	import matplotlib.pylab as plt
+	import numpy as np
+	
+	# Create a "spectrum" with 0.01 A binning ...
+	wvl = np.linspace(6000., 6100., 1000)
+	# ... and a Gaussian absorption line
+	flux = 1 - 0.7 * np.exp(-(wvl-6050.)**2/(2.*1.5**2))
+	# Add some noise
+	err = np.ones_like(flux) * 0.05
+	# Some points with unusually large error
+	err[500] = 0.3
+	err[[351, 497, 766, 787]] = 0.3
+	flux += np.random.normal(0, err, len(flux))
+	
+	# Shift that spectrum to the blue by 17 km/s including errors
+	nflux1, wlprime1, nerr1 = pyasl.dopplerShift(wvl, flux, -17., edgeHandling="firstlast", err=err)
+	
+	plt.errorbar(wvl, flux, yerr=err, fmt='b+', label="Original")
+	plt.errorbar(wvl, nflux1+0.2, yerr=nerr1, fmt='r+', label="Shifted")
+	plt.legend()
+	plt.show()
+
+
   
 Note on linear interpolation and noise
 ------------------------------------------
