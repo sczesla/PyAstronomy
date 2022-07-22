@@ -44,7 +44,7 @@ Example
     wvl = np.linspace(6000., 6100., 10000)
     # ... a gradient in the continuum ...
     flux = np.ones(len(wvl)) + (wvl/wvl.min())*0.05
-    # ... and a Gaussian absoption line
+    # ... and a Gaussian absorption line
     flux -= np.exp(-(wvl-6050.)**2/(2.*0.5**2))*0.05
     
     # Shift that spectrum redward by 20 km/s using
