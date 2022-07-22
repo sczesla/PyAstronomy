@@ -26,10 +26,15 @@ def sysrem_iter_c(rij, sigij, a, sigij2=None):
     
     a2 = a**2
     ss2 = sigij**2 if sigij2 is None else sigij2
-    c = np.zeros(nds)
-    for i in range(nds):
-        ss = ss2[::,i]
-        c[i] = np.sum( rij[::,i]*a/ss ) / np.sum( a2/ss )
+    
+    # Short form below
+    #c = np.zeros(nds)
+    #for i in range(nds):
+    #    ss = ss2[::,i]
+    #    c[i] = np.sum( rij[::,i]*a/ss ) / np.sum( a2/ss )
+        
+    c = np.sum( ((rij/ss2).T * a).T, axis=0) / np.sum( (a2 * (1/ss2).T).T, axis=0 )
+        
     return c
 
 def sysrem_iter_a(rij, sigij, c, sigij2=None):
@@ -56,10 +61,15 @@ def sysrem_iter_a(rij, sigij, c, sigij2=None):
     
     c2 = c**2
     ss2 = sigij**2 if sigij2 is None else sigij2
-    a = np.zeros(nobs)
-    for j in range(nobs):
-        ss = ss2[j,::]
-        a[j] = np.sum( rij[j,::]*c / ss ) / np.sum( c2/ss )
+    
+    # Short form below
+    #a = np.zeros(nobs)
+    #for j in range(nobs):
+    #    ss = ss2[j,::]
+    #    a[j] = np.sum( rij[j,::]*c / ss ) / np.sum( c2/ss )
+        
+    a = np.sum(rij / ss2 * c, axis=1) / np.sum( c2 * (1/ss2), axis=1 )
+    
     return a
     
 def sysrem_data_prepare(obs, sigs):
