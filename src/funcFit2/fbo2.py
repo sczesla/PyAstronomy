@@ -460,7 +460,7 @@ class PyABaSoS(object):
             Complete parameter name
         """
         result = b
-        if not r is None:
+        if (not r is None) and (r != ""):
             result += "_" + r
         if (not n is None) and (n != 0):
             result += ("(%d)" % n)
