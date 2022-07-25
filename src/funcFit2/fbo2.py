@@ -394,6 +394,19 @@ class PyABaSoS(object):
         self.pmap[new] = tmp
         
     def relate(self, dv, idv, func=None):
+        """
+        Establish functional relations
+        
+        Parameters
+        ----------
+        dv : string
+            Dependent variable
+        idv : string or list of strings
+            Independent variables
+        func : callable
+            Callable taking the independent variables as arguments
+            and returns the value of the dependent variable.
+        """
         if isinstance(idv, six.string_types):
             # Convert single string into list
             idv = [idv]
@@ -413,6 +426,8 @@ class PyABaSoS(object):
             self.pmap[n].affects.update([self.pmap[dv]])
         # Trigger update of the value of the related parameter
         self.pmap[dv].updateRelation()
+        # Freeze the dependent variable
+        self.freeze(dv)
     
     def copy(self):
         """ Return a shallow copy of the object """
