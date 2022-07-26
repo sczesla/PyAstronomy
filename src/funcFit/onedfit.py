@@ -2610,7 +2610,7 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
             widgets=widgets, maxval=sampleArgs["iters"]).start()
 
     n = 0
-    for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True):
+    for pos, prob, state in emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1):
         n += 1
         if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
             if ic.check["progressbar"]:
