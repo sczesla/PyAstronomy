@@ -690,6 +690,28 @@ class ScipyFMIN(IFitterBase):
         return self._result[0], self._result[1]
 
 
+class ScipyFMIN_POWELL(IFitterBase):
+    """
+    Wrapper around scipy.optimize.fmin_powell.
+    """
+
+    def __init__(self, *args, **kwargs):
+        IFitterBase.__init__(self)
+        self._allowedKWs = ["xtol", "ftol", "maxiter",
+                            "maxfun", "disp", "retall", "callback", "direc"]
+        self.name = "scipy.optimize.fmin_powell"
+
+    def fit(self, miniFunc, x0, *fminpars, **fminargs):
+        """
+        Wrapper around scipy.optimize.fmin_powell
+        """
+        self._digestkwargs(fminargs)
+        self._result = sco.fmin_powell(miniFunc, x0, *fminpars,
+                                full_output=True, **fminargs)
+        self._objfval = self._result[1]
+        return self._result[0], self._result[1]
+
+
 class FuFNM(IFitterBase):
 
     def __init__(self, *args, **kwargs):
@@ -1932,12 +1954,18 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 return FuFNM(self, **maa)
             elif minAlgo == "spfmin":
                 # scipy.optimize.fmin
-                global _scoImport
                 if not _scoImport:
                     raise(PE.PyARequiredImport("SciPy.optimize could not be imported.",
                                                solution=["Install SciPy (see www.scipy.org/).",
                                                          "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
                 return ScipyFMIN(**maa)
+            elif minAlgo == "spfmp":
+                # scipy.optimize.fmin
+                if not _scoImport:
+                    raise(PE.PyARequiredImport("SciPy.optimize could not be imported.",
+                                               solution=["Install SciPy (see www.scipy.org/).",
+                                                         "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
+                return ScipyFMIN_POWELL(**maa)                
             else:
                 raise(PE.PyAValError("Unknown string identifier for minimization algorithm: " + minAlgo,
                                      solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
@@ -1969,10 +1997,12 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         minAlgo : callable or string, optional
             The minimization algorithm. If not specified, scipy's 'fmin'
             implementation will be used. If a callable is given, it
-            must adhere to funcFit's internal optimizer model.
+            must adhere to funcFit's internal optimizer model (a suitable
+            example is scipy's fmin_powell).
             Valid strings are:
               - 'spfmin' : scipy.optimize.fmin
-              - 'fufnm' : funcFit's implementation of the Nelder-Mead simplex algorithm.
+              - 'fufnm' : funcFit's implementation of the Nelder-Mead simplex algorithm
+              - 'spfmp' : scipy.optimize.fmin_powell
         mAA : dictionary, optional
             Keyword arguments handed to the constructor of minAlgo, i.e.,
             minAlgo Arguments (mAA). Valid keywords depend on the choice
@@ -2005,7 +2035,11 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # Choose minimization algorithm
         self.mAA = copy.copy(mAA)
         self.minAlgo = self._resolveMinAlgo(minAlgo, default="spfmin", mAA=mAA)
-
+        
+        if self.minAlgo is sco.fmin_powell:
+            # Needed to make output fit requirement
+            fminArgs["full_output"] = True
+        
         # Determine function to be minimized
         if (miniFunc is None) and (yerr is not None):
             miniFunc = "chisqr"
@@ -2024,6 +2058,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # the objective function as its second item.
         self.fitResult = self.minAlgo(self.miniFunc, self.pars.getFreeParams(), *self.fminPars,
                                       **self.fminArgs)
+        print(self.fitResult)
         # Set parameters and model to best-fit values
         self.pars.setFreeParams(self.fitResult[0])
         self.updateModel()
