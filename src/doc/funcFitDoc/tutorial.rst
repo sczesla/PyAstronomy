@@ -210,6 +210,57 @@ are given.
           property directly.
 
 
+Using fmin_powell as optimization algorithm
+---------------------------------------------
+
+The default algorithm used by funFit as scipy's `fmin`. It may be useful
+to use other algorithms, e.g., to improve the convergence of the fit.
+Scipy's `fmin_powell` can be used by handing the `minAlgo` parameter to
+the `fit` method.
+
+::
+	
+	from __future__ import print_function, division
+	# Import numpy and matplotlib
+	from numpy import arange, sqrt, exp, pi, random, ones
+	import matplotlib.pylab as plt
+	# ... and now the funcFit package
+	from PyAstronomy import funcFit as fuf
+	
+	# Creating a Gaussian with some noise
+	# Choose some parameters...
+	gPar = {"A": -5.0, "sig": 10.0, "mu": 10.0, "off": 1.0, "lin": 0.0}
+	# Calculate profile
+	x = arange(100) - 50.0
+	y = gPar["off"] + gPar["A"] / sqrt(2*pi*gPar["sig"]**2) \
+	    * exp(-(x-gPar["mu"])**2/(2*gPar["sig"]**2))
+	# Add some noise
+	y += random.normal(0.0, 0.01, x.size)
+	# Let us see what we have done...
+	plt.plot(x, y, 'bp')
+	
+	gf = fuf.GaussFit1d()
+	# Set guess values for the parameters
+	gf["A"] = -1.0
+	gf["sig"] = 12.77
+	gf["off"] = 1.87
+	gf["mu"] = 10.5
+	
+	# Which parameters shall be variable during the fit?
+	# 'Thaw' those (the order is irrelevant)
+	gf.thaw(["A", "sig", "off", "mu"])
+	
+	# Fit using the algorithm scipy.optimize.fmin_powell
+	gf.fit(x, y, yerr=ones(x.size)*0.01, minAlgo="spfmp")
+	
+	# Write the result to the screen and plot the best fit model
+	gf.parameterSummary()
+	plt.plot(x, gf.model, 'r--')
+	
+	# Show the data and the best fit model
+	plt.show()
+
+
 Introducing a custom model
 -------------------------------
 
