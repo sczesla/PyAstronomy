@@ -10,8 +10,8 @@ class ModSuiteSanity(unittest.TestCase):
 
     def tearDown(self):
         # Clean up example output from KeplerEllipseModel example
-        if os.path.isfile("kemExample.tmp"):
-            os.remove("kemExample.tmp")
+        if os.path.isfile("kemExample.emcee"):
+            os.remove("kemExample.emcee")
 
     def sanity_rmcl_model(self):
         """ Checking sanity of RmcL calculation (example) """
@@ -198,16 +198,17 @@ class ModSuiteSanity(unittest.TestCase):
 #     plt.show()
 
     def sanity_KeplerEllipseModel(self):
+        """ Sanity of Kepler Ellipse Model example """
         from PyAstronomy.modelSuite import KeplerEllipseModel
         import numpy as np
         import matplotlib.pylab as plt
-
+        
         # Create a model class instance
         # In this case, we are only interested
         # in the x- and z-components of the orbit
         # solution.
         kem = KeplerEllipseModel(relevantAxes="xz")
-
+        
         # Setting some guess parameters
         kem["a"] = 7.8
         kem["per"] = 12.3
@@ -216,7 +217,7 @@ class ModSuiteSanity(unittest.TestCase):
         kem["Omega"] = 143.
         kem["w"] = 0.2
         kem["i"] = 92.0
-
+        
         # Evaluate the model
         time = np.linspace(0, kem["per"], 20)
         model = kem.evaluate(time)
@@ -225,22 +226,22 @@ class ModSuiteSanity(unittest.TestCase):
         # the data for two axes
         print("Used " + str(len(time)) + " time points")
         print("-> length of model: ", len(model))
-
+        
         # Isolating the model for the x-axis, i.e.,
         # every second data point starting from the
         # beginning.
         xmodel = model[0::2]
         # Isolating the model for the y-axis
         ymodel = model[1::2]
-
+        
         # Use the model to obtain mock data
         # by introducing some scatter
         data = model + np.random.normal(0., 0.5, model.size)
         # Plot the resulting "data"
         plt.title("Kepler Ellipse Model --- Example")
-        plt.errorbar(data[0::2], data[1::2], xerr=np.ones(20) * 0.5,
-                     yerr=np.ones(20) * 0.5, fmt="bp")
-
+        plt.errorbar(data[0::2], data[1::2], xerr=np.ones(20)*0.5,
+                     yerr=np.ones(20)*0.5, fmt="bp")
+        
         # Use MCMC to sample from the posterior
         # Specify free parameters
         kem.thaw(["a", "per", "e", "tau", "Omega", "w", "i"])
@@ -250,18 +251,33 @@ class ModSuiteSanity(unittest.TestCase):
         for p in kem.freeParameters():
             X0[p] = kem[p]
             steps[p] = kem[p] / 20.
-
+        
         lims = {"a": [5., 10.], "per": [10., 15.], "e": [0., 1.], "tau": [0.5, 1.],
                 "Omega": [0., 360.], "w": [-5., 5.], "i": [90., 95.]}
-
-        kem.fitMCMC(time, data, X0, lims, steps, yerr=np.ones(len(data)) * 0.5,
-                    iter=500, dbfile="kemExample.tmp")
-
+        
+        # Generate functions serving as uniform priors with lower and upper limit
+        def getprior(ll, ul):
+            """ lower (ll) and upper (ul) limit """
+            def prior(pardict, p):
+                if pardict[p] < ll:
+                    return -np.inf
+                elif pardict[p] > ul:
+                    return -np.inf
+                else:
+                    return 0
+            return prior
+        
+        # Define priors for parameters according to lims
+        priors = {par:getprior(l[0], l[1]) for par, l in lims.items()}
+        
+        kem.fitEMCEE(time, data, yerr=np.ones(len(data))*0.5, dbfile="kemExample.emcee", priors=priors)
+        
         # Plot the lowest deviance model
         ldmodel = kem.evaluate(np.linspace(0, kem["per"], 200))
         plt.plot(ldmodel[0::2], ldmodel[1::2], 'r--')
+        
+        #plt.show()
 
-#     plt.show()
 
 
 #  def sanity_atanProfile(self):
