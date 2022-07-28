@@ -120,15 +120,23 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False,
     """
     # Check whether wvl axis is linear
     dwls = wvl[1:] - wvl[0:-1]
-    if (abs(max(dwls) - min(dwls)) > np.mean(dwls) * 1e-6) and (not equid):
+    # True if wavelength axis is not equidistant
+    dwlned = abs(max(dwls) - min(dwls)) > np.mean(dwls) * 1e-6
+    if dwlned and (not equid):
         raise(PE.PyAValError("The wavelength axis is not equidistant, which is required.",
                              where="instrBroadGaussFast", \
                              solution=["Define equidistant wavelength axis", "Set 'equid' to True"]))
-    elif (abs(max(dwls) - min(dwls)) > np.mean(dwls) * 1e-6) and equid:
+    elif dwlned and equid:
         # Define an equidistant wavelength grid
         wvlorig = wvl
         wvl = np.linspace(wvl[0], wvl[-1], 2*len(wvl))
         flux = sci.interp1d(wvlorig, flux)(wvl)
+    elif (not dwlned) and equid:
+        # Wavelength axis is equidistant and equid is also True (not required) 
+        equid = False
+    elif (not dwlned) and (not equid):
+        # Wavelength axis is equidistant and no intermediate wvl axis requested
+        pass
         
     meanWvl = np.mean(wvl)
     fwhm = 1.0 / float(resolution) * meanWvl
