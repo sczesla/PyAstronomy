@@ -537,7 +537,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
             planetData["SMA"] = pdin["pl_orbsmax"]
             planetData["RpJ"] = pdin["pl_radj"]
             planetData["RsSun"] = pdin["st_rad"]
-            planetData["Tdur"] = pdin["pl_trandur"]
+            planetData["Tdur"] = pdin["pl_trandur"] / 24 # Convert into days
             planetData["plName"] = pdin["pl_name"]
             if np.isnan(planetData["Tdur"]):
                 del planetData["Tdur"]
