@@ -578,4 +578,25 @@ class SanityOfPyaslExt1(unittest.TestCase):
         print(np.std(r))
         self.assertAlmostEqual(np.std(r), 0, msg="SysRem problem with linear data", delta=1e-10)
 
-
+    def sanity_parallacticAngle_example(self):
+        """ Checking example of parallactic angle """
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        # Geo-latitude of Keck [deg]
+        gl = 19.83
+        
+        # Declinations to be considered
+        decs = np.arange(-80, 81, 20)
+        # Hour angles to be considered
+        t = np.linspace(0.0, 8*15, 1000)
+        
+        for dec in decs:
+            q = pyasl.parallacticAngle(t, gl, dec)
+            plt.plot(t/15, q, '-', label="$\delta = $" + f"{dec} deg")
+        
+        plt.ylabel("Parallactic angle [deg]")
+        plt.xlabel("Hour angle [h]")
+        plt.legend()
+        #plt.show()

@@ -97,6 +97,7 @@ Coordinates, time, and observation tools
    aslDoc/coordinates.rst
    aslDoc/properMotion.rst
    aslDoc/gal_uvw.rst
+   aslDoc/aslExt_1Doc/parallactic_angle.rst
 
 Transit and planet routines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
