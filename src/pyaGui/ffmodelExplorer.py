@@ -351,7 +351,7 @@ class FFModelExplorerList:
         Class instance managing the actual plotting.
     """
 
-    def __init__(self, odf, plotter):
+    def __init__(self, odf, plotter, plist=None):
         self.f = Figure()
 
         # Save reference to the model
@@ -388,7 +388,10 @@ class FFModelExplorerList:
         self.selectedPar = tk.StringVar(self.controlFrame)
 
         # Get parameters of model
-        ps = list(self.odf.parameters().keys())
+        if plist is None:
+            ps = list(self.odf.parameters().keys())
+        else:
+            ps = plist[:]
         # Set default modification properties
         # Saves these properties for all parameters
         self.modProps = {}
@@ -440,11 +443,11 @@ class FFModelExplorerList:
             # Create a scrollable region
             # Check maximum number of characters for parameter names:
         maxParamLen = 0
-        for k in sorted(self.odf.parameters().keys()):
+        for k in sorted(ps):
             if len(k) > maxParamLen:
                 maxParamLen = len(k)
             # Create an entry for each parameter
-        for k in sorted(self.odf.parameters().keys()):
+        for k in sorted(ps):
             x = tk.Frame(self.parameterFrame, height=2,
                          bd=2, relief=tk.SUNKEN, pady=2)
             self.singleParameterFrames[k] = x
@@ -863,7 +866,7 @@ class FFModelExplorerList:
 FFModelExplorer = FFModelExplorerList
 
 
-def ffmodelExplorer(odf, plotter, version="list"):
+def ffmodelExplorer(odf, plotter, version="list", plist=None):
     """
     Instantiate the model explorer.
 
@@ -883,12 +886,12 @@ def ffmodelExplorer(odf, plotter, version="list"):
         An instance of the model explorer.
     """
     if version == "list":
-        ffmod = FFModelExplorerList(odf, plotter)
+        ffmod = FFModelExplorerList(odf, plotter, plist=plist)
         return ffmod
     elif version == "dropdown":
         PE.warn(PE.PyADeprecationError("Please note that the dropdown version is no longer supported. " +
                                        "The list version will be called instead."))
-        ffmod = FFModelExplorerList(odf, plotter)
+        ffmod = FFModelExplorerList(odf, plotter, plist=plist)
         return ffmod
     else:
         raise(PE.PyAValError("Unknown version: '" + str(version) + "'",
