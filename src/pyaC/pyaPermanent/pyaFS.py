@@ -213,14 +213,27 @@ class PyAFS:
             return
 
         def download(url, context, nocontext=False):
-            if not nocontext:
-                # Use context
-                response = urllib.request.urlopen(url, context=context)
-            else:
-                # Disregard context
-                response = urllib.request.urlopen(url)
-            data = response.read()     # a `bytes` object
-            self.requestFile(fn, 'wb', openMethod).write(data)
+            try:
+                if not nocontext:
+                    # Use context
+                    response = urllib.request.urlopen(url, context=context)
+                else:
+                    # Disregard context
+                    response = urllib.request.urlopen(url)
+                data = response.read()     # a `bytes` object
+                self.requestFile(fn, 'wb', openMethod).write(data)
+            except UnicodeDecodeError as e:
+                pr = urllib.parse.urlparse(url)
+                if pr.scheme == "ftp":
+                    # FTP fallback to circumvent default utf-8 encoding if not applicable
+                    print("    (Entering fallback for FTP/latin-1 servers)")
+                    from ftplib import FTP
+                    ftp = FTP(pr.netloc, encoding="latin-1")
+                    ftp.login()
+                    with self.requestFile(fn, 'wb', openMethod) as ofi:
+                        ftp.retrbinary("RETR "+pr.path, ofi.write)
+                else:
+                    raise e
 
         ana = self._analyzeFilename(fn, True)
         self.touchFile(ana["fullname"])
