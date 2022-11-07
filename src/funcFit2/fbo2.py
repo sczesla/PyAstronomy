@@ -670,41 +670,42 @@ def _gaussLogL(self, *args, **kwargs):
     return gaussLogL(x, y, yerr, m)
 
         
-
-def chisqrobjf(self, pars, *args, **kwargs):
-    """
-    Default implementation of chi-square objective function
+def getchisqrobjf(sumfct=np.sum):
     
-    Parameters
-    ----------
-    x, y : arrays
-        The x and y coordinates of the data points.
-    yerr : array or float, optional
-        If not specified, a value of 1.0 will be assumed. Otherwise interpreted as
-        the error of the data points.
+    def chisqrobjf(self, pars, *args, **kwargs):
+        """
+        Default implementation of chi-square objective function
+        
+        Parameters
+        ----------
+        x, y : arrays
+            The x and y coordinates of the data points.
+        yerr : array or float, optional
+            If not specified, a value of 1.0 will be assumed. Otherwise interpreted as
+            the error of the data points.
+        
+        Returns
+        -------
+        chi square : float
+            Returns chi square if uncertainty is specified and sum of squared residuals
+            otherwise.
+        """
+        if len(args) == 2:
+            x, y = args[0], args[1]
+            yerr = 1.0
+        elif len(args) >= 3:
+            x, y, yerr = args[0], args[1], args[2]
+        else:
+            raise(PE.PyAValError("Invalid call to _chisqr. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
     
-    Returns
-    -------
-    chi square : float
-        Returns chi square if uncertainty is specified and sum of squared residuals
-        otherwise.
-    """
-    if len(args) == 2:
-        x, y = args[0], args[1]
-        yerr = 1.0
-    elif len(args) >= 3:
-        x, y, yerr = args[0], args[1], args[2]
-    else:
-        raise(PE.PyAValError("Invalid call to _chisqr. Received " + str(len(args)) + " arguments but takes 2 or 3 (x, y, [yerr])."))
-
-    if "_currentModel" in kwargs:
-        m = kwargs["_currentModel"]
-    else:
-        m = self.evaluate(*args, **kwargs)
+        if "_currentModel" in kwargs:
+            m = kwargs["_currentModel"]
+        else:
+            m = self.evaluate(*args, **kwargs)
+        
+        return sumfct( (m-y)**2/yerr**2 )
+    return chisqrobjf
     
-    return np.sum( (m-y)**2/yerr**2 )
-    
-
 
 class MBO(object):
     """
@@ -1188,7 +1189,9 @@ it requires a data set as input.
                     return -self.logPost(*args[1:], **kwargs)
                 f = nln
             elif f == "chisqr":
-                f = chisqrobjf
+                f = getchisqrobjf()
+            elif f == "nanchisqr":
+                f = getchisqrobjf(sumfct=np.nansum)
             else:
                 raise(PE.PyAValError("Unknown objective function string: '"+f+"'"))
         
@@ -1265,6 +1268,7 @@ class MBOEv(MBO):
         # Use likelihood based on Gaussian errors with std yerr
         self.setlogL("1dgauss")
         self.addSPLikeObjf("chisqr", "chisqr")
+        self.addSPLikeObjf("nanchisqr", "nanchisqr")
     
     def evaluate(self, *args, **kwargs):
         """
