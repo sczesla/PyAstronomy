@@ -71,6 +71,7 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
       - `Omega` - Longitude of the ascending node [deg].
       - `w` - Argument of periapsis [deg]. Note that the longitude if periapsis is given by Omega+w.
       - `e` - Orbital eccentricity (0-1).
+      - `sed` - Secondary eclipse depth 
 
     *Limb darkening parameters (quadratic)*:
       - `linLib` - Linear limb-darkening coefficient.
@@ -91,6 +92,14 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
     The non-linear limb-darkening law is given by:
 
     .. math :: \\frac{I(\mu)}{I(1)}= 1 - \\sum_{n=1}^{4}{a_n(1-\mu^{n/2})}
+
+    :Modeling of secondary eclipse:
+    
+    If the parameter `sed` is not equal zero, a secondary eclipse (occultation) is added to the model. The
+    secondary eclipse is modeled via a purely geometric eclipse of the stellar and planetary disk, which would
+    then be behind the star (no limb darkening). The parameter `sed` specifies the depth of the secondary eclipse
+    when the planetary disk is completely covered by the stellar disk, i.e., the depth may not be reached in a
+    grazing configuration.
 
     .. warning::
         Time units have to be consistent.
@@ -136,11 +145,11 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                                        ))
 
         if orbit == "circular":
-            plist = ["p", "a", "i", "T0", "per", "b"]
+            plist = ["p", "a", "i", "T0", "per", "b", "sed"]
         else:
             # It is an elliptical orbit
             plist = ["p", "a", "i", "per", "b",
-                     "e", "Omega", "tau", "w"]
+                     "e", "Omega", "tau", "w", "sed"]
 
         if ld == "quad":
             plist.extend(["linLimb", "quadLimb"])
@@ -194,6 +203,9 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                 result = occultnl.occultnl(self["p"], self["a1"], self["a2"], self["a3"],
                                            self["a4"], self._zlist[self._intrans])
             df[self._intrans] = (1.0 - result[0])
+            if self["sed"] != 0:
+                df[self._inocc] = (1.0 - occultquad.occultquad(self._zlist[self._inocc], 0, 0, \
+                                               self["p"], len(self._inocc))[0])/self["p"]**2*self["sed"]
 
         self.lightcurve = (1. - df) * 1. / \
             (1. + self["b"]) + self["b"] / (1.0 + self["b"])

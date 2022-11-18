@@ -10,7 +10,9 @@ class _ZList:
 
     The resulting values will be stored in the `_zlist` attribute. Additionally,
     the indices belonging to in-transit points will be saved in the `_intrans`
-    attribute. These can be used as input to calculate the transit light-curve.
+    attribute. Indices pertaining to the occultation (secondary eclipse) are
+    available via the `_inocc` attribute.
+    These can be used as input to calculate the transit light-curve.
 
     Parameters
     ----------
@@ -30,9 +32,6 @@ class _ZList:
             The time points (unit has to be consistent throughout all parameters
             used for calculation).
         """
-        # Initialize the z-list (NaN values will be neglected)
-        self._zlist = np.empty(len(time))
-        self._zlist[:] = np.NAN
         # w = circular frequency
         w = 2.0 * np.pi / self["per"]
         # The angle needed to realize the orbit inclination
@@ -40,13 +39,17 @@ class _ZList:
         # Determine the phases (to ensure that the secondary eclipse is not considered)
         phase = time / self["per"]
         phase -= np.floor(phase)
+        
+        # Distance between centers
+        wt = w*time
+        self._zlist = self["a"] * np.sqrt(np.sin(wt)**2 + np.sin(alpha)**2 * np.cos(wt)**2)
+        
         # In these cases the 'planet' will be in front of the primary
-        self._intrans = np.where(
+        self._intrans = np.where( (np.abs(self._zlist) < (1+self["p"])) &
             np.logical_or(phase > 0.75, phase < 0.25))[0]
-
-        # Calculate the 'orbit' and store z-values in __zlist
-        self._zlist[self._intrans] = self["a"] * np.sqrt(np.sin(w * time[self._intrans])**2 +
-                                                            np.sin(alpha)**2 * np.cos(w * time[self._intrans])**2)
+        # Here, the planet is behind the star (occultation)
+        self._inocc = self._intrans = np.where( (np.abs(self._zlist) < (1+self["p"])) &
+            np.logical_and(phase > 0.25, phase < 0.75))[0]
 
     def _zlistKep(self, time):
         """ 
@@ -98,9 +101,12 @@ class _ZList:
         # between stellar and planetary distance is lower than 1+p.
         self._intrans = np.where(np.logical_and(
             z <= (1. + self["p"]), pos[::, 2] < 0.0))[0]
+        self._inocc = np.where(np.logical_and(
+            z <= (1. + self["p"]), pos[::, 2] > 0.0))[0]
 
         # Calculate the 'orbit' and store z-values in _zlist
-        self._zlist[self._intrans] = z[self._intrans]
+        self._zlist = z
+        
 
     def __init__(self, orbit, cc=True):
         if orbit == "circular":
