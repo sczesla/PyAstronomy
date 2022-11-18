@@ -1,5 +1,5 @@
 from __future__ import division
-import numpy
+import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import pyasl
 
@@ -31,22 +31,22 @@ class _ZList:
             used for calculation).
         """
         # Initialize the z-list (NaN values will be neglected)
-        self._zlist = numpy.empty(len(time))
-        self._zlist[:] = numpy.NAN
+        self._zlist = np.empty(len(time))
+        self._zlist[:] = np.NAN
         # w = circular frequency
-        w = 2.0 * numpy.pi / self["per"]
+        w = 2.0 * np.pi / self["per"]
         # The angle needed to realize the orbit inclination
-        alpha = (90.0 - self["i"]) / 180.0 * numpy.pi
+        alpha = (90.0 - self["i"]) / 180.0 * np.pi
         # Determine the phases (to ensure that the secondary eclipse is not considered)
         phase = time / self["per"]
-        phase -= numpy.floor(phase)
+        phase -= np.floor(phase)
         # In these cases the 'planet' will be in front of the primary
-        self._intrans = numpy.where(
-            numpy.logical_or(phase > 0.75, phase < 0.25))[0]
+        self._intrans = np.where(
+            np.logical_or(phase > 0.75, phase < 0.25))[0]
 
         # Calculate the 'orbit' and store z-values in __zlist
-        self._zlist[self._intrans] = self["a"] * numpy.sqrt(numpy.sin(w * time[self._intrans])**2 +
-                                                            numpy.sin(alpha)**2 * numpy.cos(w * time[self._intrans])**2)
+        self._zlist[self._intrans] = self["a"] * np.sqrt(np.sin(w * time[self._intrans])**2 +
+                                                            np.sin(alpha)**2 * np.cos(w * time[self._intrans])**2)
 
     def _zlistKep(self, time):
         """ 
@@ -73,8 +73,8 @@ class _ZList:
         self._ke.w = self["w"]
 
         # Initialize the z-list (NaN values will be neglected)
-        self._zlist = numpy.empty(len(time))
-        self._zlist[:] = numpy.NAN
+        self._zlist = np.empty(len(time))
+        self._zlist[:] = np.NAN
         # Get position of body from Keplerian orbit
         pos = self._ke.xyzPos(time)
 
@@ -83,12 +83,12 @@ class _ZList:
 
         # Calculate projected distance between centers of star and
         # planet sqrt(x**2 + y**2)
-        z = numpy.sqrt(pos[::, 0]**2 + pos[::, 1]**2)
+        z = np.sqrt(pos[::, 0]**2 + pos[::, 1]**2)
 
         # If enabled, check for body collisions
         if self._collisionCheck:
-            r = numpy.sqrt(pos[::, 0]**2 + pos[::, 1]**2 + pos[::, 2]**2)
-            indi = numpy.where(r < 1. + self["p"])[0]
+            r = np.sqrt(pos[::, 0]**2 + pos[::, 1]**2 + pos[::, 2]**2)
+            indi = np.where(r < 1. + self["p"])[0]
             if len(indi) > 0:
                 raise(PE.PyAValError("There is a body collision on this orbit.",
                                      where="_ZList"))
@@ -96,7 +96,7 @@ class _ZList:
         # Determine which values are relevant. In particular, these are those
         # for which the planet is in front of the star (z > 0) and the distance
         # between stellar and planetary distance is lower than 1+p.
-        self._intrans = numpy.where(numpy.logical_and(
+        self._intrans = np.where(np.logical_and(
             z <= (1. + self["p"]), pos[::, 2] < 0.0))[0]
 
         # Calculate the 'orbit' and store z-values in _zlist
