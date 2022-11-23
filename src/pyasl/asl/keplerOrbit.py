@@ -168,6 +168,7 @@ class KeplerEllipse(object):
     derive from the book "Orbital Motion" by A.E. Roy.
 
     :Orientation of the ellipse in the coordinate system:
+        One of the foci of the ellipse is in the origin of the coordinate system.
         For zero inclination the ellipse is located in the x-y plane.
         If the eccentricity is increased, the periastron will lie
         in +x direction. If the inclination is increased, the ellipse
