@@ -12,7 +12,7 @@ from PyAstronomy.pyasl.asl import *
 from PyAstronomy.pyasl.resBased import *
 
 
-def moduleImportStatus(mode="all"):
+def moduleImportStatus(mode="all", tb=False):
     """
     Provide information on model import status.
 
@@ -22,6 +22,9 @@ def moduleImportStatus(mode="all"):
         If 'all' is given, all modules will be shown. If
         'fail' is given, only failures will be shown and
         the opposite in case of 'success'.
+    tb : boolean, optional
+        If True, also the traceback of the exception will be
+        printed. Default is False.
     """
     mss = ("all", "fail", "success")
     if not mode in mss:
@@ -51,7 +54,13 @@ def moduleImportStatus(mode="all"):
             if not _moduleImportStatus[k]:
                 continue
         lines.append(("%" + str(mlpaks) + "s  " + "%" + str(mlmods) +
-                      "s  %5s") % (k[0], k[1], str(_moduleImportStatus[k])))
+                      "s  %5s") % (k[0], k[1], str(_moduleImportStatus[k][0])))
+        if not _moduleImportStatus[k][0]:
+            lines[-1] += "  " + str(_moduleImportStatus[k][1])
+            if tb:
+                lines.append("*"*10 + " Start of Traceback " + "*"*10)
+                lines.extend(["    "+l for l in _moduleImportStatus[k][2]])
+                lines.append("*"*10 + " End of Traceback " + "*"*10)
         mlline = max(mlline, len(lines[-1]))
 
     sep = "-" * mlline

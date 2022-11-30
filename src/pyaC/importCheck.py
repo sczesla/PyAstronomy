@@ -1,5 +1,6 @@
 from . import pyaErrors as PE
 import importlib
+import traceback
 
 
 def pyaimportallfrom(mn, pak, globs, cra=False, rf=False, re=False):
@@ -8,7 +9,6 @@ def pyaimportallfrom(mn, pak, globs, cra=False, rf=False, re=False):
 
     Get some help here.
     # https://stackoverflow.com/questions/21221358/python-how-to-import-all-methods-and-attributes-from-a-module-dynamically
-
 
     Parameters
     ----------
@@ -28,7 +28,17 @@ def pyaimportallfrom(mn, pak, globs, cra=False, rf=False, re=False):
     re : boolean, optional
         If False (default), no exception will be raised on
         import failure (note, also `rf` must be set True to
-        make this happen). 
+        make this happen).
+        
+    Returns
+    -------
+    status : boolean
+        True if import was successful
+    exception : string
+        If an exception occurred, the text describing the exception. Otherwise
+        an empty string
+    traceback : list of strings
+        If an exception occurred, the traceback. Otherwise an empty string.
     """
     try:
         n = importlib.import_module("." + mn, pak)
@@ -56,8 +66,8 @@ def pyaimportallfrom(mn, pak, globs, cra=False, rf=False, re=False):
             else:
                 # Raise exception
                 raise(f)
-        return False
-    return True
+        return False, str(e), [l.rstrip("\n") for l in traceback.format_exc().splitlines(True)]
+    return True, "", ""
 
 
 class ImportCheck:
