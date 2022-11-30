@@ -4,6 +4,7 @@ Calculate a Keplerian (two body) orbit
 ========================================
 
 .. p23ready
+.. currentModule:: PyAstronomy.pyasl
 
 Although the two-body problem has long been solved,
 calculation the orbit position of a body in an eccentric
