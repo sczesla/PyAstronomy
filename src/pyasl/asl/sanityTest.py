@@ -347,6 +347,137 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         self.assertAlmostEqual(np.max(np.abs(n4[0] - np.array([0., -1., 0.]))), 0.0, delta=1e-12,
                                msg="Wrong ascending node for Omega = 270")
 
+    def sanity_binaryOrbit_vs_keplerEllipse_pos_and_vel(self):
+        """
+        Sanity of binary orbit positions and velocities in comparison with Kepler Ellipse
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        m2m1 = 0.3
+        bo = pyasl.BinaryOrbit(m2m1, 1, 365., e=0.3, tau=50, Omega=117, w=30., i=13.)
+        ke1 = bo.getKeplerEllipse_primary()
+        ke2 = bo.getKeplerEllipse_secondary()
+        t = np.linspace(0, 350*86400, 35)
+        
+        r1, r2 = bo.xyzPos(t)
+        v1, v2 = bo.xyzVel(t)
+        rr1 = ke1.xyzPos(t)
+        rr2 = ke2.xyzPos(t)
+        vv1 = ke1.xyzVel(t)
+        vv2 = ke2.xyzVel(t)
+        
+        np.testing.assert_allclose(r1, rr1, 0, 1e-3, err_msg="Binary orbit: Primary positions not matching in comparison with KE", verbose=True)
+        np.testing.assert_allclose(r2, rr2, 0, 1e-3, err_msg="Binary orbit: Secondary positions not matching in comparison with KE", verbose=True)
+        np.testing.assert_allclose(v1, vv1, 0, 1e-3, err_msg="Binary orbit: Primary velocities not matching in comparison with KE", verbose=True)
+        np.testing.assert_allclose(v2, vv2, 0, 1e-3, err_msg="Binary orbit: Secondary velocities not matching in comparison with KE", verbose=True)
+
+        # Momentum
+        m1 = v1
+        m2 = m2m1*v2
+        np.testing.assert_allclose(m1, -m2, 1e-7, 1e-3, err_msg="Binary orbit: Problem with momentum", verbose=True)
+        
+        # Relative distance
+        rd = np.sqrt(np.sum((r1-r2)**2, axis=1))
+        self.assertEqual(5, np.argmin(rd), msg="Binary Orbit: Problem with time of periastron")
+        
+    def sanity_binaryOrbit_jup_orb(self):
+        """
+        Sanity of binary orbit positions and velocities in comparison with Kepler Ellipse
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        from PyAstronomy import constants as PC
+
+        pc = PC.PyAConstants()
+        pc.setSystem("SI")
+
+        m2m1 = pc.MJ / pc.MSun
+        e = 0.0489
+        bo = pyasl.BinaryOrbit(m2m1, 1, 11*365+315+3/24, e=e, tau=0.5, Omega=0, w=0., i=0.)
+        
+        perihel = bo.a2/pc.AU * (1-e)
+        aphel = bo.a2/pc.AU * (1+e)
+        self.assertAlmostEqual(perihel, 4.95, msg="Binary orbit: Perihel of Jupiter is off", delta=0.05)
+        self.assertAlmostEqual(aphel, 5.459, msg="Binary orbit: Aphel of Jupiter is off", delta=0.05)
+        
+        t = np.linspace(0,12,20)*365*86400
+        v1, v2 = bo.xyzVel(t)
+        vabs2 = np.sqrt(v2[::,0]**2 + v2[::,1]**2 + v2[::,2]**2)
+        mvabs2 = np.mean(vabs2)
+        self.assertAlmostEqual(mvabs2, 13.06*1e3, msg="Binary orbit: Jupiter's mean orbital velocity is off", delta=50)
+
+    def sanity_binaryOrbit_example(self):
+        """
+        Checking example of binary orbit
+        """
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        m2m1 = 0.3
+        tau = 12.5
+        
+        bo = pyasl.BinaryOrbit(m2m1, 2.3, 17., e=0.5, tau=tau, Omega=180, w=0., i=0.)
+        
+        ke1 = bo.getKeplerEllipse_primary()
+        ke2 = bo.getKeplerEllipse_secondary()
+        
+        # Input time in seconds
+        t = np.linspace(10, 10+15, 35) * 86400
+        
+        r1, r2 = bo.xyzPos(t)
+        v1, v2 = bo.xyzVel(t)
+        
+        #=======================================================================
+        # plt.subplot(2,1,1)
+        # plt.plot(r1[::,0], r1[::,1], 'b.-', label="Primary orbit")
+        # plt.plot(r2[::,0], r2[::,1], 'r.-', label="Secondary orbit")
+        # plt.xlabel("x [m]")
+        # plt.ylabel("y [m]")
+        # plt.legend()
+        #=======================================================================
+        # Relative distance of masses (centers)
+        rd = np.sqrt(np.sum((r1-r2)**2, axis=1))
+        #=======================================================================
+        # plt.subplot(2,1,2)
+        # plt.plot(t/86400, rd, 'b.-', label="Relative distance")
+        # plt.axvline(tau, ls=':', c='k', label="Time of periastron")
+        # plt.xlabel("Time [days]")
+        # plt.ylabel("Distance [m]")
+        # plt.legend()
+        # plt.show()
+        #=======================================================================
+        
+        #=======================================================================
+        # plt.subplot(3,1,1)
+        # plt.plot(t/86400, v1[::,0]/1e3, 'b.-', label="Primary")
+        # plt.plot(t/86400, v2[::,0]/1e3, 'r.-', label="Secondary")
+        # plt.xlabel("Time [days]")
+        # plt.ylabel("vx [km/s]")
+        # plt.legend()
+        # plt.subplot(3,1,2)
+        # plt.plot(t/86400, v1[::,1]/1e3, 'b.-', label="Primary")
+        # plt.plot(t/86400, v2[::,1]/1e3, 'r.-', label="Secondary")
+        # plt.xlabel("Time [days]")
+        # plt.ylabel("vy [km/s]")
+        # plt.legend()
+        #=======================================================================
+        # Orbit velocities
+        #=======================================================================
+        # plt.subplot(3,1,3)
+        #=======================================================================
+        ov1 = np.sqrt(np.sum(v1**2, axis=1))
+        ov2 = np.sqrt(np.sum(v2**2, axis=1))
+        #=======================================================================
+        # plt.plot(t/86400, ov1/1e3, 'b.-', label="Primary")
+        # plt.plot(t/86400, ov2/1e3, 'r.-', label="Secondary")
+        # plt.xlabel("Time [days]")
+        # plt.ylabel("Orbit velocity [km/s]")
+        # plt.legend()
+        # plt.show()
+        #=======================================================================
+
+
     def sanity_MarkleyKESolver_precision(self):
         """
         Checking precision of Markley solver for Kepler's equation.

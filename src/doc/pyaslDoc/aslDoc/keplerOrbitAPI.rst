@@ -16,3 +16,9 @@ The `KeplerEllipse` class - the orbit
 
 .. autoclass:: KeplerEllipse
                :members:
+               
+The `BinaryOrbit` class
+--------------------------------------
+
+.. autoclass:: BinaryOrbit
+               :members:

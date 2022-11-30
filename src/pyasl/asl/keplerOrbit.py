@@ -1,8 +1,10 @@
 from __future__ import print_function, division
 import numpy
-from numpy import pi, abs, sqrt, cos, sin, arccos, arctan, tan
+from numpy import pi, abs, sqrt, cos, sin, arccos, arctan, tan, cbrt
 from PyAstronomy.pyaC import pyaErrors as PE
 import six.moves as smo
+from PyAstronomy import constants as _PC
+import copy
 
 
 class MarkleyKESolver:
@@ -783,6 +785,218 @@ class KeplerEllipse(object):
         self.tau = tau
         self.ks = ks()
 
+
+class BinaryOrbit(object):
+    """
+    Keplerian orbits of binary components
+    
+    The binary system consists of the primary mass (m1) and the secondary mass (m2),
+    which orbit a common center of mass. The latter is in the origin of the coordinate system,
+    stationary, and identical with a focus of either of the orbit ellipses.
+    The system is parameterized by its total mass (m1+m2), the mass ratio (m2/m1), and the orbital
+    elements of the primary orbit. The orbit of the secondary has a different semi-major axis
+    than that of the primary and its argument of periapsis is shifted by 180 degrees.
+    The orientation of the orbit ellipses follows the convention of :class:`KeplerEllipse`
+    
+    Parameters
+    ----------
+    m2m1 : float
+        Mass ratio between secondary and primary component (e.g., low for planetary systems)
+    mtot : float
+         Total mass of the system [solar masses]
+    per : float
+        Orbital period [d]
+    e : float, optional
+        Orbital eccentricity (0-1).
+    tau : float, optional
+        Time of periapsis passage [d].
+    Omega : float, optional
+        Longitude of the ascending node [deg].
+    w : float, optional
+        Argument of periapsis (primary orbit) [deg]. Note that the longitude
+        if periapsis is given by Omega+w.
+    i : float, optional
+        Orbit inclination [deg].
+    ks : Class object, optional
+        The solver for Kepler's Equation. Default is the
+        `MarkleyKESolver`. Each solver must have a `getE`
+        method, which takes either a float or array of float
+        of mean anomalies and the eccentricity, and returns
+        the associated eccentric anomalies.
+    msun : float, optional
+        Solar mass [kg] to be adopted. By default the value from PyA's constants
+        will be used.    
+    """
+    
+    def _calcSMAs(self):
+        """
+        Calculate semi-major-axes from total mass and mass ratio
+        """
+        # a1 + a2 from Kepler III
+        self._a_m = cbrt( (self._per_s**2 * self._pc.G * self._mtot_kg ) / (4*pi**2) )
+        # Get SMA of secondary body
+        self._a2_m = self._a_m / (1+self._m2m1)
+        self._a1_m = self._a_m - self._a2_m
+        
+    a = property(fget=lambda self:self._a_m, fset=None, doc="Total semi-major axis (a1+a2) [m]")
+    a1 = property(fget=lambda self:self._a1_m, fset=None, doc="Semi-major axis of primary orbit (a1) [m]")
+    a2 = property(fget=lambda self:self._a2_m, fset=None, doc="Semi-major axis of secondary orbit (a2) [m]")
+    msun = property(fget=lambda self:self._MSun, fset=None, doc="Adopted solar mass [kg]")
+        
+    def _setm2m1(self, m2m1):
+        """
+        Set mass ratio
+        """
+        if m2m1 < 0:
+            raise(PE.PyAValError(f"Mass ratio m2m1 must be >= 0. Current value is {m2m1}.", \
+                                 where="BinaryOrbit"))
+        self._m2m1 = m2m1
+        self._calcSMAs()
+        
+    def _setmtot(self, mtot):
+        """
+        Set total mass
+        
+        Parameters
+        ----------
+        mtot : float > 0
+            Total mass of system [MSun]
+        """
+        if mtot <= 0:
+            raise(PE.PyAValError(f"Total mass must be > 0. Current value is {mtot} MSun.", \
+                                 where="BinaryOrbit"))  
+        self._mtot_msun = mtot
+        self._mtot_kg = mtot * self._MSun
+        self._calcSMAs()
+        
+    def _setper(self, per):
+        """
+        Set orbital period
+        
+        Parameters
+        ----------
+        per : float > 0
+            Orbital period [days]
+        """
+        if per <= 0:
+            raise(PE.PyAValError(f"Orbital period must be > 0. Current value is {per} days.", \
+                                 where="BinaryOrbit"))              
+        self._per_d = per
+        self._per_s = self._per_d * 86400
+    
+    def _settau(self, tau):
+        """
+        Set orbital period
+        
+        Parameters
+        ----------
+        tau : float
+            Time of periastron [days]
+        """           
+        self._tau_d = tau
+        self._tau_s = self._tau_d * 86400    
+        
+    m2m1 = property(fget=lambda self:self._m2m1, fset=_setm2m1, doc="Mass ratio m2/m1 (>=0)")
+    mtot = property(fget=lambda self:self._mtot_msun, fset=_setmtot, doc="Total mass of system [MSun]")
+    per = property(fget=lambda self:self._per_d, fset=_setper, doc="Orbital period [days]")
+    tau = property(fget=lambda self:self._tau_d, fset=_settau, doc="Time of periapsis [days]")
+            
+    def __init__(self, m2m1, mtot, per, e=0, tau=0, Omega=0, w=0, i=0, msun=None, ks=MarkleyKESolver):
+        self._pc = _PC.PyAConstants()
+        self._pc.setSystem("SI")
+        if msun is None:
+            self._MSun = self._pc.MSun
+        else:
+            self._MSun = msun
+        
+        # Dummies to be replaced shortly
+        self._m2m1 = numpy.NaN
+        self._mtot_kg = numpy.NaN
+        
+        self.per = per
+        self.mtot = mtot
+        self.m2m1 = m2m1
+        self.tau = tau
+        
+        self._ke = KeplerEllipse(self._a1_m, self._per_s, e=e, tau=self._tau_s, Omega=Omega, w=w, i=i, ks=ks)
+        
+        # Forward properties to class API
+        self.i = self._ke.i
+        self.w = self._ke.w
+        self.Omega = self._ke.Omega
+        
+    def getKeplerEllipse_primary(self):
+        """
+        Get Kepler ellipse model for the primary component
+        
+        Returns
+        -------
+        ke : KeplerEllipse
+            KeplerEllipse object pertaining to primary object.
+        """
+        return self._ke
+
+    def getKeplerEllipse_secondary(self):
+        """
+        Get Kepler ellipse model for the secondary component
+        
+        Returns
+        -------
+        ke : KeplerEllipse
+            KeplerEllipse object pertaining to secondary object.
+        """
+        k = copy.deepcopy(self._ke)
+        k.w = k.w + 180.
+        k.a = self._a2_m
+        return k
+    
+    def xyzPos(self, t):
+        """
+        Calculate orbit position.
+
+        Parameters
+        ----------
+        t : float or array
+            The time axis [s]
+
+        Returns
+        -------
+        Position primary : array
+            The x, y, and z coordinates of the body at the given time [m].
+            If the input was an array, the output will be an array of
+            shape (input-length, 3), holding the positions at the given
+            times.
+        Position secondary : array
+            The x, y, and z coordinates of the secondary [m].
+        """
+        r1 = self._ke.xyzPos(t)
+        r2 = -r1/self.m2m1
+        return r1, r2
+    
+    def xyzVel(self, t):
+        """
+        Calculate orbit velocity.
+
+        Parameters
+        ----------
+        t : float or array
+            The time axis [s].
+
+        Returns
+        -------
+        Velocity primary : array
+            The x, y, and z components of the body's velocity at the
+            given time [m/s]. If the input was an array, the output will be
+            an array of shape (input-length, 3), holding the velocity
+            components at the given times. The unit is that of the
+            semi-major axis divided by that of the period.
+        Velocity secondary : array
+            The x, y, and z velocity components of the secondary [m/s].
+        """
+        v1 = self._ke.xyzVel(t)
+        v2 = -v1/self.m2m1
+        return v1, v2
+    
 
 def phaseAngle(pos, los='-z'):
     """
