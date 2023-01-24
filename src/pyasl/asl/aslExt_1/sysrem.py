@@ -178,6 +178,34 @@ class SysRem:
         self.rijs = [self.rij]
         self.ac = [(None,None)]
     
+    def get_model(self, last=True, a=None, c=None):
+        """
+        Get model corresponding to a,c vector
+        
+        Parameters
+        ----------
+        last : boolean, optional
+            If True (default), the model for the last iteration will be
+            returned (a,c must not be given then).
+        a, c : arrays, optional
+            If given, these will be used to calculate the model (`last` must be
+            set False)
+        """
+        
+        if (a is not None) and (c is not None) and (not last):
+            return np.outer(a, c)
+        elif last and (a is None) and (c is None):
+            if len(self.rijs) == 0:
+                raise(PE.PyAValError("Last model requested, but no model exists yet.", \
+                                     where="SysRem", \
+                                     solution="Call 'iterate' first."))
+            a, c = self.rijs[-1][1], self.rijs[-1][2]
+            return np.outer(a, c)
+        else:
+            raise(PE.PyAValError("Unknown combination of parameters given.", \
+                                 where="SysRem.get_model", \
+                                 solution="Specify either a and c or use 'last=True'."))
+    
     def iterate(self, atol=1e-3, rtol=0, imax=1001):
         """
         A single SysRem iteration: Remove linear systematic effect
