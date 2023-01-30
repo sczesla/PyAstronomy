@@ -119,6 +119,10 @@ def sysrem_update_rij(rij, a, c):
     """
     Subtract current model from residuals
     
+    In matrix notation Tamuz et al. write (Eq. 6) R' = R - c a^T. The operation here
+    implemented corresponds to (R' = R - c^T)^T -> R'^T = R^T - a c^T (where ^T is the transpose,
+    R is a matrix and a and c are vectors).  
+    
     Returns
     -------
     New rij : 2d array
@@ -139,11 +143,17 @@ class SysRem:
         light curves, but has been applied in other areas such as planetary atmospheric
         spectroscopy.
         
+        .. note::
+        
+            The data (or residuals) are stored such that X[::,0] gives the first observation, i.e.,
+            the observation is stored in the first column. The data matrix is, therefore, stored here as
+            the transpose of that adopted for the PCA etc..
+        
         Parameters
         ----------
         obs : list of 1d arrays or 2d array
             List of observations (e.g., light curves) or 2d array such that
-            obs[::,0] is the first observation
+            obs[::,0] is the first observation. 
         sigs : list of 1d arrays or 2d array
             Uncertainties (same format as obs)
         a0 : 1d array, optional

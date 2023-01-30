@@ -12,6 +12,11 @@ in the context of correcting systematic effects in samples of
 light curves. Repeated application allows to remove more complex effects but the danger of removing actual
 signal tends to increase with the number of iteration.
 
+.. note::
+
+    The data (or residuals) are stored such that X[::,0] gives the first observation, i.e.,
+    the observation is stored in the first column. The data matrix is, therefore, stored here as
+    the transpose of that adopted for the PCA etc..
 
 Example: Application to mock data
 -------------------------------------
