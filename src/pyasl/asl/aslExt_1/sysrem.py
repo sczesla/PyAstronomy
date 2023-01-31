@@ -72,7 +72,7 @@ def sysrem_iter_a(rij, sigij, c, sigij2=None):
     
     return a
     
-def sysrem_data_prepare(obs, sigs):
+def sysrem_data_prepare(obs, sigs, ms_obs=True, ms_feat=False):
     """
     Construct data sets for SysRem
     
@@ -92,6 +92,10 @@ def sysrem_data_prepare(obs, sigs):
         The uncertainties in the same format as rij
     a0 : 1d array
         A dummy guess for the 'a' vector (linear between 0 and 1)
+    ms_obs : boolean, optional
+        Subtract mean from observations (columns of data matrix). Default is True.
+    ms_feat : boolean, optional
+        Subtract mean from features (e.g., spectral bins). Default is False.
     """
     nds = len(obs)
     nobs = len(obs[0])
@@ -109,8 +113,17 @@ def sysrem_data_prepare(obs, sigs):
             raise(PE.PyAValError(f"NaN value found in error array no. {n}. No NaNs admissible."))
     
     for n in range(nds):
-        rij[::,n] = obs[n] - np.mean(obs[n])
+        rij[::,n] = obs[n]
         sm[::,n] = sigs[n]
+    
+    if ms_obs:
+        # Subtract mean for observations/experiments
+        for n in range(nds):
+            rij[::,n] -= np.mean(rij[::,n])
+    if ms_feat:
+        # Subtract mean from features/bins
+        for n in range(rij.shape[0]):
+            rij[n,::] -= np.mean(rij[n,::])
 
     return rij, sm, np.linspace(0,1,nobs)
     
@@ -133,7 +146,7 @@ def sysrem_update_rij(rij, a, c):
 
 class SysRem:
     
-    def __init__(self, obs, sigs, a0=None):
+    def __init__(self, obs, sigs, ms_obs=True, ms_feat=False, a0=None):
         """
         Implementation of the SysRem algorithm.
         
@@ -160,6 +173,10 @@ class SysRem:
             Starting values for 'a' parameter (same length as
             the observations). If not given, values linearly
             increasing from 0 to 1 are assumed.
+        ms_obs : boolean, optional
+            Subtract mean from observations in initial data matrix (columns of data matrix). Default is True.
+        ms_feat : boolean, optional
+            Subtract mean from features in initial data matrix (e.g., spectral bins). Default is False.
         
         Attributes
         ----------
@@ -177,7 +194,7 @@ class SysRem:
         if isinstance(sigs, np.ndarray) and (sigs.ndim == 2):
             sigs = [sigs[::,i] for i in range(sigs.shape[1])]
             
-        self.rij, self.sm, self.a0 = sysrem_data_prepare(obs, sigs)
+        self.rij, self.sm, self.a0 = sysrem_data_prepare(obs, sigs, ms_obs=ms_obs, ms_feat=ms_feat)
         self.sm2 = self.sm**2
         if a0 is not None:
             self.a0 = a0
@@ -256,7 +273,7 @@ class SysRem:
             
             dm = (m-m0)/self.sm
             
-            if np.allclose(dm,0,atol=atol,rtol=rtol):
+            if np.allclose(0,dm,atol=atol,rtol=rtol):
                 converge = True
                 break
 

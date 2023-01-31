@@ -600,3 +600,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         plt.xlabel("Hour angle [h]")
         plt.legend()
         #plt.show()
+        
+    def sanity_sysrem_pca(self):
+        """ Check sanity of SYSREM with PCA """
+        
