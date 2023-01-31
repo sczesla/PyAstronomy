@@ -603,4 +603,89 @@ class SanityOfPyaslExt1(unittest.TestCase):
         
     def sanity_sysrem_pca(self):
         """ Check sanity of SYSREM with PCA """
+        from PyAstronomy import pyasl
+        import numpy as np
+        from sklearn.decomposition import PCA
+        # n observations (e.g., light curves) with m data points each
+        n = 4
+        m = 7
+        
+        # Some arbitrary observations (with observations is COLUMNS)
+        obs = np.zeros( (m,n) )
+        for i in range(0, n):
+            for j in range(m):
+                obs[j,i] = j*i**3+j*i**2+(j+i+1)
+        # Equal error for all data points
+        sigs = np.ones_like(obs)
+
+        pca = PCA()
+        res = pca.fit(obs.T)
+        
+        p1 = pca.components_[0,::]
+        p2 = pca.components_[1,::]
+        
+        sr = pyasl.SysRem(obs, sigs, ms_obs=False, ms_feat=True)
+        r1, a1, c1 = sr.iterate()
+        r2, a2, c2 = sr.iterate()
+        a1 = a1/np.linalg.norm(a1)
+        a2 = a2/np.linalg.norm(a2)
+        
+        sign = lambda x: -1 if x < 0 else 1
+
+        # Get sign right
+        if sign(a1[0]) != sign(p1[0]):
+            a1 *= -1
+        if sign(a2[0]) != sign(p2[0]):
+            a2 *= -1    
+        
+        np.testing.assert_almost_equal(a1, p1, decimal=5, err_msg=f'SYSREM: Problem with PCA component 1. Compared {p1} and {a1} (p1 and a1)', verbose=True)
+        np.testing.assert_almost_equal(a2, p2, decimal=5, err_msg=f'SYSREM: Problem with PCA component 2. Compared {p2} and {a2} (p2 and a2)', verbose=True)
+                
+    def sanity_sysrem_example(self):
+        """
+        Checking sanity of SYSREM example
+        """
+        from PyAstronomy import pyasl
+        import numpy as np
+        import matplotlib.pylab as plt
+        
+        # No. of data sets (e.g., light curves)
+        nds = 50
+        # No. of data points per data set
+        nobs = 200
+        
+        obs, sigs = [], []
+        
+        # Generate mock data
+        x = np.linspace(0,1,nobs)-0.5
+        for i in range(nds):
+            # Add noise
+            y = np.random.normal(0,0.01+0.0001*i,nobs)
+            # Add 3rd degree polynomial
+            p = (i, 0.2*i, 0.3*i)
+            y += np.polyval(p,x)
+            # Add moving Gaussian signal
+            y -= 0.02 * np.exp(-(x-(i/nds-0.5))**2/(2*0.02**2))
+            # Add growing but stationary Gaussian signal
+            y -= (i**2*0.05) * np.exp(-x**2/(2*0.06**2))
+            obs.append(y)
+            sigs.append(np.ones_like(y)*0.01+0.0001*i)
+        
+            plt.plot(x, y, '.-')
+        plt.title("Mock data")
+        # plt.show()
+        
+        sr = pyasl.SysRem(obs, sigs)
+        # First iteration
+        r, a, c = sr.iterate()
+        # plt.subplot(2,1,1)
+        # plt.title("Residuals after first (top) and second iteration (bottom)")
+        # plt.imshow(r, origin='lower', aspect="auto")
+        # Second iteration
+        r, a, c = sr.iterate()
+        # plt.subplot(2,1,2)
+        # plt.imshow(r, origin='lower', aspect="auto")
+        # plt.show()
+
+
         

@@ -66,6 +66,11 @@ Example: Application to mock data
 	plt.show()
 
 
+Example: SYSREM, PCA, and eigenvectors
+----------------------------------------
+
+* :doc:`ex_sysrem_pca` :download:`(Download notebook) <ex_sysrem_pca.ipynb>`
+
 
 API
 ----
