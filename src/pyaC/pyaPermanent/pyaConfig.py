@@ -129,7 +129,7 @@ class PyAConfig(object):
         hd = os.getenv("HOME")
         if hd is None:
             # Try alternative solution
-            self.homeDir = os.path.expanduser("~")
+            hd = os.path.expanduser("~")
         return hd
         
     def __init__(self):
