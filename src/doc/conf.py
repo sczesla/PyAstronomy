@@ -38,6 +38,12 @@ try:
 except ImportError:
     mathext = "sphinx.ext.imgmath"
     
+try:
+    import sphinx.ext.mathjax
+    mathext = "sphinx.ext.mathjax"
+except ImportError:
+    mathext = "sphinx.ext.imgmath"
+    
 print(f"mathext = '{mathext}'")
 
 extensions = []
