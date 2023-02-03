@@ -38,6 +38,7 @@ try:
 except ImportError:
     mathext = "sphinx.ext.imgmath"
     
+print(f"mathext = '{mathext}'")
 
 extensions = []
 try:
