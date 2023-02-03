@@ -226,7 +226,7 @@ class SysRem:
                 raise(PE.PyAValError("Last model requested, but no model exists yet.", \
                                      where="SysRem", \
                                      solution="Call 'iterate' first."))
-            a, c = self.rijs[-1][1], self.rijs[-1][2]
+            a, c = self.ac[-1][0], self.ac[-1][1]
             return np.outer(a, c)
         else:
             raise(PE.PyAValError("Unknown combination of parameters given.", \
