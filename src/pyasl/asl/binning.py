@@ -113,21 +113,21 @@ def binningx0dt(
         raise (PE.PyAParameterConflict("Specify one of `dt`, `nbins`, or `reduceBy`."))
     if ((not x0 is None) + (not reduceBy is None)) > 1:
         raise (PE.PyAParameterConflict("Specify either `x0` or `reduceBy`."))
+    if np.any(np.isfinite(x) == False):
+        raise (
+            PE.PyAValError(
+                "X axis contains invalid values (NaN or inf).",
+                solution="Remove invalid values from input.",
+            )
+        )
     if x0 is None:
-        # Use first time as starting point
+        # Use smallest time as starting point
         x0 = np.min(x)
     if x0 > np.max(x):
         raise (
             PE.PyAValError(
                 "The starting point, `x0`, is larger than the end time of the data.",
                 solution="Use a smaller value.",
-            )
-        )
-    if np.any(np.isfinite(x) == False):
-        raise (
-            PE.PyAValError(
-                "X axis contains invalid values (NaN or inf).",
-                solution="Remove invalid values from input.",
             )
         )
 
