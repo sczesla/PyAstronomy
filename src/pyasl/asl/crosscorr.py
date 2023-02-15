@@ -81,8 +81,8 @@ def crosscorrRV(w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edg
   
   if edgeTapering is not None:
     # Smooth the edges using a sine
-    if isinstance(edgeTapering, float):
-      edgeTapering = [edgeTapering, edgeTapering]
+    if isinstance(edgeTapering, (float,int)):
+      edgeTapering = [float(edgeTapering), float(edgeTapering)]
     if len(edgeTapering) != 2:
       raise(PE.PyAValError("'edgeTapering' must be a float or a list of two floats.", \
                            where="crosscorrRV"))
