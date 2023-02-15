@@ -4,8 +4,21 @@ import numpy as np
 import copy
 
 
-def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, removeEmpty=True,
-                removeNoError=False, useBinCenter=True, useMeanX=False, nanHandling=None, yvalFunc=np.mean):
+def binningx0dt(
+    x,
+    y,
+    yerr=None,
+    x0=None,
+    dt=None,
+    nbins=None,
+    reduceBy=None,
+    removeEmpty=True,
+    removeNoError=False,
+    useBinCenter=True,
+    useMeanX=False,
+    nanHandling=None,
+    yvalFunc=np.mean,
+):
     """
     A simple binning algorithm.
 
@@ -43,7 +56,7 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
         be given). Note that this specifies the number of bins into which
         the range from `x0` to the last data point is subdivided.
     reduceBy : int, optional
-        Reduce the number of elements in the array by the given factor 
+        Reduce the number of elements in the array by the given factor
         (either `dt`, `nbins` or `reduceBy` must be given). Note that
         in this case, `x0` is set to the first (minimum x-value) and
         the number of bins, n, is calculated according to the
@@ -76,10 +89,10 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
           - 'ignore': In this case, NaNs contained in the input data are
             removed from the data prior binning. Note however, that `x0`,
             unless specified explicitly, will still refer to the first data
-            point, whether or not this holds a NaN value. 
+            point, whether or not this holds a NaN value.
           - float: If a float is given, input data values containing NaNs
             are replaced by the given float before binning. Note that no error on
-            the data (yerr) can be considered in this case, to avoid 
+            the data (yerr) can be considered in this case, to avoid
             erronous treatment of un- or misspecified error values.
 
     Returns
@@ -95,21 +108,28 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
         The width of the bins.
     """
     if len(x) != len(y):
-        raise(PE.PyAValError("x and y need to have the same length."))
+        raise (PE.PyAValError("x and y need to have the same length."))
     if ((not dt is None) + (not nbins is None) + (not reduceBy is None)) != 1:
-        raise(PE.PyAParameterConflict(
-            "Specify one of `dt`, `nbins`, or `reduceBy`."))
+        raise (PE.PyAParameterConflict("Specify one of `dt`, `nbins`, or `reduceBy`."))
     if ((not x0 is None) + (not reduceBy is None)) > 1:
-        raise(PE.PyAParameterConflict("Specify either `x0` or `reduceBy`."))
+        raise (PE.PyAParameterConflict("Specify either `x0` or `reduceBy`."))
     if x0 is None:
         # Use first time as starting point
         x0 = np.min(x)
     if x0 > np.max(x):
-        raise(PE.PyAValError("The starting point, `x0`, is larger than the end time of the data.",
-                             solution="Use a smaller value."))
+        raise (
+            PE.PyAValError(
+                "The starting point, `x0`, is larger than the end time of the data.",
+                solution="Use a smaller value.",
+            )
+        )
     if np.any(np.isfinite(x) == False):
-        raise(PE.PyAValError("X axis contains invalid values (NaN or inf).", \
-                             solution="Remove invalid values from input."))
+        raise (
+            PE.PyAValError(
+                "X axis contains invalid values (NaN or inf).",
+                solution="Remove invalid values from input.",
+            )
+        )
 
     # Use arrays in calculation. Only copy if conversion to numpy array
     # is required
@@ -146,27 +166,35 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
             try:
                 nanValue = float(nanHandling)
             except ValueError as ve:
-                raise(PE.PyAValError("Invalid value given for 'nanHandling'. Error was: " + str(ve),
-                                     solution="Use None, 'ignore', or float number."))
+                raise (
+                    PE.PyAValError(
+                        "Invalid value given for 'nanHandling'. Error was: " + str(ve),
+                        solution="Use None, 'ignore', or float number.",
+                    )
+                )
 
             gi = np.isnan(y)
             y[gi] = nanValue
             if yerr is not None:
-                raise(PE.PyAValError("yerr is not permitted for option 'nanHandling=float'.",
-                                     solution="Remove yerr=... from the call."))
+                raise (
+                    PE.PyAValError(
+                        "yerr is not permitted for option 'nanHandling=float'.",
+                        solution="Remove yerr=... from the call.",
+                    )
+                )
 
     # Calculate the new number of array elements.
     if reduceBy is not None:
-        nbins = int(round(len(x)/float(reduceBy)))
+        nbins = int(round(len(x) / float(reduceBy)))
         if nbins == 0:
             nbins = 1  # Prevent empty return arrays
     if nbins is not None:
         # Use a specified number of bins.
         # Calculate bin length
-        dt = (np.max(x) - x0)/float(nbins)
+        dt = (np.max(x) - x0) / float(nbins)
     # Start calculation
     # In which bin do the individual data points belong?
-    inWhichBin = np.floor(((x-x0)/dt)).astype(np.int)
+    inWhichBin = np.floor(((x - x0) / dt)).astype(np.int)
     # Lonely last bin correction
     # Brings the last data point into the last valid bin
     # instead of creating a new bin with that data point\
@@ -186,7 +214,7 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
     result[::, 0] = x0 + np.arange(nbins) * dt
     if useBinCenter:
         # Use the center of the bin for timing
-        result[::, 0] += (0.5 * dt)
+        result[::, 0] += 0.5 * dt
     # Set data point counter (points/bin) to zero
     result[::, 3] = 0
     for b in bwd:
@@ -206,7 +234,7 @@ def binningx0dt(x, y, yerr=None, x0=None, dt=None, nbins=None, reduceBy=None, re
         else:
             # There are errors on the data points
             # Use error propagation
-            result[b, 2] = np.sqrt(np.sum(yerr[indi]**2)) / result[b, 3]
+            result[b, 2] = np.sqrt(np.sum(yerr[indi] ** 2)) / result[b, 3]
 
     if removeEmpty:
         # Remove bins without data points in it
