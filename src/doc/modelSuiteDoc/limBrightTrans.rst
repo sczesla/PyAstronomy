@@ -28,7 +28,7 @@ Example code - Calculate model light curve
     
     
     # Import some unrelated modules
-    import matplotlib.pylab as mpl
+    import matplotlib.pylab as plt
     from numpy import arange
     # ... and now the LimBrightTrans module
     from PyAstronomy.modelSuite import LimBrightTrans
@@ -48,10 +48,10 @@ Example code - Calculate model light curve
     y = lbt.evaluate(time)
     
     # Let's see what happened...
-    mpl.ylabel("Relative Flux")
-    mpl.xlabel("Time")
-    mpl.plot(time, y, 'r-')
-    mpl.show()
+    plt.ylabel("Relative Flux")
+    plt.xlabel("Time")
+    plt.plot(time, y, 'r-')
+    plt.show()
 
 
 .. [#fSchlawin] Schlawin et al. 2010, "Exoplanetary Transits of Limb-brightened Lines:
