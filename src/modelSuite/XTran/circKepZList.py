@@ -47,8 +47,9 @@ class _ZList:
         # In these cases the 'planet' will be in front of the primary
         self._intrans = np.where( (np.abs(self._zlist) < (1+self["p"])) &
             np.logical_or(phase > 0.75, phase < 0.25))[0]
+
         # Here, the planet is behind the star (occultation)
-        self._inocc = self._intrans = np.where( (np.abs(self._zlist) < (1+self["p"])) &
+        self._inocc = np.where( (np.abs(self._zlist) < (1+self["p"])) &
             np.logical_and(phase > 0.25, phase < 0.75))[0]
 
     def _zlistKep(self, time):
