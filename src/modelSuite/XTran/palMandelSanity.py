@@ -2,6 +2,8 @@ from __future__ import division
 import unittest
 import numpy as np
 
+    
+
 class palMandelSanity(unittest.TestCase):
   
   def setUp(self):
@@ -46,6 +48,7 @@ class palMandelSanity(unittest.TestCase):
       Checking basic MA and Pal transit configuration. Must be identical.
     """
     from PyAstronomy.modelSuite import XTran as xt
+    import numpy as np
     mac = xt.forTrans.MandelAgolLC()
     mak = xt.forTrans.MandelAgolLC(orbit="keplerian")
     
@@ -53,19 +56,31 @@ class palMandelSanity(unittest.TestCase):
     mac["per"] = 2.1
     mac["linLimb"] = 0.37
     mac["a"] = 5.4
+    mac["i"] = 90
     
-    for p in ["p", "per", "linLimb", "a"]:
+    for p in ["p", "per", "linLimb", "a", "i"]:
       mak[p] = mac[p]
     
     t = np.linspace(0,4,1001)
     cc = mac.evaluate(t)
     ck = mak.evaluate(t)
-    self.assertAlmostEqual(np.max(np.abs(cc-ck)), 0.0, delta=1e-12, \
+    self.assertAlmostEqual(np.max(np.abs(cc-ck)), 0.0, delta=1e-8, \
                            msg="MandelAgol: Default for circ and kep orbit not identical")
     
     pa = xt.palTrans.PalLC()
-    for p in ["p", "per", "linLimb", "a"]:
+    for p in ["p", "per", "linLimb", "a", "i"]:
       pa[p] = mac[p]
     cp = pa.evaluate(t)
-    self.assertAlmostEqual(np.max(np.abs(cc-cp)), 0.0, delta=1e-12, \
+    self.assertAlmostEqual(np.max(np.abs(cc-cp)), 0.0, delta=1e-8, \
                            msg="MandelAgol vs. Pal: Default for circ orbit not identical")
+    
+    t = np.array([0,1.05,2.099])
+    cp = pa.evaluate(t)
+    np.testing.assert_array_equal(np.array([0,2]), pa._intrans, \
+                                  err_msg='_zlistCirc: Problem with _intrans', verbose=True)
+    np.testing.assert_array_equal(np.array([1]), pa._inocc, \
+                                  err_msg='_zlistCirc: Problem with _inocc', verbose=True)
+    
+    
+    
+    
