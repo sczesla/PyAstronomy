@@ -56,7 +56,7 @@ Documentation and further information
 
   Visit the documentation of the latest release:
   
-  https://pyastronomy.readthedocs.io/en/v_0-18-1/
+  https://pyastronomy.readthedocs.io/en/v_0-18-2/
 
 Licensing
 ---------
