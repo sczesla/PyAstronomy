@@ -21,7 +21,7 @@ class _ZList:
     """
 
     def _zlistCirc(self, time):
-        """ 
+        """
         Calculate projected distance in case of circular orbit.
 
         Required parameters: per, i, a (assumes transit center at 0)
@@ -39,21 +39,27 @@ class _ZList:
         # Determine the phases (to ensure that the secondary eclipse is not considered)
         phase = time / self["per"]
         phase -= np.floor(phase)
-        
+
         # Distance between centers
-        wt = w*time
-        self._zlist = self["a"] * np.sqrt(np.sin(wt)**2 + np.sin(alpha)**2 * np.cos(wt)**2)
-        
+        wt = w * time
+        self._zlist = self["a"] * np.sqrt(
+            np.sin(wt) ** 2 + np.sin(alpha) ** 2 * np.cos(wt) ** 2
+        )
+
         # In these cases the 'planet' will be in front of the primary
-        self._intrans = np.where( (np.abs(self._zlist) < (1+self["p"])) &
-            np.logical_or(phase > 0.75, phase < 0.25))[0]
+        self._intrans = np.where(
+            (np.abs(self._zlist) < (1 + self["p"]))
+            & np.logical_or(phase > 0.75, phase < 0.25)
+        )[0]
 
         # Here, the planet is behind the star (occultation)
-        self._inocc = np.where( (np.abs(self._zlist) < (1+self["p"])) &
-            np.logical_and(phase > 0.25, phase < 0.75))[0]
+        self._inocc = np.where(
+            (np.abs(self._zlist) < (1 + self["p"]))
+            & np.logical_and(phase > 0.25, phase < 0.75)
+        )[0]
 
     def _zlistKep(self, time):
-        """ 
+        """
         Calculate the projected, normalized distance of star and planet centers.
 
         Required parameters: per, i, a, e, w, T0pa, Omega, p
@@ -87,32 +93,36 @@ class _ZList:
 
         # Calculate projected distance between centers of star and
         # planet sqrt(x**2 + y**2)
-        z = np.sqrt(pos[::, 0]**2 + pos[::, 1]**2)
+        z = np.sqrt(pos[::, 0] ** 2 + pos[::, 1] ** 2)
 
         # If enabled, check for body collisions
         if self._collisionCheck:
-            r = np.sqrt(pos[::, 0]**2 + pos[::, 1]**2 + pos[::, 2]**2)
-            indi = np.where(r < 1. + self["p"])[0]
+            r = np.sqrt(pos[::, 0] ** 2 + pos[::, 1] ** 2 + pos[::, 2] ** 2)
+            indi = np.where(r < 1.0 + self["p"])[0]
             if len(indi) > 0:
-                raise(PE.PyAValError("There is a body collision on this orbit.",
-                                     where="_ZList"))
+                raise (
+                    PE.PyAValError(
+                        "There is a body collision on this orbit.", where="_ZList"
+                    )
+                )
 
         # Determine which values are relevant. In particular, these are those
         # for which the planet is in front of the star (z > 0) and the distance
         # between stellar and planetary distance is lower than 1+p.
-        self._intrans = np.where(np.logical_and(
-            z <= (1. + self["p"]), pos[::, 2] < 0.0))[0]
-        self._inocc = np.where(np.logical_and(
-            z <= (1. + self["p"]), pos[::, 2] > 0.0))[0]
+        self._intrans = np.where(
+            np.logical_and(z <= (1.0 + self["p"]), pos[::, 2] < 0.0)
+        )[0]
+        self._inocc = np.where(
+            np.logical_and(z <= (1.0 + self["p"]), pos[::, 2] > 0.0)
+        )[0]
 
         # Calculate the 'orbit' and store z-values in _zlist
         self._zlist = z
-        
 
     def __init__(self, orbit, cc=True):
         if orbit == "circular":
             self._calcZList = self._zlistCirc
         elif orbit == "keplerian":
             self._collisionCheck = cc
-            self._ke = pyasl.KeplerEllipse(1., 1.)
+            self._ke = pyasl.KeplerEllipse(1.0, 1.0)
             self._calcZList = self._zlistKep
