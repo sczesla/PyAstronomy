@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 from PyAstronomy.funcFit import OneDFit
-import numpy
+import numpy as np
 from PyAstronomy.modelSuite.XTran import _ZList
 
 
@@ -59,7 +59,7 @@ class LimBrightTrans(_ZList, OneDFit):
         b3 = 0.03328355346
         b4 = 0.00441787012
         ek1 = a0 + m1 * (a1 + m1 * (a2 + m1 * (a3 + m1 * a4)))
-        ek2 = (b0 + m1 * (b1 + m1 * (b2 + m1 * (b3 + m1 * b4)))) * numpy.log(m1)
+        ek2 = (b0 + m1 * (b1 + m1 * (b2 + m1 * (b3 + m1 * b4)))) * np.log(m1)
         return ek1 - ek2
 
     def __ell2(self, k):
@@ -77,7 +77,7 @@ class LimBrightTrans(_ZList, OneDFit):
         b3 = 0.04069697526
         b4 = 0.00526449639
         ee1 = 1.0 + m1 * (a1 + m1 * (a2 + m1 * (a3 + m1 * a4)))
-        ee2 = m1 * (b1 + m1 * (b2 + m1 * (b3 + m1 * b4))) * numpy.log(1.0 / m1)
+        ee2 = m1 * (b1 + m1 * (b2 + m1 * (b3 + m1 * b4))) * np.log(1.0 / m1)
         return ee1 + ee2
 
     def __ell3(self, n, k):
@@ -85,13 +85,13 @@ class LimBrightTrans(_ZList, OneDFit):
         Computes the complete elliptical integral of the third kind using
         the algorithm of Bulirsch (1965)
         """
-        kc = numpy.sqrt(1.0 - k**2.0)
+        kc = np.sqrt(1.0 - k**2.0)
         p = n + 1.0
-        if numpy.min(p) < 0.0:
+        if np.min(p) < 0.0:
             print("Negative p")
         m0 = 1.0
         c = 1.0
-        p = numpy.sqrt(p)
+        p = np.sqrt(p)
         d = 1.0 / p
         e = kc
         loop = True
@@ -103,12 +103,12 @@ class LimBrightTrans(_ZList, OneDFit):
             p = g + p
             g = m0
             m0 = kc + m0
-            if numpy.max(numpy.abs(1.0 - kc / g)) > 1e-13:
-                kc = 2.0 * numpy.sqrt(e)
+            if np.max(np.abs(1.0 - kc / g)) > 1e-13:
+                kc = 2.0 * np.sqrt(e)
                 e = kc * m0
             else:
                 loop = False
-        return 0.5 * numpy.pi * (c * m0 + d) / (m0 * (m0 + p))
+        return 0.5 * np.pi * (c * m0 + d) / (m0 * (m0 + p))
 
     def evaluate(self, time):
         """
@@ -132,10 +132,15 @@ class LimBrightTrans(_ZList, OneDFit):
         """
         self._calcZList(time - self["T0"])
 
-        a = numpy.zeros(len(self._zlist))
-        indi = numpy.where(self._zlist + self["p"] < 1.0)[0]
+        a = np.zeros(len(self._zlist))
+        # Primary transit indices
+        itb = np.zeros(len(self._zlist), dtype=bool)
+        itb[self._intrans] = 1
+        
+        indi = np.where((self._zlist + self["p"] < 1.0) & itb)[0]
+        
         if len(indi) > 0:
-            k = numpy.sqrt(
+            k = np.sqrt(
                 4.0
                 * self._zlist[indi]
                 * self["p"]
@@ -143,7 +148,7 @@ class LimBrightTrans(_ZList, OneDFit):
             )
             a[indi] = (
                 4.0
-                / numpy.sqrt(1.0 - (self._zlist[indi] - self["p"]) ** 2)
+                / np.sqrt(1.0 - (self._zlist[indi] - self["p"]) ** 2)
                 * (
                     ((self._zlist[indi] - self["p"]) ** 2 - 1.0) * self.__ell2(k)
                     - (self._zlist[indi] ** 2 - self["p"] ** 2) * self.__ell1(k)
@@ -159,13 +164,13 @@ class LimBrightTrans(_ZList, OneDFit):
                 )
             )
 
-        indi = numpy.where(
-            numpy.logical_and(
+        indi = np.where(
+            np.logical_and(
                 self._zlist + self["p"] > 1.0, self._zlist - self["p"] < 1.0
-            )
+            ) & itb
         )[0]
         if len(indi) > 0:
-            k = numpy.sqrt(
+            k = np.sqrt(
                 (1.0 - (self._zlist[indi] - self["p"]) ** 2)
                 / 4.0
                 / self._zlist[indi]
@@ -174,7 +179,7 @@ class LimBrightTrans(_ZList, OneDFit):
             a[indi] = (
                 2.0
                 / (self._zlist[indi] - self["p"])
-                / numpy.sqrt(self._zlist[indi] * self["p"])
+                / np.sqrt(self._zlist[indi] * self["p"])
                 * (
                     4.0
                     * self._zlist[indi]
@@ -195,6 +200,6 @@ class LimBrightTrans(_ZList, OneDFit):
 
         self.lightcurve = (
             1.0
-            - (4.0 * numpy.pi * (self["p"] > self._zlist) * 1.0 + a) / 4.0 / numpy.pi
+            - (4.0 * np.pi * ((self["p"] > self._zlist) & itb) * 1.0 + a) / 4.0 / np.pi
         )
         return self.lightcurve
