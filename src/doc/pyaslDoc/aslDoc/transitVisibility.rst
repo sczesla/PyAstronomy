@@ -23,24 +23,20 @@ Code
 
 ::
     
-    from PyAstronomy import pyasl
-    import datetime as dt
-    
-    # Get the data for WASP-7 from NEXA data base
-    nexa = pyasl.NasaExoplanetArchive()
-    dat = nexa.selectByPlanetName("Wasp-7 b")
-    
-    # Convert July 14th, 2018, 10pm to a Julian date
-    d = dt.datetime(2018, 7, 14, 22)
-    jd = pyasl.jdcnv(d)
-    
-    # Calculate transit data for transits within 100 days starting
-    # form July 14th, 2018.
-    dat = pyasl.transitTimes(jd, jd+100., dat, nexaInput=True,
-                             observatory="esoparanal", obsOffset=1./24.,
-                             minAltitude=10.0)
-    # Plot the result
-    pyasl.transitVisibilityPlot(dat, markTransit=True)
+	from PyAstronomy import pyasl
+	import datetime as dt
+	
+	# Convert July 14th, 2018, 10pm to a Julian date
+	d = dt.datetime(2018, 7, 14, 22)
+	jd = pyasl.jdcnv(d)
+	
+	# Calculate transit data for transits within 100 days starting
+	# form July 14th, 2018.
+	dat = pyasl.transitTimes(jd, jd+100., "WASP-7 b",
+	                         observatory="esoparanal", obsOffset=1./24.,
+	                         minAltitude=10.0)
+	# Plot the result
+	pyasl.transitVisibilityPlot(dat, markTransit=True)
 
 
 Text output
