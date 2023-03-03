@@ -2,6 +2,7 @@
 from __future__ import print_function, division
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy import pyasl
 from .keplerOrbit import KeplerEllipse
 from .astroTimeLegacy import helio_jd, daycnv
 from . import observatory as pyaobs
@@ -59,24 +60,31 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
         an array holding the indices of those time points,
         which fall into a transit window. The `boolOutput`
         option may be used to obtain a boolean array holding
-        True for in-transit points. 
+        True for in-transit points.
 
     """
-    if halfDuration > period / 2.:
-        raise(PE.PyAValError("The half-duration is longer than half the period. This cannot be true.",
-                             where="isInTransit"))
+    if halfDuration > period / 2.0:
+        raise (
+            PE.PyAValError(
+                "The half-duration is longer than half the period. This cannot be true.",
+                where="isInTransit",
+            )
+        )
     if (period <= 0.0) or (halfDuration <= 0.0):
-        raise(PE.PyAValError("Both period and half-duration must be larger 0.",
-                             where="isInTransit"))
+        raise (
+            PE.PyAValError(
+                "Both period and half-duration must be larger 0.", where="isInTransit"
+            )
+        )
     absPhase = np.array(np.abs((np.array(time) - T0) / period), ndmin=1)
     absPhase -= np.floor(absPhase)
     dPhase = halfDuration / period
-    isIn = np.logical_or(absPhase <= dPhase, absPhase >= (1. - dPhase))
+    isIn = np.logical_or(absPhase <= dPhase, absPhase >= (1.0 - dPhase))
     if secin:
         isIn = isIn | (np.abs(absPhase - 0.5) < dPhase)
     indi = np.where(isIn)[0]
     if isinstance(time, float):
-        return (len(indi) == 1)
+        return len(indi) == 1
     if boolOutput:
         return isIn
     return indi
@@ -122,22 +130,22 @@ def ingressDuration(sma, rp, rs, inc, period):
 
     c = PC.PyAConstants()
     # Calculate the impact parameter
-    impact = (sma * c.AU) * np.cos(inc / 180. * np.pi)
-    imsin = (sma * c.AU) * np.sin(inc / 180. * np.pi)
+    impact = (sma * c.AU) * np.cos(inc / 180.0 * np.pi)
+    imsin = (sma * c.AU) * np.sin(inc / 180.0 * np.pi)
     # Calculate the geometric transit duration
-    idur = (period / (2.*np.pi)) * ( \
-        np.arcsin(np.sqrt((rs * c.RSun + rp * c.RJ)** 2 - impact**2) / imsin) - \
-        np.arcsin(np.sqrt((rs * c.RSun - rp * c.RJ)** 2 - impact**2) / imsin)   \
-        )
+    idur = (period / (2.0 * np.pi)) * (
+        np.arcsin(np.sqrt((rs * c.RSun + rp * c.RJ) ** 2 - impact**2) / imsin)
+        - np.arcsin(np.sqrt((rs * c.RSun - rp * c.RJ) ** 2 - impact**2) / imsin)
+    )
     return idur
 
 
 def ingressDuration_Rs(sma, rprs, inc, period):
     """
     Calculate transit duration
-    
+
     Invokes :py:func:`transitDuration` after parameter transformation.
-    
+
     Parameters
     ----------
     sma : float
@@ -152,13 +160,14 @@ def ingressDuration_Rs(sma, rprs, inc, period):
     Returns
     -------
     Transit duration : float
-        The duration of the transit (same units as `period`).    
+        The duration of the transit (same units as `period`).
     """
     from PyAstronomy import constants as PC
+
     c = PC.PyAConstants()
 
     rs = c.RSun
-    return ingressDuration(sma*rs/c.AU, rprs*rs/c.RJ, 1., inc, period)
+    return ingressDuration(sma * rs / c.AU, rprs * rs / c.RJ, 1.0, inc, period)
 
 
 def transitDuration(sma, rp, rs, inc, period, exact=False):
@@ -178,7 +187,7 @@ def transitDuration(sma, rp, rs, inc, period, exact=False):
     and a the semi-major axis.
 
     If the `exact` flag is set True, the slightly more accurate expression
-    
+
     .. math::
 
         T_D = \\frac{P}{\\pi} \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a \\sin(i)} \\right)
@@ -213,22 +222,22 @@ def transitDuration(sma, rp, rs, inc, period, exact=False):
 
     c = PC.PyAConstants()
     # Calculate the impact parameter
-    impact = (sma * c.AU) * np.cos(inc / 180. * np.pi)
+    impact = (sma * c.AU) * np.cos(inc / 180.0 * np.pi)
     # Correction factor (inclination dependent factor)
-    cfac = 1.0 if not exact else np.sin(inc / 180. * np.pi) 
+    cfac = 1.0 if not exact else np.sin(inc / 180.0 * np.pi)
     # Calculate the geometric transit duration
-    dur = (period / np.pi) * \
-        np.arcsin(np.sqrt((rs * c.RSun + rp * c.RJ)
-                          ** 2 - impact**2) / (sma * c.AU * cfac))
+    dur = (period / np.pi) * np.arcsin(
+        np.sqrt((rs * c.RSun + rp * c.RJ) ** 2 - impact**2) / (sma * c.AU * cfac)
+    )
     return dur
 
 
 def transitDuration_Rs(sma, rprs, inc, period, exact=False):
     """
     Calculate transit duration
-    
+
     Invokes :py:func:`transitDuration` after parameter transformation.
-    
+
     Parameters
     ----------
     sma : float
@@ -246,22 +255,23 @@ def transitDuration_Rs(sma, rprs, inc, period, exact=False):
     Returns
     -------
     Transit duration : float
-        The duration of the transit (same units as `period`).    
+        The duration of the transit (same units as `period`).
     """
     from PyAstronomy import constants as PC
+
     c = PC.PyAConstants()
 
     rs = c.RSun
-    return transitDuration(sma*rs/c.AU, rprs*rs/c.RJ, 1., inc, period, exact)
+    return transitDuration(sma * rs / c.AU, rprs * rs / c.RJ, 1.0, inc, period, exact)
 
 
 def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     """
     Calculate first to fourth contact times for elliptical orbit.
-    
+
     The contact times are numerically estimated using the algorithms
     provided by :py:class:`KeplerEllipse`.
-    
+
     Parameters
     ----------
     sma : float
@@ -281,7 +291,7 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     transit : string, {p, s}, optional
         Determines whether contact point times for primary (p, default)
         or secondary (s) transit are to be calculated.
-    
+
     Returns
     -------
     T1-T4 : tuple of floats
@@ -289,27 +299,31 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
         in the case of grazing transits or no transit at all. None is returned
         for undefined contact times.
     """
-    
+
     if not transit in ["p", "s"]:
-        raise(PE.PyAValError("transit must be 'p' or 's' ('" + str(transit) + "' was given).", \
-                             where="transit_T1_T4_ell"))
-    
+        raise (
+            PE.PyAValError(
+                "transit must be 'p' or 's' ('" + str(transit) + "' was given).",
+                where="transit_T1_T4_ell",
+            )
+        )
+
     ke = KeplerEllipse(sma, period, e=e, tau=tau, w=w, i=inc)
-    
+
     def r(t):
         # R in terms of Rs
         p = ke.xyzPos(t)
-        r = np.sqrt( p[0]**2 + p[1]**2 )
+        r = np.sqrt(p[0] ** 2 + p[1] ** 2)
         return r
-    
+
     # Estimate transit time (central transit time in case of circular orbit)
-    t0sec, t0prim = ke.yzCrossingTime(ordering='z')
+    t0sec, t0prim = ke.yzCrossingTime(ordering="z")
     if transit == "p":
         t0 = t0prim
     else:
         t0 = t0sec
     t0 = t0 % period
-    
+
     # Get nodes positions and times
     na, nd = ke.xyzNodes_LOSZ(getTimes=True)
     # Times between which T1 and T4 must occur
@@ -322,29 +336,140 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
         lims[1] += period
     if t0 < lims[0]:
         t0 += period
-    
+
     try:
-        t1 = sco.brentq(lambda t : r(t) - (1+rprs), lims[0], t0)
+        t1 = sco.brentq(lambda t: r(t) - (1 + rprs), lims[0], t0)
     except ValueError:
         t1 = None
-    try: 
-        t2 = sco.brentq(lambda t : r(t) - (1-rprs), lims[0], t0)
+    try:
+        t2 = sco.brentq(lambda t: r(t) - (1 - rprs), lims[0], t0)
     except ValueError:
         t2 = None
     try:
-        t3 = sco.brentq(lambda t : r(t) - (1-rprs), t0, lims[1])
+        t3 = sco.brentq(lambda t: r(t) - (1 - rprs), t0, lims[1])
     except ValueError:
         t3 = None
     try:
-        t4 = sco.brentq(lambda t : r(t) - (1+rprs), t0, lims[1])
+        t4 = sco.brentq(lambda t: r(t) - (1 + rprs), t0, lims[1])
     except ValueError:
         t4 = None
     return t1, t2, t3, t4
 
 
-def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
-                 observatory=None, lon=None, lat=None, alt=None, minAltitude=None,
-                 showTwilight="all", moonDist=None, nexaInput=False, fileOutput=None):
+def collectTransitDataFromDB(pn, dbp=("nexa", "eorg", "eeu"), verbose=False):
+    """
+    Get transit timing data from database
+
+    Parameters
+    ----------
+    pn : string
+        Planet name (e.g., 'WASP-12 b')
+    dbp : tuple of strings
+        A tuple with the strings 'nexa', 'eorg', and 'eeu', which specify the priorities
+        of the exoplanet databases. Data is collected from the first DB, which returns
+        useful results.
+    verbose : boolean, optional
+        If True, information about the progress is printed. Default is False.
+
+    Returns
+    -------
+    Transit data : dictionary
+        A dictionary with keys: ra, dec, T0, orbPer, orbInc, SMA, RpJ, RsSun, and optionally Tdur.
+        Suitable to be used with the `transitTimes` function.
+    DB name : string, {nexa, eorg, eeu}
+        The name of the database from which the data were collected.
+    """
+
+    def colfromorg(pn):
+        epl = pyasl.ExoplanetsOrg()
+        d = epl.selectByPlanetName(pn)
+        m = {
+            "ra": "ra",
+            "dec": "dec",
+            "T0": "pl_tranmid",
+            "orbPer": "pl_orbper",
+            "orbInc": "pl_orbincl",
+            "SMA": "pl_orbsmax",
+            "RpJ": "pl_radj",
+            "RsSun": "st_rad",
+            "Tdur": "pl_trandur",
+        }
+        r = {k: d[m[k]] for k in list(m)}
+        return r
+
+    def colfromnexa(pn):
+        nexa = pyasl.NasaExoplanetArchive()
+        d = nexa.selectByPlanetName(pn)
+        m = {
+            "ra": "ra",
+            "dec": "dec",
+            "T0": "pl_tranmid",
+            "orbPer": "pl_orbper",
+            "orbInc": "pl_orbincl",
+            "SMA": "pl_orbsmax",
+            "RpJ": "pl_radj",
+            "RsSun": "st_rad",
+            "Tdur": "pl_trandur",
+        }
+        r = {k: d[m[k]] for k in list(m)}
+        return r
+
+    def colfromeu(pn):
+        eu = pyasl.ExoplanetEU2()
+        d = eu.selectByPlanetName(pn)
+        m = {
+            "ra": "ra",
+            "dec": "dec",
+            "T0": "tzero_tr",
+            "orbPer": "orbital_period",
+            "orbInc": "inclination",
+            "SMA": "semi_major_axis",
+            "RpJ": "radius",
+            "RsSun": "star_radius",
+        }
+        r = {k: d[m[k]] for k in list(m)}
+        r["Tdur"] = None
+        return r
+
+    dbm = {"nexa": colfromnexa, "eorg": colfromorg, "eeu": colfromeu}
+    for db in dbp:
+        try:
+            r = dbm[db](pn)
+            try:
+                r["ra"] = float(r["ra"])
+            except ValueError:
+                # Convert into deg
+                r["ra"], r["dec"] = pyasl.coordsSexaToDeg(r["ra"] + " " + r["dec"])
+            m = ["ra", "dec", "T0", "orbPer", "orbInc", "SMA", "RpJ", "RsSun"]
+            for k in m:
+                if not np.isfinite(r[k]):
+                    raise (PE.PyAValError(f"Value {k} not defined (finite)"))
+        except Exception as e:
+            if verbose:
+                print(f"Failed to collect planet data from DB {db}")
+                print(e)
+        else:
+            return r, db
+
+    return None, None
+
+
+def transitTimes(
+    tmin,
+    tmax,
+    planetData,
+    obsOffset=0.0,
+    hjd=True,
+    observatory=None,
+    lon=None,
+    lat=None,
+    alt=None,
+    minAltitude=None,
+    showTwilight="all",
+    moonDist=None,
+    nexaInput=False,
+    fileOutput=None,
+):
     """
     Calculate transit times for a given planet and a given period of time.
 
@@ -365,7 +490,7 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
     =======  =================================
 
     If the transit duration (Tdur) is not given, the duration will
-    be estimated using pyasl's `transitDuration` function. 
+    be estimated using pyasl's `transitDuration` function.
 
     .. note:: The input times (`tmin` and `tmax`) are expected in JD (UT).
               Input time will be calculated to HJD.
@@ -377,10 +502,12 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
         Start of time interval in Julian days (UT).
     tmax : float
         End of time interval in Julian days (UT).
-    planetData: dictionary
-        A dictionary containing the parameters of the exoplanet
-        for which the transit times should be calculated.
-        The required keys are specified above.
+    planetData: dictionary or string
+        Either a dictionary containing the parameters of the exoplanet
+        for which the transit times should be calculated or the name of the
+        planet (e.g., 'WASP-12 b'). In the case of a string, an attempt will be
+        made to download the data from a database.
+        The required keys for the dictionary are specified above.
     obsOffset : float, optional
         Specifies additional time before AND after the transit in DAYS.
         This is useful if the observation should start and end
@@ -445,13 +572,13 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
         If a string is given, a file with the name will be created
         and the output will be written to that file. If a (writable)
         file object is given, the output will be written to that
-        file. In both cases, no output will be given on screen. 
+        file. In both cases, no output will be given on screen.
 
     Returns
     -------
     Transit times : dictionary
         Returns a dictionary containing the transit details. The dictionary key
-        is a running number (starting with one), which is equivalent to that 
+        is a running number (starting with one), which is equivalent to that
         listed in the first column of the table.
 
         For each transit, the function returns a dictionary with the transit
@@ -512,54 +639,78 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
     if fileOutput is not None:
         oldStdout = sys.stdout
         if isinstance(fileOutput, six.string_types):
-            sys.stdout = open(fileOutput, 'w')
+            sys.stdout = open(fileOutput, "w")
         else:
             sys.stdout = fileOutput
 
     try:
-
         if tmin >= tmax:
-            raise(PE.PyAValError("The given time range is inconsistent (tmin >= tmax)",
-                                 where="transitTimes",
-                                 solution="Adapt tmin and tmax."))
+            raise (
+                PE.PyAValError(
+                    "The given time range is inconsistent (tmin >= tmax)",
+                    where="transitTimes",
+                    solution="Adapt tmin and tmax.",
+                )
+            )
 
-        # Copy input dictionary, because it may be changed
-        planetData = planetData.copy()
+        if isinstance(planetData, dict):
+            # Copy input dictionary, because it may be changed
+            planetData = planetData.copy()
 
-        if nexaInput:
-            pdin = planetData.copy()
-            planetData = {}
-            planetData["ra"] = pdin["ra"]
-            planetData["dec"] = pdin["dec"]
-            planetData["orbPer"] = pdin["pl_orbper"]
-            planetData["T0"] = pdin["pl_tranmid"]
-            planetData["orbInc"] = pdin["pl_orbincl"]
-            planetData["SMA"] = pdin["pl_orbsmax"]
-            planetData["RpJ"] = pdin["pl_radj"]
-            planetData["RsSun"] = pdin["st_rad"]
-            planetData["Tdur"] = pdin["pl_trandur"] / 24 # Convert into days
-            planetData["plName"] = pdin["pl_name"]
-            if np.isnan(planetData["Tdur"]):
-                del planetData["Tdur"]
+            if nexaInput:
+                pdin = planetData.copy()
+                planetData = {}
+                planetData["ra"] = pdin["ra"]
+                planetData["dec"] = pdin["dec"]
+                planetData["orbPer"] = pdin["pl_orbper"]
+                planetData["T0"] = pdin["pl_tranmid"]
+                planetData["orbInc"] = pdin["pl_orbincl"]
+                planetData["SMA"] = pdin["pl_orbsmax"]
+                planetData["RpJ"] = pdin["pl_radj"]
+                planetData["RsSun"] = pdin["st_rad"]
+                planetData["Tdur"] = pdin["pl_trandur"] / 24  # Convert into days
+                planetData["plName"] = pdin["pl_name"]
+                if np.isnan(planetData["Tdur"]):
+                    del planetData["Tdur"]
+        elif isinstance(planetData, str):
+            # Try to collect data from DBs
+            pn = planetData
+            planetData, dbname = collectTransitDataFromDB(pn, verbose=False)
+            if planetData is None:
+                raise (
+                    PE.PyAValError(
+                        f"Could not download transit data for target '{pn}' from data base.",
+                        where="transitTimes",
+                        solution=["Check name of planet", "Specify parameter manually"],
+                    )
+                )
+            planetData["plName"] = pn
 
         # Check whether required keys are present
-        reke = ["ra", "dec", "orbPer", "T0",
-                "orbInc", "SMA", "RpJ", "RsSun", "plName"]
+        reke = ["ra", "dec", "orbPer", "T0", "orbInc", "SMA", "RpJ", "RsSun", "plName"]
         msg = ""
         fail = False
         for key in reke:
-            if (not key in planetData):
+            if not key in planetData:
                 msg += "The required key '" + key + "' is missing in the input data!\n"
                 fail = True
                 continue
             if isinstance(planetData[key], (tuple(six.integer_types) + (float,))):
                 if np.isnan(planetData[key]):
-                    msg += "The required key '" + key + "' has NaN value in the input data!\n"
+                    msg += (
+                        "The required key '"
+                        + key
+                        + "' has NaN value in the input data!\n"
+                    )
                     fail = True
         if fail:
-            raise(PE.PyAValError("The input `planetData` is inappropriate:\n" + msg,
-                                 where="transitTimes",
-                                 solution="Specify all required input values."))
+            raise (
+                PE.PyAValError(
+                    "The input `planetData` is inappropriate:\n" + msg,
+                    where="transitTimes",
+                    solution="Specify all required input values.",
+                )
+            )
 
         # Object position [degrees]
         ra = planetData["ra"]
@@ -573,9 +724,15 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
 
         print("Specified time span")
         print(
-            "Start date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmin)))
+            "Start date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(
+                *daycnv(tmin)
+            )
+        )
         print(
-            "End date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(*daycnv(tmax)))
+            "End date (DDDD-MM-YY and fractional hours): {0:4d}-{1:02d}-{2:02d} {3:6.3f}".format(
+                *daycnv(tmax)
+            )
+        )
         print()
 
         # Transit parameters
@@ -592,14 +749,18 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
             rs = planetData["RsSun"]  # Msun
             dur = transitDuration(sma, rp, rs, inc, period)
             print(
-                "Estimating transit duration using orbital inclination, semi-major axis,")
+                "Estimating transit duration using orbital inclination, semi-major axis,"
+            )
             print("  planetary radius, and stellar radius")
         else:
             dur = planetData["Tdur"]
 
-        print("Transit duration: ", dur * 24. * 60., " minutes")
-        print("Off-transit time before and after transit: ",
-              obsOffset * 24. * 60., " minutes")
+        print("Transit duration: ", dur * 24.0 * 60.0, " minutes")
+        print(
+            "Off-transit time before and after transit: ",
+            obsOffset * 24.0 * 60.0,
+            " minutes",
+        )
 
         # First and last epoch contained in specified range
         trnum_start = np.floor((tmin - T0) / period)
@@ -607,11 +768,16 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
         # Relevant transit epochs
         tr = np.arange(trnum_start, trnum_end, 1)
 
-        if (observatory is not None) and \
-                ((lon is not None) or (lat is not None) or (alt is not None)):
-            raise(PE.PyAParameterConflict("You must either specify `observatory` OR `lon`, `lat`, and `alt`.",
-                                          where="transitTimes",
-                                          solution="Adapt function call."))
+        if (observatory is not None) and (
+            (lon is not None) or (lat is not None) or (alt is not None)
+        ):
+            raise (
+                PE.PyAParameterConflict(
+                    "You must either specify `observatory` OR `lon`, `lat`, and `alt`.",
+                    where="transitTimes",
+                    solution="Adapt function call.",
+                )
+            )
 
         if observatory is not None:
             # Resolve observatory string
@@ -623,58 +789,94 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
         # Check if the observatory data are complete
         obsCompl = (lon is None) + (lat is None) + (alt is None)
         if (obsCompl == 1) or (obsCompl == 2):
-            raise(PE.PyAValError("Observatory data is incomplete. `lon`, `lat`, and `alt` must all be specified.\n" +
-                                 "Current values are: lon = " +
-                                 str(lon) + ", lat = " + str(lat) +
-                                 ", alt = " + str(alt),
-                                 where="transitTimes",
-                                 solution="Provide complete observatory information."))
+            raise (
+                PE.PyAValError(
+                    "Observatory data is incomplete. `lon`, `lat`, and `alt` must all be specified.\n"
+                    + "Current values are: lon = "
+                    + str(lon)
+                    + ", lat = "
+                    + str(lat)
+                    + ", alt = "
+                    + str(alt),
+                    where="transitTimes",
+                    solution="Provide complete observatory information.",
+                )
+            )
 
         if (minAltitude is not None) and (lon is None):
             # Observer's location not given so minAltitude cannot have any effect
-            raise(PE.PyAParameterConflict("The observer's location is not specified, but `minAltitude` is given.\n" +
-                                          "This parameter can only be used, if the observer's location is known.",
-                                          where="transitTimes",
-                                          solution="Either specify the observer's location or set `minAltitude` to None."))
+            raise (
+                PE.PyAParameterConflict(
+                    "The observer's location is not specified, but `minAltitude` is given.\n"
+                    + "This parameter can only be used, if the observer's location is known.",
+                    where="transitTimes",
+                    solution="Either specify the observer's location or set `minAltitude` to None.",
+                )
+            )
 
         if (showTwilight != "all") and (lon is None):
             # Observer's location not given so showTwilight cannot have any effect
-            raise(PE.PyAParameterConflict("The observer's location is not specified, but `showTwilight` is given.\n" +
-                                          "This parameter can only be used, if the observer's location is known.",
-                                          where="transitTimes",
-                                          solution="Either specify the observer's location or set `showTwilight` to \"all\"."))
+            raise (
+                PE.PyAParameterConflict(
+                    "The observer's location is not specified, but `showTwilight` is given.\n"
+                    + "This parameter can only be used, if the observer's location is known.",
+                    where="transitTimes",
+                    solution='Either specify the observer\'s location or set `showTwilight` to "all".',
+                )
+            )
 
-        if (showTwilight != "all") and (showTwilight != "civil") and (showTwilight != "nautical") and \
-           (showTwilight != "astronomical") and (showTwilight != "night"):
+        if (
+            (showTwilight != "all")
+            and (showTwilight != "civil")
+            and (showTwilight != "nautical")
+            and (showTwilight != "astronomical")
+            and (showTwilight != "night")
+        ):
             # None of the possible choices for showTwilight have been used.
-            raise(PE.PyAValError("Wrong keyword given for showTwilight.\n" +
-                                 "Current keyword is " + showTwilight,
-                                 where="transitTimes",
-                                 solution="Select a valid keyword for showTwilight: `all', `civil', `nautical', `astronomical', or `night'."))
+            raise (
+                PE.PyAValError(
+                    "Wrong keyword given for showTwilight.\n"
+                    + "Current keyword is "
+                    + showTwilight,
+                    where="transitTimes",
+                    solution="Select a valid keyword for showTwilight: `all', `civil', `nautical', `astronomical', or `night'.",
+                )
+            )
 
         if moonDist is None:
             # No limit on Moon distance
             moonDist = 0.0
         if (moonDist != 0.0) and (lon is None):
             # Observer's location not given so showTwilight cannot have any effect
-            raise(PE.PyAParameterConflict("The observer's location is not specified, but `moonDist` is given.\n" +
-                                          "This parameter can only be used, if the observer's location is known.",
-                                          where="transitTimes",
-                                          solution="Either specify the observer's location or set `moonDist` to 0.0 or None."))
+            raise (
+                PE.PyAParameterConflict(
+                    "The observer's location is not specified, but `moonDist` is given.\n"
+                    + "This parameter can only be used, if the observer's location is known.",
+                    where="transitTimes",
+                    solution="Either specify the observer's location or set `moonDist` to 0.0 or None.",
+                )
+            )
 
         if moonDist < 0.0:
             # Moon distance below zero does not make sense
-            PE.warn("The specified `moonDist' is below zero (" + str(moonDist) + ") which does not make sense.\n" +
-                    "It was changed to 0.0.\n" +
-                    "Please use a value >= 0.0 or None if specifying `moonDist'.")
+            PE.warn(
+                "The specified `moonDist' is below zero ("
+                + str(moonDist)
+                + ") which does not make sense.\n"
+                + "It was changed to 0.0.\n"
+                + "Please use a value >= 0.0 or None if specifying `moonDist'."
+            )
 
         print()
         if np.logical_and(lon != None, lat != None):
-            print("No. Tmid [HJD]      Obs. start [UT] [ALT, DIR(AZI)]     Transit mid [UT] [ALT, DIR(AZI)]     Obs. end [UT] [ALT, DIR(AZI)]   twilight" +
-                  " (SUN ALT)                   moon distance     moon phase")
+            print(
+                "No. Tmid [HJD]      Obs. start [UT] [ALT, DIR(AZI)]     Transit mid [UT] [ALT, DIR(AZI)]     Obs. end [UT] [ALT, DIR(AZI)]   twilight"
+                + " (SUN ALT)                   moon distance     moon phase"
+            )
         else:
             print(
-                "No. Tmid [HJD]      Obs. start [UT]    Transit mid [UT]   Obs. end [UT]")
+                "No. Tmid [HJD]      Obs. start [UT]    Transit mid [UT]   Obs. end [UT]"
+            )
 
         allData = {}
         trcounter = 1
@@ -692,14 +894,19 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
             obs_end_hjd = Tmid + (dur / 2.0) + obsOffset
             obs_end = daycnv(obs_end_hjd)
             time_temp = np.array([obs_start_hjd, Tmid, obs_end_hjd])
-            transit_only = np.array(
-                [Tmid - (dur / 2.0), Tmid, Tmid + (dur / 2.0)])
+            transit_only = np.array([Tmid - (dur / 2.0), Tmid, Tmid + (dur / 2.0)])
 
             # Get visibility
             if (lon is not None) and (lat is not None):
                 # Get alt/az of object for current transit
-                altaz = eq2hor.eq2hor(time_temp, np.ones(time_temp.size) * ra,
-                                      np.ones(time_temp.size) * dec, lon=lon, lat=lat, alt=alt)
+                altaz = eq2hor.eq2hor(
+                    time_temp,
+                    np.ones(time_temp.size) * ra,
+                    np.ones(time_temp.size) * dec,
+                    lon=lon,
+                    lat=lat,
+                    alt=alt,
+                )
                 # If minimum altitude is not fulfilled during observation,
                 # do not show transit
                 if minAltitude is not None:
@@ -709,10 +916,14 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
                         continue
                 # Get Sun position for current transit
                 sunpos_radec = sunpos.sunpos(time_temp[1])
-                sunpos_altaz = eq2hor.eq2hor(time_temp, np.ones(time_temp.size) * sunpos_radec[1],
-                                             np.ones(time_temp.size) *
-                                             sunpos_radec[2],
-                                             lon=lon, lat=lat, alt=alt)
+                sunpos_altaz = eq2hor.eq2hor(
+                    time_temp,
+                    np.ones(time_temp.size) * sunpos_radec[1],
+                    np.ones(time_temp.size) * sunpos_radec[2],
+                    lon=lon,
+                    lat=lat,
+                    alt=alt,
+                )
                 twi = twilight.twilightName(max(sunpos_altaz[0]))
                 # Check type of twilight -> if requirement not fulfilled, don't show transit
                 if showTwilight == "civil":
@@ -748,20 +959,43 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
                 if mdist < moonDist:
                     continue
                 # Get lunar phase in percent
-                moonpha = moonphase(time_temp) * 100.
-                print("%3d %10.5f   %2d.%2d. %2d:%02d    [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d     [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d  [%3d°,%s(%3d°)]   %18s (%3d°,%3d°,%3d°)   (%3d°,%3d°,%3d°)  %3d%%"
-                      % (trcounter, Tmid, obs_start[2], obs_start[1], np.floor(obs_start[3]), (obs_start[3] - np.floor(obs_start[3])) * 60.,
-                         altaz[0][0], getCardinalPoint(
-                             altaz[1][0]), altaz[1][0],
-                         obs_mid[2], obs_mid[1], np.floor(
-                             obs_mid[3]), (obs_mid[3] - np.floor(obs_mid[3])) * 60.,
-                         altaz[0][1], getCardinalPoint(
-                             altaz[1][1]), altaz[1][1],
-                         obs_end[2], obs_end[1], np.floor(
-                             obs_end[3]), (obs_end[3] - np.floor(obs_end[3])) * 60.,
-                         altaz[0][2], getCardinalPoint(
-                             altaz[1][2]), altaz[1][2], twi, sunpos_altaz[0][0], sunpos_altaz[0][1], sunpos_altaz[0][2],
-                         mdists[0], mdists[1], mdists[2], np.max(moonpha)))
+                moonpha = moonphase(time_temp) * 100.0
+                print(
+                    "%3d %10.5f   %2d.%2d. %2d:%02d    [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d     [%3d°,%s(%3d°)]      %2d.%2d. %2d:%02d  [%3d°,%s(%3d°)]   %18s (%3d°,%3d°,%3d°)   (%3d°,%3d°,%3d°)  %3d%%"
+                    % (
+                        trcounter,
+                        Tmid,
+                        obs_start[2],
+                        obs_start[1],
+                        np.floor(obs_start[3]),
+                        (obs_start[3] - np.floor(obs_start[3])) * 60.0,
+                        altaz[0][0],
+                        getCardinalPoint(altaz[1][0]),
+                        altaz[1][0],
+                        obs_mid[2],
+                        obs_mid[1],
+                        np.floor(obs_mid[3]),
+                        (obs_mid[3] - np.floor(obs_mid[3])) * 60.0,
+                        altaz[0][1],
+                        getCardinalPoint(altaz[1][1]),
+                        altaz[1][1],
+                        obs_end[2],
+                        obs_end[1],
+                        np.floor(obs_end[3]),
+                        (obs_end[3] - np.floor(obs_end[3])) * 60.0,
+                        altaz[0][2],
+                        getCardinalPoint(altaz[1][2]),
+                        altaz[1][2],
+                        twi,
+                        sunpos_altaz[0][0],
+                        sunpos_altaz[0][1],
+                        sunpos_altaz[0][2],
+                        mdists[0],
+                        mdists[1],
+                        mdists[2],
+                        np.max(moonpha),
+                    )
+                )
                 # Save transit data
                 trData["Tmid"] = Tmid
                 trData["Obs jd"] = time_temp
@@ -779,17 +1013,34 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
                 trData["Moon dec"] = mpos[1]
                 trData["Moon AD"] = mdist
                 trData["Moon phase"] = moonpha
-                trData["Star CP"] = [getCardinalPoint(altaz[1][0]), getCardinalPoint(
-                    altaz[1][1]), getCardinalPoint(altaz[1][2])]
+                trData["Star CP"] = [
+                    getCardinalPoint(altaz[1][0]),
+                    getCardinalPoint(altaz[1][1]),
+                    getCardinalPoint(altaz[1][2]),
+                ]
 
                 trData["Obs coord"] = [lon, lat, alt]
             else:
                 # If you do not specify the observer's location, return all transits of the object
-                print("%3d %10.5f   %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d"
-                      % (trcounter, Tmid, obs_start[2], obs_start[1], np.floor(obs_start[3]), (obs_start[3] - np.floor(obs_start[3])) * 60.,
-                         obs_mid[2], obs_mid[1], np.floor(
-                             obs_mid[3]), (obs_mid[3] - np.floor(obs_mid[3])) * 60.,
-                         obs_end[2], obs_end[1], np.floor(obs_end[3]), (obs_end[3] - np.floor(obs_end[3])) * 60.))
+                print(
+                    "%3d %10.5f   %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d       %2d.%2d. %2d:%02d"
+                    % (
+                        trcounter,
+                        Tmid,
+                        obs_start[2],
+                        obs_start[1],
+                        np.floor(obs_start[3]),
+                        (obs_start[3] - np.floor(obs_start[3])) * 60.0,
+                        obs_mid[2],
+                        obs_mid[1],
+                        np.floor(obs_mid[3]),
+                        (obs_mid[3] - np.floor(obs_mid[3])) * 60.0,
+                        obs_end[2],
+                        obs_end[1],
+                        np.floor(obs_end[3]),
+                        (obs_end[3] - np.floor(obs_end[3])) * 60.0,
+                    )
+                )
                 trData["Tmid"] = Tmid
                 trData["Obs jd"] = time_temp
                 trData["Obs cal"] = [obs_start, obs_mid, obs_end]
@@ -817,7 +1068,9 @@ def transitTimes(tmin, tmax, planetData, obsOffset=0., hjd=True,
     return allData
 
 
-def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonDist=True, print2file=False):
+def transitVisibilityPlot(
+    allData, markTransit=False, plotLegend=True, showMoonDist=True, print2file=False
+):
     """
     Plot the visibility of transits.
 
@@ -857,7 +1110,7 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
         be clearly indicated in the plot.
         Note that this would not be the case otherwise, which is particularly
         important if extra off-transit time before and after the transit has been
-        requested. 
+        requested.
     showMoonDist : boolean, optional
         If True (default), the Moon distance will be shown.
     print2file : boolean or string, optional
@@ -866,10 +1119,15 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
         it specifies the name of the output file.
     """
     from PyAstronomy.pyasl import _ic
+
     if not _ic.check["matplotlib"]:
-        raise(PE.PyARequiredImport("matplotlib is not installed.",
-                                   where="transitVisibilityPlot",
-                                   solution="Install matplotlib (http://matplotlib.org/)"))
+        raise (
+            PE.PyARequiredImport(
+                "matplotlib is not installed.",
+                where="transitVisibilityPlot",
+                solution="Install matplotlib (http://matplotlib.org/)",
+            )
+        )
 
     import matplotlib
     import matplotlib.pylab as plt
@@ -878,18 +1136,23 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     from matplotlib.font_manager import FontProperties
     from matplotlib import rcParams
 
-    rcParams['xtick.major.pad'] = 12
+    rcParams["xtick.major.pad"] = 12
 
     if len(allData) == 0:
-        raise(PE.PyAValError("Input dictionary is empty",
-                             where="transitVisibilityPlot",
-                             solution=["Use `transitTimes` to generate input dictionary",
-                                       "Did you forget to supply observer's location?",
-                                       "If you used `transitTime`, you might need to change the call argument (e.g., times)"]))
+        raise (
+            PE.PyAValError(
+                "Input dictionary is empty",
+                where="transitVisibilityPlot",
+                solution=[
+                    "Use `transitTimes` to generate input dictionary",
+                    "Did you forget to supply observer's location?",
+                    "If you used `transitTime`, you might need to change the call argument (e.g., times)",
+                ],
+            )
+        )
 
     # Check whether all relevant data have been specified
-    reqK = ["Obs jd", "Obs coord", "Star ra",
-            "Star dec", "Obs cal", "Planet name"]
+    reqK = ["Obs jd", "Obs coord", "Star ra", "Star dec", "Obs cal", "Planet name"]
     if markTransit:
         reqK.append("Transit jd")
     missingK = []
@@ -897,9 +1160,14 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
         if not k in allData[1]:
             missingK.append(k)
     if len(missingK) > 0:
-        raise(PE.PyAValError("The following keys are missing in the input dictionary: " + ', '.join(missingK),
-                             where="transitVisibilityPlot",
-                             solution="Did you specify observer's location in `transitTimes`?"))
+        raise (
+            PE.PyAValError(
+                "The following keys are missing in the input dictionary: "
+                + ", ".join(missingK),
+                where="transitVisibilityPlot",
+                solution="Did you specify observer's location in `transitTimes`?",
+            )
+        )
 
     fig = plt.figure(figsize=(15, 10))
     fig.subplots_adjust(left=0.07, right=0.8, bottom=0.15, top=0.88)
@@ -907,109 +1175,200 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
 
     font0 = FontProperties()
     font1 = font0.copy()
-    font0.set_family('sans-serif')
-    font0.set_weight('light')
-    font1.set_family('sans-serif')
-    font1.set_weight('medium')
+    font0.set_family("sans-serif")
+    font0.set_weight("light")
+    font1.set_family("sans-serif")
+    font1.set_weight("medium")
 
     for n in six.iterkeys(allData):
         # JD array
-        jdbinsize = 1.0 / 24. / 10.
-        jds = np.arange(allData[n]["Obs jd"][0],
-                        allData[n]["Obs jd"][2], jdbinsize)
+        jdbinsize = 1.0 / 24.0 / 10.0
+        jds = np.arange(allData[n]["Obs jd"][0], allData[n]["Obs jd"][2], jdbinsize)
         # Get JD floating point
         jdsub = jds - np.floor(jds[0])
         # Get alt/az of object
-        altaz = eq2hor.eq2hor(jds, np.ones(jds.size) * allData[n]["Star ra"], np.ones(jds.size) * allData[n]["Star dec"],
-                              lon=allData[n]["Obs coord"][0], lat=allData[n]["Obs coord"][1],
-                              alt=allData[n]["Obs coord"][2])
+        altaz = eq2hor.eq2hor(
+            jds,
+            np.ones(jds.size) * allData[n]["Star ra"],
+            np.ones(jds.size) * allData[n]["Star dec"],
+            lon=allData[n]["Obs coord"][0],
+            lat=allData[n]["Obs coord"][1],
+            alt=allData[n]["Obs coord"][2],
+        )
         # Get alt/az of Sun
-        sunpos_altaz = eq2hor.eq2hor(jds, np.ones(jds.size) * allData[n]["Sun ra"], np.ones(jds.size) * allData[n]["Sun dec"],
-                                     lon=allData[n]["Obs coord"][0], lat=allData[n]["Obs coord"][1],
-                                     alt=allData[n]["Obs coord"][2])
+        sunpos_altaz = eq2hor.eq2hor(
+            jds,
+            np.ones(jds.size) * allData[n]["Sun ra"],
+            np.ones(jds.size) * allData[n]["Sun dec"],
+            lon=allData[n]["Obs coord"][0],
+            lat=allData[n]["Obs coord"][1],
+            alt=allData[n]["Obs coord"][2],
+        )
 
         # Define plot label
-        plabel = "[%02d]  %02d.%02d.%4d" % (n, allData[n]["Obs cal"][0][2],
-                                            allData[n]["Obs cal"][0][1], allData[n]["Obs cal"][0][0])
+        plabel = "[%02d]  %02d.%02d.%4d" % (
+            n,
+            allData[n]["Obs cal"][0][2],
+            allData[n]["Obs cal"][0][1],
+            allData[n]["Obs cal"][0][0],
+        )
 
         # Find periods of: day, twilight, and night
-        day = np.where(sunpos_altaz[0] >= 0.)[0]
-        twi = np.where(np.logical_and(
-            sunpos_altaz[0] > -18., sunpos_altaz[0] < 0.))[0]
-        night = np.where(sunpos_altaz[0] <= -18.)[0]
+        day = np.where(sunpos_altaz[0] >= 0.0)[0]
+        twi = np.where(np.logical_and(sunpos_altaz[0] > -18.0, sunpos_altaz[0] < 0.0))[
+            0
+        ]
+        night = np.where(sunpos_altaz[0] <= -18.0)[0]
 
         if (len(day) == 0) and (len(twi) == 0) and (len(night) == 0):
             print()
-            print("transitVisibilityPlot - no points to draw for date %2d.%2d.%4d"
-                  % (allData[n]["Obs cal"][0][2], allData[n]["Obs cal"][0][1], allData[n]["Obs cal"][0][0]))
+            print(
+                "transitVisibilityPlot - no points to draw for date %2d.%2d.%4d"
+                % (
+                    allData[n]["Obs cal"][0][2],
+                    allData[n]["Obs cal"][0][1],
+                    allData[n]["Obs cal"][0][0],
+                )
+            )
             print("Skip transit and continue with next")
             print()
             continue
 
         mpos = moonpos(jds)
         mpha = moonphase(jds)
-        mpos_altaz = eq2hor.eq2hor(jds, mpos[0], mpos[1], lon=allData[n]["Obs coord"][0],
-                                   lat=allData[n]["Obs coord"][1], alt=allData[n]["Obs coord"][2])
-        moonind = np.where(mpos_altaz[0] > 0.)[0]
+        mpos_altaz = eq2hor.eq2hor(
+            jds,
+            mpos[0],
+            mpos[1],
+            lon=allData[n]["Obs coord"][0],
+            lat=allData[n]["Obs coord"][1],
+            alt=allData[n]["Obs coord"][2],
+        )
+        moonind = np.where(mpos_altaz[0] > 0.0)[0]
 
         if showMoonDist:
-            mdist = getAngDist(mpos[0], mpos[1], np.ones(jds.size) * allData[n]["Star ra"],
-                               np.ones(jds.size) * allData[n]["Star dec"])
-            bindist = int((2.0 / 24.) / jdbinsize)
+            mdist = getAngDist(
+                mpos[0],
+                mpos[1],
+                np.ones(jds.size) * allData[n]["Star ra"],
+                np.ones(jds.size) * allData[n]["Star dec"],
+            )
+            bindist = int((2.0 / 24.0) / jdbinsize)
             firstbin = np.random.randint(0, bindist)
             for mp in range(0, int(len(jds) / bindist)):
                 bind = int(firstbin + float(mp) * bindist)
-                ax.text(jdsub[bind], altaz[0][bind] - 1., str(int(mdist[bind])) + r"$^\circ$", ha="center", va="top",
-                        fontsize=8, stretch='ultra-condensed', fontproperties=font0, alpha=1.)
+                ax.text(
+                    jdsub[bind],
+                    altaz[0][bind] - 1.0,
+                    str(int(mdist[bind])) + r"$^\circ$",
+                    ha="center",
+                    va="top",
+                    fontsize=8,
+                    stretch="ultra-condensed",
+                    fontproperties=font0,
+                    alpha=1.0,
+                )
 
         if markTransit:
             # Mark points within transit. These may differ from that pertaining to the
             # observation if an extra offset was given to provide off-transit time.
-            transit_only_ind = np.where(np.logical_and(jds >= allData[n]["Transit jd"][0],
-                                                       jds <= allData[n]["Transit jd"][2]))[0]
-            ax.plot(jdsub[transit_only_ind], altaz[0]
-                    [transit_only_ind], 'g', linewidth=6, alpha=.3)
+            transit_only_ind = np.where(
+                np.logical_and(
+                    jds >= allData[n]["Transit jd"][0],
+                    jds <= allData[n]["Transit jd"][2],
+                )
+            )[0]
+            ax.plot(
+                jdsub[transit_only_ind],
+                altaz[0][transit_only_ind],
+                "g",
+                linewidth=6,
+                alpha=0.3,
+            )
 
         if len(twi) > 1:
             # There are points in twilight
-            linebreak = np.where(
-                (jdsub[twi][1:] - jdsub[twi][:-1]) > 2.0 * jdbinsize)[0]
+            linebreak = np.where((jdsub[twi][1:] - jdsub[twi][:-1]) > 2.0 * jdbinsize)[
+                0
+            ]
             if len(linebreak) > 0:
                 plotrjd = np.insert(jdsub[twi], linebreak + 1, np.nan)
                 plotdat = np.insert(altaz[0][twi], linebreak + 1, np.nan)
-                ax.plot(plotrjd, plotdat, "-", color='#BEBEBE', linewidth=1.5)
+                ax.plot(plotrjd, plotdat, "-", color="#BEBEBE", linewidth=1.5)
             else:
-                ax.plot(jdsub[twi], altaz[0][twi], "-",
-                        color='#BEBEBE', linewidth=1.5)
+                ax.plot(jdsub[twi], altaz[0][twi], "-", color="#BEBEBE", linewidth=1.5)
 
-        ax.plot(jdsub[night], altaz[0][night],
-                'k', linewidth=1.5, label=plabel)
-        ax.plot(jdsub[day], altaz[0][day], color='#FDB813', linewidth=1.5)
+        ax.plot(jdsub[night], altaz[0][night], "k", linewidth=1.5, label=plabel)
+        ax.plot(jdsub[day], altaz[0][day], color="#FDB813", linewidth=1.5)
 
         altmax = np.argmax(altaz[0])
-        ax.text(jdsub[altmax], altaz[0][altmax], str(n), color="b", fontsize=14,
-                fontproperties=font1, va="bottom", ha="center")
+        ax.text(
+            jdsub[altmax],
+            altaz[0][altmax],
+            str(n),
+            color="b",
+            fontsize=14,
+            fontproperties=font1,
+            va="bottom",
+            ha="center",
+        )
 
         if n == 29:
-            ax.text(1.1, 1.0 - float(n) * 0.04, "too many transits", ha="left", va="top", transform=ax.transAxes,
-                    fontsize=10, fontproperties=font0, color="r")
+            ax.text(
+                1.1,
+                1.0 - float(n) * 0.04,
+                "too many transits",
+                ha="left",
+                va="top",
+                transform=ax.transAxes,
+                fontsize=10,
+                fontproperties=font0,
+                color="r",
+            )
         else:
-            ax.text(1.1, 1.0 - float(n) * 0.04, plabel, ha="left", va="top", transform=ax.transAxes,
-                    fontsize=12, fontproperties=font0, color="b")
+            ax.text(
+                1.1,
+                1.0 - float(n) * 0.04,
+                plabel,
+                ha="left",
+                va="top",
+                transform=ax.transAxes,
+                fontsize=12,
+                fontproperties=font0,
+                color="b",
+            )
 
-    ax.text(1.1, 1.03, "Start of observation", ha="left", va="top", transform=ax.transAxes,
-            fontsize=12, fontproperties=font0, color="b")
-    ax.text(1.1, 1.0, "[No.]  Date", ha="left", va="top", transform=ax.transAxes,
-            fontsize=12, fontproperties=font0, color="b")
+    ax.text(
+        1.1,
+        1.03,
+        "Start of observation",
+        ha="left",
+        va="top",
+        transform=ax.transAxes,
+        fontsize=12,
+        fontproperties=font0,
+        color="b",
+    )
+    ax.text(
+        1.1,
+        1.0,
+        "[No.]  Date",
+        ha="left",
+        va="top",
+        transform=ax.transAxes,
+        fontsize=12,
+        fontproperties=font0,
+        color="b",
+    )
 
     axrange = ax.get_xlim()
     ax.set_xlabel("UT [hours]")
 
     if axrange[1] - axrange[0] <= 1.0:
-        jdhours = np.arange(0, 3, 1.0 / 24.)
+        jdhours = np.arange(0, 3, 1.0 / 24.0)
         utchours = (np.arange(0, 72, dtype=int) + 12) % 24
     else:
-        jdhours = np.arange(0, 3, 1.0 / 12.)
+        jdhours = np.arange(0, 3, 1.0 / 12.0)
         utchours = (np.arange(0, 72, 2, dtype=int) + 12) % 24
     ax.set_xticks(jdhours)
     ax.set_xlim(axrange)
@@ -1023,8 +1382,8 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     ax2.set_xlabel("UT [hours]")
 
     # Horizon angle for airmass
-    airmass_ang = np.arange(5., 90., 5.)
-    geo_airmass = airmass.airmassPP(90. - airmass_ang)
+    airmass_ang = np.arange(5.0, 90.0, 5.0)
+    geo_airmass = airmass.airmassPP(90.0 - airmass_ang)
     ax2.set_yticks(airmass_ang)
     airmassformat = []
     for t in range(geo_airmass.size):
@@ -1032,41 +1391,62 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     ax2.set_yticklabels(airmassformat, rotation=90)
     ax2.set_ylabel("Relative airmass", labelpad=32)
     ax2.tick_params(axis="y", pad=10, labelsize=10)
-    plt.text(1.015, -0.04, "Plane-parallel", transform=ax.transAxes, ha='left',
-             va='top', fontsize=10, rotation=90)
+    plt.text(
+        1.015,
+        -0.04,
+        "Plane-parallel",
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=10,
+        rotation=90,
+    )
 
     ax22 = ax.twin()
     ax22.set_xticklabels([])
     ax22.set_frame_on(True)
     ax22.patch.set_visible(False)
-    ax22.yaxis.set_ticks_position('right')
-    ax22.yaxis.set_label_position('right')
-    ax22.spines['right'].set_position(('outward', 25))
-    ax22.spines['right'].set_color('k')
-    ax22.spines['right'].set_visible(True)
-    airmass2 = np.array([airmass.airmassSpherical(
-        90. - ang, allData[n]["Obs coord"][2]) for ang in airmass_ang])
+    ax22.yaxis.set_ticks_position("right")
+    ax22.yaxis.set_label_position("right")
+    ax22.spines["right"].set_position(("outward", 25))
+    ax22.spines["right"].set_color("k")
+    ax22.spines["right"].set_visible(True)
+    airmass2 = np.array(
+        [
+            airmass.airmassSpherical(90.0 - ang, allData[n]["Obs coord"][2])
+            for ang in airmass_ang
+        ]
+    )
     ax22.set_yticks(airmass_ang)
     airmassformat = []
     for t in range(airmass2.size):
         airmassformat.append("%2.2f" % airmass2[t])
     ax22.set_yticklabels(airmassformat, rotation=90)
     ax22.tick_params(axis="y", pad=10, labelsize=10)
-    plt.text(1.045, -0.04, "Spherical+Alt", transform=ax.transAxes, ha='left', va='top',
-             fontsize=10, rotation=90)
+    plt.text(
+        1.045,
+        -0.04,
+        "Spherical+Alt",
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=10,
+        rotation=90,
+    )
 
     ax3 = ax.twiny()
     ax3.set_frame_on(True)
     ax3.patch.set_visible(False)
-    ax3.xaxis.set_ticks_position('bottom')
-    ax3.xaxis.set_label_position('bottom')
-    ax3.spines['bottom'].set_position(('outward', 50))
-    ax3.spines['bottom'].set_color('k')
-    ax3.spines['bottom'].set_visible(True)
+    ax3.xaxis.set_ticks_position("bottom")
+    ax3.xaxis.set_label_position("bottom")
+    ax3.spines["bottom"].set_position(("outward", 50))
+    ax3.spines["bottom"].set_color("k")
+    ax3.spines["bottom"].set_visible(True)
 
-    ltime, ldiff = localtime.localTime(utchours, np.repeat(
-        allData[n]["Obs coord"][0], len(utchours)))
-    jdltime = jdhours - ldiff / 24.
+    ltime, ldiff = localtime.localTime(
+        utchours, np.repeat(allData[n]["Obs coord"][0], len(utchours))
+    )
+    jdltime = jdhours - ldiff / 24.0
     ax3.set_xticks(jdltime)
     ax3.set_xticklabels(utchours)
     ax3.set_xlim([axrange[0], axrange[1]])
@@ -1081,17 +1461,17 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
     ax.set_yticklabels(ytickformat, fontsize=20)
     ax.set_ylabel("Altitude", fontsize=18)
     yticksminor = np.array(ax.get_yticks(minor=True))
-    ymind = np.where(yticksminor % 15. != 0.)[0]
+    ymind = np.where(yticksminor % 15.0 != 0.0)[0]
     yticksminor = yticksminor[ymind]
-#     ax.set_yticks(yticksminor, minor=True)
+    #     ax.set_yticks(yticksminor, minor=True)
     m_ytickformat = []
     for t in range(yticksminor.size):
         m_ytickformat.append(str(int(yticksminor[t])) + r"$^\circ$")
     ax.set_yticklabels(m_ytickformat, minor=True)
 
-    ax.yaxis.grid(color='gray', linestyle='dashed')
-    ax.yaxis.grid(color='gray', which="minor", linestyle='dotted')
-    ax2.xaxis.grid(color='gray', linestyle='dotted')
+    ax.yaxis.grid(color="gray", linestyle="dashed")
+    ax.yaxis.grid(color="gray", which="minor", linestyle="dotted")
+    ax2.xaxis.grid(color="gray", linestyle="dotted")
 
     def decifnec(s):
         try:
@@ -1099,41 +1479,92 @@ def transitVisibilityPlot(allData, markTransit=False, plotLegend=True, showMoonD
         except AttributeError:
             r = s
         return r
-            
-    plt.text(0.5, 0.95, "Transit visibility of " + decifnec(allData[n]["Planet name"]),
-             transform=fig.transFigure, ha='center', va='bottom', fontsize=20)
+
+    plt.text(
+        0.5,
+        0.95,
+        "Transit visibility of " + decifnec(allData[n]["Planet name"]),
+        transform=fig.transFigure,
+        ha="center",
+        va="bottom",
+        fontsize=20,
+    )
 
     if plotLegend:
         line1 = matplotlib.lines.Line2D(
-            (0, 0), (1, 1), color='#FDB813', linestyle="-", linewidth=2)
+            (0, 0), (1, 1), color="#FDB813", linestyle="-", linewidth=2
+        )
         line2 = matplotlib.lines.Line2D(
-            (0, 0), (1, 1), color='#BEBEBE', linestyle="-", linewidth=2)
+            (0, 0), (1, 1), color="#BEBEBE", linestyle="-", linewidth=2
+        )
         line3 = matplotlib.lines.Line2D(
-            (0, 0), (1, 1), color='k', linestyle="-", linewidth=2)
+            (0, 0), (1, 1), color="k", linestyle="-", linewidth=2
+        )
         line4 = matplotlib.lines.Line2D(
-            (0, 0), (1, 1), color='g', linestyle="-", linewidth=6, alpha=.3)
+            (0, 0), (1, 1), color="g", linestyle="-", linewidth=6, alpha=0.3
+        )
 
         if markTransit:
-            lgd2 = plt.legend((line1, line2, line3, line4), ("day", "twilight", "night", "transit",),
-                              bbox_to_anchor=(0.88, 0.15), loc=2, borderaxespad=0., prop={'size': 12}, fancybox=True)
+            lgd2 = plt.legend(
+                (line1, line2, line3, line4),
+                (
+                    "day",
+                    "twilight",
+                    "night",
+                    "transit",
+                ),
+                bbox_to_anchor=(0.88, 0.15),
+                loc=2,
+                borderaxespad=0.0,
+                prop={"size": 12},
+                fancybox=True,
+            )
         else:
-            lgd2 = plt.legend((line1, line2, line3), ("day", "twilight", "night",),
-                              bbox_to_anchor=(0.88, 0.13), loc=2, borderaxespad=0., prop={'size': 12}, fancybox=True)
-        lgd2.get_frame().set_alpha(.5)
+            lgd2 = plt.legend(
+                (line1, line2, line3),
+                (
+                    "day",
+                    "twilight",
+                    "night",
+                ),
+                bbox_to_anchor=(0.88, 0.13),
+                loc=2,
+                borderaxespad=0.0,
+                prop={"size": 12},
+                fancybox=True,
+            )
+        lgd2.get_frame().set_alpha(0.5)
 
-    targetco = r"Target coordinates: (%8.4f$^\circ$, %8.4f$^\circ$)" % \
-        (allData[n]["Star ra"], allData[n]["Star dec"])
-    obsco = "Obs coord.: (%8.4f$^\circ$, %8.4f$^\circ$, %4d m)" % \
-            (allData[n]["Obs coord"][0], allData[n]
-             ["Obs coord"][1], allData[n]["Obs coord"][2])
-    plt.text(0.01, 0.97, targetco, transform=fig.transFigure,
-             ha='left', va='center', fontsize=10)
-    plt.text(0.01, 0.95, obsco, transform=fig.transFigure,
-             ha='left', va='center', fontsize=10)
+    targetco = r"Target coordinates: (%8.4f$^\circ$, %8.4f$^\circ$)" % (
+        allData[n]["Star ra"],
+        allData[n]["Star dec"],
+    )
+    obsco = "Obs coord.: (%8.4f$^\circ$, %8.4f$^\circ$, %4d m)" % (
+        allData[n]["Obs coord"][0],
+        allData[n]["Obs coord"][1],
+        allData[n]["Obs coord"][2],
+    )
+    plt.text(
+        0.01,
+        0.97,
+        targetco,
+        transform=fig.transFigure,
+        ha="left",
+        va="center",
+        fontsize=10,
+    )
+    plt.text(
+        0.01,
+        0.95,
+        obsco,
+        transform=fig.transFigure,
+        ha="left",
+        va="center",
+        fontsize=10,
+    )
 
-    if (print2file == True): 
-        outfile = "transVis-" + \
-            str(allData[n]["Planet name"]).replace(" ", "") + ".png"
+    if print2file == True:
+        outfile = "transVis-" + str(allData[n]["Planet name"]).replace(" ", "") + ".png"
         plt.savefig(outfile, format="png", dpi=300)
     elif isinstance(print2file, six.string_types):
         plt.savefig(print2file, format="png", dpi=300)
