@@ -675,6 +675,7 @@ def transitTimes(
         elif isinstance(planetData, str):
             # Try to collect data from DBs
             pn = planetData
+            print(f"Collecting transit parameters for {pn} from database")
             planetData, dbname = collectTransitDataFromDB(pn, verbose=False)
             if planetData is None:
                 raise (
@@ -711,6 +712,12 @@ def transitTimes(
                     solution="Specify all required input values.",
                 )
             )
+
+        print("-"*30)
+        print("Adopted transit parameters")
+        for k,v in planetData.items():
+            print(f"    {k} = {v}")
+        print("-"*30)
 
         # Object position [degrees]
         ra = planetData["ra"]
