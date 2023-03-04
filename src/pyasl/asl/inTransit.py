@@ -1461,21 +1461,15 @@ def transitVisibilityPlot(
 
     ax.yaxis.set_major_locator(MultipleLocator(15))
     ax.yaxis.set_minor_locator(MultipleLocator(5))
-    yticks = ax.get_yticks()
-    ytickformat = []
-    for t in range(yticks.size):
-        ytickformat.append(str(int(yticks[t])) + r"$^\circ$")
-    ax.set_yticklabels(ytickformat, fontsize=20)
-    ax.set_ylabel("Altitude", fontsize=18)
-    yticksminor = np.array(ax.get_yticks(minor=True))
-    ymind = np.where(yticksminor % 15.0 != 0.0)[0]
-    yticksminor = yticksminor[ymind]
-    #     ax.set_yticks(yticksminor, minor=True)
-    m_ytickformat = []
-    for t in range(yticksminor.size):
-        m_ytickformat.append(str(int(yticksminor[t])) + r"$^\circ$")
-    ax.set_yticklabels(m_ytickformat, minor=True)
+   
+    # Major tick format and font size 
+    ax.yaxis.set_major_formatter('{x:.0f}'+r"$^\circ$")
+    ax.tick_params(axis='y', which='major', labelsize=20)
+    # Minor tick format (fontsize default)
+    ax.yaxis.set_minor_formatter('{x:.0f}'+r"$^\circ$")
 
+    ax.set_ylabel("Altitude", fontsize=18)
+    
     ax.yaxis.grid(color="gray", linestyle="dashed")
     ax.yaxis.grid(color="gray", which="minor", linestyle="dotted")
     ax2.xaxis.grid(color="gray", linestyle="dotted")
