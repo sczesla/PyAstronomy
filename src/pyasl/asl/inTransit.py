@@ -1441,7 +1441,7 @@ def transitVisibilityPlot(
         rotation=90,
     )
 
-    ax3 = ax.twiny()
+    ax3 = ax.twin()
     ax3.set_frame_on(True)
     ax3.patch.set_visible(False)
     ax3.xaxis.set_ticks_position("bottom")
