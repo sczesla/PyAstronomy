@@ -686,6 +686,8 @@ def transitTimes(
                     )
                 )
             planetData["plName"] = pn
+            if (planetData["Tdur"] is None) or (not np.isfinite(planetData["Tdur"])):
+                del planetData["Tdur"]
 
         # Check whether required keys are present
         reke = ["ra", "dec", "orbPer", "T0", "orbInc", "SMA", "RpJ", "RsSun", "plName"]
