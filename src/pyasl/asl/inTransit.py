@@ -412,6 +412,8 @@ def collectTransitDataFromDB(pn, dbp=("nexa", "eorg", "eeu"), verbose=False):
             "Tdur": "pl_trandur",
         }
         r = {k: d[m[k]] for k in list(m)}
+        # Convert duration into days
+        r["Tdur"] /= 24.0
         return r
 
     def colfromeu(pn):
@@ -469,6 +471,7 @@ def transitTimes(
     moonDist=None,
     nexaInput=False,
     fileOutput=None,
+    psT0=0.0,
 ):
     """
     Calculate transit times for a given planet and a given period of time.
@@ -568,6 +571,10 @@ def transitTimes(
 
         Note that this can only have an effect, if the observer's location is
         specified.
+    psT0 : float, optional
+        Phase-shift the transit midpoint. This may be useful to determine, e.g.,
+        eclipse times. In this case, psT0=0.5 may be suitable, which shifts T0
+        by 0.5 orbital periods. Default is 0.0
     fileOutput : string or file, optional
         If a string is given, a file with the name will be created
         and the output will be written to that file. If a (writable)
@@ -714,6 +721,15 @@ def transitTimes(
                     solution="Specify all required input values.",
                 )
             )
+            
+        if psT0 != 0.0:
+            print()
+            pst = planetData["orbPer"] * psT0
+            print(f"Shifting T0 by {psT0} orbital periods, i.e., by {pst}")
+            print(f"    T0 before shift = {planetData['T0']}")
+            planetData["T0"] += pst
+            print(f"    T0 after shift = {planetData['T0']}")
+            print()
 
         print("-"*30)
         print("Adopted transit parameters")
