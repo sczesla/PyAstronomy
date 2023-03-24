@@ -44,7 +44,7 @@ class TransmissionCurves:
             )
         self.bands[bn] = np.zeros((len(lines), 2))
         for i in smo.range(len(lines)):
-            self.bands[bn][i, ::] = np.array(lines[i].split(), dtype=np.float)
+            self.bands[bn][i, ::] = np.array(lines[i].split(), dtype=float)
 
     def _readData(self, fn):
         """
