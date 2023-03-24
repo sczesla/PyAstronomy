@@ -26,13 +26,13 @@ def del_future(s):
 def sanitize(s, name="example"):
     x = """
 import unittest
-class SanityOfNotebook(unittest.TestCase):
+class TestSanityOfNotebook(unittest.TestCase):
     def setUp(self):
         pass
     def tearDown(self):
         pass
         
-    def sanity_%s(self):""" % name
+    def testsanity_%s(self):""" % name
     x = x.split("\n")
     s = [" "*8+l for l in s]
     x.extend(s)
