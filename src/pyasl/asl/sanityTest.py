@@ -637,8 +637,8 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         import numpy as np
         from PyAstronomy import pyasl
         
-        fnu = np.array("1.790 4.063 3.636 3.064 2.416 1.589 1.021 0.640 0.676 0.285 0.238".split(), dtype=np.float)
-        flam = np.array("417.5 632 363.1 217.7 112.6 31.47 11.38 3.961 4.479 0.708 0.489".split(), dtype=np.float)
+        fnu = np.array("1.790 4.063 3.636 3.064 2.416 1.589 1.021 0.640 0.676 0.285 0.238".split(), dtype=float)
+        flam = np.array("417.5 632 363.1 217.7 112.6 31.47 11.38 3.961 4.479 0.708 0.489".split(), dtype=float)
         
         for i, b in enumerate("U, B, V, R, I, J, H, K, Kp, L, L*".split(",")):
             a, lame = pyasl.magToFluxDensity_bessel98(b.strip(), 0.0, "nu")
