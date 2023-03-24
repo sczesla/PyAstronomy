@@ -35,9 +35,13 @@ class TransmissionCurves:
             a function of wavelength.
         """
         if bn in self.bands:
-            PE.warn(PE.PyAValError("Band named '" + str(bn) + "' already exists.",
-                                   where="TransmissionCurves (reading data from file)",
-                                   solution="Use unique band names."))
+            PE.warn(
+                PE.PyAValError(
+                    "Band named '" + str(bn) + "' already exists.",
+                    where="TransmissionCurves (reading data from file)",
+                    solution="Use unique band names.",
+                )
+            )
         self.bands[bn] = np.zeros((len(lines), 2))
         for i in smo.range(len(lines)):
             self.bands[bn][i, ::] = np.array(lines[i].split(), dtype=np.float)
@@ -59,9 +63,13 @@ class TransmissionCurves:
             The filename of the data file.
         """
         if not os.path.isfile(fn):
-            raise(PE.PyAValError("No such file: " + fn,
-                                 where="TransmissionCurves",
-                                 solution="Use valid file or use 'default'."))
+            raise (
+                PE.PyAValError(
+                    "No such file: " + fn,
+                    where="TransmissionCurves",
+                    solution="Use valid file or use 'default'.",
+                )
+            )
         self.bands = {}
         cb = None
         lcol = None
@@ -76,7 +84,7 @@ class TransmissionCurves:
                 cb = r.group(1)
                 lcol = []
             else:
-                if l.find('#') != -1:
+                if l.find("#") != -1:
                     # It is a comment not specifying a band
                     # Ignore this...
                     continue
@@ -96,9 +104,13 @@ class TransmissionCurves:
         Check whether band name is defined.
         """
         if not bn in self.bands:
-            raise(PE.PyAValError("No such band: " + str(bn),
-                                 where="TransmissionCurves",
-                                 solution="Use one of: " + ', '.join(self.availableBands())))
+            raise (
+                PE.PyAValError(
+                    "No such band: " + str(bn),
+                    where="TransmissionCurves",
+                    solution="Use one of: " + ", ".join(self.availableBands()),
+                )
+            )
 
     def availableBands(self):
         """
@@ -111,7 +123,7 @@ class TransmissionCurves:
         """
         return sorted(list(self.bands))
 
-    def getTransCurve(self, bn, ik='linear'):
+    def getTransCurve(self, bn, ik="linear"):
         """
         Get a transmission curve.
 
@@ -129,11 +141,16 @@ class TransmissionCurves:
         Transmission curve : callable
             An object (scipy.interpolate.interp1d) that can be called
             with wavelength (float or array in [A]) as argument and returns
-            the transmission. 
+            the transmission.
         """
         self._checkBand(bn)
-        fi = sci.interp1d(self.bands[bn][::, 0], self.bands[bn]
-                          [::, 1], kind=ik, bounds_error=False, fill_value=0.0)
+        fi = sci.interp1d(
+            self.bands[bn][::, 0],
+            self.bands[bn][::, 1],
+            kind=ik,
+            bounds_error=False,
+            fill_value=0.0,
+        )
         return fi
 
     def getTransCurveData(self, bn):
@@ -144,7 +161,7 @@ class TransmissionCurves:
         -------
         Transmission table : 2d array
             A table (array) with wavelength [A] in first column and
-            transmission (0-1) in the second column. 
+            transmission (0-1) in the second column.
         """
         self._checkBand(bn)
         return self.bands[bn]
@@ -194,8 +211,15 @@ class TransmissionCurves:
         """
         if not snc:
             if name in self.bands:
-                raise(PE.PyANameClash("A passband with name '" + str(name) + "' is already present.",
-                                      solution=["Change the name.", "Use `snc=True` to ignore and overwrite old passband."]))
+                raise (
+                    PE.PyANameClash(
+                        "A passband with name '" + str(name) + "' is already present.",
+                        solution=[
+                            "Change the name.",
+                            "Use `snc=True` to ignore and overwrite old passband.",
+                        ],
+                    )
+                )
         self.bands[name] = np.vstack((wvl, trans)).transpose()
 
     def addSpitzerIRACPassbands(self, forceDownload=False, verbose=True):
@@ -217,9 +241,16 @@ class TransmissionCurves:
             on progress.
         """
 
-        fns = ["080924ch1trans_full.txt", "080924ch2trans_full.txt", "080924ch3trans_full.txt",
-               "080924ch4trans_full.txt", "080924ch1trans_sub.txt", "080924ch2trans_sub.txt",
-               "080924ch3trans_sub.txt", "080924ch4trans_sub.txt"]
+        fns = [
+            "080924ch1trans_full.txt",
+            "080924ch2trans_full.txt",
+            "080924ch3trans_full.txt",
+            "080924ch4trans_full.txt",
+            "080924ch1trans_sub.txt",
+            "080924ch2trans_sub.txt",
+            "080924ch3trans_sub.txt",
+            "080924ch4trans_sub.txt",
+        ]
 
         path = "pyasl/resBased/"
 
@@ -227,13 +258,19 @@ class TransmissionCurves:
             fno = path + fn
             if (not self._fs.fileExists(fn)) or forceDownload:
                 self._fs.downloadToFile(
-                    "http://irsa.ipac.caltech.edu/data/SPITZER/docs/irac/calibrationfiles/spectralresponse/" + fn, fno, forceDownload, verbose)
+                    "http://irsa.ipac.caltech.edu/data/SPITZER/docs/irac/calibrationfiles/spectralresponse/"
+                    + fn,
+                    fno,
+                    forceDownload,
+                    verbose,
+                )
 
             dat = np.loadtxt(self._fs.requestFile(fno))
             dat[::, 0] *= 1e4
 
-            wl = re.match(".*IRAC\s+(\d+\.\d+)\s+.*",
-                          self._fs.requestFile(fno).readline()).group(1)
+            wl = re.match(
+                ".*IRAC\s+(\d+\.\d+)\s+.*", self._fs.requestFile(fno).readline()
+            ).group(1)
             if fn.find("_full") != -1:
                 win = "_full"
             else:
@@ -261,12 +298,15 @@ class TransmissionCurves:
             on progress.
         """
 
-        fno = os.path.join("pyasl", "resBased",
-                           "kepler_response_hires1.txt.gz")
+        fno = os.path.join("pyasl", "resBased", "kepler_response_hires1.txt.gz")
 
         if (not self._fs.fileExists(fno)) or forceDownload:
             self._fs.downloadToFile(
-                "http://keplergo.arc.nasa.gov/kepler_response_hires1.txt", fno, forceDownload, verbose)
+                "http://keplergo.arc.nasa.gov/kepler_response_hires1.txt",
+                fno,
+                forceDownload,
+                verbose,
+            )
 
         dat = np.loadtxt(self._fs.requestFile(fno))
         # Convert into A
@@ -294,12 +334,15 @@ class TransmissionCurves:
             on progress.
         """
 
-        fno = os.path.join("pyasl", "resBased",
-                           "tess-response-function-v1.0.csv")
+        fno = os.path.join("pyasl", "resBased", "tess-response-function-v1.0.csv")
 
         if (not self._fs.fileExists(fno)) or forceDownload:
             self._fs.downloadToFile(
-                "https://heasarc.gsfc.nasa.gov/docs/tess/data/tess-response-function-v1.0.csv", fno, forceDownload, verbose)
+                "https://heasarc.gsfc.nasa.gov/docs/tess/data/tess-response-function-v1.0.csv",
+                fno,
+                forceDownload,
+                verbose,
+            )
 
         dat = np.loadtxt(self._fs.requestFile(fno), delimiter=",", skiprows=8)
         # Convert into A
@@ -310,5 +353,4 @@ class TransmissionCurves:
 
     def __init__(self, fn="default"):
         self._fs = PP.PyAFS()
-        self._readData(os.path.join(
-            os.path.dirname(__file__), "transCurves.dat"))
+        self._readData(os.path.join(os.path.dirname(__file__), "transCurves.dat"))
