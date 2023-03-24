@@ -272,7 +272,7 @@ def _iocon(inp):
 
     try:
         # Using ravel to avoid generating object with zero length
-        out = np.ravel(np.array(inp, dtype=np.float))
+        out = np.ravel(np.array(inp, dtype=float))
     except Exception as e:
         raise (
             PE.PyAValError(
