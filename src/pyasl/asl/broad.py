@@ -50,7 +50,7 @@ def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
         lx = int(((sigma * maxsig) / dxs[0]) * 2.0) + 1
     # To preserve the position of spectral lines, the broadening function
     # must be centered at N//2 - (1-N%2) = N//2 + N%2 - 1
-    nx = (np.arange(lx, dtype=np.int) - sum(divmod(lx, 2)) + 1) * dxs[0]
+    nx = (np.arange(lx, dtype=int) - sum(divmod(lx, 2)) + 1) * dxs[0]
     gf = fuf.GaussFit1d()
     gf["A"] = 1.0
     gf["sig"] = sigma
