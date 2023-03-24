@@ -46,7 +46,7 @@ def readUnit7(fn, minwl=None, maxwl=None):
     result = np.zeros((len(lines), 4))
     for i in smo.range(len(lines)):
         result[i, ::] = np.array(
-            lines[i].replace("D", "E").split()[0:4], dtype=np.float
+            lines[i].replace("D", "E").split()[0:4], dtype=float
         )
     # Remove entries using min and max wavelength
     if minwl is not None:
@@ -94,7 +94,7 @@ def readDTable(fn, sort=None):
     ncol = len(lines[0].split())
     result = np.zeros((len(lines), ncol))
     for i in smo.range(len(lines)):
-        result[i, ::] = np.array(lines[i].replace("D", "E").split(), dtype=np.float)
+        result[i, ::] = np.array(lines[i].replace("D", "E").split(), dtype=float)
     if sort is not None:
         # Sort with respect to column
         result = result[np.argsort(result[::, sort]), ::]
