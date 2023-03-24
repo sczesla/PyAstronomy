@@ -194,7 +194,7 @@ def binningx0dt(
         dt = (np.max(x) - x0) / float(nbins)
     # Start calculation
     # In which bin do the individual data points belong?
-    inWhichBin = np.floor(((x - x0) / dt)).astype(np.int)
+    inWhichBin = np.floor(((x - x0) / dt)).astype(int)
     # Lonely last bin correction
     # Brings the last data point into the last valid bin
     # instead of creating a new bin with that data point\
