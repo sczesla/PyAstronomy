@@ -3,7 +3,7 @@ import unittest
 import os
 
 
-class ModSuiteSanity(unittest.TestCase):
+class TestModSuiteSanity(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -13,7 +13,7 @@ class ModSuiteSanity(unittest.TestCase):
         if os.path.isfile("kemExample.emcee"):
             os.remove("kemExample.emcee")
 
-    def sanity_rmcl_model(self):
+    def testsanity_rmcl_model(self):
         """ Checking sanity of RmcL calculation (example) """
         # Import some unrelated modules
         from numpy import arange, pi
@@ -37,7 +37,7 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(time, rv, '.')
 #     plt.show()
 
-    def sanity_rmcl_fit(self):
+    def testsanity_rmcl_fit(self):
         """ Checking sanity of RmcL fit (example) """
         # Import some unrelated modules
         from numpy import arange, pi, random
@@ -78,7 +78,7 @@ class ModSuiteSanity(unittest.TestCase):
         plt.legend(["Observation", "Model"])
 #     plt.show()
 
-    def sanity_rmclell_calc(self):
+    def testsanity_rmclell_calc(self):
         """
         Checking sanity of RmcLell (example)
         """
@@ -115,7 +115,7 @@ class ModSuiteSanity(unittest.TestCase):
 #         plt.legend()
 #         plt.show()
 
-    def sanity_rmcl_vs_rmclell(self):
+    def testsanity_rmcl_vs_rmclell(self):
         """ Cross-checking Rmcl and RmcLell """
         from numpy import arange, pi
         import numpy as np
@@ -156,7 +156,7 @@ class ModSuiteSanity(unittest.TestCase):
             self.assertAlmostEqual(d/m, 0.0, delta=1e-8, msg="Elliptical and circular orbit solution for RmcL and RmcLell do not match. " + \
                                    str(r2.parameters()))
 
-    def sanity_SinRadVel(self):
+    def testsanity_SinRadVel(self):
         # Import some unrelated modules
         from numpy import arange, random, ones
         import matplotlib.pylab as plt
@@ -197,7 +197,7 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(time, y, 'r-')
 #     plt.show()
 
-    def sanity_KeplerEllipseModel(self):
+    def testsanity_KeplerEllipseModel(self):
         """ Sanity of Kepler Ellipse Model example """
         from PyAstronomy.modelSuite import KeplerEllipseModel
         import numpy as np
@@ -280,7 +280,7 @@ class ModSuiteSanity(unittest.TestCase):
 
 
 
-#  def sanity_atanProfile(self):
+#  def testsanity_atanProfile(self):
 #    from PyAstronomy import modelSuite as ms
 #    import numpy as np
 #    import matplotlib.pylab as plt
@@ -313,7 +313,7 @@ class ModSuiteSanity(unittest.TestCase):
 #    plt.plot(x, apd.evaluate(x), 'r.-')
 # plt.show()
 
-    def sanity_lineListGaussModel(self):
+    def testsanity_lineListGaussModel(self):
         """
         Checking example of line list Gauss model
         """
@@ -382,7 +382,7 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(wvl, llg.evaluate(wvl), 'r--')
 #    plt.show()
 
-    def sanity_VoigtAstroPExample(self):
+    def testsanity_VoigtAstroPExample(self):
         """
         Sanity of VoigtAstroP example
         """
@@ -409,7 +409,7 @@ class ModSuiteSanity(unittest.TestCase):
 #    plt.show()
 
 
-    def sanity_VoigtAstroP_R_Example(self):
+    def testsanity_VoigtAstroP_R_Example(self):
         """
         Sanity of VoigtAstroP example with instrumental resolution
         """
@@ -442,7 +442,7 @@ class ModSuiteSanity(unittest.TestCase):
 #         plt.legend()
 #         plt.show()
 
-    def sanity_LyATransmission(self):
+    def testsanity_LyATransmission(self):
         """
         Checking sanity of LyATransmission example
         """
@@ -465,7 +465,7 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(wvl, m, 'b.-')
 #    plt.show()
 
-    def sanity_RotBroadProfileExample(self):
+    def testsanity_RotBroadProfileExample(self):
         """
         Example of rotational broadening.
         """
@@ -501,7 +501,7 @@ class ModSuiteSanity(unittest.TestCase):
         plt.plot(vv, x.model, 'r--')
 #    plt.show()
 
-    def sanity_RotBroadProfile(self):
+    def testsanity_RotBroadProfile(self):
         """
         Checking RotBroadProfile
         """
@@ -535,7 +535,7 @@ class ModSuiteSanity(unittest.TestCase):
                          msg="Incorrect profile for eps=0.0")
 
 
-    def sanity_KeplerRVModel_example(self):
+    def testsanity_KeplerRVModel_example(self):
         """
         Checking sanity of KeplerRVModel example
         """
@@ -633,7 +633,7 @@ class ModSuiteSanity(unittest.TestCase):
         
 
 
-class VoigtAstroPSanity(unittest.TestCase):
+class TestVoigtAstroPSanity(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -641,7 +641,7 @@ class VoigtAstroPSanity(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def sanity_normalization(self):
+    def testsanity_normalization(self):
         """
         Normalization of AstroVoigtP
         """
@@ -676,7 +676,7 @@ class VoigtAstroPSanity(unittest.TestCase):
                 
                 self.assertAlmostEqual(i/const, f, delta=1e-2, msg="Normalization of AstroVoigtP is broken: f, w0, i: % g, % g, % g" % (f, w0, i))
 
-    def sanity_instrumentalResolution(self):
+    def testsanity_instrumentalResolution(self):
         """
         Checking integrity of instrumental resolution in VoigtAstroP
         """

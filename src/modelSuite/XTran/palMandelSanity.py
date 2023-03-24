@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 
-class palMandelSanity(unittest.TestCase):
+class TestpalMandelSanity(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -13,7 +13,7 @@ class palMandelSanity(unittest.TestCase):
     def _rr(self, low, high):
         return np.random.random() * (high - low) + low
 
-    def sanity_comapare(self):
+    def testsanity_comapare(self):
         """
         Compare Mandel's occultquad and the Pal results.
         """
@@ -52,7 +52,7 @@ class palMandelSanity(unittest.TestCase):
                 True,
             )
 
-    def sanity_basicCirc(self):
+    def testsanity_basicCirc(self):
         """
         Checking basic MA and Pal transit configuration. Must be identical.
         """
