@@ -168,7 +168,7 @@ class IAGVFit:
     self._pointCache = []
 
     # What to consider in the fit
-    self._rangeIndices = np.arange(self._x.size, dtype=np.int)
+    self._rangeIndices = np.arange(self._x.size, dtype=int)
     
     # A frame containing the mpl plot
     self.plotFrame = tk.Frame()
