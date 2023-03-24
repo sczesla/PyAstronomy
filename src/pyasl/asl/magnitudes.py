@@ -51,7 +51,7 @@ def magToFluxDensity_bessel98(band, mag, mode="nu"):
     for i in range(6):
         t[s[i * 12]] = s[i * 12 + 1 : (i + 1) * 12]
         if s[i * 12] != "bands":
-            t[s[i * 12]] = np.array(t[s[i * 12]], dtype=np.float)
+            t[s[i * 12]] = np.array(t[s[i * 12]], dtype=float)
 
     if not band in t["bands"]:
         raise (
