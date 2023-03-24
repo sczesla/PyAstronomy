@@ -129,7 +129,7 @@ class BSBase(object):
         self._checkJP(j)
 
         # Range of available indices
-        x = np.arange(ndp, dtype=np.int)
+        x = np.arange(ndp, dtype=int)
 
         # Chunk length from which to extract subsamples
         step = (2 + N) * j
@@ -176,7 +176,7 @@ class BSBase(object):
         # Number of chunks
         nc = len(cd[0])
 
-        result = np.zeros((nc, cl), dtype=np.int)
+        result = np.zeros((nc, cl), dtype=int)
         for i in smo.range(cl):
             result[::, i] = cd[i]
         return result
