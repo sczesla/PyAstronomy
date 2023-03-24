@@ -92,7 +92,7 @@ class Ramirez2005:
         for i, l in enumerate(dat):
             s = l.split()
             bands[i] = self._convertBandName("".join(s[0 : len(s) - 8]))
-            result[i, ::] = np.array(s[-8:], dtype=np.float)
+            result[i, ::] = np.array(s[-8:], dtype=float)
         return bands, result
 
     def _readTab45(self, lines, tableno):
@@ -119,9 +119,9 @@ class Ramirez2005:
             s = l.split()
             if len(s) > 10:
                 # A new band identifier is given
-                result[i, ::] = np.array(s[-10:], dtype=np.float)
+                result[i, ::] = np.array(s[-10:], dtype=float)
             else:
-                result[i, ::] = np.array(s[:], dtype=np.float)
+                result[i, ::] = np.array(s[:], dtype=float)
         return result
 
     def _readData(self, fn):
