@@ -19,7 +19,7 @@ class _FDs:
         # Extract finite differences
         fdsStrings = r.group(3).split()
         coeffs = np.zeros(len(fdsStrings))
-        offsets = np.arange(len(fdsStrings), dtype=np.int) - len(fdsStrings)//2
+        offsets = np.arange(len(fdsStrings), dtype=int) - len(fdsStrings)//2
         for i, s in enumerate(fdsStrings):
           r = re.match("(-)?(\d+)(/(\d+))?", s)
           coeffs[i] = float(r.group(2))
