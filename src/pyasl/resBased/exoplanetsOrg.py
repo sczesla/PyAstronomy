@@ -88,67 +88,67 @@ class ExoplanetsOrg(pp.PyAUpdateCycle):
         self._columns = {}
         # planetary parameters
         self._columns[0] = ["pl_name", "Name of the planet", "", "U15"]
-        self._columns[1] = ["pl_orbper", "Planetary orbital period", "d", np.float]
-        self._columns[2] = ["pl_massj", "Planetary mass", "MJ", np.float]
-        self._columns[3] = ["pl_msini", "Minimum planetary mass", "MJ", np.float]
-        self._columns[4] = ["pl_radj", "Planetary radius", "RJ", np.float]
+        self._columns[1] = ["pl_orbper", "Planetary orbital period", "d", float]
+        self._columns[2] = ["pl_massj", "Planetary mass", "MJ", float]
+        self._columns[3] = ["pl_msini", "Minimum planetary mass", "MJ", float]
+        self._columns[4] = ["pl_radj", "Planetary radius", "RJ", float]
         self._columns[5] = [
             "pl_trandep",
             "Central depth of transit",
             "(r_p/r_star)^2",
-            np.float,
+            float,
         ]
-        self._columns[6] = ["pl_impact", "Impact Parameter", "Stellar Radii", np.float]
-        self._columns[7] = ["pl_trandur", "Duration of transit", "d", np.float]
-        self._columns[8] = ["pl_tranmid", "Transit midpoint", "BJD", np.float]
-        self._columns[9] = ["pl_tperi", "Time of Periastron passage", "d", np.float]
-        self._columns[10] = ["pl_orbsmax", "Semi-major-axis", "AU", np.float]
+        self._columns[6] = ["pl_impact", "Impact Parameter", "Stellar Radii", float]
+        self._columns[7] = ["pl_trandur", "Duration of transit", "d", float]
+        self._columns[8] = ["pl_tranmid", "Transit midpoint", "BJD", float]
+        self._columns[9] = ["pl_tperi", "Time of Periastron passage", "d", float]
+        self._columns[10] = ["pl_orbsmax", "Semi-major-axis", "AU", float]
         self._columns[11] = [
             "pl_orbsmaxr",
             "Ratio sma to R_star",
             "Stellar Radii",
-            np.float,
+            float,
         ]
         self._columns[12] = [
             "pl_orbincl",
             "Orbital inclination of planet",
             "deg",
-            np.float,
+            float,
         ]
         self._columns[13] = [
             "pl_missal",
             "Orbital misalignment of planet ",
             "deg",
-            np.float,
+            float,
         ]
-        self._columns[14] = ["pl_omega", "Argument of Periastron", "deg", np.float]
-        self._columns[15] = ["pl_ecc", "Planetary orbital eccentricity", "", np.float]
+        self._columns[14] = ["pl_omega", "Argument of Periastron", "deg", float]
+        self._columns[15] = ["pl_ecc", "Planetary orbital eccentricity", "", float]
         self._columns[16] = [
             "pl_grav",
             "Planetary surface gravity",
             "log10(cm/s^2)",
-            np.float,
+            float,
         ]
-        self._columns[17] = ["pl_dens", "Planetary Density", "g/cm^3", np.float]
+        self._columns[17] = ["pl_dens", "Planetary Density", "g/cm^3", float]
         self._columns[18] = ["pl_dtype", "Detection type", "", "U27"]
-        self._columns[19] = ["KOI", "Kepler ID (if available)", "", np.float]
+        self._columns[19] = ["KOI", "Kepler ID (if available)", "", float]
         # stellar pars
         self._columns[20] = ["pl_hostname", "Name of host star", "", "U15"]
-        self._columns[21] = ["st_binary", "Binary Flag", "", np.float]
-        self._columns[22] = ["st_rad", "Radius of star", "Solar", np.float]
-        self._columns[23] = ["st_dist", "Distance to Star", "pc", np.float]
-        self._columns[24] = ["st_par", "Stellar parallax", "mas", np.float]
-        self._columns[25] = ["st_mass", "Stellar mass", "Solar", np.float]
-        self._columns[26] = ["st_teff", "Stellar effective temperature", "K", np.float]
-        self._columns[27] = ["st_vsini", "Stellar vsin(i)", "km/s", np.float]
-        self._columns[28] = ["st_logg", "Stellar surface gravity", "cm/s**2", np.float]
-        self._columns[29] = ["st_acts", "Stellar S-Index ", "", np.float]
-        self._columns[30] = ["st_actc", "Stellar chromospheric activity", "", np.float]
-        self._columns[31] = ["st_vj", "Stellar V-band brightness", "mag", np.float]
-        self._columns[32] = ["st_fe", "Stellar metallicity", "", np.float]
-        self._columns[33] = ["st_radv", "System radial velocity", "km/s", np.float]
-        self._columns[34] = ["st_dens", "Density of star", "g/cm^3", np.float]
-        self._columns[35] = ["K", "Velocity Semi-amplitude", "m/s", np.float]
+        self._columns[21] = ["st_binary", "Binary Flag", "", float]
+        self._columns[22] = ["st_rad", "Radius of star", "Solar", float]
+        self._columns[23] = ["st_dist", "Distance to Star", "pc", float]
+        self._columns[24] = ["st_par", "Stellar parallax", "mas", float]
+        self._columns[25] = ["st_mass", "Stellar mass", "Solar", float]
+        self._columns[26] = ["st_teff", "Stellar effective temperature", "K", float]
+        self._columns[27] = ["st_vsini", "Stellar vsin(i)", "km/s", float]
+        self._columns[28] = ["st_logg", "Stellar surface gravity", "cm/s**2", float]
+        self._columns[29] = ["st_acts", "Stellar S-Index ", "", float]
+        self._columns[30] = ["st_actc", "Stellar chromospheric activity", "", float]
+        self._columns[31] = ["st_vj", "Stellar V-band brightness", "mag", float]
+        self._columns[32] = ["st_fe", "Stellar metallicity", "", float]
+        self._columns[33] = ["st_radv", "System radial velocity", "km/s", float]
+        self._columns[34] = ["st_dens", "Density of star", "g/cm^3", float]
+        self._columns[35] = ["K", "Velocity Semi-amplitude", "m/s", float]
         self._columns[36] = ["dec", "Declination (J2000)", "dms", "U12"]
         self._columns[37] = ["ra", "Right ascension (J2000)", "hms", "U12"]
 
