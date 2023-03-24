@@ -4,7 +4,7 @@ import numpy
 from PyAstronomy import funcFit as fuf
 import six
 
-class FuncFitSanity(unittest.TestCase):
+class TestFuncFitSanity(unittest.TestCase):
   
   def setUp(self):
     pass
@@ -12,7 +12,7 @@ class FuncFitSanity(unittest.TestCase):
   def tearDown(self):
     pass
   
-  def parameterAssignment1_sanity(self):
+  def testsanity_parameterAssignment1(self):
     gf = fuf.GaussFit1d()
     origVars = ["A", "mu", "sig", "off", "lin"]
     vals     = [1.0, 2.0,  3.0,   4.0,    5.0]
@@ -23,7 +23,7 @@ class FuncFitSanity(unittest.TestCase):
     gf.assignValue(dict(zip(origVars, numpy.zeros(len(origVars)))))
     self.assertEquals(numpy.sum(list(gf.parameters().values())), 0.0)
   
-  def combine1_sanity(self):
+  def testsanity_combine1(self):
     gf = fuf.GaussFit1d()
     gff = gf + gf + gf
     for p in six.iterkeys(gff.parameters()):
@@ -39,7 +39,7 @@ class FuncFitSanity(unittest.TestCase):
         gff.freeze(s); gff.freeze([s,s])
         gff.setRestriction({s:[None, 10.]})
 
-  def description_sanity(self):
+  def testsanity_description(self):
     """
       Check sanity of 'description'
     """
@@ -55,7 +55,7 @@ class MultiVoigtSanity(unittest.TestCase):
   def tearDown(self):
     pass
   
-  def oneVsMulti_sanity(self):
+  def testsanity_oneVsMulti(self):
     """
       Checking MultiVoigt1d vs. Voigt1d
     """

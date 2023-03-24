@@ -4,7 +4,7 @@ from PyAstronomy import funcFit as fuf
 import os
 import numpy as np
 
-class FuncFitSanity(unittest.TestCase):
+class TestFuncFitSanity(unittest.TestCase):
   
   def setUp(self):
     pass
@@ -13,7 +13,7 @@ class FuncFitSanity(unittest.TestCase):
     if os.path.isfile("saveState.tmp"):
       os.remove("saveState.tmp")
   
-  def saveState_sanity(self):
+  def testsanity_saveState(self):
     gf = fuf.GaussFit1d()
     gf.assignValue({"A":1, "mu":2, "off":3, "sig":4, "lin":5.0})
     gf.setRestriction({"A":[0,10], "off":[None, 7.8]})
@@ -31,7 +31,7 @@ class FuncFitSanity(unittest.TestCase):
     self.assertEqual(gf2.getRestrictions(), gf.getRestrictions())
     self.assertEqual(gf2.frozenParameters(), gf.frozenParameters())
   
-  def coordinateGrid_sanity(self):
+  def testsanity_coordinateGrid(self):
     x = np.arange(5)
     y = np.arange(10) + 10.
     z = np.arange(2) + 100.

@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import unittest
 import os
 
-class ExampleSanity(unittest.TestCase):
+class TestExampleSanity(unittest.TestCase):
   
   def setUp(self):
     pass
@@ -10,7 +10,7 @@ class ExampleSanity(unittest.TestCase):
   def tearDown(self):
     pass
 
-  def sanity_firstExample(self):
+  def testsanity_firstExample(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -79,7 +79,7 @@ class ExampleSanity(unittest.TestCase):
     # Show the data and the best fit model
 #     plt.show()
 
-  def sanity_fmin_powell_example(self):
+  def testsanity_fmin_powell_example(self):
     """
     Checking fmin_powell example
     """
@@ -122,7 +122,7 @@ class ExampleSanity(unittest.TestCase):
     # Show the data and the best fit model
     #plt.show()
 
-  def sanity_CustomModel(self):
+  def testsanity_CustomModel(self):
     # Import numpy and matplotlib
     from numpy import arange, random
     import matplotlib.pylab as plt
@@ -170,7 +170,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(x, lf.model, 'r--')
 #     plt.show()
     
-  def sanity_Relations(self):
+  def testsanity_Relations(self):
     # import numpy and matplotlib
     from numpy import arange, random
     import matplotlib.pylab as plt
@@ -239,7 +239,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(x, lf.model, 'r--')
 #     plt.show()
   
-  def sanity_CombiningModels(self):
+  def testsanity_CombiningModels(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -324,7 +324,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(x, twoG.model, 'r--')
 #     plt.show()
 
-  def sanity_CustomObjectiveFunctions(self):
+  def testsanity_CustomObjectiveFunctions(self):
     # Import numpy and matplotlib
     from numpy import arange, exp, random, ones, sum, abs
     import matplotlib.pylab as plt
@@ -374,7 +374,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(x, edf.model, 'r-')
 #     plt.show()
 
-  def sanity_Overbinning(self):
+  def testsanity_Overbinning(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -448,7 +448,7 @@ class ExampleSanity(unittest.TestCase):
     # Show the data and the best fit model
 #     plt.show()
 
-  def sanity_simultaneousFit(self):
+  def testsanity_simultaneousFit(self):
     from PyAstronomy import funcFit as fuf
     import numpy
     import matplotlib.pylab as plt
@@ -532,7 +532,7 @@ class ExampleSanity(unittest.TestCase):
     
 #     plt.show()
 
-  def sanity_2dCircularFit(self):
+  def testsanity_2dCircularFit(self):
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -569,7 +569,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(model[::,0], model[::,1], 'r--')
 #    plt.show()
 
-  def sanity_2dGaussFit(self):
+  def testsanity_2dGaussFit(self):
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -612,7 +612,7 @@ class ExampleSanity(unittest.TestCase):
     plt.imshow(np.transpose(im - gf.evaluate(g)), origin="lower")
 #    plt.show()
 
-  def sanity_2gGaussFitTupleExample(self):
+  def testsanity_2gGaussFitTupleExample(self):
     from PyAstronomy import funcFit as fuf
     import numpy as np
     import matplotlib.pylab as plt
@@ -651,7 +651,7 @@ class ExampleSanity(unittest.TestCase):
     plt.imshow(np.transpose(im - gf.evaluate((x,y))), origin="lower")
 #    plt.show()
 
-  def sanity_coordinateGridExample(self):
+  def testsanity_coordinateGridExample(self):
     from PyAstronomy import funcFit as fuf
     import numpy as np
     
@@ -666,7 +666,7 @@ class ExampleSanity(unittest.TestCase):
     
     print("(x, y) coordinates at index (11, 28): ", g[11,28])
 
-  def sanity_CashStatisticsExample(self):
+  def testsanity_CashStatisticsExample(self):
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -700,7 +700,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(x, g.evaluate(x), 'r--')
 #    plt.show()
   
-  def sanity_steppar1(self):
+  def testsanity_steppar1(self):
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -753,7 +753,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot(As, [cmin+2.706]*len(As), 'k:')
 #    plt.show() 
 
-  def sanity_steppar2(self):
+  def testsanity_steppar2(self):
     import numpy as np
     import matplotlib.pylab as plt
     from PyAstronomy import funcFit as fuf
@@ -810,7 +810,7 @@ class ExampleSanity(unittest.TestCase):
     plt.plot([1.0], [0.87], 'k+', markersize=20)
 #    plt.show()
 
-  def sanity_errorConfInterval(self):
+  def testsanity_errorConfInterval(self):
     """
       Checking example of errorConfInterval
     """
@@ -881,7 +881,7 @@ class ExampleSanity(unittest.TestCase):
 #     plt.show()
 
 
-  def sanity_conditionalRestrictions(self):
+  def testsanity_conditionalRestrictions(self):
     """
       Check the conditional restriction example.
     """
@@ -951,7 +951,7 @@ class ExampleSanity(unittest.TestCase):
 
 
 
-class MCMCExampleSanity(unittest.TestCase):
+class TestMCMCExampleSanity(unittest.TestCase):
   
   def setUp(self):
     pass
@@ -983,7 +983,7 @@ class MCMCExampleSanity(unittest.TestCase):
       print("Could not remove file: musig.emcee")
 
 #===============================================================================
-#   def sanity_MCMCSampler(self):    
+#   def testsanity_MCMCSampler(self):    
 #     # Import some required modules
 #     from numpy import arange, sqrt, exp, pi, random, ones
 #     import matplotlib.pylab as plt
@@ -1064,7 +1064,7 @@ class MCMCExampleSanity(unittest.TestCase):
 
 
   #=============================================================================
-  # def sanity_MCMCPriorExample(self):
+  # def testsanity_MCMCPriorExample(self):
   #   from PyAstronomy import funcFit as fuf
   #   import numpy as np
   #   import matplotlib.pylab as plt
@@ -1134,7 +1134,7 @@ class MCMCExampleSanity(unittest.TestCase):
   #=============================================================================
     
 #===============================================================================
-#   def sanity_autoMCMCExample1(self):
+#   def testsanity_autoMCMCExample1(self):
 #     from PyAstronomy import funcFit as fuf
 #     import numpy as np
 #     import matplotlib.pylab as plt
@@ -1179,7 +1179,7 @@ class MCMCExampleSanity(unittest.TestCase):
 
 
 #===============================================================================
-#   def sanity_autoMCMCExample2(self):
+#   def testsanity_autoMCMCExample2(self):
 #     from PyAstronomy import funcFit as fuf
 #     import numpy as np
 #     import matplotlib.pylab as plt
@@ -1215,7 +1215,7 @@ class MCMCExampleSanity(unittest.TestCase):
 #===============================================================================
 
 
-  def sanity_TAtut_createTrace(self):
+  def testsanity_TAtut_createTrace(self):
     """
       TA tutorial, all examples
     """
@@ -1406,7 +1406,7 @@ class MCMCExampleSanity(unittest.TestCase):
 #    ta.show()
 
   #=============================================================================
-  # def sanity_MCMCautoParameters(self):
+  # def testsanity_MCMCautoParameters(self):
   #   """
   #     Checking sanity of MCMCautoParameters
   #   """
@@ -1431,7 +1431,7 @@ class MCMCExampleSanity(unittest.TestCase):
 #     plt.plot(x, gauss.evaluate(x), 'r--')
 #     plt.show()
 
-  def sanity_EMCEEfirstexample(self):
+  def testsanity_EMCEEfirstexample(self):
 
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
@@ -1478,7 +1478,7 @@ class MCMCExampleSanity(unittest.TestCase):
 #     plt.show()
 
 
-  def sanity_EMCEEpriorexample(self):
+  def testsanity_EMCEEpriorexample(self):
     # Import numpy and matplotlib
     from numpy import arange, sqrt, exp, pi, random, ones
     import matplotlib.pylab as plt
@@ -1571,7 +1571,7 @@ class MCMCExampleSanity(unittest.TestCase):
 #     plt.show()
 
 
-  def sanity_InstatiatePrior(self):
+  def testsanity_InstatiatePrior(self):
     from PyAstronomy import funcFit as fuf
     
     # Instantiate prior
@@ -1583,7 +1583,7 @@ class MCMCExampleSanity(unittest.TestCase):
     # Get log(prior) for parameter "b"
     print(gp(cvals, "b"))
     
-  def sanity_sampleEMCEE_sampleFromGaussian(self):
+  def testsanity_sampleEMCEE_sampleFromGaussian(self):
     """
     Checking first sampleEMCEE example (sample from Gaussian distribution)
     """
@@ -1642,7 +1642,7 @@ class MCMCExampleSanity(unittest.TestCase):
 #     plt.plot(xx, yy, 'r--')
 #     plt.show()
     
-  def sanity_sampleEMCEE_estimateMuSig(self):
+  def testsanity_sampleEMCEE_estimateMuSig(self):
     """
     Checking sampleEMCEE example (estimate mu and sigma)
     """
