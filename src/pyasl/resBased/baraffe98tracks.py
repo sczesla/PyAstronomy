@@ -149,7 +149,7 @@ class Baraffe98Tracks:
         # There is a valid model, return it as a recarray
         dt = []
         for col in columns:
-            dt.append((col, np.float))
+            dt.append((col, float))
         result = np.recarray(shape=(len(self._models[model]),), dtype=dt)
         for col in columns:
             result[col] = self.dat[self._models[model], self.nameToCol[col]]
