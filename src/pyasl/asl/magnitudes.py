@@ -1,10 +1,11 @@
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
 
+
 def magToFluxDensity_bessel98(band, mag, mode="nu"):
     """
     Convert magnitude into flux density according to Bessel et al. 1998
-    
+
     The conversion implemented here is based on the data given in Table A2 of
     Bessel et al. 1998, A&A 333, 231-250, which gives "Effective wavelengths (for an A0 star),
     absolute fluxes (corresponding to zero magnitude) and zeropoint magnitudes for the UBVRI-
@@ -24,15 +25,19 @@ def magToFluxDensity_bessel98(band, mag, mode="nu"):
     -------
     f_nu/lam : float
         The corresponding flux density in units if erg/cm**2/s/Hz in the
-        case of mode 'nu' and erg/cm**2/s/A in the case of 'lam'. 
+        case of mode 'nu' and erg/cm**2/s/A in the case of 'lam'.
     lam_eff : float
         Effective filter wavelength in Angstrom
     """
     if not mode in ["nu", "lam"]:
-        raise(PE.PyAValError("Unknown mode", \
-                             where="magToFluxDensity_bessel98", \
-                             solution="Use 'nu' or 'lam'"))
-    
+        raise (
+            PE.PyAValError(
+                "Unknown mode",
+                where="magToFluxDensity_bessel98",
+                solution="Use 'nu' or 'lam'",
+            )
+        )
+
     # Data from Bessel 1998 Table A2
     d = """bands U B V R I J H K Kp L L*
     lam_eff 0.366 0.438 0.545 0.641 0.798 1.22 1.63 2.19 2.12 3.45 3.80
@@ -44,24 +49,27 @@ def magToFluxDensity_bessel98(band, mag, mode="nu"):
     s = d.split()
     t = {}
     for i in range(6):
-        t[s[i*12]] = s[i*12+1:(i+1)*12]
-        if s[i*12] != "bands":
-            t[s[i*12]] = np.array(t[s[i*12]], dtype=np.float)
-        
+        t[s[i * 12]] = s[i * 12 + 1 : (i + 1) * 12]
+        if s[i * 12] != "bands":
+            t[s[i * 12]] = np.array(t[s[i * 12]], dtype=np.float)
+
     if not band in t["bands"]:
-        raise(PE.PyAValError("Unknown passband: " + str(band), \
-                             where="magToFluxDensity_bessel98", \
-                             solution="Use any of: " + ", ".join(t["bands"])))
-    
+        raise (
+            PE.PyAValError(
+                "Unknown passband: " + str(band),
+                where="magToFluxDensity_bessel98",
+                solution="Use any of: " + ", ".join(t["bands"]),
+            )
+        )
+
     # Band index
     bi = t["bands"].index(band)
-    
-    c = {"nu": 48.598, "lam":21.1}
-    
-    f = 10.0**((mag + c[mode] + t["zp(f_"+mode+")"][bi])/-2.5)
-    return f, t["lam_eff"][bi]*1e4
-    
-    
+
+    c = {"nu": 48.598, "lam": 21.1}
+
+    f = 10.0 ** ((mag + c[mode] + t["zp(f_" + mode + ")"][bi]) / -2.5)
+    return f, t["lam_eff"][bi] * 1e4
+
 
 def absMagToPower(am, absMagSun=4.75, absLumSun=3.846e33):
     """
@@ -87,7 +95,7 @@ def absMagToPower(am, absMagSun=4.75, absLumSun=3.846e33):
         Total emitted power. Same units as `absLumSun`;
         the default corresponds to erg/s.
     """
-    power = 10.0**((am - absMagSun) / (-2.5)) * absLumSun
+    power = 10.0 ** ((am - absMagSun) / (-2.5)) * absLumSun
     return power
 
 
@@ -108,5 +116,5 @@ def absModuleToDist(magApp, magAbs):
         The distance resulting from the difference in
         apparent and absolute magnitude [pc].
     """
-    d = 10.0**(-(magAbs - magApp) / 5.0 + 1.0)
+    d = 10.0 ** (-(magAbs - magApp) / 5.0 + 1.0)
     return d
