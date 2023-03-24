@@ -80,34 +80,34 @@ class NasaExoplanetArchive(pp.PyAUpdateCycle):
             "",
             "U2",
         ]
-        self._columns[3] = ["ra", "Right ascension", "deg", np.float]
-        self._columns[4] = ["dec", "Declination", "deg", np.float]
-        self._columns[5] = ["pl_orbper", "Planetary orbital period", "d", np.float]
-        self._columns[6] = ["pl_massj", "Planetary mass", "MJ", np.float]
-        self._columns[7] = ["pl_radj", "Planetary radius", "RJ", np.float]
-        self._columns[8] = ["pl_trandep", "Central depth of transit", "%", np.float]
-        self._columns[9] = ["pl_trandur", "Transit duration", "d", np.float]
-        self._columns[10] = ["pl_tranmid", "Transit midpoint", "BJD", np.float]
-        self._columns[11] = ["pl_orbsmax", "Semi-major-axis", "AU", np.float]
+        self._columns[3] = ["ra", "Right ascension", "deg", float]
+        self._columns[4] = ["dec", "Declination", "deg", float]
+        self._columns[5] = ["pl_orbper", "Planetary orbital period", "d", float]
+        self._columns[6] = ["pl_massj", "Planetary mass", "MJ", float]
+        self._columns[7] = ["pl_radj", "Planetary radius", "RJ", float]
+        self._columns[8] = ["pl_trandep", "Central depth of transit", "%", float]
+        self._columns[9] = ["pl_trandur", "Transit duration", "d", float]
+        self._columns[10] = ["pl_tranmid", "Transit midpoint", "BJD", float]
+        self._columns[11] = ["pl_orbsmax", "Semi-major-axis", "AU", float]
         self._columns[12] = [
             "pl_orbincl",
             "Orbital inclination of planet",
             "deg",
-            np.float,
+            float,
         ]
-        self._columns[13] = ["st_rad", "Stellar radii", "Solar", np.float]
-        self._columns[14] = ["sy_dist", "Distance to star", "pc", np.float]
-        self._columns[15] = ["st_mass", "Stellar mass", "Solar", np.float]
-        self._columns[16] = ["st_teff", "Effective temperature of star", "K", np.float]
-        self._columns[17] = ["st_logg", "Stellar surface gravity", "cm/s**2", np.float]
-        self._columns[18] = ["sy_vmag", "Stellar V-band brightness", "mag", np.float]
+        self._columns[13] = ["st_rad", "Stellar radii", "Solar", float]
+        self._columns[14] = ["sy_dist", "Distance to star", "pc", float]
+        self._columns[15] = ["st_mass", "Stellar mass", "Solar", float]
+        self._columns[16] = ["st_teff", "Effective temperature of star", "K", float]
+        self._columns[17] = ["st_logg", "Stellar surface gravity", "cm/s**2", float]
+        self._columns[18] = ["sy_vmag", "Stellar V-band brightness", "mag", float]
         self._columns[19] = [
             "st_vsin",
             "Projected stellar rotation speed (vsini)",
             "km/s",
-            np.float,
+            float,
         ]
-        self._columns[20] = ["sy_kmag", "Stellar Ks-band brightness", "mag", np.float]
+        self._columns[20] = ["sy_kmag", "Stellar Ks-band brightness", "mag", float]
         # Check whether data file exists
         self._fs = pp.PyAFS()
 
