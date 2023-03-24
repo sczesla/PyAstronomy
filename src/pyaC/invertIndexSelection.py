@@ -37,6 +37,6 @@ def invertIndexSelection(a, indi):
     raise(PE.PyAValError("First parameter is neither a one-dimensional numpy array or an integer.", \
           solution="Use one of these types to describe the array."))
   
-  x = np.ones(n, dtype=np.bool)
+  x = np.ones(n, dtype=bool)
   x[indi] = False
   return np.arange(n)[x]

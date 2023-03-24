@@ -95,7 +95,7 @@ class KuruczMT:
                                      where="KuruczMT::_readModelTable"))
         # Build array of available models
         self._modelsAvailable = np.zeros(
-            (len(teffs), len(loggs)), dtype=np.bool)
+            (len(teffs), len(loggs)), dtype=bool)
         self.teffs = np.array(sorted(teffs))
         self.loggs = np.array(sorted(loggs))
         for i, teff in enumerate(self.teffs):
