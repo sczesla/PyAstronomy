@@ -18,7 +18,7 @@ import six.moves as smo
 from PyAstronomy.pyaC import pyaErrors as PE
 
 
-class SanityOfPyasl(unittest.TestCase, SaniBase):
+class TestSanityOfPyasl(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -26,7 +26,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_airtovacExample1(self):
+    def testsanity_airtovacExample1(self):
         """
         Checking conversion example for `airtovac2`
         """
@@ -47,7 +47,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         wvlAir = pyasl.vactoair2(wvlVac)
         print("Wavelength in air: ", wvlAir)
 
-    def sanity_airtovacExample2(self):
+    def testsanity_airtovacExample2(self):
         """
         Checking difference example for `airtovac2`
         """
@@ -73,7 +73,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
                  wvlVacCiddor * 299792458., 'b.-')
 #    plt.show()
 
-    def sanity_airtovac(self):
+    def testsanity_airtovac(self):
         """
         Checking `airtovac` and back...
         """
@@ -84,7 +84,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
             self.assertTrue(self.mrd(wvl_vac, wvl_vac2) < 1e-10,
                             msg="Problem with vac<->air conversion (mode = " + str(mode) + ")")
 
-    def sanity_specAirVacConvertExample(self):
+    def testsanity_specAirVacConvertExample(self):
         """
         Checking example of "specAirVacConvert".
         """
@@ -117,7 +117,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         plt.plot(wvl, airflux, "r.-")
 #    plt.show()
 
-    def sanity_refractiveIndexExample(self):
+    def testsanity_refractiveIndexExample(self):
         """
         Checking example of refractive index.
         """
@@ -135,7 +135,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         for w, nc in zip(wvl, n):
             print("{0:5.1f}  {1:10.8e}".format(w, nc - 1.0))
 
-    def sanity_aitoff(self):
+    def testsanity_aitoff(self):
         """
         Checking Aitoff projection.
         """
@@ -147,7 +147,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
             self.assertTrue(self.mrd(l2, l) < 1e-6)
             self.assertTrue(self.mrd(b2, b) < 1e-6)
 
-    def sanity_aitoffExample(self):
+    def testsanity_aitoffExample(self):
         """
         Checking example of aitoff projection
         """
@@ -166,7 +166,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         l2, b2 = pyasl.inverseAitoff(x, y)
         print(l2, b2)
 
-    def sanity_daycnv(self):
+    def testsanity_daycnv(self):
         """
         Checking `daycnv`.
         """
@@ -207,7 +207,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         self.assertEqual(np.round((dts[1] - dts[0]).total_seconds()), 19876.,
                          msg="Distance of 19876 s not reproduced by daycvn.")
 
-    def sanity_daycnvExample(self):
+    def testsanity_daycnvExample(self):
         """
         Example of daycnv
         """
@@ -224,7 +224,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         dt = pyasl.daycnv(jd, mode='dt')
         print("Datetime object: ", dt)
 
-    def sanity_daycnv_etc(self):
+    def testsanity_daycnv_etc(self):
         """
         Checking example of daycnv etc...
         """
@@ -251,7 +251,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         print("Current (reduced) heliocentric Julian date (ra=100 deg, dec=37 deg): ",
               pyasl.helio_jd(cjd - 2.4e6, 100.0, 37.0))
 
-    def sanity_juldate(self):
+    def testsanity_juldate(self):
         """
         Checking `juldate`.
         """
@@ -259,7 +259,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         jd = juldate(dt)
         self.assertEqual(jd, 2451596.812500 - 2400000.0)
 
-    def sanity_keplerOrbitPos(self):
+    def testsanity_keplerOrbitPos(self):
         """
         Checking Kepler orbit.
         """
@@ -270,7 +270,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
             pos1 = ke.xyzPos(time[i])
             self.assertEqual(numpy.sum(numpy.abs((pos[i, ::] - pos1))), 0.0)
 
-    def sanity_keplerAngMom(self):
+    def testsanity_keplerAngMom(self):
         """
         Checking Kepler orbit: Angular momentum
         """
@@ -302,7 +302,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
             self.assertAlmostEqual(
                 d, 0.0, delta=1e-12, msg="Angular momentum changes with argument of periapsis")
 
-    def sanity_keplerOrbitNodes(self):
+    def testsanity_keplerOrbitNodes(self):
         """
         Checking node position of Kepler ellipse.
         """
@@ -347,7 +347,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         self.assertAlmostEqual(np.max(np.abs(n4[0] - np.array([0., -1., 0.]))), 0.0, delta=1e-12,
                                msg="Wrong ascending node for Omega = 270")
 
-    def sanity_binaryOrbit_vs_keplerEllipse_pos_and_vel(self):
+    def testsanity_binaryOrbit_vs_keplerEllipse_pos_and_vel(self):
         """
         Sanity of binary orbit positions and velocities in comparison with Kepler Ellipse
         """
@@ -380,7 +380,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         rd = np.sqrt(np.sum((r1-r2)**2, axis=1))
         self.assertEqual(5, np.argmin(rd), msg="Binary Orbit: Problem with time of periastron")
         
-    def sanity_binaryOrbit_jup_orb(self):
+    def testsanity_binaryOrbit_jup_orb(self):
         """
         Sanity of binary orbit positions and velocities in comparison with Kepler Ellipse
         """
@@ -406,7 +406,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         mvabs2 = np.mean(vabs2)
         self.assertAlmostEqual(mvabs2, 13.06*1e3, msg="Binary orbit: Jupiter's mean orbital velocity is off", delta=50)
 
-    def sanity_binaryOrbit_example(self):
+    def testsanity_binaryOrbit_example(self):
         """
         Checking example of binary orbit
         """
@@ -478,7 +478,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         #=======================================================================
 
 
-    def sanity_MarkleyKESolver_precision(self):
+    def testsanity_MarkleyKESolver_precision(self):
         """
         Checking precision of Markley solver for Kepler's equation.
         """
@@ -486,7 +486,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         p = ks.precisionTest()
         self.assertLess(p, 1e-14)
 
-    def sanity_dmstodeg(self):
+    def testsanity_dmstodeg(self):
         """
         Check sanity of dmstodeg
         """
@@ -519,7 +519,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         self.assertAlmostEqual(dmsToDeg(0, 1, 0, -1), -1. / 60., delta=1e-12,
                                msg="dmsToDeg: (0,1,0,-1) not correctly converted")
 
-    def sanity_degToSexaCoordConversion(self):
+    def testsanity_degToSexaCoordConversion(self):
         """
         Checking degrees-sexagesimal coordinate conversion.
         """
@@ -576,7 +576,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
                 self.assertAlmostEqual(
                     dect[j], hddmss[i][j], delta=1e-5, msg="degToDMS: Incorrect conversion")
 
-    def sanity_degToSexaCoordConversionExample(self):
+    def testsanity_degToSexaCoordConversionExample(self):
         """
         Checking example of sexagesimal-decimal conversion
         """
@@ -595,7 +595,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
         sexa = pyasl.coordsDegToSexa(ra, dec)
         print("Coordinates of HD 1 [sexa]: ", sexa)
 
-    def sanity_PlanckExample(self):
+    def testsanity_PlanckExample(self):
         """
         Checking sanity of Planck example
         """
@@ -630,7 +630,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
 #     plt.plot(lam*1e10, s7erg, 'b-')
 #     plt.show()
 
-    def sanity_magToFluxDensity_bessel98(self):
+    def testsanity_magToFluxDensity_bessel98(self):
         """
         Checking consistency of magToFluxDensity_bessel98
         """
@@ -647,7 +647,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
             print()       
             self.assertAlmostEqual((b*1e11 - flam[i])/flam[i], 0.0, delta=8e-3, msg="flam does not match for zero magnitude")
 
-    def sanity_magToFluxDensity_bessel98_example(self):
+    def testsanity_magToFluxDensity_bessel98_example(self):
         """
         Checking example of magToFluxDensity_bessel98
         """
@@ -668,7 +668,7 @@ class SanityOfPyasl(unittest.TestCase, SaniBase):
             fd_nu * (299792458e2/(le/1e8)**2) / 1e8 )
 
 
-class SanityOfMoonpos(unittest.TestCase, SaniBase):
+class TestSanityOfMoonpos(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -676,7 +676,7 @@ class SanityOfMoonpos(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_exampleMoonposition(self):
+    def testsanity_exampleMoonposition(self):
         """
         Checking example of moonpos (position)
         """
@@ -700,7 +700,7 @@ class SanityOfMoonpos(unittest.TestCase, SaniBase):
             print("%15.4f  %8.4f  %8.4f  %11.4f  %8.4f  %8.4f" %
                   (jd[i], res[0][i], res[1][i], res[2][i], res[3][i], res[4][i]))
 
-    def sanity_moonphaseExample(self):
+    def testsanity_moonphaseExample(self):
         """
         Checking exmaple of moonphase
         """
@@ -720,7 +720,7 @@ class SanityOfMoonpos(unittest.TestCase, SaniBase):
             print("%15.4f  %3d%%" % (jd[i], mp[i] * 100.))
 
 
-class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
+class TestSanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -728,7 +728,7 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example1(self):
+    def testsanity_example1(self):
         """
         Checking Markley solver example.
         """
@@ -745,7 +745,7 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
         e = 0.3
         print("Eccentric anomaly: ", ks.getE(M, e))
 
-    def sanity_example2(self):
+    def testsanity_example2(self):
         """
         Checking Kepler orbit calculation example.
         """
@@ -801,7 +801,7 @@ class SanityOfKeplerOrbitExamples(unittest.TestCase, SaniBase):
 #     plt.show()
 
 
-class SanityOfBinnin(unittest.TestCase, SaniBase):
+class TestSanityOfBinnin(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -809,7 +809,7 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example_binningx0dt(self):
+    def testsanity_example_binningx0dt(self):
         """
         Checking `binningx0dt` example 1.
         """
@@ -850,7 +850,7 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
         plt.errorbar(r3[::, 0], r3[::, 1], yerr=r3[::, 2], fmt='gp--')
 #     plt.show()
 
-    def sanity_example_binningx0dt_example2(self):
+    def testsanity_example_binningx0dt_example2(self):
         """
         Checking `binningx0dt` example 2.
         """
@@ -886,7 +886,7 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
         plt.errorbar(r2[::, 0], r2[::, 1], yerr=r2[::, 2], fmt='rp--')
 #     plt.show()
 
-    def sanity_example_binningx0dt_example3(self):
+    def testsanity_example_binningx0dt_example3(self):
         """
         Chacking example 3 for binningx0dt (nanHandling)
         """
@@ -942,7 +942,7 @@ class SanityOfBinnin(unittest.TestCase, SaniBase):
 #     plt.show()
 
 
-class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
+class TestSanityOfPhotonConversion(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -950,7 +950,7 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_fluxConversion(self):
+    def testsanity_fluxConversion(self):
         """
         Checking `flux2photons` and `photons2flux`.
         """
@@ -961,7 +961,7 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
         flux2 = photons2flux(wvl, photons)
         self.assertLess(max(numpy.abs(flux - flux2)), 1e-12)
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Checking sanity of flux conversion example.
         """
@@ -986,7 +986,7 @@ class SanityOfPhotonConversion(unittest.TestCase, SaniBase):
               % (photons, wvl, flux2))
 
 
-class SanityOfFolding(unittest.TestCase, SaniBase):
+class TestSanityOfFolding(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -994,7 +994,7 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_foldAtExample(self):
+    def testsanity_foldAtExample(self):
         """
         Checking `foldAt` example.
         """
@@ -1023,7 +1023,7 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
         plt.plot(phases, flux, 'bp')
         # plt.show()
 
-    def sanity_foldAtEpoch(self):
+    def testsanity_foldAtEpoch(self):
         """
         Checking epoch calculation of `foldAt`
         """
@@ -1035,7 +1035,7 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
         pe = np.array([-2., -1., 0.0, 1.0, 9.0])
         self.assertFalse(np.any(np.abs(pe - e) > 1e-5), msg="Bad epoch")
 
-    def sanity_foldAtBackAndForth(self):
+    def testsanity_foldAtBackAndForth(self):
         """
         Checking relations from foldAt documentation
         """
@@ -1048,7 +1048,7 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
         t2 = T0 + (e+p)*per
         self.assertFalse(np.any(np.abs(t2 - t) > 1e-5), msg="foldAt back and forth: Bad conversion!")
 
-    def sanity_foldAtSort(self):
+    def testsanity_foldAtSort(self):
         """ Sort and centralzero test """
         from PyAstronomy.pyasl import foldAt
         import numpy as np
@@ -1061,7 +1061,7 @@ class SanityOfFolding(unittest.TestCase, SaniBase):
         self.assertFalse(np.any((p < -0.5) | (p > 0.5)), msg="foldAt central zero does not work!")
 
 
-class SanityOfDopplerShift(unittest.TestCase, SaniBase):
+class TestSanityOfDopplerShift(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1069,7 +1069,7 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_backAndForth(self):
+    def testsanity_backAndForth(self):
         """
         Doppler shift -- shifting back and forth
         """
@@ -1083,7 +1083,7 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
 
         self.assertLess(max(numpy.abs(flux - nflux2)), 1e-5)
 
-    def sanity_uncertainties(self):
+    def testsanity_uncertainties(self):
         """
         Doppler shift -- sanity of errors after shift
         """
@@ -1101,7 +1101,7 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
         
         self.assertAlmostEqual(np.mean(err), np.mean(nerr1), msg="Doppler shift: Problem with shifting error", delta=1e-10)
 
-    def sanity_checkExample(self):
+    def testsanity_checkExample(self):
         """
         Doppler shift -- Checking whether example works
         """
@@ -1139,7 +1139,7 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
         plt.plot(wvl, nflux2, 'g.-')
 #     plt.show()
 
-    def sanity_checkExample(self):
+    def testsanity_checkExample(self):
         """
         Doppler shift -- Checking whether example with uncertainties works
         """
@@ -1167,7 +1167,7 @@ class SanityOfDopplerShift(unittest.TestCase, SaniBase):
         #plt.legend()
         #plt.show()
 
-class SanityOfrotBroad(unittest.TestCase, SaniBase):
+class TestSanityOfrotBroad(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1175,7 +1175,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Sanity of "rotBroad" example.
         """
@@ -1223,7 +1223,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
         plt.plot(wvl, lflux, 'g-')
 #     plt.show()
 
-    def sanity_rotBroadEW(self):
+    def testsanity_rotBroadEW(self):
         """
         Checking whether "rotBroad" changes the EW.
         """
@@ -1255,7 +1255,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
                 self.assertAlmostEqual(ew, refEW, 5, "The EW in rotbroad changes for: vsini = " +
                                        str(broad) + ", and eps = " + str(eps))
 
-    def sanity_slowVsFast(self):
+    def testsanity_slowVsFast(self):
         """
         Comparing 'slow' and 'fast' algorithm.
         """
@@ -1286,7 +1286,7 @@ class SanityOfrotBroad(unittest.TestCase, SaniBase):
             numpy.max(numpy.abs(bfast[indi] - bslow[indi])), 0.0, delta=1e-5)
 
 
-class SanityOfBaryvel(unittest.TestCase, SaniBase):
+class TestSanityOfBaryvel(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1294,7 +1294,7 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Sanity of "baryvel" example
         """
@@ -1315,7 +1315,7 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
         vh, vb = pyasl.baryCorr(jd, ra, dec, deq=2000.0)
         print("Barycentric velocity of Earth toward Sirius: ", vb)
 
-    def sanity_baryCorrAltair(self):
+    def testsanity_baryCorrAltair(self):
         """
         Checking barycentric correction for Altair (IDL example)
         """
@@ -1324,7 +1324,7 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
             2449398.5000000000, 297.69488, 8.8676389, deq=2000)
         self.assertAlmostEqual(vb, 10.583091, delta=1e-5)
 
-    def sanity_helcorrExample(self):
+    def testsanity_helcorrExample(self):
         """
         Checking sanity of helcorr example.
         """
@@ -1352,7 +1352,7 @@ class SanityOfBaryvel(unittest.TestCase, SaniBase):
         print("Heliocentric Julian day: ", hjd)
 
 
-class SanityOfSVD(unittest.TestCase, SaniBase):
+class TestSanityOfSVD(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1360,7 +1360,7 @@ class SanityOfSVD(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_deltaExample(self):
+    def testsanity_deltaExample(self):
         """
         The delta function example from SVD.
         """
@@ -1397,7 +1397,7 @@ class SanityOfSVD(unittest.TestCase, SaniBase):
         plt.plot(nflux, 'g--')
 #    plt.show()
 
-    def sanity_NoiseExample(self):
+    def testsanity_NoiseExample(self):
         """
         The noise example from SVD
         """
@@ -1438,7 +1438,7 @@ class SanityOfSVD(unittest.TestCase, SaniBase):
 #    plt.show()
 
 
-class SanityOfUnred(unittest.TestCase, SaniBase):
+class TestSanityOfUnred(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1446,7 +1446,7 @@ class SanityOfUnred(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Check the example
         """
@@ -1470,7 +1470,7 @@ class SanityOfUnred(unittest.TestCase, SaniBase):
 #    plt.show()
 
 
-class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
+class TestSanityOfEstimateSNR(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1478,7 +1478,7 @@ class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Check the example for estimateSNR
         """
@@ -1510,7 +1510,7 @@ class SanityOfEstimateSNR(unittest.TestCase, SaniBase):
         print("Estimate of the SNR: ", snrEsti["SNR-Estimate"])
 
 
-class SanityOfOutlier(unittest.TestCase, SaniBase):
+class TestSanityOfOutlier(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1518,7 +1518,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_ESDexample(self):
+    def testsanity_ESDexample(self):
         """
         Check the example for the generalized ESD
         """
@@ -1551,7 +1551,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
             plt.plot(r[1][i], x[r[1][i]], 'rp')
 #     plt.show()
 
-    def sanity_pointDistGESDExample(self):
+    def testsanity_pointDistGESDExample(self):
         """
         Sanity of pointDistGESD example
         """
@@ -1577,7 +1577,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
             plt.plot(r[1][i], x[r[1][i]], 'rp')
 #     plt.show()
 
-    def sanity_polyResOutlierExample(self):
+    def testsanity_polyResOutlierExample(self):
         """
         Sanity of polyResOutlier example
         """
@@ -1612,7 +1612,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
         plt.plot(xnew, ynew, 'bp')
 #     plt.show()
 
-    def sanity_slidingPolyResOutlier(self):
+    def testsanity_slidingPolyResOutlier(self):
         """
         Checking slidingPolyResOutlier
         """
@@ -1633,7 +1633,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
         self.assertTrue(np.all(iout == np.array(
             [5, 6])), msg="slidingPolyResOutlier: Wrong outliers detected (indices " + str(iout) + ").")
 
-    def sanity_slidingPolyResOutlierExample(self):
+    def testsanity_slidingPolyResOutlierExample(self):
         """
         Checking sliding PolyResOutlierExample
         """
@@ -1668,7 +1668,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
         plt.plot(xnew, ynew, 'bp')
 #     plt.show()
 
-    def sanity_generalizedESD_NISTR_compatibility(self):
+    def testsanity_generalizedESD_NISTR_compatibility(self):
         """ Checking generalizedESD vs R implementation of NIST """
         import numpy as np
         import matplotlib.pylab as plt
@@ -1694,7 +1694,7 @@ class SanityOfOutlier(unittest.TestCase, SaniBase):
         self.assertAlmostEqual(r2, 0.0, delta=1e-7, msg="generalizedESD incompatible with NIST's R implementation (r2 = " + str(r2) + ")")
 
 
-class SanityOfMagnitudes(unittest.TestCase, SaniBase):
+class TestSanityOfMagnitudes(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1702,7 +1702,7 @@ class SanityOfMagnitudes(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_absMagToPowerExample(self):
+    def testsanity_absMagToPowerExample(self):
         """
         Sanity of example for `absMagToPower`.
         """
@@ -1713,7 +1713,7 @@ class SanityOfMagnitudes(unittest.TestCase, SaniBase):
         print("  Absolute luminosity [erg/s]: ",
               pyasl.absMagToPower(absMagSun))
 
-    def sanity_absModuleToDistExample(self):
+    def testsanity_absModuleToDistExample(self):
         """
         Sanity of distance module example.
         """
@@ -1728,7 +1728,7 @@ class SanityOfMagnitudes(unittest.TestCase, SaniBase):
         print("brightness of 11.37 mag: %5.2f pc" %
               (pyasl.absModuleToDist(appMag, absMagSun)))
 
-    def sanity_absModuleToDist(self):
+    def testsanity_absModuleToDist(self):
         """
         Sanity checks for absModuleToDist.
         """
@@ -1739,7 +1739,7 @@ class SanityOfMagnitudes(unittest.TestCase, SaniBase):
         self.assertAlmostEqual(x, 100., delta=1e-7)
 
 
-class SanityOfSunpos(unittest.TestCase, SaniBase):
+class TestSanityOfSunpos(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1747,7 +1747,7 @@ class SanityOfSunpos(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_sunposExample(self):
+    def testsanity_sunposExample(self):
         """
         Sanity of example for `sunpos`.
         """
@@ -1779,7 +1779,7 @@ class SanityOfSunpos(unittest.TestCase, SaniBase):
                   (pos[0][i], pos[1][i], pos[2][i]))
 
 
-class SanityOfNutation(unittest.TestCase, SaniBase):
+class TestSanityOfNutation(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1787,7 +1787,7 @@ class SanityOfNutation(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_nutationExample(self):
+    def testsanity_nutationExample(self):
         """
         Sanity of example for `nutate`
         """
@@ -1817,7 +1817,7 @@ class SanityOfNutation(unittest.TestCase, SaniBase):
         print("Longitude: ", res[0])
         print("Obliquity: ", res[1])
 
-    def sanity_conutateExample(self):
+    def testsanity_conutateExample(self):
         """
         Sanity of example for `co_nutate`.
         """
@@ -1852,7 +1852,7 @@ class SanityOfNutation(unittest.TestCase, SaniBase):
             print("%12.5f   %8.5f   %8.5f" % (jds[i], res[0][i], res[1][i]))
 
 
-class SanityOfAberration(unittest.TestCase, SaniBase):
+class TestSanityOfAberration(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1860,7 +1860,7 @@ class SanityOfAberration(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_aberrationExample(self):
+    def testsanity_aberrationExample(self):
         """
         Sanity of example for `aberration`.
         """
@@ -1895,7 +1895,7 @@ class SanityOfAberration(unittest.TestCase, SaniBase):
             print("%12.5f   %8.5f   %8.5f" % (jds[i], res[0][i], res[1][i]))
 
 
-class SanityOfAltitude(unittest.TestCase, SaniBase):
+class TestSanityOfAltitude(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1903,7 +1903,7 @@ class SanityOfAltitude(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_altitudeExample(self):
+    def testsanity_altitudeExample(self):
         """
         Sanity of example for `altitude`
         """
@@ -1944,7 +1944,7 @@ class SanityOfAltitude(unittest.TestCase, SaniBase):
                   % (r[0][i], r[1][i], r[2][i]))
 
 
-class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
+class TestSanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -1952,7 +1952,7 @@ class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_hadec2altazExample(self):
+    def testsanity_hadec2altazExample(self):
         """
         Sanity of example for `hadec2altaz`
         """
@@ -1979,7 +1979,7 @@ class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
         print("alt: ", altaz[0])
         print("az: ", altaz[1])
 
-    def sanity_eq2horExample(self):
+    def testsanity_eq2horExample(self):
         """
         Sanity of example for `eq2hor`
         """
@@ -2026,7 +2026,7 @@ class SanityOfHorizontalCoordinates(unittest.TestCase, SaniBase):
 #     plt.show()
 
 
-class SanityOfObservatory(unittest.TestCase, SaniBase):
+class TestSanityOfObservatory(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -2034,7 +2034,7 @@ class SanityOfObservatory(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Sanity of observatory example.
         """
@@ -2050,7 +2050,7 @@ class SanityOfObservatory(unittest.TestCase, SaniBase):
         print("time zone in hours West of Greenwich")
 
 
-class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
+class TestSanityOfDampingConstConversion(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -2058,7 +2058,7 @@ class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Checking example for converting damping constant into line width.
         """
@@ -2071,7 +2071,7 @@ class SanityOfDampingConstConversion(unittest.TestCase, SaniBase):
               pyasl.convertDampingConstant(gLya, 1215.67))
 
 
-class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
+class TestSanityOfCardinalPoint(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -2079,7 +2079,7 @@ class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_checkNumbers(self):
+    def testsanity_checkNumbers(self):
         """
         Check some numbers for cardinal point
         """
@@ -2091,7 +2091,7 @@ class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
         self.assertEqual(getCardinalPoint(315.0), "W")
         self.assertEqual(getCardinalPoint(217.0), "S")
 
-    def sanity_checkExample(self):
+    def testsanity_checkExample(self):
         """
         Check cardinal point example
         """
@@ -2106,7 +2106,7 @@ class SanityOfCardinalPoint(unittest.TestCase, SaniBase):
                 azimuth, cp))
 
 
-class SanityOfTwilight(unittest.TestCase, SaniBase):
+class TestSanityOfTwilight(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -2114,7 +2114,7 @@ class SanityOfTwilight(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_checkNumbers(self):
+    def testsanity_checkNumbers(self):
         """
         Check twilightName example
         """
@@ -2126,7 +2126,7 @@ class SanityOfTwilight(unittest.TestCase, SaniBase):
                   pyasl.twilightName(alt))
 
 
-class SanityOfAngDist(unittest.TestCase, SaniBase):
+class TestSanityOfAngDist(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -2134,7 +2134,7 @@ class SanityOfAngDist(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_checkExample(self):
+    def testsanity_checkExample(self):
         """
         Check angular distance example
         """
@@ -2148,7 +2148,7 @@ class SanityOfAngDist(unittest.TestCase, SaniBase):
                                38.78368896, 297.69582730, +08.86832120))
 
 
-class SanityOfTransit(unittest.TestCase, SaniBase):
+class TestSanityOfTransit(unittest.TestCase, SaniBase):
 
     def setUp(self):
         pass
@@ -2156,7 +2156,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
-    def sanity_transitDurationExample(self):
+    def testsanity_transitDurationExample(self):
         """
         Transit duration example
         """
@@ -2175,7 +2175,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         ti = pyasl.ingressDuration(1.0, reJ, 1.0, 90.0, 365.0)
         print("The in- and egress last: %6.4f days or %4.2f hours" % (ti, ti*24))
     
-    def sanity_transitDuration_RsExample(self):
+    def testsanity_transitDuration_RsExample(self):
         """
         Check example of transitDuration_Rs
         """
@@ -2194,7 +2194,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         ti = pyasl.ingressDuration_Rs(sma, rprs, 85.7, 2.21858)
         print("The in- and egress of HD 189733 b lasts: %5.2f hours" % (ti*24.))
     
-    def sanity_transitDuration(self):
+    def testsanity_transitDuration(self):
         """
         """
         from PyAstronomy import pyasl
@@ -2210,7 +2210,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         print("td1: ", td1, ", trs: ", trs)
         self.assertAlmostEqual(td1, trs, delta=1e-10, msg="transitDuration and transitDuration_Rs in conflict!")
     
-    def sanity_ingressDuration(self):
+    def testsanity_ingressDuration(self):
         """
         Check sanity and consistency of ingressDuration
         """
@@ -2242,7 +2242,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         
         
             
-    def sanity_transitDurationExact(self):
+    def testsanity_transitDurationExact(self):
         """
         Check approximation of transit duration.
         """
@@ -2255,7 +2255,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         td2 = pyasl.transitDuration(0.05, 0.1, 1.0, 88.0, 365.0, exact=True)
         self.assertAlmostEqual(365./np.pi*np.arcsin(np.sin(td1*np.pi/365.)/np.sin(88./180.*np.pi)), td2, delta=1e-12, msg="Relation between exact and approximate transit duration broken.")
 
-    def sanity_inTransitExample_1(self):
+    def testsanity_inTransitExample_1(self):
         """
         inTransit---individual point in time
         """
@@ -2275,7 +2275,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         else:
             print("Yes")
 
-    def sanity_inTransitExample_2(self):
+    def testsanity_inTransitExample_2(self):
         """
         inTransit---Series of points in time
         """
@@ -2299,7 +2299,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         print(pyasl.isInTransit(times, T0, period,
                                 duration / 2.0, boolOutput=True))
 
-    def sanity_transit_T1_T4_ell_example(self):
+    def testsanity_transit_T1_T4_ell_example(self):
         """
         Checking example for transit_T1_T4_ell example
         """
@@ -2331,7 +2331,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
         print()
         print("Duration of primary and secondary transit: %5.3f, %5.3f " % (pts[3]-pts[0], sts[3]-sts[0]))
 
-    def sanity_ell_vs_circ_duration(self):
+    def testsanity_ell_vs_circ_duration(self):
         """
         Checking sanity of T1-4 elliptical contact points vs. circular solution
         """
@@ -2400,7 +2400,7 @@ class SanityOfTransit(unittest.TestCase, SaniBase):
             
         
 
-class SanityOfAirmass(unittest.TestCase):
+class TestSanityOfAirmass(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2408,7 +2408,7 @@ class SanityOfAirmass(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_airmassSphericalExample(self):
+    def testsanity_airmassSphericalExample(self):
         """
         Example airmass spherical, homogeneous atmosphere.
         """
@@ -2420,7 +2420,7 @@ class SanityOfAirmass(unittest.TestCase):
             print("Zenith angle: %2d, airmass = %7.2f" %
                   (za, pyasl.airmassSpherical(za, obsAlt)))
 
-    def sanity_airmassPPExample(self):
+    def testsanity_airmassPPExample(self):
         """
         Example for plane-parallel airmass
         """
@@ -2431,7 +2431,7 @@ class SanityOfAirmass(unittest.TestCase):
             print("Zenith angle: %2d deg, airmass = %7.2f" %
                   (za, pyasl.airmassPP(za)))
 
-    def sanity_compAirmasses(self):
+    def testsanity_compAirmasses(self):
         """
         Compare different airmass calculations
         """
@@ -2442,7 +2442,7 @@ class SanityOfAirmass(unittest.TestCase):
             self.assertAlmostEqual(ampp / amsp, 1.0, delta=0.01)
 
 
-class SanityOfTransitTimes(unittest.TestCase):
+class TestSanityOfTransitTimes(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2450,7 +2450,7 @@ class SanityOfTransitTimes(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Checking example of transitTimes
         """
@@ -2469,7 +2469,7 @@ class SanityOfTransitTimes(unittest.TestCase):
         # Plot the result
         #pyasl.transitVisibilityPlot(dat, markTransit=True)
 
-    def sanity_ETD_compare(self):
+    def testsanity_ETD_compare(self):
         """
         Check transit of Wasp-7 on Oct. 03, 2018, with ETD result.
         """
@@ -2520,7 +2520,7 @@ class SanityOfTransitTimes(unittest.TestCase):
                                3.567, delta=15. / 60., msg="Duration does not match")
 
 
-class SanityOfDecimalYear(unittest.TestCase):
+class TestSanityOfDecimalYear(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2528,7 +2528,7 @@ class SanityOfDecimalYear(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Check example of decimal year.
         """
@@ -2549,7 +2549,7 @@ class SanityOfDecimalYear(unittest.TestCase):
         print(" ... or equivalently (y, m, d, h, m, s, ms): ",
               pyasl.decimalYearGregorianDate(decy, "tuple"))
 
-    def sanity_decimalYear(self):
+    def testsanity_decimalYear(self):
         """
         Decimal year: Check that conversion is reasonable.
         """
@@ -2570,7 +2570,7 @@ class SanityOfDecimalYear(unittest.TestCase):
         t = pyasl.decimalYearGregorianDate(2008.8196, "tuple")
 
 
-class SanityOfBroad(unittest.TestCase):
+class TestSanityOfBroad(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2578,7 +2578,7 @@ class SanityOfBroad(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Checking sanity of 'instrBroadGaussFast' example.
         """
@@ -2616,7 +2616,7 @@ class SanityOfBroad(unittest.TestCase):
         plt.legend(loc=4)
 #     plt.show()
 
-    def sanity_tests(self):
+    def testsanity_tests(self):
         """
         Checking sanity of 'instrBroadGaussFast'
         """
@@ -2646,7 +2646,7 @@ class SanityOfBroad(unittest.TestCase):
         s2 = r.sum()
         self.assertAlmostEqual(s1, s2, 6, "EW in spectrum did change")
 
-    def sanity_convolutionGaussian(self):
+    def testsanity_convolutionGaussian(self):
         """
         Check the sanity of broadGaussFast (properties of result in case of two Gaussians)
         """
@@ -2678,7 +2678,7 @@ class SanityOfBroad(unittest.TestCase):
         self.assertAlmostEqual(np.sum(y), np.sum(y2), delta=1e-4,
                                msg="Normalization of convoluted Gaussian (" + str(np.sum(y2)) + ") is incorrect.")
 
-    def sanity_convolutionGaussianMaxsig(self):
+    def testsanity_convolutionGaussianMaxsig(self):
         """
         Check the sanity of broadGaussFast including maxsig
         """
@@ -2715,7 +2715,7 @@ class SanityOfBroad(unittest.TestCase):
         self.assertAlmostEqual(np.sum(y), np.sum(y2), delta=1e-4,
                                msg="Normalization of convoluted Gaussian (" + str(np.sum(y2)) + ") is incorrect.")
 
-    def sanity_thermalBroadening(self):
+    def testsanity_thermalBroadening(self):
         """
         Check sanity of thermal broadening width.
         """
@@ -2728,7 +2728,7 @@ class SanityOfBroad(unittest.TestCase):
         self.assertAlmostEqual(fwhm, sig * 2 * np.sqrt(2. * np.log(2.0)), delta=1e-9,
                                msg="FWHM and std differ.")
 
-    def sanity_thermalExample(self):
+    def testsanity_thermalExample(self):
         """
         Checking example of thermal broadening
         """
@@ -2743,7 +2743,7 @@ class SanityOfBroad(unittest.TestCase):
         print("Line width [FWHM]: %5.2f" % linefwhm)
         print("Thermal broadening temperature: %6.1f" % tbroad)
         
-    def sanity_thermalBroadeningAndReverse(self):
+    def testsanity_thermalBroadeningAndReverse(self):
         """
         Checking thermal broadening and its reverse
         """
@@ -2760,7 +2760,7 @@ class SanityOfBroad(unittest.TestCase):
 
 
 
-class SanityOfCrosscor(unittest.TestCase):
+class TestSanityOfCrosscor(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2768,7 +2768,7 @@ class SanityOfCrosscor(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Checking example of crosscorr
         """
@@ -2810,7 +2810,7 @@ class SanityOfCrosscor(unittest.TestCase):
         plt.plot(rv[maxind], cc[maxind], 'ro')
 #     plt.show()
 
-    def sanity_ShiftedGaussian(self):
+    def testsanity_ShiftedGaussian(self):
         """
         Checking the shift of a single Gaussian.
         """
@@ -2859,7 +2859,7 @@ class SanityOfCrosscor(unittest.TestCase):
             self.assertAlmostEqual(rv1[m1], rv, delta=accu)
             self.assertAlmostEqual(rv2[m1], rv, delta=accu)
 
-    def sanity_randomDIstribution(self):
+    def testsanity_randomDIstribution(self):
         """
         Checking the shift with random numbers.
         """
@@ -2883,7 +2883,7 @@ class SanityOfCrosscor(unittest.TestCase):
         self.assertAlmostEqual(rv1[m1], rv, delta=accu)
 
 
-class SanityOfQuadExtreme(unittest.TestCase):
+class TestSanityOfQuadExtreme(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2891,7 +2891,7 @@ class SanityOfQuadExtreme(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_quadextreme(self):
+    def testsanity_quadextreme(self):
         """
         Checking quadExtreme: find max and min of parabola.
         """
@@ -2911,7 +2911,7 @@ class SanityOfQuadExtreme(unittest.TestCase):
                 p, indi = pyasl.quadExtreme(x, y, mode=mode, dp=(3, 7))
                 self.assertAlmostEqual(p - delta, 0.0, delta=1e-14)
 
-    def sanity_quadextremeFullPoint(self):
+    def testsanity_quadextremeFullPoint(self):
         """
         Checking quadExtreme: find max and min of parabola (ordinate values included).
         """
@@ -2935,7 +2935,7 @@ class SanityOfQuadExtreme(unittest.TestCase):
                 self.assertAlmostEqual(p[0] - delta, 0.0, delta=1e-8)
                 self.assertAlmostEqual(p[1], c, delta=1e-8)
 
-    def sanity_quadextremeExample(self):
+    def testsanity_quadextremeExample(self):
         """
         Checking example for quadExtreme.
         """
@@ -2981,7 +2981,7 @@ class SanityOfQuadExtreme(unittest.TestCase):
 #     plt.show()
 
 
-class SanityOfPositionAngle(unittest.TestCase):
+class TestSanityOfPositionAngle(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -2989,7 +2989,7 @@ class SanityOfPositionAngle(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_Example(self):
+    def testsanity_Example(self):
         """
         Checking position angle example
         """
@@ -3004,7 +3004,7 @@ class SanityOfPositionAngle(unittest.TestCase):
 
         print("Position angle of Alcor (from Mizar): %4.2f deg" % r)
 
-    def sanity_positionAngle(self):
+    def testsanity_positionAngle(self):
         """
         Checking sanity of positionAngle
         """
@@ -3018,7 +3018,7 @@ class SanityOfPositionAngle(unittest.TestCase):
         self.assertEqual(positionAngle(10.0, 0.0, 9.9, 0.0), 270.0)
 
 
-class SanityOfSMW_RHK(unittest.TestCase):
+class TestSanityOfSMW_RHK(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -3026,7 +3026,7 @@ class SanityOfSMW_RHK(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_ExampleConversion(self):
+    def testsanity_ExampleConversion(self):
         """
         Check the S-index -> RHK conversion example
         """
@@ -3046,7 +3046,7 @@ class SanityOfSMW_RHK(unittest.TestCase):
         print("Convert S-index to RHK assuming a main-sequence star")
         ss.SMWtoRHK(s, teff, bv, lc="ms", verbose=True)
 
-    def sanity_ExampleShowCCF(self):
+    def testsanity_ExampleShowCCF(self):
         """
         Check example showing the Ccf conversion factor.
         """
@@ -3075,7 +3075,7 @@ class SanityOfSMW_RHK(unittest.TestCase):
 #     plt.show()
 
 
-class SanityOfAtomicNo(unittest.TestCase):
+class TestSanityOfAtomicNo(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -3083,7 +3083,7 @@ class SanityOfAtomicNo(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_Example(self):
+    def testsanity_Example(self):
         """
         Check example of atomic number (AtomicNo)
         """
@@ -3101,7 +3101,7 @@ class SanityOfAtomicNo(unittest.TestCase):
 
         print(an.getElementName(25))
 
-    def sanity_AtomicNo(self):
+    def testsanity_AtomicNo(self):
         """
         Check a number of associations
         """
@@ -3121,7 +3121,7 @@ class SanityOfAtomicNo(unittest.TestCase):
         print(an.getElementName(25))
 
 
-class SanityOfFitsSpec(unittest.TestCase):
+class TestSanityOfFitsSpec(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -3131,7 +3131,7 @@ class SanityOfFitsSpec(unittest.TestCase):
         os.remove("test1.fits")
         os.remove("test2.fits")
 
-    def sanity_write1dFitsSpecExample(self):
+    def testsanity_write1dFitsSpecExample(self):
         """
         Sanity of write1dFitsSpec example
         """
@@ -3151,7 +3151,7 @@ class SanityOfFitsSpec(unittest.TestCase):
         pyasl.write1dFitsSpec("test2.fits", flux, waveParams=wp, clobber=True)
 
 
-class SanityOftgal_uvw(unittest.TestCase):
+class TestSanityOftgal_uvw(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -3159,7 +3159,7 @@ class SanityOftgal_uvw(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Checking sanity of gal_uvw example
         """
@@ -3175,7 +3175,7 @@ class SanityOftgal_uvw(unittest.TestCase):
         print("U, V, W (LSR corrected) [kms/s]:  % 5.3f, % 5.3f, % 5.3f" % \
             pyasl.gal_uvw(ra, dec, pmra, pmdec, d, rv, lsr=(8.5, 13.38, 6.49) ) )
 
-    def sanity_galuvw(self):
+    def testsanity_galuvw(self):
         """
         Checking sanity of gal_uvw 
         """
@@ -3205,7 +3205,7 @@ class SanityOftgal_uvw(unittest.TestCase):
         self.assertAlmostEqual(w-w0, 0, delta=0.1, msg="Problem with W (no 2)")
         
 
-class SanityOfProperMotion(unittest.TestCase):
+class TestSanityOfProperMotion(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -3213,7 +3213,7 @@ class SanityOfProperMotion(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_pm(self):
+    def testsanity_pm(self):
         """
         Test sanity of proper motion
         """
@@ -3261,7 +3261,7 @@ class SanityOfProperMotion(unittest.TestCase):
             self.assertAlmostEqual(ra2, ra3, delta=1e-6, msg="Fixes test failed (ra, no. %d)" % i)
             self.assertAlmostEqual(dec2, dec3, delta=1e-6, msg="Fixes test failed (dec, no. %d)" % i)
 
-    def sanity_example(self):
+    def testsanity_example(self):
         """
         Testing proper motion example
         """
@@ -3279,9 +3279,9 @@ class SanityOfProperMotion(unittest.TestCase):
         print("Position 2050: %10.6f  % 10.6f" % (ra5, dec5))
 
 
-class SanityOfBetaSigma(unittest.TestCase):
+class TestSanityOfBetaSigma(unittest.TestCase):
  
-    def sanity_test1(self):
+    def testsanity_test1(self):
         """
         Beta Sigma sanity test 1
         """
@@ -3307,7 +3307,7 @@ class SanityOfBetaSigma(unittest.TestCase):
         self.assertAlmostEqual(e, 1., delta=2 * se,
                                msg="SanityOfBetaSigma, test1: e does not match 1 within 2 std.")
  
-    def sanity_test2(self):
+    def testsanity_test2(self):
         """
         Beta Sigma sanity test 2
         """
@@ -3343,7 +3343,7 @@ class SanityOfBetaSigma(unittest.TestCase):
                 self.assertAlmostEqual(
                     e, 1., delta=4 * se, msg="SanityOfBetaSigma, test2: e does not match 1 within 4 std.")
  
-    def sanity_test_betaSampleIndices(self):
+    def testsanity_test_betaSampleIndices(self):
         """
         Beta sigma sample indices for independent sample construction
         """
@@ -3381,7 +3381,7 @@ class SanityOfBetaSigma(unittest.TestCase):
                 print(len(ka), len(x), N, j)
                 self.assertTrue(len(ka) >= len(x) - (N + 2) * (j + 1))
  
-    def test3(self):
+    def testsanity3(self):
         """
         Beat sigma test3
         """
@@ -3396,13 +3396,13 @@ class SanityOfBetaSigma(unittest.TestCase):
         ne = pyasl.BSEqSamp()
  
         std, e = ne.stdUnbiased(y)
-        madstd = ne.estimateStdMAD(y)
+        madstd = ne.estimateStdMAD(y, "em")
  
         self.assertAlmostEqual(std, madstd, delta=e,
                                msg="SanityOfBetaSigma, test3: std and madstd do not match")
  
  
-    def sanity_example_quickstart(self):
+    def testsanity_example_quickstart(self):
         """
         Beta-Sigma Quickstart example
         """
@@ -3432,7 +3432,7 @@ class SanityOfBetaSigma(unittest.TestCase):
         print("Input noise std: ", gstd)
         print("Estimated noise std = %5.3f +/- %5.3f" % (nstd, nstdstd))
 
-    def sanity_example_different_N(self):
+    def testsanity_example_different_N(self):
         """
         BS example: Noise estimates with different orders of approximations (N)
         """
@@ -3508,7 +3508,7 @@ class SanityOfBetaSigma(unittest.TestCase):
 #         plt.tight_layout()
 #         plt.show()
 
-    def sanity_example_outliers(self):
+    def testsanity_example_outliers(self):
         """
         BS example: The effect of outliers: A case for robust estimation
         """
@@ -3568,7 +3568,7 @@ class SanityOfBetaSigma(unittest.TestCase):
 #         plt.hist(bseq.betaSample, 30)
 #         plt.show()
  
-    def sanity_example_eqarbsamp(self):
+    def testsanity_example_eqarbsamp(self):
         """
         Equidistant vs. arbitrary sampling
         """
