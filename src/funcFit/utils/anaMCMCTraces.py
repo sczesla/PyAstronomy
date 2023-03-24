@@ -237,7 +237,7 @@ class TraceAnalysis:
             The walker to be considered in the analysis. Counting
             starts at zero.
         """
-        self._selectedWalker = np.array(ws, dtype=np.int)
+        self._selectedWalker = np.array(ws, dtype=int)
         if self.dbtype == "emcee":
             # Apply burn-in to individual walkers
             self._loadEMCEEChain(burn=self.burn)
