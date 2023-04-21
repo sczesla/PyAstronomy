@@ -233,6 +233,18 @@ class SysRem:
                                  where="SysRem.get_model", \
                                  solution="Specify either a and c or use 'last=True'."))
     
+    def get_cumulative_model(self):
+        """
+        Get the cumulative model (sum of all available models)
+        """
+        cm = None
+        for ac in self.ac:
+            if ac[0] is None:
+                continue
+            m = self.get_model(last=False, a=ac[0], c=ac[1])
+            cm = m if cm is None else cm+m
+        return cm
+    
     def iterate(self, atol=1e-3, rtol=0, imax=1001):
         """
         A single SysRem iteration: Remove linear systematic effect
