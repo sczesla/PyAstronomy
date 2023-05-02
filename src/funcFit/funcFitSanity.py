@@ -55,6 +55,78 @@ class TestFuncFitSanity(unittest.TestCase):
             "Wrong description: " + gff.description(),
         )
 
+    def testsanity_gaussfit1d_parameterization(self):
+        """ Test parameterization of GaussFit1d """
+        import numpy as np
+        
+        gf_hs = fuf.GaussFit1d(prm=("h", "sig"))
+        gf_as = fuf.GaussFit1d(prm=("A", "sig"))
+        gf_af = fuf.GaussFit1d(prm=("A", "FWHM"))
+        gf_hf = fuf.GaussFit1d(prm=("h", "FWHM"))
+        
+        fsig = 2*np.sqrt(2*np.log(2))
+        print(f"fsig = {fsig}")
+        
+        gfs = [gf_hs, gf_as, gf_af, gf_hf]
+        
+        gf_as["A"] = 1
+        gf_as["sig"] = 1
+        
+        gf_af["A"] = 1
+        gf_af["FWHM"] = fsig
+        
+        gf_hs["h"] = 1/np.sqrt(2*np.pi)
+        gf_hs["sig"] = 1
+        
+        gf_hf["h"] = 1/np.sqrt(2*np.pi)
+        gf_hf["FWHM"] = fsig
+        
+        x = np.linspace(-3,3,100)
+        ys = []
+        for g in gfs:
+            ys.append( g.evaluate(x) )
+            
+        for i in range(1, len(ys)):
+            print(f"Checking y({i}) against 0")
+            np.testing.assert_allclose(ys[i], ys[0], rtol=0, atol=1e-8)
+
+    def testsanity_gaussfit1d_parameterization_fit(self):
+        """ Test parameterization of GaussFit1d (fitting) """
+        import numpy as np
+        
+        np.random.seed(1919)
+        
+        gf_hs = fuf.GaussFit1d(prm=("h", "sig"))
+        gf_as = fuf.GaussFit1d(prm=("A", "sig"))
+        gf_af = fuf.GaussFit1d(prm=("A", "FWHM"))
+        gf_hf = fuf.GaussFit1d(prm=("h", "FWHM"))
+        
+        fsig = 2*np.sqrt(2*np.log(2))
+        print(f"fsig = {fsig}")
+        
+        gfs = [gf_hs, gf_as, gf_af, gf_hf]
+        
+        gf_as["A"] = 1
+        gf_as["sig"] = 1
+        
+        x = np.linspace(-3,3,100)
+        y = gf_as.evaluate(x)
+        y += np.random.normal(0, 0.001, len(x))
+        
+        gf_hf.thaw("h")
+        gf_hf.thaw("FWHM")
+        gf_hf.thaw("mu")
+        
+        gf_hf["h"] = 0.1
+        gf_hf["FWHM"] = 2
+        
+        gf_hf.fit(x, y, minAlgo="spfmp")
+        gf_hf.parameterSummary()
+        
+        np.testing.assert_almost_equal(gf_hf["h"], 1/np.sqrt(2*np.pi), decimal=3)
+        np.testing.assert_almost_equal(gf_hf["FWHM"], fsig, decimal=3)
+        np.testing.assert_almost_equal(gf_hf["mu"], 0, decimal=3)
+
 
 class MultiVoigtSanity(unittest.TestCase):
     def setUp(self):

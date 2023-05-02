@@ -7,7 +7,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 
 class GaussFit1d(OneDFit):
     """
-    Implements a one dimensional Gaussian.
+    A one-dimensional Gaussian
 
     The functional form is:
 
@@ -16,41 +16,94 @@ class GaussFit1d(OneDFit):
     Here, `lin` and `off` denote the linear and the offset term.
 
     *Fit parameters*:
-     - `A` - Amplitude (the area of the Gaussian)
+     - `A` - Area of the Gaussian (formerly called Amplitude)
      - `mu` - Center of the Gaussian
      - `sig` - Standard deviation
      - `off` - Offset
      - `lin` - Linear term
+    
+    .. note::
+        Other parameterizations using FWHM and 'height' of the curve can be used.
+    
+    Parameters
+    ----------
+    prm : optional tuple of two strings, {("A", "sig"), ("h", "sig"), ("A", "FWHM"), ("h", "FWHM")}
+        Can be used to adapt the parameterization of the Gaussian. By default, the curve is
+        parameterized by Area (A) and standard deviation (sig). Alternatively, also the height (h)
+        of the curve (h = A/sqrt(2*pi*sig**2)) and the Full Width at Half Maximum (FWHM) can be
+        used. The naming of the fit parameters is updated accordingly.
     """
 
-    def __init__(self):
-        OneDFit.__init__(self, ["A", "mu", "sig", "off", "lin"])
+    # Valid parameterizations
+    _valid_prms = (("A", "sig"), ("h", "sig"), ("A", "FWHM"), ("h", "FWHM"))
+    # FWHM -> STD
+    _fwhm_to_sig = 2 * np.sqrt(2 * np.log(2))
+
+    def __init__(self, prm=("A", "sig")):
+        if not prm in GaussFit1d._valid_prms:
+            raise (
+                PE.PyAValError(
+                    f"Invalid parameterization (f{str(prm)}).",
+                    where="GaussFit1d",
+                    solution="Choose any of: " + ", ".join([str(x) for x in GaussFit1d._valid_prms]),
+                )
+            )
+
+        self._prm = prm
+        OneDFit.__init__(self, ["mu", "off", "lin"] + list(prm))
         self.setRootName("Gaussian")
 
-    def evaluate(self, x):
+    def _check_zero_width(self):
         """
-        Evaluates the model for current parameter values.
+        Check if width (sig/FWHM) is zero. Raise exception if so.
+        """
+        if self[self._prm[1]] == 0.0:
+            raise (
+                PE.PyAValError(
+                    "Width of Gaussian must be larger than zero.",
+                    solution=f"Change width ('{self._prm[1]}').",
+                )
+            )
+
+    def evaluate_h_sig(self, x, h, sig):
+        """
+        Evaluates the model for given height and standard deviation (sig)-
 
         Parameters
         ----------
         x : array
             Specifies the points at which to evaluate the model.
+        
+        Returns
+        -------
+        model : array
         """
-        if self["sig"] == 0.0:
-            raise (
-                PE.PyAValError(
-                    "Width of Gaussian must be larger than zero.",
-                    solution="Change width ('sig').",
-                )
-            )
+
         y = (
-            self["A"]
-            / np.sqrt(2.0 * np.pi * self["sig"] ** 2)
-            * np.exp(-((self["mu"] - x) ** 2) / (2.0 * self["sig"] ** 2))
+            h * np.exp(-((self["mu"] - x) ** 2) / (2.0 * sig**2))
             + self["off"]
             + (self["lin"] * x)
         )
         return y
+
+    def evaluate(self, x):
+        self._check_zero_width()
+        if self._prm == ("h", "sig"):
+                return self.evaluate_h_sig(x, self["h"], self["sig"])
+        elif self._prm == ("A", "sig"):
+                return self.evaluate_h_sig(
+                    x, self["A"] / np.sqrt(2 * np.pi * self["sig"] ** 2), self["sig"]
+                )
+        elif self._prm == ("h", "FWHM"):
+                return self.evaluate_h_sig(
+                    x, self["h"], self["FWHM"] / GaussFit1d._fwhm_to_sig
+                )
+        elif self._prm == ("A", "FWHM"):
+                return self.evaluate_h_sig(
+                    x,
+                    self["A"] / np.sqrt(2 * np.pi * (self["FWHM"]/self._fwhm_to_sig) ** 2),
+                    self["FWHM"] / GaussFit1d._fwhm_to_sig,
+                )
 
 
 class MultiGauss1d(OneDFit):
