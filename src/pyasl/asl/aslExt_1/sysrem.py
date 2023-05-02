@@ -245,7 +245,7 @@ class SysRem:
             cm = m if cm is None else cm+m
         return cm
     
-    def iterate(self, atol=1e-3, rtol=0, imax=1001):
+    def iterate(self, atol=1e-3, rtol=0, imax=1001, a0=None):
         """
         A single SysRem iteration: Remove linear systematic effect
         
@@ -260,6 +260,10 @@ class SysRem:
         imax : int
             Maximum of iterations. Throws exception if convergence
             is not reached earlier.
+        a0 : array, optional
+            Starting value for SYSREM model PCA-like component. If not
+            specified, the value defined during instance initialization
+            will be used.
         
         Returns
         -------
@@ -270,7 +274,14 @@ class SysRem:
         c : array
             Best-fit 'c' values
         """
-        a = self.a0
+        if a0 is None:
+            a = self.a0
+        else:
+            if a0.shape != self.a0.shape:
+                raise(PE.PyAValError("a0 has wrong shape", \
+                                     where="SYSREM iterate", \
+                                     solution="Needs to be a 1d array with same length as 'observation'."))
+            a = a0
         # First ac iteration
         c = sysrem_iter_c(self.rijs[-1], None, a, sigij2=self.sm2)
         a = sysrem_iter_a(self.rijs[-1], None, c, sigij2=self.sm2)
