@@ -2058,7 +2058,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # the objective function as its second item.
         self.fitResult = self.minAlgo(self.miniFunc, self.pars.getFreeParams(), *self.fminPars,
                                       **self.fminArgs)
-        print(self.fitResult)
+
         # Set parameters and model to best-fit values
         self.pars.setFreeParams(self.fitResult[0])
         self.updateModel()
