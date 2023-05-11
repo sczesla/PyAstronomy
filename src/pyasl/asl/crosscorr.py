@@ -4,7 +4,18 @@ from PyAstronomy.pyasl import _ic
 
 
 def crosscorrRV(
-    w, f, tw, tf, rvmin, rvmax, drv, mode="doppler", skipedge=0, edgeTapering=None
+    w,
+    f,
+    tw,
+    tf,
+    rvmin,
+    rvmax,
+    drv,
+    mode="doppler",
+    skipedge=0,
+    edgeTapering=None,
+    weights=None,
+    meanwvl=None,
 ):
     """
     Cross-correlate a spectrum with a template.
@@ -16,6 +27,22 @@ def crosscorrRV(
     shifted template is then linearly interpolated at
     the wavelength points of the observation
     (spectrum) to calculate the cross-correlation function.
+
+    If N data points :math:`f_i` at wavelengths :math:`w_i` are given, the cross
+    correlation function :math:`CC(v_j)`, depending on the velocity :math:`v_j` and
+    optional weights :math:`\\alpha_i` is calculated as:
+
+    .. math::
+
+        CC(v_j) = \\sum_{i=1}^N \\alpha_i \\times \left(f_i \\times t(w_i-\Delta_{i,j}) \\right)
+
+    If the mode is `lin`, the shift is implemented as :math:`\Delta_{i,j} = \\bar{w} (v_j/c)`, where
+    :math:`\\bar{w}` is the mean wavelength (i.e., the mean of the input w unless meanwvl is specified).
+    For any velocity, the shift is a constant across the entire wavelength
+    axis. If the mode is `doppler`, the shift is implemented as
+    :math:`\Delta_{i,j} = w_i (v_j/c)`, which depends both on the wavelength and the velocity.
+    The evaluation of the shifted template :math:`t(w_i-\Delta_{i,j})` is carried out using linear interpolation.
+    If no weights are specified, :math:`\\alpha_i = 1` is adopted.
 
     Parameters
     ----------
@@ -60,6 +87,14 @@ def crosscorrRV(
         high wavelength end. If a nonzero 'skipedge' is given, it
         will be applied first. Edge tapering can help to avoid
         edge effects (see, e.g., Gullberg and Lindegren 2002, A&A 390).
+    weights : array of floats, optional
+        If given, it specifies weights for individual data points (given by f).
+        A possible choice for weights is 1/sigma_i**2 where sigma_i is the
+        uncertainty of the i-th data point.
+    meanwvl : float, optional
+        If given, this value will be adopted for the mean wavelength
+        :math:`\\bar{w}` to calculate shifts in 'lin' mode instead of
+        the mean of the input array w.
 
     Returns
     -------
@@ -82,10 +117,25 @@ def crosscorrRV(
         )
     import scipy.interpolate as sci
 
+    if weights is None:
+        weights = np.ones_like(w)
+    else:
+        weights = weights.copy()
+
+    if (w.shape != f.shape) or (w.shape != weights.shape):
+        raise (
+            PE.PyAValError(
+                f"w, f, and weights must have the same shape. Given shapes are (w,f,weights): {w.shape}, {f.shape}, {weights.shape}",
+                where="crosscorrRV",
+                solution="Adjust arrays (w,f) and/or weights if specified.",
+            )
+        )
+
     # Copy and cut wavelength and flux arrays
     w, f = w.copy(), f.copy()
     if skipedge > 0:
         w, f = w[skipedge:-skipedge], f[skipedge:-skipedge]
+        weights = weights[skipedge:-skipedge]
 
     if edgeTapering is not None:
         # Smooth the edges using a sine
@@ -126,7 +176,10 @@ def crosscorrRV(
         )
     # Check whether template is large enough
     if mode == "lin":
-        meanWl = np.mean(w)
+        if meanwvl is None:
+            meanWl = np.mean(w)
+        else:
+            meanWl = meanwvl
         dwlmax = meanWl * (rvmax / c)
         dwlmin = meanWl * (rvmin / c)
         if (tw[0] + dwlmax) > w[0]:
@@ -184,5 +237,5 @@ def crosscorrRV(
             # Apply the Doppler shift
             fi = sci.interp1d(tw * (1.0 + rv / c), tf)
         # Shifted template evaluated at location of spectrum
-        cc[i] = np.sum(f * fi(w))
+        cc[i] = np.sum(f * fi(w) * weights)
     return drvs, cc
