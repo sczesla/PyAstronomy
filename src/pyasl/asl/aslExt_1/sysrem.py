@@ -146,7 +146,7 @@ def sysrem_update_rij(rij, a, c):
 
 class SysRem:
     
-    def __init__(self, obs, sigs, ms_obs=True, ms_feat=False, a0=None):
+    def __init__(self, obs, sigs, ms_obs=True, ms_feat=False, a0=None, ms_warn=True):
         """
         Implementation of the SysRem algorithm.
         
@@ -177,6 +177,9 @@ class SysRem:
             Subtract mean from observations in initial data matrix (columns of data matrix). Default is True.
         ms_feat : boolean, optional
             Subtract mean from features in initial data matrix (e.g., spectral bins). Default is False.
+        ms_warn : boolean, optional
+            If True (default), a warning will be printed if either ms_obs or ms_feat is True so that the
+            data will be manipulated by subtracting mean(s). Set False to suppress warning.
         
         Attributes
         ----------
@@ -193,7 +196,13 @@ class SysRem:
             obs = [obs[::,i] for i in range(obs.shape[1])]
         if isinstance(sigs, np.ndarray) and (sigs.ndim == 2):
             sigs = [sigs[::,i] for i in range(sigs.shape[1])]
-            
+        
+        if (ms_obs or ms_feat) and ms_warn:
+            PE.warn(PE.PyAValError(f"Be aware: Mean will be subtracted from the data (ms_feat={ms_feat}, ms_obs={ms_obs}).", \
+                                   where="SYSREM", \
+                                   solution=["Use ms_warn=False to suppress this warning or change ms_feat/obs.", \
+                                   "Initial data can be viewed using the attribute rijs[0]."]))
+        
         self.rij, self.sm, self.a0 = sysrem_data_prepare(obs, sigs, ms_obs=ms_obs, ms_feat=ms_feat)
         self.sm2 = self.sm**2
         if a0 is not None:
