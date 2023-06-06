@@ -42,8 +42,12 @@ def crosscorrRV(
     axis. If the mode is `doppler`, the shift is implemented as
     :math:`\Delta_{i,j} = w_i (v_j/c)`, which depends both on the wavelength and the velocity.
     The evaluation of the shifted template :math:`t(w_i-\Delta_{i,j})` is carried out using linear interpolation.
-    If no weights are specified, :math:`\\alpha_i = 1` is adopted.
-
+    
+    If no weights are specified, :math:`\\alpha_i = 1` is adopted. If uncertainties, :math:`\\sigma_i`, for the
+    :math:`f_i` are known, a useful choice for the weights is :math:`\\alpha_i = \sigma_i^{-2}`, because this makes
+    maximizing the CCF equivalent to maximizing the likelihood 
+    (see, e.g., `Lookwood et al. 2014, ApJ 783 <https://ui.adsabs.harvard.edu/abs/2014ApJ...783L..29L/abstract>`_).
+    
     Parameters
     ----------
     w : array
