@@ -18,6 +18,11 @@ signal tends to increase with the number of iteration.
     the observation is stored in the first column. The data matrix is, therefore, stored here as
     the transpose of that adopted for the PCA etc..
 
+.. note::
+    
+    Compared to the presentation by Tamuz et al., the roles of `a` and `c` are exchanged.
+
+
 Example: Application to mock data
 -------------------------------------
 
