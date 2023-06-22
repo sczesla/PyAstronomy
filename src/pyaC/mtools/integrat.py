@@ -3,7 +3,7 @@ from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
 
 
-def ibtrapz(x, y, x0, x1, iaout=False):
+def ibtrapz(x, y, x0, x1, iaout=False, jne=False):
     """
     Use the trapezoid rule to integrate and interpolate boundary values.
 
@@ -21,6 +21,12 @@ def ibtrapz(x, y, x0, x1, iaout=False):
         If True, the arrays used internally for
         integration are also returned. The default
         is False.
+    jne : boolean, optional
+        If True, a leave-one-out error estimate
+        is produced for the value of the integral.
+        In that case, the actual integral, the error
+        estimate (standard deviation), and the individual
+        jacknife estimates are returned.
 
     Returns
     -------
@@ -66,6 +72,13 @@ def ibtrapz(x, y, x0, x1, iaout=False):
                 solution="Give more data or adjust integration boundaries.",
             )
         )
+    if jne & iaout:
+        raise (
+            PE.PyAParameterConflict(
+                "jne and iaout cannot be used simultaneously.", where="ibtrapz"
+            )
+        )
+
     # Interpolate at integration boundaries
     fi = sci.interp1d(x, y)
     y0, y1 = fi(x0), fi(x1)
@@ -80,6 +93,22 @@ def ibtrapz(x, y, x0, x1, iaout=False):
     xi[-1] = x1
     yi[0] = y0
     yi[-1] = y1
+
+    if jne:
+        # Produce a leave-one-out jackknife error
+        if len(xi) < 3:
+            # This is technically impossible
+            return scinteg.trapz(yi, xi), None, None
+        m = np.ones_like(xi, dtype=bool)
+        estis = []
+        for i in range(1, len(m) - 1):
+            m[i] = False
+            estis.append(scinteg.trapz(yi[m], xi[m]))
+            m[i] = True
+        estis = np.array(estis)
+        me = np.mean(estis)
+        var = (len(estis) - 1) / len(estis) * np.sum((estis - me) ** 2)
+        return scinteg.trapz(yi, xi), np.sqrt(var), estis
 
     if iaout:
         return scinteg.trapz(yi, xi), xi, yi
