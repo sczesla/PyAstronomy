@@ -2,7 +2,6 @@ from __future__ import print_function, division
 import scipy.interpolate as sci
 import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
-import six.moves as smo
 
 
 def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err=None):
