@@ -153,8 +153,23 @@ class PyAUniformPrior(PyAPrior):
                 return y
         
         PyAPrior.__init__(self, ivs, f, descr=descr)
-      
-      
+
+
+class PyANormalPrior(PyAPrior):
+    
+    def __init__(self, ivs, mean=None, std=None, descr=""):
+
+        if (mean is None) and (std is None):
+            raise(PE.PyAValError("Both mean and std must be specified"))
+
+        const = -0.5*np.log(2*np.pi*std**2)
+        durch = 2*std**2
+
+        f = lambda x: const - (x-mean)**2/durch
+        
+        PyAPrior.__init__(self, ivs, f, descr=descr)
+
+        
 class PyASmoothUniformPrior(PyAPrior):
       
     def __init__(self, ivs, lower=None, upper=None, scale=1e-9, descr=""):
@@ -1090,6 +1105,23 @@ it requires a data set as input.
         self.pars._checkParam(pn)
         descr = "Cauchy prior on '" + str(pn) + "' (scale = %g, location = %g, side = %s)" % (scale, x0, side)
         self.priors.append(PyACauchyPrior(self.getPRef(pn), scale, x0, side, descr=descr))
+        
+    def addNormalPrior(self, pn, mean, std):
+        """
+        Add normal (Gaussian) prior
+        
+        Parameters
+        ----------
+        pn : string
+            Name of the parameter
+        mean : float
+            Location parameter of the distribution
+        std : float
+            Standard deviation of the distribution
+        """
+        self.pars._checkParam(pn)
+        descr = "Normal prior on '" + str(pn) + "' (mean = %g, std = %g)" % (mean, std)
+        self.priors.append(PyANormalPrior(self.getPRef(pn), mean, std, descr=descr))
         
     def addPrior(self, p):
         pass
