@@ -54,7 +54,7 @@ def rochepot_dl(x, y, z, q):
 
 def ddx_rochepot_dl(x, q, y=0, z=0):
     """
-    Derive of dimensionless Roche potential along x-axis
+    Derivative of dimensionless Roche potential along x-axis
     
     Parameters
     ----------
@@ -75,7 +75,7 @@ def ddx_rochepot_dl(x, q, y=0, z=0):
 
 def ddz_rochepot_dl(z, q, x=1, y=0):
     """
-    Derive of dimensionless Roche potential along z-axis
+    Derivative of dimensionless Roche potential along z-axis
     
     Parameters
     ----------
@@ -96,7 +96,7 @@ def ddz_rochepot_dl(z, q, x=1, y=0):
 
 def ddy_rochepot_dl(y, q, x=1, z=0):
     """
-    Derive of dimensionless Roche potential along y-axis
+    Derivative of dimensionless Roche potential along y-axis
     
     Parameters
     ----------
