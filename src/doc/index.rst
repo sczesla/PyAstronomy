@@ -14,7 +14,6 @@ About PyAstronomy
    pyaCDoc/installingPyA.rst
    PyAGroup.rst
    license.rst
-   changeLog/index.rst
    pyaCDoc/acknowledgement.rst
    pyaCDoc/cont.rst
 
