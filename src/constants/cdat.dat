@@ -83,6 +83,15 @@ unitSI  = m
 unitcgs = cm
 source  = http://maia.usno.navy.mil/NSFA/NSFA_cbe.html#GaussianGrav2009
 
+[MassEarth]
+descr   = Mass of the Earth
+symbol  = MEarth
+valueSI = 5.9722e24
+errSI   = 0.0006
+unitSI  = kg
+unitcgs = g
+source  = https://en.wikipedia.org/wiki/Earth_mass
+
 [RadEqJupiter]
 descr   = Equatorial radius of Jupiter
 symbol  = RJ
