@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import unittest
 
-class SanityOfPyaslExt1(unittest.TestCase):
+class TestSanityOfPyaslExt1(unittest.TestCase):
   
   def setUp(self):
     pass
@@ -9,7 +9,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
   def tearDown(self):
     pass
   
-  def sanity_ExampleTransmissionCurves(self):
+  def testsanity_ExampleTransmissionCurves(self):
     """
       Checking example for 'TransmissionCurves'
     """
@@ -33,15 +33,15 @@ class SanityOfPyaslExt1(unittest.TestCase):
     
     # Plot transmission curves for Bessel b, v, and r bands
     for (b, c) in six.iteritems({"b":"b", "v":"k", "r":"r"}):
-      tc = tcs.getTransCurve("Bessel " + b)
-      trans = tc(wvl)
-      plt.plot(wvl, trans, c+'-', label="Bessel " + b)
+        tc = tcs.getTransCurve("Bessel " + b)
+        trans = tc(wvl)
+        plt.plot(wvl, trans, c+'-', label="Bessel " + b)
     
     # Plot transmission curves for Johnson U, B, and V bands
     for (b, c) in six.iteritems({"U":"m", "B":"b", "V":"k"}):
-      tc = tcs.getTransCurve("Johnson " + b)
-      trans = tc(wvl)
-      plt.plot(wvl, trans, c+'--', label="Johnson " + b)
+        tc = tcs.getTransCurve("Johnson " + b)
+        trans = tc(wvl)
+        plt.plot(wvl, trans, c+'--', label="Johnson " + b)
     
     plt.legend()
     plt.xlabel("Wavelength [$\AA$]")

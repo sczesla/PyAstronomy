@@ -3,7 +3,7 @@ import unittest
 from PyAstronomy import pyasl
 
 
-class SanityOfPyaslExt1(unittest.TestCase):
+class TestSanityOfPyaslExt1(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -11,7 +11,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def sanity_pizzolatoExample(self):
+    def testsanity_pizzolatoExample(self):
         """
         Example of Pizzolato 2003 relations
         """
@@ -44,7 +44,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         plt.plot(prot, lxlbol, 'bp-')
 #     plt.show()
 
-    def sanity_pizzolato(self):
+    def testsanity_pizzolato(self):
         """
         Pizzolato 2003 sanity
         """
@@ -64,7 +64,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         self.assertAlmostEqual(
             x[0], -4.1694, msg="Pizzolato relation (m=1.15, pr=3.0) failed (value=" + str(x[0]) + ").", delta=1e-4)
 
-    def sanity_expCorrRN_Example1(self):
+    def testsanity_expCorrRN_Example1(self):
         """
         Sanity of example 1 for expCorrRN
         """
@@ -91,7 +91,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         plt.plot(range(200), g, 'g.')
 #     plt.show()
 
-    def sanity_expCorrRN_Example2(self):
+    def testsanity_expCorrRN_Example2(self):
         """
         Sanity of example 2 for expCorrRN
         """
@@ -118,7 +118,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         plt.plot(x, np.exp(-x / tau) * ac.max(), 'r--')
     #   plt.show()
 
-    def sanity_ramirez2005Example(self):
+    def testsanity_ramirez2005Example(self):
         """
         Check sanity of Ramirez/Melendez 2005 example
         """
@@ -139,7 +139,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         print("B-V = ", bv, ", Teff = ", teff,
               ", bv1 = ", bv1, ", bv-bv1 = ", bv - bv1)
 
-    def sanity_ramirez2005Example2(self):
+    def testsanity_ramirez2005Example2(self):
         """
         Checking Ramirez, Ballesteros example
         """
@@ -156,7 +156,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
             print(("B-V [mag] = {3:4.2f} : Teff (R05) = {0:4.0f} K, " +
                    "Teff (B12) = {1:4.0f} K, dTeff = {2: 4.0f} K").format(tr, tb, tr - tb, bv))
 
-    def sanity_ramirez2005(self):
+    def testsanity_ramirez2005(self):
         """
         Check sanity Ramirez/Melendez 2005 conversions
         """
@@ -192,7 +192,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
             self.assertAlmostEqual(x[0], col, delta=1e-2,
                                    msg="Two-way color-temperature conversion is inconsistent. bv = %.4e, feh = %.4e" % x)
 
-    def sanity_BallesterosExample(self):
+    def testsanity_BallesterosExample(self):
         """
         Checking example for Ballesteros
         """
@@ -211,7 +211,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         bv = b.t2bv(teff)
         print("Teff = {0:4.0f} K -> B-V = {1:4.2f} mag".format(teff, bv))
 
-    def sanity_gyroAgeBarnes(self):
+    def testsanity_gyroAgeBarnes(self):
         """
         Check Gyro age of Barnes 2007
         """
@@ -222,7 +222,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
             self.assertAlmostEqual(e / a * 100., d[2], delta=1.0,
                                    msg="Relative errors of Barnes 2007 cannot be reproduced.")
 
-    def sanity_sanity_gyroAgeBarnesExample(self):
+    def testsanity_sanity_gyroAgeBarnesExample(self):
         """
         Example gyro age (Barnes 2007)
         """
@@ -237,7 +237,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         # ... and print it
         print("Solar age: {0:4.2f} +/- {1:4.2f} Ga".format(*age))
 
-    def sanity_chromoAgeRHK(self):
+    def testsanity_chromoAgeRHK(self):
         """
         Checking sanity of chromospheric age (Donahue)
         """
@@ -250,7 +250,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
             self.assertAlmostEqual(a, d[1], delta=0.3,
                                    msg="Cannot reproduce age estimate from Donahue fig 1.")
 
-    def sanity_chromoAgeRHKExample(self):
+    def testsanity_chromoAgeRHKExample(self):
         """
         Example chromospheric age (Donahue)
         """
@@ -259,7 +259,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         # Approximate chromospheric age of the Sun
         print("Solar age: {0:4.2f} Ga".format(pyasl.chromoAgeRHK(-4.95)))
 
-    def sanity_abundancepatternsExample(self):
+    def testsanity_abundancepatternsExample(self):
         """
         Checking example of AbundancePatterns
         """
@@ -285,7 +285,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         for el, ab in ap.patternByMass("aspl", key="symbol").items():
             print(f"Element: {el} with mass fraction of {ab}")
 
-    def sanity_abundancePatterns(self):
+    def testsanity_abundancePatterns(self):
         """
         Checking abundance pattern
         """
@@ -299,7 +299,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         self.assertAlmostEqual(p["Ti"], 6.46e-08, delta=1e-12,
                                msg="Ti abundance broken (wilm)")
 
-    def sanity_SpecTypeDeJagerExample1(self):
+    def testsanity_SpecTypeDeJagerExample1(self):
         """
         Sanity of example 1 (SpecTypeDeJager)
         """
@@ -313,7 +313,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         print("Luminosity = {0:4.2f} Lsun".format(10.0**llum))
         print("Effective temperature = {0:6.1f} K".format(10.0**lteff))
 
-    def sanity_SpecTypeDeJagerExample2(self):
+    def testsanity_SpecTypeDeJagerExample2(self):
         """
         Sanity of example 2 (SpecTypeDeJager)
         """
@@ -371,7 +371,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
 #     plt.xlabel("Spectral type")
 #     plt.show()
 
-    def sanity_SpecTypeDeJagerSanity(self):
+    def testsanity_SpecTypeDeJagerSanity(self):
         """
         Sanity of SpecTypeDeJager
         """
@@ -406,7 +406,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         self.assertTrue(lteff1 > lteff2 > lteff3,
                         msg="Float subtype, wrong order of luminosities")
 
-    def sanity_MMSCETSTableExample(self):
+    def testsanity_MMSCETSTableExample(self):
         """
         Sanity of example for MMSCETS table
         """
@@ -432,7 +432,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         plt.ylabel("Mv [mag]")
 #     plt.show()
 
-    def sanity_Roche(self):
+    def testsanity_Roche(self):
         """
         Check Roche
         """
@@ -455,7 +455,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
             self.assertAlmostEqual(qd[3], x1, delta=1e-4, msg="Roche: problem with Monacki " + str(qd))
             self.assertAlmostEqual(qd[4], x2, delta=1e-4, msg="Roche: problem with Monacki " + str(qd))
 
-    def sanity_roche_example(self):
+    def testsanity_roche_example(self):
         """ Cehcking example of Roche """
         from PyAstronomy import pyasl
         import numpy as np
@@ -497,7 +497,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         
 #         plt.contour(p, [l5pot*1.02, l3pot, l2pot, l1pot], colors=['g', 'c', 'b', 'r'], extent=[-1.5,2,-1.6,1.6])
 
-    def sanity_sysrem_example(self):
+    def testsanity_sysrem_example(self):
         """
         Checking SysRem example
         """
@@ -543,7 +543,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         #plt.imshow(r, origin='lower', aspect="auto")
         #plt.show()
 
-    def sanity_sysrem_lindata(self):
+    def testsanity_sysrem_lindata(self):
         """
         Checking SysRem sanity for linear data
         """
@@ -578,7 +578,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         print(np.std(r))
         self.assertAlmostEqual(np.std(r), 0, msg="SysRem problem with linear data", delta=1e-10)
 
-    def sanity_parallacticAngle_example(self):
+    def testsanity_parallacticAngle_example(self):
         """ Checking example of parallactic angle """
         import numpy as np
         import matplotlib.pylab as plt
@@ -601,7 +601,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         plt.legend()
         #plt.show()
         
-    def sanity_sysrem_pca(self):
+    def testsanity_sysrem_pca(self):
         """ Check sanity of SYSREM with PCA """
         from PyAstronomy import pyasl
         import numpy as np
@@ -641,7 +641,7 @@ class SanityOfPyaslExt1(unittest.TestCase):
         np.testing.assert_almost_equal(a1, p1, decimal=5, err_msg=f'SYSREM: Problem with PCA component 1. Compared {p1} and {a1} (p1 and a1)', verbose=True)
         np.testing.assert_almost_equal(a2, p2, decimal=5, err_msg=f'SYSREM: Problem with PCA component 2. Compared {p2} and {a2} (p2 and a2)', verbose=True)
                 
-    def sanity_sysrem_example(self):
+    def testsanity_sysrem_example(self):
         """
         Checking sanity of SYSREM example
         """
@@ -687,5 +687,37 @@ class SanityOfPyaslExt1(unittest.TestCase):
         # plt.imshow(r, origin='lower', aspect="auto")
         # plt.show()
 
-
+    def testsanity_scaleHeight(self):
+        """
+        Checking sanity of scale height
+        """
+        from PyAstronomy import pyasl
+        T, mu, g = 290, 28.97, 9.8
+        she = pyasl.atmosphericScaleHeight(T, mu, g)
+        she2 = pyasl.atmosphericScaleHeight_MR(290, 28.97, 1, 1, "E")
+        self.assertAlmostEqual(she/she2, 1, delta=1e-3, msg="Scale height of Earth cross check failed")
         
+        T, mu, mp, rp = 165, 2.2, 1, 1
+        shj = pyasl.atmosphericScaleHeight_MR(T, mu, mp, rp, "J")
+        self.assertAlmostEqual(shj, 25.152, delta=1e-3, msg=f"Scale height of Jupiter does not match. result obtained is {shj}")
+    
+    def testsanity_scaleHeight_example(self):
+        """
+        Checking example of scale height
+        """
+        from PyAstronomy import pyasl
+    
+        T, mu, g = 290, 28.97, 9.8
+        she = pyasl.atmosphericScaleHeight(T, mu, g) 
+        
+        print("Earth")
+        print(f"T, mu, g = {T} K, {mu}, {g} m/s**2")
+        print(f"Scale height = {she:4.1f} [km]")
+        
+        
+        T, mu, mp, rp = 165, 2.2, 1, 1
+        shj = pyasl.atmosphericScaleHeight_MR(T, mu, mp, rp, "J")
+        
+        print("Jupiter")
+        print(f"T, mu, mp, rp = {T} K, {mu}, {mp} [MJ], {rp} [RJ]")
+        print(f"Scale height = {shj:4.1f} [km]")

@@ -109,6 +109,7 @@ Transit and planet routines
    aslDoc/inTran.rst
    aslDoc/transitVisibility.rst
    aslDoc/planetPhase.rst
+   aslDoc/aslExt_1Doc/scaleHeight.rst
 
 Statistics
 ~~~~~~~~~~
