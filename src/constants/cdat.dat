@@ -136,3 +136,12 @@ errSI   = 0.000000074e-27
 unitSI  = kg
 unitcgs = g
 source  = NIST, CODATA (http://physics.nist.gov/cgi-bin/cuu/Value?mp|search_for=proton+mass)
+
+[UnifiedAtomicMassUnit]
+descr   = Unified atomic mass unit
+symbol  = u
+valueSI = 1.66053906660e-27 
+errSI   = 0.00000000050e-27
+unitSI  = kg
+unitcgs = g
+source  = NIST, CODATA (https://physics.nist.gov/cgi-bin/cuu/Value?ukg%7Csearch_for=atomic+mass+unit)
