@@ -1051,7 +1051,7 @@ it requires a data set as input.
         """
         self.pars._checkParam(pn)
         descr = "Uniform prior on '" + str(pn) + "' (lower = %g, upper = %g)" % (self._too(lower, -np.inf), self._too(upper, np.inf))
-        self.priors.append(PyAUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+        self.addPrior(PyAUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
       
     def addSmoothUniformPrior(self, pn, lower=None, upper=None, scale=1e-9):
         """
@@ -1067,7 +1067,7 @@ it requires a data set as input.
         self.pars._checkParam(pn)
         descr = "Smooth uniform prior on '" + str(pn) + "' (lower = %g, upper = %g, scale = %g)" % \
                 (self._too(lower, -np.inf), self._too(upper, np.inf), scale)
-        self.priors.append(PyASmoothUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
+        self.addPrior(PyASmoothUniformPrior(self.getPRef(pn), lower=lower, upper=upper, descr=descr))
         
     def addScalePrior(self, pn, m):
         """
@@ -1082,7 +1082,7 @@ it requires a data set as input.
         """
         self.pars._checkParam(pn)
         descr = "Scale prior on '" + str(pn) + "' (exponent = %g)" % m
-        self.priors.append(PyAScalePrior(self.getPRef(pn), m, descr=descr))
+        self.addPrior(PyAScalePrior(self.getPRef(pn), m, descr=descr))
         
     def addCauchyPrior(self, pn, x0, scale, side):
         """
@@ -1104,7 +1104,7 @@ it requires a data set as input.
         """
         self.pars._checkParam(pn)
         descr = "Cauchy prior on '" + str(pn) + "' (scale = %g, location = %g, side = %s)" % (scale, x0, side)
-        self.priors.append(PyACauchyPrior(self.getPRef(pn), scale, x0, side, descr=descr))
+        self.addPrior(PyACauchyPrior(self.getPRef(pn), scale, x0, side, descr=descr))
         
     def addNormalPrior(self, pn, mean, std):
         """
@@ -1121,10 +1121,18 @@ it requires a data set as input.
         """
         self.pars._checkParam(pn)
         descr = "Normal prior on '" + str(pn) + "' (mean = %g, std = %g)" % (mean, std)
-        self.priors.append(PyANormalPrior(self.getPRef(pn), mean, std, descr=descr))
+        self.addPrior(PyANormalPrior(self.getPRef(pn), mean, std, descr=descr))
         
-    def addPrior(self, p):
-        pass
+    def addPrior(self, pyaprior):
+        """
+        Add a prior
+        
+        Parameters
+        ----------
+        pyaprior : PyAPrior
+            Instance of PyAPrior
+        """
+        self.priors.append(pyaprior)
     
     def mlD(self, *args, **kwargs):
         """
