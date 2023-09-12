@@ -15,4 +15,5 @@ Examples for using the class are given in the associated tutorial: :ref:`traceAn
 
 .. autofunction:: hpd
 .. autofunction:: quantiles
+.. autofunction:: modeGrenander
 

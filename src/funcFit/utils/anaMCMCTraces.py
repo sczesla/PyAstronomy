@@ -70,6 +70,49 @@ def hpd(trace, cred):
     return starts[imin], ends[imin]
 
 
+def modeGrenander(trace, k, p):
+    """
+    Estimate the mode using estimator by Grenander 1965
+    
+    Evaluate the estimator, where x represents the trace sorted in ascending order,
+    
+    .. math::
+    
+        M^*_{p,k} = \\frac{ \\frac{1}{2} \sum_{i=1}^{n-k} (x_{i+k} + x_k)/(x_{i+k} - x_k)^p }{\sum_{i=1}^{n-k} 1/(x_{i+k} - x_k)^p }
+    
+    given by Grenander 1965 ("Some Direct Estimates of the Mode." Ann. Math. Statist. 36 (1) 131 - 138).
+    
+    Parameters
+    ----------
+    k : int
+        Index offset (should be >2*p for asymptotic normality)
+    p : float
+        Parameter of estimator (1 < p < k)
+    
+    Returns
+    -------
+    mode : float
+        Estimate of mode
+    """
+    if (p < 1) or (p > k):
+        raise(PE.PyAValError("1 < p < k is required.", \
+                             where="modeGrenander"))
+    if k < 2*p:
+        PE.warn(PE.PyAValError("For asymptotic normality, k > 2p is required.", \
+                               where="modeGrenander"))
+    s = np.sort(trace)
+    spk = s[k:]
+    smk = s[0:-k]
+    ssp = (spk-smk)**p
+    if np.any(ssp == 0):
+        raise(PE.PyAValError("sorted(trace)[i+k] - sorted(trace)[i] = 0 encountered.", \
+                             where="modeGrenander", \
+                             solution="Increase k"))
+    oben = 0.5 * np.sum((spk+smk)/ssp)
+    unten = np.sum(1/ssp)
+    return oben/unten
+
+
 def quantiles(trace, qs):
     """
     Get quantiles for trace.

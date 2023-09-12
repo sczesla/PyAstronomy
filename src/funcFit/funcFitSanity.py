@@ -128,6 +128,22 @@ class TestFuncFitSanity(unittest.TestCase):
         np.testing.assert_almost_equal(gf_hf["mu"], 0, decimal=3)
 
 
+    def testsanity_modeGrenander(self):
+        """ Test sanity of mode Grenander """
+        import numpy as np
+        from PyAstronomy import funcFit as fuf
+        
+        np.random.seed(1919)
+        x = np.random.normal(0.9, 2, 10000)
+        
+        k = 20
+        for p in [1,2,3,4,5,6,7]:
+            m = fuf.modeGrenander(x, k, p)
+            print(p, m)
+            self.assertAlmostEqual(m, 0.9, delta=0.1, msg="Problem with modeGrenander")
+
+
+
 class MultiVoigtSanity(unittest.TestCase):
     def setUp(self):
         pass
