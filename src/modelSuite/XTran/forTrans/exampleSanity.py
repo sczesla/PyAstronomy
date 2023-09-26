@@ -132,3 +132,54 @@ class TestForTransExampletestsanity_(unittest.TestCase):
         plt.plot(time, yNLLD, "d", label="Non-linear LD")
         plt.legend()
         # plt.show()
+
+
+class TestFortranPyImplementation(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+    
+    def testsanity_py_vs_fortran(self):
+        """
+        Check python vs fortran implementation (occultquad)
+        """
+        import numpy as np
+        # ... and now the forTrans module
+        from PyAstronomy.modelSuite import forTrans as ft
+        
+        
+        # Create MandelAgolLC object with
+        # circular orbit and quadratic limb darkening
+        ma = ft.MandelAgolLC(orbit="circular", ld="quad", pyfo=False)
+        mapy = ft.MandelAgolLC(orbit="circular", ld="quad", pyfo=True)
+
+        np.random.seed(1819)
+        # Choose some time axis
+        time = np.linspace(-0.5, 0.5, 2000)
+        
+        for i in range(100):
+        
+            # Set parameters
+            ma["per"] = 1
+            ma["a"] = 4
+            ma["p"] = np.random.random()*0.1 + 1e-4
+            imin = 90 - np.arcsin( (1+ma["p"])/ma["a"] )/180*np.pi
+            ma["i"] = np.random.random() * (89-imin) + imin
+            ma["T0"] = 0.0
+            ma["linLimb"] = np.random.random()
+            ma["quadLimb"] = np.random.random() * (1-ma["linLimb"])
+            ma["b"] = 0.
+        
+            mapy.assignValues(ma.parameters())
+            
+            y = ma.evaluate(time)
+            ypy = mapy.evaluate(time)
+            
+            maxab = np.max(np.abs(y-ypy))
+            
+            ma.parameterSummary()
+            self.assertAlmostEqual(maxab, 0, 7, msg=f"Problem with python vs fortran implementations at position {i}")
+            
+    

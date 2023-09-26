@@ -3,11 +3,14 @@ import numpy
 import PyAstronomy.funcFit as fuf
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.modelSuite.XTran import _ZList
+from .occultquad_pya import OccultQuadPy
 
 try:
+    # Try import from local directory
     from . import occultquad
     _importOccultquad = True
 except ImportError:
+    # Try import from extension
     try:
         from PyAstronomy_ext.forTrans import occultquad
         _importOccultquad = True
@@ -44,6 +47,9 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                f2py -c occultquad.pyf occultquad.f
 
                f2py -c occultnl.pyf occultnl.f
+               
+               If no FORTRAN implementation is available, a python re-implementation is used.
+               Performance may be impacted.
 
     :Model parameters:
 
@@ -119,9 +125,13 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
         is a physical collision between the star and the planet
         on evaluating the model and raises an exception when there
         is one.
+    pyfo : boolean, optional
+        Use python implementation of FORTRAN routines. Default is False;
+        if FORTRAN routines are unavailable, this is the fallback option.
+        Performance may be impacted.
     """
 
-    def __init__(self, orbit="circular", ld="quad", collCheck=True):
+    def __init__(self, orbit="circular", ld="quad", collCheck=True, pyfo=False):
         if not orbit in ["circular", "keplerian"]:
             raise(PE.PyAValError("Invalid option for orbit: " + str(orbit),
                                  soltuion="Use either 'circular' or 'keplerian'."))
@@ -130,15 +140,20 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                                  soltuion="Use either 'quad' or 'nl'."))
         _ZList.__init__(self, orbit, collCheck)
 
-        if (not _importOccultquad) and (ld == "quad"):
-            raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",
-                                       solution=["Use 'pip install PyAstronomy_ext' to get it.",
-                                                 "Invoke PyA's install script (setup.py) with the --with-ext option.",
-                                                 "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultquad.pyf occultquad.f"]
-                                       ))
+        if ((not _importOccultquad) or pyfo) and (ld == "quad"):
+            # raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",
+            #                            solution=["Use 'pip install PyAstronomy_ext' to get it.",
+            #                                      "Invoke PyA's install script (setup.py) with the --with-ext option.",
+            #                                      "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultquad.pyf occultquad.f"]
+            #                            ))
+            # Use python implementation of FORTRAN routines
+            self._oq = OccultQuadPy()
+            self._oqcalc = self._oq.occultquad
+        else:
+            self._oqcalc = occultquad.occultquad
 
         if (not _importOccultnl) and (ld == "nl"):
-            raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",
+            raise(PE.PyARequiredImport("Could not import required shared object library 'occultnl.so'",
                                        solution=["Use 'pip install PyAstronomy_ext' to get it.",
                                                  "Invoke PyA's install script (setup.py) with the --with-ext option.",
                                                  "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultnl.pyf occultnl.f"]
@@ -197,7 +212,7 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
         if len(self._intrans) > 0:
             if self._ld == "quad":
                 # Use occultquad Fortran library to compute flux decrease
-                result = occultquad.occultquad(self._zlist[self._intrans], self["linLimb"], self["quadLimb"],
+                result = self._oqcalc(self._zlist[self._intrans], self["linLimb"], self["quadLimb"],
                                                self["p"], len(self._intrans))
             else:
                 result = occultnl.occultnl(self["p"], self["a1"], self["a2"], self["a3"],
