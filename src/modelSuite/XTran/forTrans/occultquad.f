@@ -31,7 +31,7 @@ C To use this routine
 C
 C Addition (Czesla) of margin for cases "Table 3, Case III" and "Table 3, Case IV"
 C 	The original code by M&A 2002 uses 1.0001d0
-      margin = 1.0001d0
+      margin = 1.000001d0
 C
 C Now, compute pure occultation curve:
       omega=1.d0-u1/3.d0-u2/6.d0
