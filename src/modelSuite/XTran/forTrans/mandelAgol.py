@@ -140,14 +140,8 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                                  soltuion="Use either 'quad' or 'nl'."))
         _ZList.__init__(self, orbit, collCheck)
 
+        self._oq = OccultQuadPy()
         if ((not _importOccultquad) or pyfo) and (ld == "quad"):
-            # raise(PE.PyARequiredImport("Could not import required shared object library 'occultquad.so'",
-            #                            solution=["Use 'pip install PyAstronomy_ext' to get it.",
-            #                                      "Invoke PyA's install script (setup.py) with the --with-ext option.",
-            #                                      "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultquad.pyf occultquad.f"]
-            #                            ))
-            # Use python implementation of FORTRAN routines
-            self._oq = OccultQuadPy()
             self._oqcalc = self._oq.occultquad
         else:
             self._oqcalc = occultquad.occultquad
@@ -181,6 +175,21 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
 
         self._orbit = orbit
         self._ld = ld
+
+    def backendStatus(self):
+        """
+        Print information on the code being used for evaluation
+        """
+        print("Backend status for MandelAgolLC")
+        print("    Quadratic limb-darkening (quad)")
+        if self._oqcalc == self._oq.occultquad:
+            print("        Using Python reimplementation of FORTRAN routines")
+            print(" "*8 + "To install compiled FORTRAN code you may attempt to:")
+            print(" "*10 + "- Use 'pip install PyAstronomy_ext' to get it")
+            print(" "*10 + "- Invoke PyA's install script (setup.py) with the --with-ext option")
+            print(" "*10 + "- Go to 'forTrans' directory of PyAstronomy and invoke 'f2py -c occultquad.pyf occultquad.f'")
+        else:
+            print("        Using FORTRAN implementation")
 
     def evaluate(self, time):
         """ 
