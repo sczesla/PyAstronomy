@@ -7,7 +7,8 @@ C  in your research.  Please report errors or bugs to agol@tapir.caltech.edu
       integer i,nz
       double precision z0(nz),u1,u2,p,muo1(nz),mu0(nz),
      &       mu(nz),lambdad(nz),etad(nz),lambdae(nz),lam,
-     &       pi,x1,x2,x3,z,omega,kap0,kap1,q,Kk,Ek,Pk,n,ellec,ellk,rj
+     &       pi,x1,x2,x3,z,omega,kap0,kap1,q,Kk,Ek,Pk,n,ellec,ellk,rj,
+     &       margin
       if(abs(p-0.5d0).lt.1.d-3) p=0.5d0
 C
 C Input:
@@ -27,6 +28,10 @@ C Limb darkening has the form:
 C  I(r)=[1-u1*(1-sqrt(1-(r/rs)^2))-u2*(1-sqrt(1-(r/rs)^2))^2]/(1-u1/3-u2/6)/pi
 C 
 C To use this routine
+C
+C Addition (Czesla) of margin for cases "Table 3, Case III" and "Table 3, Case IV"
+C 	The original code by M&A 2002 uses 1.0001d0
+      margin = 1.0001d0
 C
 C Now, compute pure occultation curve:
       omega=1.d0-u1/3.d0-u2/6.d0
@@ -104,7 +109,7 @@ C Equation 34: eta_2
 C the occulting star partly occults the source and crosses the limb:
 C Table 3, Case III:
         if((z.gt.0.5d0+abs(p-0.5d0).and.z.lt.1.d0+p).or.(p.gt.0.5d0.
-     &      and.z.gt.abs(1.d0-p)*1.0001d0.and.z.lt.p)) then
+     &      and.z.gt.abs(1.d0-p)*margin.and.z.lt.p)) then
           lam=0.5d0*pi
           q=sqrt((1.d0-(p-z)**2)/4.d0/z/p)
           Kk=ellk(q)
@@ -123,7 +128,7 @@ C Equation 34, eta_1:
         endif
 C the occulting star transits the source:
 C Table 3, Case IV.:
-        if(p.le.1.d0.and.z.le.(1.d0-p)*1.0001d0) then
+        if(p.le.1.d0.and.z.le.(1.d0-p)*margin) then
           lam=0.5d0*pi
           q=sqrt((x2-x1)/(1.d0-x1))
           Kk=ellk(q)
