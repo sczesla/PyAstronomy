@@ -378,7 +378,8 @@ class TraceAnalysis:
             return self.tracesDic[parm].gettrace()[self.burn::self.thin]
         elif self.dbtype == "emcee":
             index = self.emceepnames.index(parm)
-            return self.emceechain[self.burn::self.thin, index]
+            # Burn-in is handled during loading of chain
+            return self.emceechain[0::self.thin, index]
 
     def __str__(self):
         """
