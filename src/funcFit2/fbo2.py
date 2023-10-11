@@ -173,19 +173,21 @@ class PyANormalPrior(PyAPrior):
 class PyASmoothUniformPrior(PyAPrior):
       
     def __init__(self, ivs, lower=None, upper=None, scale=1e-9, descr=""):
-      
+        
         if (lower is None) and (upper is None):
             raise(PE.PyAValError("At least one of lower and upper must be specified"))      
       
         pih = np.pi/2.0
-        flmax = sys.float_info.max
+        flmax = sys.float_info.max/1e3
         def f(x):
             if not lower is None:
                 if x < lower:
-                    return -np.arctan((lower-x)/scale)/pih*flmax
+                    r = -np.arctan((lower-x)/scale)/pih*flmax
+                    return r
             if not upper is None:
                 if x > upper:
-                    return -np.arctan((x-upper)/scale)/pih*flmax
+                    r = -np.arctan((x-upper)/scale)/pih*flmax
+                    return r 
             return 0.0
         
         PyAPrior.__init__(self, ivs, f, descr=descr)
@@ -1203,7 +1205,8 @@ it requires a data set as input.
         """
         self.setFreeParamVals(args[0])
         kwargs["alllogs"] = True
-        return self.logPost(*args[1:], **kwargs)
+        r = self.logPost(*args[1:], **kwargs)
+        return r
   
     def addSPLikeObjf(self, f, name):
         """
