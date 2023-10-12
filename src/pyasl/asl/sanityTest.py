@@ -667,6 +667,68 @@ class TestSanityOfPyasl(unittest.TestCase, SaniBase):
         print("Convert f_nu into f_lam [erg/cm**2/s/A] by multiplication with (c/lam**2): ", \
             fd_nu * (299792458e2/(le/1e8)**2) / 1e8 )
 
+    def testsanity_equidistantInterpolation_example1(self):
+        """
+        Checking first example for equidistantInterpolation
+        """
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        x = np.array([0.1, 0.2, 0.5,0.87,1.5,2])
+        y = np.array([1,2,3,1,4,1.1])
+        
+        w1, f1 = pyasl.equidistantInterpolation(x, y, "2x")
+        w2, f2 = pyasl.equidistantInterpolation(x, y, "mean")
+        w3, f3 = pyasl.equidistantInterpolation(x, y, 0.05)
+        
+        plt.plot(x,y,'bo', label="Data")
+        plt.plot(w1, f1, 'r.-', label="2x")
+        plt.plot(w2, f2, 'g.-', label="mean")
+        plt.plot(w3, f3, 'm.-', label="0.02")
+        plt.legend()
+        # plt.show()
+        
+    def testsanity_equidistantInterpolation_example2(self):
+        """
+        Checking second example for equidistantInterpolation
+        """        
+        import numpy as np
+        import matplotlib.pylab as plt
+        from PyAstronomy import pyasl
+        
+        x = np.array([0.1, 0.2, 0.5,0.87,1.5,2])
+        yy = [np.array([1,2,3,1,4,1.1]), np.array([10,20,30,1,10,-4.5])]
+        
+        # Apply interpolation to list of arrays for y
+        w, ff = pyasl.equidistantInterpolation(x, yy, "2x")
+        
+        for f in ff:
+            plt.plot(w, f, '.-')
+        
+        # Specify new x-axis explicitly
+        _, g = pyasl.equidistantInterpolation(x, yy[0], w)
+        plt.plot(w, g, 'r--')
+        # plt.show()
+
+    def testsanity_equidistantInterpolation(self):
+        """
+        Checking equidistantInterpolation
+        """
+        import numpy as np
+        from PyAstronomy import pyasl
+        
+        x = np.array([0.1, 0.2, 0.5,0.87,1.5,2])
+        y = np.array([1,2,3,1,4,1.1])
+        
+        w1, f1 = pyasl.equidistantInterpolation(x, y, "2x")
+        w2, f2 = pyasl.equidistantInterpolation(x, y, "mean")
+        w3, f3 = pyasl.equidistantInterpolation(x, y, 0.05)
+        
+        self.assertEqual(len(x)*2, len(w1), "Length of equidistant x-axis does not fit for 2x mode")
+        self.assertAlmostEqual(np.mean(np.diff(x)), np.diff(w2)[0], 6, msg="X-axis spacing incorrect in 'mean' mode")
+        self.assertAlmostEqual(np.mean(np.diff(w3)), 0.05, 6, msg="X-axis spacing incorrect in '0.05' mode")
+        
 
 class TestSanityOfMoonpos(unittest.TestCase, SaniBase):
 

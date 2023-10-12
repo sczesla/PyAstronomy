@@ -3,6 +3,57 @@ import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import funcFit as fuf
 import scipy.interpolate as sci
+from quantities.dimensionality import assert_isinstance
+
+
+def equidistantInterpolation(x, y, dxmode, ifct=sci.interp1d):
+    """
+    Construct evenly sampled data set by interpolation
+    
+    Parameters
+    ----------
+    x : array
+        Input x-axis
+    y : array or list/tuple of arrays
+        The y axis or axes
+    dxmode : string {2x, mean} or float
+        If a float is given, it specifies the spacing of the new x axis. If '2x' is
+        given, an equidistant x axis with twice as many points as the input one will
+        be used. If 'mean' is given, the spacing of the new x axis corresponds to the
+        mean of that of the input axis. If dxmode is an array, it is used as the new x-axis
+        (without check for equidistant sampling).
+    ifct : interpolation callable
+        A callable taking x and y as arguments and returning a callable, which takes
+        the new equidistant wavelength axis as argument. The default is interp1d from
+        scipy called by ny = ifct(x, y)(nx).
+    
+    Returns
+    -------
+    x, y : arrays
+        New equidistant x axis and linearly interpolated y axis. If input y is a list or tuple of arrays,
+        a list of interpolated arrays is returned.
+    """
+    if type(dxmode) == float:
+        nx = np.arange(x[0], x[-1], dxmode)
+    elif isinstance(dxmode, np.ndarray):
+        nx = dxmode
+    elif dxmode == "2x":
+        nx = np.linspace(x[0], x[-1], 2*len(x))
+    elif dxmode == "mean":
+        dx = np.mean(np.diff(x))
+        nx = np.arange(x[0], x[-1], dx)
+    else:
+        raise(PE.PyAValError("Cannot interpret 'dxmode'", \
+                             where="makeEquidistant", \
+                             solution=["Use a float to specify spacing.", \
+                                       "Use '2x' or 'mean' to give rule to select spacing"]))
+    
+    if isinstance(y, (list,tuple)):
+        ny = [ifct(x, yy)(nx) for yy in y]
+    else:
+        ny = ifct(x, y)(nx)
+    
+    return nx, ny
 
 
 def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):

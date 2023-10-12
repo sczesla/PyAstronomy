@@ -53,6 +53,7 @@ General data analysis
    aslDoc/intep.rst
    aslDoc/quadextreme.rst
    aslDoc/svd.rst
+   aslDoc/equidistantInterpolation.rst
 
 Spectral routines
 ~~~~~~~~~~~~~~~~~
