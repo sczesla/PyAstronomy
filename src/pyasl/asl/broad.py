@@ -93,7 +93,8 @@ def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
     dxs = x[1:] - x[0:-1]
     if abs(max(dxs) - min(dxs)) > np.mean(dxs) * 1e-6:
         raise(PE.PyAValError("The x-axis is not equidistant, which is required.",
-                             where="broadGaussFast"))
+                             where="broadGaussFast",
+                             solution=["Use pyasl.equidistantInterpolation to produce equidistantly sampled data."]))
 
     if maxsig is None:
         lx = len(x)
@@ -176,7 +177,8 @@ def instrBroadGaussFast(wvl, flux, resolution, edgeHandling=None, fullout=False,
     if dwlned and (not equid):
         raise(PE.PyAValError("The wavelength axis is not equidistant, which is required.",
                              where="instrBroadGaussFast", \
-                             solution=["Define equidistant wavelength axis", "Set 'equid' to True"]))
+                             solution=["Define equidistant wavelength axis", "Set 'equid' to True",
+                                       "Use pyasl.equidistantInterpolation to produce equidistantly sampled data."]))
     elif dwlned and equid:
         # Define an equidistant wavelength grid
         wvlorig = wvl

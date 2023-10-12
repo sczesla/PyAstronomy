@@ -103,7 +103,8 @@ def rotBroad(wvl, flux, epsilon, vsini, edgeHandling="firstlast"):
     if abs(max(sp) - min(sp)) > 1e-6:
         raise(PE.PyAValError("Input wavelength array is not evenly spaced.",
                              where="pyasl.rotBroad",
-                             solution="Use evenly spaced input array."))
+                             solution=["Use evenly spaced input array.",
+                                       "Use pyasl.equidistantInterpolation to produce equidistantly sampled data."]))
     if vsini <= 0.0:
         raise(PE.PyAValError("vsini must be positive.", where="pyasl.rotBroad"))
     if (epsilon < 0) or (epsilon > 1.0):
@@ -188,8 +189,9 @@ def fastRotBroad(wvl, flux, epsilon, vsini, effWvl=None):
     sp = wvl[1::] - wvl[0:-1]
     if abs(max(sp) - min(sp)) > 1e-6:
         raise(PE.PyAValError("Input wavelength array is not evenly spaced.",
-                             where="pyasl.rotBroad",
-                             solution="Use evenly spaced input array."))
+                             where="pyasl.fastRotBroad",
+                             solution=["Use evenly spaced input array.",
+                                       "Use pyasl.equidistantInterpolation to produce equidistantly sampled data."]))
     if vsini <= 0.0:
         raise(PE.PyAValError("vsini must be positive.", where="pyasl.rotBroad"))
     if (epsilon < 0) or (epsilon > 1.0):
