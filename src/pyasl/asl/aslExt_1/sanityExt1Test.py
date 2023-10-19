@@ -497,6 +497,81 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
         
 #         plt.contour(p, [l5pot*1.02, l3pot, l2pot, l1pot], colors=['g', 'c', 'b', 'r'], extent=[-1.5,2,-1.6,1.6])
 
+    def testsanity_roche(self):
+        """ Sanity checks of Roche and root finding """
+        from PyAstronomy import pyasl
+        from PyAstronomy import constants as PC
+        
+        def yp(x):
+            return (x-0.1)*(x-0.5)*(x-0.7)*(x-0.5000002)
+         
+        rro = [0.1, 0.5, 0.7]
+        roots = sorted(pyasl.bisect_root_find(yp, 0, 1, 4, 1e-4, bqargs={}))
+        self.assertEqual(len(rro), len(roots), msg=f"Problem with the number of roots in bisect root finding. Roots are {roots}")
+        for i, r in enumerate(roots):
+            self.assertAlmostEqual(r, rro[i], 5, msg=f"Problem with bisect root finding. Roots are {roots}")
+            
+        pc = PC.PyAConstants()
+        pc.setSystem("SI")
+        q = pc.MEarth/pc.MSun
+        rads = pyasl.get_epradius_ss_polar_side(q, pot=None)
+        rads = [r*pc.AU/1e3 for r in rads]
+        print(rads)
+        self.assertAlmostEqual(rads[0], 1.5e6, delta=1e4, msg=f"Problem with L1 height of Earth. Radii are {rads}")
+
+    def testsanity_roche_example2(self):
+        """
+        Roche lobe example 2 (radii of Earth and hot Jupiter)
+        """
+        from PyAstronomy import pyasl
+        from PyAstronomy import constants as PC
+        
+        # Shape of the Earth and its Roche lobe (no rotation of Earth)
+        pc = PC.PyAConstants()
+        pc.setSystem("SI")
+        
+        # Mass ratio (m2/m1)
+        q = pc.MEarth/pc.MSun
+        print(f"Earth/Sun mass ratio = {q}")
+        
+        # Radii of Roche lobe along Earth--Sun connecting line, polar (out-of-plane),
+        # and side (in plane)
+        rads = pyasl.get_epradius_ss_polar_side(q, pot=None)
+        # Convert into km
+        rads = [r*pc.AU/1e3 for r in rads]
+        print(f"Roche lobe radii (substellar, polar, side) [1e6 km] = " + \
+            ", ".join(["%g"%(r/1e6) for r in rads]))
+        
+        reff_earth = pc.REarth/pc.RJ
+        # Small epsilon because rocky Earth is a small body on a large
+        # orbit (by Roche standards)
+        erads = pyasl.get_radius_ss_polar_side(q, 1, reff_earth, eps=1e-10)
+        
+        # Convert into km
+        erads = [r*pc.RJ/1e3 for r in erads]
+        print(f"Earth radii (substellar, polar, side) [km] = " + \
+            ", ".join(["%g"%(r) for r in erads[0:3]]))
+        
+        print()
+        print("Roche lobe and planetary shape of typical hot Jupiter")
+        # Typical hot Jupiter
+        q = 1e-3
+        # sma in au
+        sma = 0.02
+        # Effective (circular disk) transit radius [RJ]
+        reff = 1.4
+        
+        rads = pyasl.get_epradius_ss_polar_side(q, pot=None)
+        # Convert into km
+        rads = [r*pc.AU/1e3 for r in rads]
+        print(f"Roche lobe radii (substellar, polar, side) [1e6 km] = " + \
+            ", ".join(["%g"%(r/1e6) for r in rads]))
+        
+        jrads = pyasl.get_radius_ss_polar_side(q, sma, reff, eps=1e-10)
+        print(f"Hot Jupiter radii (substellar, polar, side) [RJ] = " + \
+            ", ".join(["%g"%(r) for r in jrads[0:3]]))
+
+
     def testsanity_sysrem_example(self):
         """
         Checking SysRem example

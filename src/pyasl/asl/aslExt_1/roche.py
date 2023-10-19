@@ -3,6 +3,83 @@ import numpy as np
 import inspect
 from PyAstronomy.pyaC import pyaErrors as PE
 from scipy import optimize as sco
+from PyAstronomy import constants as PC
+
+
+def _bisect_root_find(f, ab, nroot, eps, roots=None, bqargs={}):
+    """
+    Find roots by bisection method and scipy's brentq
+    
+    Parameters are the same is those of bisect_root_find.
+    
+    Parameters
+    ----------
+    ab : list of intervals
+        An interval is a two-list or tuple giving the lower and
+        upper limit of the interval
+    """
+    
+    if roots is None:
+        roots = []
+    
+    if len(roots) >= nroot:
+        return roots
+    
+    def addroot(root, roots):
+        # Add root unless too close
+        if sum([abs(root-r)<eps for r in roots]) == 0:
+            roots.append(root)
+    
+    if len(ab) == 0:
+        # No new intervals (possibly all <eps)
+        return roots
+    
+    # Prepare list of new intervals
+    nab = []
+    for i in ab:
+        try:
+            root = sco.brentq(f, i[0], i[1], **bqargs)
+        except ValueError:
+            # No root
+            w = i[1]-i[0]
+            if w > eps:
+                nab.extend([[i[0], i[0]+w/2], [i[0]+w/2,i[1]]])
+        else:
+            # root
+            addroot(root, roots)
+            if root-i[0] > eps:
+                nab.append([i[0], root-eps/2])
+            if i[1]-root > eps:
+                nab.append([root+eps/2, i[1]])
+    return _bisect_root_find(f, nab, nroot, eps, roots=roots)
+    
+def bisect_root_find(f, a, b, nroot, eps, bqargs={}):
+    """
+    Find multiple roots using bisection method and scipy's brentq algorithm
+    
+    Parameters
+    ----------
+    f : callable
+        Callable taking a single value as argument and
+        returning a scalar
+    a, b : float
+        Lower and upper limits of the interval
+    nroot: int
+        Number of roots to be found. The function will not
+        stop iterating before that number is found. It may
+        return more than that in advantageous settings or
+        less than that if the minimum interval length (eps)
+        is reached before nroot roots are found.
+    eps : float
+        Minimum distance between roots.
+    bqargs : dictionary, optional
+        Additional keywords handed to scipy's brentq.
+    """
+    w = b-a
+    nab = [[a, a+w/2], [a+w/2, b]]
+    return _bisect_root_find(f, nab, nroot, eps, bqargs=bqargs)
+
+
 
 def _r1r2_dl(x, y, z):
     """
@@ -185,6 +262,106 @@ def get_lagrange_1(q, getdlrp=True, eps=1e-4):
     _checkq(q)
     return _get_lagrange_123(q, eps, 1-eps, getdlrp)
 
+def get_epradius_ss_polar_side(q, pot=None, eps=1e-6):
+    """
+    Get dimensionless radii of equipotential surface for secondary mass in three directions
+    
+    Assumes that the equipotential surface is enclosed within the Roche lobe
+    
+    Parameters
+    ----------
+    q : float
+        Mass ratio m2/m1
+    pot : float, optional
+        Dimensionless potential for equipotential surface. If None (default),
+        the L1 potential will be adopted. 
+    eps : float, optional
+        Lowest dimensionless radius considered in the
+        search.
+    brl : boolean, optional
+        Search below Roche lobe (default is True).
+    
+    Returns
+    -------
+    rx : float
+        Substellar radius, height along connecting line (dimensionless)
+    rz : float
+        Polar radius (along z-axis)
+    ry : float
+        Side radius (along y-axis)
+    """
+    _checkq(q)
+    # x-axis (substellar point)
+    rlr, l1pot = get_lagrange_1(q, getdlrp=True, eps=eps)
+    if (pot is not None) and (pot < l1pot):
+        raise(PE.PyAValError(f"Given potential {pot} is below Roche lobe potential {l1pot} (minimum)", \
+                             where="get_epradius_ss_polar_side"))
+    
+    if (pot is None) or (abs(pot-l1pot)<1e-6):
+        pot = l1pot
+        xros = np.array([rlr])
+    else:
+        f = lambda x: rochepot_dl(x,0,0,q) - pot
+        xros = np.array(sorted(bisect_root_find(f, eps, 1-eps, 2, 1e-2), reverse=True))
+    # Positive height 
+    rx = 1 - xros
+    # y-axis (side radius)
+    f = lambda y: rochepot_dl(1,y,0,q) - pot
+    ry = sorted(np.array(sorted(bisect_root_find(f, eps, rlr, 1, 1e-4))))
+    # z-axis (polar radius)
+    f = lambda z: rochepot_dl(1,0,z,q) - pot
+    rz = sorted(np.array(sorted(bisect_root_find(f, eps, rlr, 1, 1e-4))))
+    return rx[0], rz[0], ry[0]
+
+def get_radius_ss_polar_side(q, sma, reff, eps=1e-6):
+    """
+    Calculate substellar, polar, and side radii of secondary body
+    
+    The function first finds the dimensionless Roche potential corresponding
+    to the equipotential surface corresponding to the effective radius and
+    then determines the radii of that surface along the x, y, and z directions. 
+    
+    The effective radius is the radius of a sphere with the same area as
+    the ellipse spanned by the polar and side radii of the equipotential
+    area.
+    
+    Parameters
+    ----------
+    q : float
+        Mass ratio m2/m1
+    sma : float
+        Semi-major axis [AU]
+    reff : float
+        Effective radius of the body [RJ]
+    
+    Returns
+    -------
+    rss, rpol, rside : float
+        Radius of equipotential surface at substellar point (along the connecting x-axis),
+        polar radius (along the z-axis), and radius toward the side (y-axis).
+    pequi : float
+        Dimensionless potential of equipotential surface corresponding to effective
+        radius.
+    """
+    _checkq(q)
+    pc = PC.PyAConstants()
+    # Dimensionless effective radius
+    reff_dl = reff*pc.RJ / (sma*pc.AU)
+    # Potential at effective radius
+    peff = rochepot_dl(1-reff_dl, 0, 0, q)
+    
+    def darea(pot):
+        """ Difference between effective area and area of ellipse (polar x side) """
+        _, rz, ry = get_epradius_ss_polar_side(q, pot, eps=eps)
+        return rz*ry - reff_dl**2
+    
+    _, l1pot = get_lagrange_1(q, getdlrp=True)
+    rpot = sco.brentq(darea, l1pot+1e-10, peff*10)
+    
+    rr = get_epradius_ss_polar_side(q, rpot, eps=eps)
+    rjs = [r*sma*PC.AU/pc.RJ for r in rr]
+    return *rjs, rpot
+    
 def get_lagrange_2(q, getdlrp=True, eps=1e-4):
     """
     Get location of second Lagrange point

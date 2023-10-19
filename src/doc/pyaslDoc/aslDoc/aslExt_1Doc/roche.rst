@@ -98,6 +98,73 @@ Example of usage
     plt.text(l5[0], l5[1], 'L5', horizontalalignment='center')
     plt.show()
 
+
+Example: Substellar, polar, and side radii of Earth and hot Jupiter planets
+----------------------------------------------------------------------------
+
+::
+
+    from PyAstronomy import pyasl
+    from PyAstronomy import constants as PC
+    
+    # Shape of the Earth and its Roche lobe (no rotation of Earth)
+    pc = PC.PyAConstants()
+    pc.setSystem("SI")
+    
+    # Mass ratio (m2/m1)
+    q = pc.MEarth/pc.MSun
+    print(f"Earth/Sun mass ratio = {q}")
+    
+    # Radii of Roche lobe along Earth--Sun connecting line, polar (out-of-plane),
+    # and side (in plane)
+    rads = pyasl.get_epradius_ss_polar_side(q, pot=None)
+    # Convert into km
+    rads = [r*pc.AU/1e3 for r in rads]
+    print(f"Roche lobe radii (substellar, polar, side) [1e6 km] = " + \
+        ", ".join(["%g"%(r/1e6) for r in rads]))
+    
+    reff_earth = pc.REarth/pc.RJ
+    # Small epsilon because rocky Earth is a small body on a large
+    # orbit (by Roche standards)
+    erads = pyasl.get_radius_ss_polar_side(q, 1, reff_earth, eps=1e-10)
+    
+    # Convert into km
+    erads = [r*pc.RJ/1e3 for r in erads]
+    print(f"Earth radii (substellar, polar, side) [km] = " + \
+        ", ".join(["%g"%(r) for r in erads[0:3]]))
+    
+    print()
+    print("Roche lobe and planetary shape of typical hot Jupiter")
+    # Typical hot Jupiter
+    q = 1e-3
+    # sma in au
+    sma = 0.02
+    # Effective (circular disk) transit radius [RJ]
+    reff = 1.4
+    
+    rads = pyasl.get_epradius_ss_polar_side(q, pot=None)
+    # Convert into km
+    rads = [r*pc.AU/1e3 for r in rads]
+    print(f"Roche lobe radii (substellar, polar, side) [1e6 km] = " + \
+        ", ".join(["%g"%(r/1e6) for r in rads]))
+    
+    jrads = pyasl.get_radius_ss_polar_side(q, sma, reff, eps=1e-10)
+    print(f"Hot Jupiter radii (substellar, polar, side) [RJ] = " + \
+        ", ".join(["%g"%(r) for r in jrads[0:3]]))
+
+With output
+
+::
+    
+    Earth/Sun mass ratio = 3.0032983882201428e-06
+    Roche lobe radii (substellar, polar, side) [1e6 km] = 1.49152, 0.952662, 0.995462
+    Earth radii (substellar, polar, side) [km] = 6378.14, 6378.14, 6378.14
+    
+    Roche lobe and planetary shape of typical hot Jupiter
+    Roche lobe radii (substellar, polar, side) [1e6 km] = 10.1264, 6.52393, 6.80657
+    Hot Jupiter radii (substellar, polar, side) [RJ] = 1.51623, 1.38718, 1.41294
+
+
 Functionality and API
 ---------------------
 
