@@ -45,6 +45,14 @@ where :math:`\Phi_n` is the dimensionless Roche potential.
 Note that moving material in the rotating frame is also subject to Coriolis forces, which are non-conservative
 and, therefore, cannot be incorporated into the scalar Roche potential. 
 
+The module provides functions to obtain the derivative of the dimensionless Roche potential with respect to the
+dimensionless variables representing the three directions. To turn the result into real, physical numbers,
+the following conversion is required
+
+.. math::
+
+    \frac{\partial \Phi}{\partial x} = -\frac{G M}{2 a^2} \frac{\partial \Phi_n}{\partial x'}
+
 Example of usage
 ----------------
 
