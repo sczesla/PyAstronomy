@@ -571,6 +571,16 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
         print(f"Hot Jupiter radii (substellar, polar, side) [RJ] = " + \
             ", ".join(["%g"%(r) for r in jrads[0:3]]))
 
+    def testsanity_roche_limit_fluid(self):
+        """
+        Test sanity of roche_limit_fluid
+        """
+        from PyAstronomy import constants as PC
+        from PyAstronomy import pyasl
+        pc = PC.PyAConstants()
+        pc.setSystem("SI")
+        a_r_jup = pyasl.roche_limit_fluid(pc.MJ/pc.MSun, pc.RJ)
+        self.assertAlmostEqual(a_r_jup/1e3, 1_713_025, delta=60_000, msg=f"Roche lobe limit for Jupiter does not fit ({a_r_jup} km).")
 
     def testsanity_sysrem_example(self):
         """

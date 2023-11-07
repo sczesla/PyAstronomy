@@ -605,5 +605,37 @@ def coriolisAcceleration(omega,v):
     c = -2*np.cross(omvec, v)
     return c
     
+def roche_limit_fluid(q, R2):
+    """
+    Calculate the Roche limit for a fluid body on circular orbit
+    
+    An expression for the Roche limit, :math:`a_R`, was given by the eponymous
+    Édouard Albert Roche in 1849 (see, e.g.,
+    `Rappaport et al. 2013, ApJL 773 <https://ui.adsabs.harvard.edu/abs/2013ApJ...773L..15R/abstract>`_
+    for a modern reference)
+    
+    .. math::
+    
+        a_R = 2.44 R_1 \sqrt[3]{\\frac{\\rho_1}{\\rho_2}} = 2.44 R_2 q^{-1/3}
+        
+    where :math:`R_{1,2}` are the radii of the primary and secondary bodies, :math:`\\rho_{1,2}`
+    the respective densities, and :math:`q` the mass ratio; the second equality relies on spherical
+    shapes.
+    
+    Parameters
+    ----------
+    q : float
+        Mass ratio
+    R2 : float
+        Radius of secondary body (assuming spherical shape). Units are
+        arbitrary and same as result.
+    
+    Returns
+    -------
+    aR : float
+        The Roche distance in the units of R2.
+    """
+    _checkq(q)
+    return 2.44*R2*q**(-1/3)
     
     

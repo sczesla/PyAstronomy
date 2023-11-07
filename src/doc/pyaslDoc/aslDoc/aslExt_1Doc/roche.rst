@@ -208,6 +208,13 @@ Roche lobe volume and radius
 .. autofunction:: roche_vol_MC
 .. autofunction:: roche_yz_extent
 
+.. _rllimit
+
+Roche limit
+~~~~~~~~~~~
+
+.. autofunction:: roche_limit_fluid
+
 .. _rllps:
 
 Lagrange points
