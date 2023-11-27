@@ -113,14 +113,16 @@ class KeplerRVModel(fuf.OneDFit):
 
     .. note:: ? is a placeholder for an integer larger zero, indicating the number of
               the planet (the total number is controlled by the `mp` keyword).
+              
+    .. note:: RVs should be given in m/s and time stamps in days
 
     *Fit parameters*
 
-      - `per?`   - The period (same time units as data)
+      - `per?`   - The period in days
       - `e?`     - The eccentricity
-      - `tau?`   - Time of periapsis passage (same time units as data)
+      - `tau?`   - Time of periapsis passage 
       - `w?`     - Argument of periapsis [deg]
-      - `K?`     - Semi-amplitude of radial velocity (same units as data)
+      - `K?`     - Semi-amplitude of radial velocity [m/s]
       - `mstar` - Stellar mass in solar masses. This parameter is usually not fitted.
                   It may be used to take into account the uncertainty on stellar mass
                   in Bayesian (MCMC) analysis.
