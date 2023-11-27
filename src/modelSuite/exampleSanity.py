@@ -550,7 +550,7 @@ class TestModSuiteSanity(unittest.TestCase):
         # ... with some error
         rverr = 0.5
         rv += np.random.normal(0, rverr, len(jd))
-        rverr = np.ones(len(rv)) * 0.5
+        rverr = np.ones(len(rv)) * rverr
         
         # Get RV model with one planet (mp) and a potential constant offset
         # in RV (deg = 0)
