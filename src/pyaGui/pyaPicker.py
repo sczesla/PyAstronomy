@@ -171,7 +171,10 @@ class Picker:
         else:
             pli, lli = self._searchPoint(lbString)
         # Remove 'old' point from plot
-        self.a.lines.pop(lli)
+        try:
+            self.a.lines.pop(lli)
+        except AttributeError:
+            self.a.lines[lli].remove()
         if state == "active":
             style = self.astyle
         elif state == "inactive":
@@ -260,7 +263,10 @@ class Picker:
         el = self.lb.get(int(sel[0]))
         pli, lli = self._searchPoint(el)
         # Remove it
-        self.a.lines.pop(lli)
+        try:
+            self.a.lines.pop(lli)
+        except AttributeError:
+            self.a.lines[lli].remove()
         self.pointList.pop(pli)
         self.lb.delete(sel[0])
         self._updateView()
