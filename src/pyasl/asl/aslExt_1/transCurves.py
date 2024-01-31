@@ -284,7 +284,7 @@ class TransmissionCurves:
         Adds Kepler mission passband.
 
         Kepler high-resolution passband is downloaded from:
-        http://keplergo.arc.nasa.gov/kepler_response_hires1.txt
+        https://keplergo.github.io/KeplerScienceWebsite/data/kepler_response_hires1.txt
 
         and added as 'Kepler_HR'.
 
@@ -302,7 +302,7 @@ class TransmissionCurves:
 
         if (not self._fs.fileExists(fno)) or forceDownload:
             self._fs.downloadToFile(
-                "http://keplergo.arc.nasa.gov/kepler_response_hires1.txt",
+                "https://keplergo.github.io/KeplerScienceWebsite/data/kepler_response_hires1.txt",
                 fno,
                 forceDownload,
                 verbose,

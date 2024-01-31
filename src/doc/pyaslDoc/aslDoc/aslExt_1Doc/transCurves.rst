@@ -25,7 +25,7 @@ Further information on photometric bands:
                       Call **addSpitzerIRACPassbands** to add to passband inventory.
                       
   Kepler              `Kepler passband (high resolution)
-                      <http://keplergo.arc.nasa.gov/kepler_response_hires1.txt>`_
+                      <https://keplergo.github.io/KeplerScienceWebsite/data/kepler_response_hires1.txt>`_
                       
                       Call **addKeplerPassband** to add passband to inventory.     
                       
