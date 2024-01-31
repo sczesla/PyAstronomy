@@ -30,9 +30,12 @@ Further information on photometric bands:
                       Call **addKeplerPassband** to add passband to inventory.     
                       
   TESS                Transmission curve for TESS mission
-                      `see <https://heasarc.gsfc.nasa.gov/docs/tess/the-tess-space-telescope.html>`_
+                      `(futher information) <https://heasarc.gsfc.nasa.gov/docs/tess/the-tess-space-telescope.html>`_
                       
                       Call **addTESSPassband** to add passband to inventory.
+
+  Gaia (DR3)          Transmission curves (G, G_BP, G_RP) for the Kepler mission (DR3)
+                      `(further information) <https://www.cosmos.esa.int/web/gaia/edr3-passbands>`_    
   ==================  ===========================================================================================
 
 
