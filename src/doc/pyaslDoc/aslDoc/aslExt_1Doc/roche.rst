@@ -179,8 +179,10 @@ Functionality and API
     - :ref:`rlpot`
     - :ref:`rlpade`
     - :ref:`rlvol`
+    - :ref:`rllimit`
     - :ref:`rllps`
-    
+    - :ref:`rllcori`
+    - :ref:`rllrads`
 
 .. _rlpot:
 
@@ -208,7 +210,7 @@ Roche lobe volume and radius
 .. autofunction:: roche_vol_MC
 .. autofunction:: roche_yz_extent
 
-.. _rllimit
+.. _rllimit:
 
 Roche limit
 ~~~~~~~~~~~
@@ -226,8 +228,17 @@ Lagrange points
 .. autofunction:: get_lagrange_4
 .. autofunction:: get_lagrange_5
 
+.. _rllcori:
+
 Coriolis force
 ~~~~~~~~~~~~~~
 
 .. autofunction:: coriolisAcceleration
 
+.. _rllrads:
+
+Radii in the Roche geometry
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_epradius_ss_polar_side
+.. autofunction:: get_radius_ss_polar_side
