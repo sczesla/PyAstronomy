@@ -42,3 +42,28 @@ class TestFuncFitSanity(unittest.TestCase):
         self.assertEqual(g[1, 0, 1, 0], 1.0)
         self.assertEqual(g[1, 2, 1, 1], 12.0)
         self.assertEqual(g[1, 2, 1, 2], 101.0)
+
+    def testsanity_fminArgs(self):
+        """
+        Test handling of fminArgs
+        """
+        np.random.seed(101)
+
+        fwhm = 10833/100_000
+        snr = 100
+        
+        # Wvl and 'data' (independent, without signal)
+        w = np.arange(10830, 10836, fwhm)
+        d = np.random.normal(1, 1/snr, len(w))
+        e = np.ones_like(w)/snr
+        
+        gf = fuf.GaussFit1d()
+        gf["mu"] = 10833
+        gf["off"] = 1.0
+        gf["A"] = -0.1
+        # Assumption
+        gf["sig"] = fwhm*3
+        
+        # 'Real' estimate from the data
+        gf.thaw(["A"])
+        gf.fit(w, d, yerr=e, minAlgo='spfmp', fminArgs={'disp':0})

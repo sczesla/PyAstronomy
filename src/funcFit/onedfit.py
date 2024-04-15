@@ -2036,10 +2036,6 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         self.mAA = copy.copy(mAA)
         self.minAlgo = self._resolveMinAlgo(minAlgo, default="spfmin", mAA=mAA)
         
-        if self.minAlgo is sco.fmin_powell:
-            # Needed to make output fit requirement
-            fminArgs["full_output"] = True
-        
         # Determine function to be minimized
         if (miniFunc is None) and (yerr is not None):
             miniFunc = "chisqr"
@@ -2050,7 +2046,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         if X0 is not None:
             self.pars.setFreeParams(X0)
         # Save fminPars and fminArgs to internal variables
-        self.fminArgs, self.fminPars = fminArgs, fminPars
+        self.fminArgs, self.fminPars = fminArgs['fminArgs'] if 'fminArgs' in fminArgs else {}, fminPars
         # Carry out fit
         fitStartTime = timestamp()
         # For "historical" reasons, the fitResult must hold a list of the
