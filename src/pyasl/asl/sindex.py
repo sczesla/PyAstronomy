@@ -9,9 +9,12 @@ class SMW_RHK:
         """
         Converting Mount-Wilson S-index into RHK index.
 
-        The Mount-Wilson S-index is a measure of the emission-line cores
+        The Mount-Wilson S-index is a measure of the flux in the emission-line cores
         of the Ca II H and K lines at about 3933 A and 3968 A in two
-        narrow bands normalized by two adjacent continuum bands.
+        narrow bands normalized by the flux in two adjacent continuum bands
+        (3891.067-3911.069 A and 3991.067-4011.067 A).
+        For technical reasons, the narrow bands have a triangular bandpass with
+        a FWHM of 1.09 A (Vaughan et al. 1978). 
 
         The activity index RHK is closely related to the S-index. In
         particular, it gives the emission in the narrow bands normalized
@@ -42,8 +45,8 @@ class SMW_RHK:
         a thorough discussion on the differences between the individual approaches
         and results given in the literature.
 
-        Finally, the RHK index thus derived still covers a photospheric
-        contribution, which is always present and not related to the
+        The RHK index thus derived still contains a contribution of photospheric
+        flux in the narrow bands, which is always present and not related to the
         chromosphere. To obtain the purely chromospheric, primed RHK index,
         an estimate of the photospheric surface flux in the H and K pass-bands
         has to be subtracted. For active stars, the photospheric correction
@@ -75,6 +78,7 @@ class SMW_RHK:
           - Rutten 1984, A&A 130, 353
           - Hall et al. 2007, AJ 133, 862
           - Mittag et al. 2013, A&A 549, 117
+          - Vaughan et al. 1978, PASP 90, 267
 
         Parameters
         ----------
