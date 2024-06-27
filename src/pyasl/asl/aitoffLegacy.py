@@ -80,7 +80,7 @@ def aitoff(l, b):
     y = y*(180.0/numpy.pi)/f
 
     if wasFloat:
-        return float(x), float(y)
+        return float(x[0]), float(y[0])
     else:
         return x, y
 
@@ -138,6 +138,6 @@ def inverseAitoff(x, y):
     b = b*180.0 / numpy.pi
 
     if wasFloat:
-        return float(l), float(b)
+        return float(l[0]), float(b[0])
     else:
         return l, b, indi
