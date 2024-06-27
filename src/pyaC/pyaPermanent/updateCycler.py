@@ -3,7 +3,6 @@ from .pyaFS import PyAFS
 import six.moves.configparser as CP
 import datetime as DT
 from PyAstronomy.pyaC import pyaErrors as PE
-import io
 
 
 class PyAUpdateCycle:
