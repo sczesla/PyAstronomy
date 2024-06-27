@@ -540,7 +540,7 @@ def co_aberration(jd, ra, dec, radian=False):
     else:
         sunlon = np.zeros(jd.size)
         for i in smo.range(jd.size):
-            sunlon[i] = np.ravel(sunpos(jd[i], full_output=True)[3])
+            sunlon[i] = sunpos(jd[i], full_output=True)[3][0]
 
     # Earth's orbital eccentricity
     e = 0.016708634 - 0.000042037*jdcen - 0.0000001267*jdcen**2
@@ -1155,7 +1155,7 @@ def co_refract(alt, observer_alt=0.0, pressure=None, temperature=None, epsilon=0
                     raise(PE.PyAAlgorithmFailure("Maximum number of iterations exceeded.", \
                                                  where="co_refract", \
                                                  solution=["Try to change 'epsilon'", "Raise maxiter"]))
-            altout[i] = cur.copy()
+            altout[i] = cur.copy()[0]
 
     if full_output:
         return altout, pres, temper
