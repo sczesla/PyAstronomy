@@ -14,7 +14,6 @@ Example: `co_refract_forward` and `co_refract`
     
     from __future__ import print_function, division
     from PyAstronomy import pyasl
-    import datetime
     import numpy as np
     
     # Assume, a star is observed at an altitude of 50 degrees
@@ -30,7 +29,7 @@ Example: `co_refract_forward` and `co_refract`
     print("You are not observing from sea level, but from an altitude of 5000 meter.")
     print(("Apparent altitude = %9.5f, estimated pressure [mbar] = %9.5f, " +
            "estimated temperature [K] = %9.5f") %
-          pyasl.co_refract(alt, observer_alt=5000, convert_to_observed=False))
+          tuple([x[0] for x in pyasl.co_refract(alt, observer_alt=5000, convert_to_observed=False)]))
     
     print()
     print("Convert apparent (real) altitude into observed altitude.")
