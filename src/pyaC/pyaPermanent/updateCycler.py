@@ -39,7 +39,8 @@ class PyAUpdateCycle:
             self._config.write(self._fs.requestFile(fn, 'wt'))
         else:
             # File exists
-            self._config.read_file(self._fs.requestFile(self._fn, 'rt'))
+            with self._fs.requestFile(self._fn, 'rt') as rcf:
+                self._config.read_file(rcf)
             if not self._config.has_section(section):
                 # Only the section does not yet exists
                 # Add the content
@@ -50,7 +51,8 @@ class PyAUpdateCycle:
                 self._config.write(self._fs.requestFile(fn, 'wt'))
 
         # Read the current data set from file
-        self._config.read_file(self._fs.requestFile(self._fn, 'rt'))
+        with self._fs.requestFile(self._fn, 'rt') as rcf:
+            self._config.read_file(rcf)
         self._updateCycle = self._config.getfloat(
             self._section, "DATA_UPDATE_CYCLE_DAYS")
         self._timeString = self._config.get(
