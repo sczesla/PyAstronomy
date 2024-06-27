@@ -14,11 +14,12 @@ class AtomicNo:
 
         self._data = {}
         self._elNames = {}
-        for l in open(os.path.join(path, "atomicNo.dat")):
-            l = l.rstrip("\n")
-            s = l.split()
-            self._data[int(s[2])] = s[1]
-            self._elNames[int(s[2])] = s[0]
+        with open(os.path.join(path, "atomicNo.dat")) as df:
+            for l in df:
+                l = l.rstrip("\n")
+                s = l.split()
+                self._data[int(s[2])] = s[1]
+                self._elNames[int(s[2])] = s[0]
         # Add reverse mapping to _data dict, i.e., element symbol->atomic number
         self._data.update(dict((self._data[k], k) for k in self._data))
 
