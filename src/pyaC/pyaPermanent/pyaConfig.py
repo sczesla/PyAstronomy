@@ -247,7 +247,8 @@ class PyAConfig(object):
         else:
             # There is a .pyaConfigWhere file.
             try:
-                self.dpath = open(self.configWhere).readline()
+                with open(self.configWhere) as cfi:
+                    self.dpath = cfi.readline()
             except Exception as e:
                 PE.warn(PE.PyAValError("The file " + self.configWhere +
                                        " exists, but could not be opened for reading.",
