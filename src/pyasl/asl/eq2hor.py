@@ -1207,7 +1207,7 @@ def eq2hor(jd, ra, dec, observatory=None, lon=None, lat=None, alt=None, B1950=Fa
     aberration : boolean, optional
          If True (default), the annual aberration is considered
          in the calculations.
-    refraction : boolean, optional
+    refract : boolean, optional
          If True, the atmospheric refraction is considered
          in the calculations.
 
