@@ -316,6 +316,8 @@ def co_nutate(jd, ra, dec, radian=False, plot=False, full_output=False):
                              where="co_nutate",
                              solution="Make arrays the same size or use float as input type."))
 
+    cfac = np.pi/180.
+
     # Must calculate obliquity of ecliptic
     nut = nutate(jd)
     # Change degrees to seconds
@@ -324,15 +326,15 @@ def co_nutate(jd, ra, dec, radian=False, plot=False, full_output=False):
 
     eps0 = 23.4392911*3600. - 46.8150*jdcen - 0.00059*jdcen**2 + 0.001813*jdcen**3
     # True obliquity of the ecliptic in radians
-    eps = (eps0 + d_eps)/3600.*(np.pi/180.)
+    eps = (eps0 + d_eps)/3600.*(cfac)
 
     ce = np.cos(eps)
     se = np.sin(eps)
 
     # convert ra-dec to equatorial rectangular coordinates
-    x = np.cos(ra*np.pi/180.) * np.cos(dec*np.pi/180.)
-    y = np.sin(ra*np.pi/180.) * np.cos(dec*np.pi/180.)
-    z = np.sin(dec*np.pi/180.)
+    x = np.cos(ra*cfac) * np.cos(dec*cfac)
+    y = np.sin(ra*cfac) * np.cos(dec*cfac)
+    z = np.sin(dec*cfac)
 
     # apply corrections to each rectangular coordinate
     x2 = x - (y*ce + z*se)*d_psi * (np.pi/(180.*3600.))
@@ -370,8 +372,8 @@ def co_nutate(jd, ra, dec, radian=False, plot=False, full_output=False):
             dec2[w2] = np.arcsin(z2[w2]/r[w2])
 
     # Convert into DEGREES
-    ra2 = ra2/np.pi*180.
-    dec2 = dec2/np.pi*180.
+    ra2 = ra2/cfac
+    dec2 = dec2/cfac
     d_psi /= 3600.
     d_eps /= 3600.
 
@@ -389,12 +391,12 @@ def co_nutate(jd, ra, dec, radian=False, plot=False, full_output=False):
 
     if radian:
         # convert result to RADIAN
-        d_ra *= (np.pi/180.)
-        d_dec *= (np.pi/180.)
-        d_psi *= (np.pi/180.)
-        d_eps *= (np.pi/180.)
+        d_ra *= (cfac)
+        d_dec *= (cfac)
+        d_psi *= (cfac)
+        d_eps *= (cfac)
     else:
-        eps = eps/np.pi*180.  # eps in DEGREES
+        eps = eps/cfac  # eps in DEGREES
 
     if plot:
         if not _ic.check["matplotlib"]:
