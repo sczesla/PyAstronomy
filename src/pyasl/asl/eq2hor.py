@@ -793,12 +793,14 @@ def hadec2altaz(ha, dec, lat, ws=False, radian=False):
                              where="hadec2altaz",
                              solution="Make the arrays the same size."))
 
-    sh = np.sin(ha*np.pi/180.)
-    ch = np.cos(ha*np.pi/180.)
-    sd = np.sin(dec*np.pi/180.)
-    cd = np.cos(dec*np.pi/180.)
-    sl = np.sin(lat*np.pi/180.)
-    cl = np.cos(lat*np.pi/180.)
+    cfac = np.pi/180.
+
+    sh = np.sin(ha*cfac)
+    ch = np.cos(ha*cfac)
+    sd = np.sin(dec*cfac)
+    cd = np.cos(dec*cfac)
+    sl = np.sin(lat*cfac)
+    cl = np.cos(lat*cfac)
 
     x = - ch * cd * sl + sd * cl
     y = - sh * cd
@@ -806,8 +808,8 @@ def hadec2altaz(ha, dec, lat, ws=False, radian=False):
     r = np.sqrt(x**2 + y**2)
 
     # Now get Alt, Az
-    az = np.arctan2(y, x) / (np.pi/180.)
-    alt = np.arctan2(z, r) / (np.pi/180.)
+    az = np.arctan2(y, x) / (cfac)
+    alt = np.arctan2(z, r) / (cfac)
 
     # Correct for negative AZ
     if ha.size == 1:
