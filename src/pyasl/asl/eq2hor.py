@@ -90,34 +90,35 @@ def nutate(jd, radian=False, plot=False):
           Updated typo in cdelt term              December 2000
           Avoid overflow for more than 32767 input dates W. Landsman January 2005    
     """
+    cfac = np.pi/180.
 
     # form time in Julian centuries from 1900.0
     jdcen = (np.array(jd, ndmin=1) - 2451545.0)/36525.0
 
     # Mean elongation of the Moon
     coef_moon = [1.0/189474.0, -0.0019142, 445267.111480, 297.85036]
-    d = np.polyval(coef_moon, jdcen)*np.pi/180.
+    d = np.polyval(coef_moon, jdcen)*cfac
     d = cirrange(d, radians=True)
 
     # Sun's mean anomaly
     coef_sun = [-1.0/3e5, -0.0001603, 35999.050340, 357.52772]
-    sun = np.polyval(coef_sun, jdcen)*np.pi/180.
+    sun = np.polyval(coef_sun, jdcen)*cfac
     sun = cirrange(sun, radians=True)
 
     # Moon's mean anomaly
     coef_mano = [1.0/5.625e4, 0.0086972, 477198.867398, 134.96298]
-    mano = np.polyval(coef_mano, jdcen)*np.pi/180.
+    mano = np.polyval(coef_mano, jdcen)*cfac
     mano = cirrange(mano, radians=True)
 
     # Moon's argument of latitude
     coef_mlat = [-1.0/3.27270e5, -0.0036825, 483202.017538, 93.27191]
-    mlat = np.polyval(coef_mlat, jdcen)*np.pi/180.
+    mlat = np.polyval(coef_mlat, jdcen)*cfac
     mlat = cirrange(mlat, radians=True)
 
     # Longitude of the ascending node of the Moon's mean orbit on the ecliptic,
     #  measured from the mean equinox of the date
     coef_moe = [1.0/4.5e5, 0.0020708, -1934.136261, 125.04452]
-    omega = np.polyval(coef_moe, jdcen)*np.pi/180.
+    omega = np.polyval(coef_moe, jdcen)*cfac
     omega = cirrange(omega, radians=True)
 
     d_lng = np.array([0., -2., 0., 0., 0., 0., -2., 0., 0., -2, -2, -2, 0, 2, 0, 2, 0, 0, -2, 0, 2, 0, 0, -2, 0, -2, 0, 0, 2,
@@ -173,8 +174,8 @@ def nutate(jd, radian=False, plot=False):
     nut_lon /= 3600.
     nut_obliq /= 3600.
     if radian:
-        nut_lon *= (np.pi/180.)
-        nut_obliq *= (np.pi/180.)
+        nut_lon *= (cfac)
+        nut_obliq *= (cfac)
 
     if plot:
         if not _ic.check["matplotlib"]:
