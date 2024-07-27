@@ -532,10 +532,12 @@ def co_aberration(jd, ra, dec, radian=False):
     # Must calculate obliquity of ecliptic
     res = nutate(jd)
     d_eps = res[1]
+    
+    cfac = np.pi/180.
 
     eps0 = 23.4392911*3600. - 46.8150*jdcen - 0.00059*jdcen**2 + 0.001813*jdcen**3
     # true obliquity of the ecliptic in radians
-    eps = (eps0/3600. + d_eps)*(np.pi/180.)
+    eps = (eps0/3600. + d_eps)*(cfac)
 
     if jd.size == 1:
         sunlon = np.ravel(sunpos(jd, full_output=True)[3])
@@ -552,16 +554,16 @@ def co_aberration(jd, ra, dec, radian=False):
     k = 20.49552
 
     # Trigonometric Functions
-    cd = np.cos(dec*np.pi/180.)
-    sd = np.sin(dec*np.pi/180.)
+    cd = np.cos(dec*cfac)
+    sd = np.sin(dec*cfac)
     ce = np.cos(eps)
     te = np.tan(eps)
-    cp = np.cos(pi*np.pi/180.)
-    sp = np.sin(pi*np.pi/180.)
-    cs = np.cos(sunlon*np.pi/180.)
-    ss = np.sin(sunlon*np.pi/180.)
-    ca = np.cos(ra*np.pi/180.)
-    sa = np.sin(ra*np.pi/180.)
+    cp = np.cos(pi*cfac)
+    sp = np.sin(pi*cfac)
+    cs = np.cos(sunlon*cfac)
+    ss = np.sin(sunlon*cfac)
+    ca = np.cos(ra*cfac)
+    sa = np.sin(ra*cfac)
 
     term1 = (ca*cs*ce+sa*ss)/cd
     term2 = (ca*cp*ce+sa*sp)/cd
@@ -576,8 +578,8 @@ def co_aberration(jd, ra, dec, radian=False):
 
     if radian:
         # Convert result into radian
-        d_ra *= (np.pi/180.)
-        d_dec *= (np.pi/180.)
+        d_ra *= (cfac)
+        d_dec *= (cfac)
 
     return d_ra, d_dec
 
