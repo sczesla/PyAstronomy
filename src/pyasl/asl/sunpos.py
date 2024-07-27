@@ -143,45 +143,47 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
 
     # Mean solar longitude
     sunlon = (279.696678 + idlMod((36000.768925 * time), 360.0)) * 3600.0
+    
+    cfac = np.pi / 180.
 
     # Allow for ellipticity of the orbit (equation of center)
     # using the Earth's mean anomaly ME
     me = 358.475844 + idlMod((35999.049750 * time), 360.0)
-    ellcor = (6910.1 - 17.2 * time) * np.sin(me * np.pi / 180.) + \
-        72.3 * np.sin(2.0 * me * np.pi / 180.)
+    ellcor = (6910.1 - 17.2 * time) * np.sin(me * cfac) + \
+        72.3 * np.sin(2.0 * me * cfac)
     sunlon += ellcor
 
     # Allow for the Venus perturbations using the mean anomaly of Venus MV
     mv = 212.603219 + idlMod((58517.803875 * time), 360.0)
-    vencorr = 4.8 * np.cos((299.1017 + mv - me) * np.pi / 180.) + \
-        5.5 * np.cos((148.3133 + 2.0 * mv - 2.0 * me) * np.pi / 180.) + \
-        2.5 * np.cos((315.9433 + 2.0 * mv - 3.0 * me) * np.pi / 180.) + \
-        1.6 * np.cos((345.2533 + 3.0 * mv - 4.0 * me) * np.pi / 180.) + \
-        1.0 * np.cos((318.15 + 3.0 * mv - 5.0 * me) * np.pi / 180.)
+    vencorr = 4.8 * np.cos((299.1017 + mv - me) * cfac) + \
+        5.5 * np.cos((148.3133 + 2.0 * mv - 2.0 * me) * cfac) + \
+        2.5 * np.cos((315.9433 + 2.0 * mv - 3.0 * me) * cfac) + \
+        1.6 * np.cos((345.2533 + 3.0 * mv - 4.0 * me) * cfac) + \
+        1.0 * np.cos((318.15 + 3.0 * mv - 5.0 * me) * cfac)
     sunlon += vencorr
 
     # Allow for the Mars perturbations using the mean anomaly of Mars MM
     mm = 319.529425 + idlMod((19139.858500 * time), 360.0)
-    marscorr = 2.0 * np.cos((343.8883 - 2.0 * mm + 2.0 * me) * np.pi / 180.) + \
-        1.8 * np.cos((200.4017 - 2.0 * mm + me) * np.pi / 180.)
+    marscorr = 2.0 * np.cos((343.8883 - 2.0 * mm + 2.0 * me) * cfac) + \
+        1.8 * np.cos((200.4017 - 2.0 * mm + me) * cfac)
     sunlon += marscorr
 
     # Allow for the Jupiter perturbations using the mean anomaly of Jupiter MJ
     mj = 225.328328 + idlMod((3034.6920239 * time), 360.0)
-    jupcorr = 7.2 * np.cos((179.5317 - mj + me) * np.pi / 180.) + \
-        2.6 * np.cos((263.2167 - mj) * np.pi / 180.) + \
-        2.7 * np.cos((87.1450 - 2.0 * mj + 2.0 * me) * np.pi / 180.) + \
-        1.6 * np.cos((109.4933 - 2.0 * mj + me) * np.pi / 180.)
+    jupcorr = 7.2 * np.cos((179.5317 - mj + me) * cfac) + \
+        2.6 * np.cos((263.2167 - mj) * cfac) + \
+        2.7 * np.cos((87.1450 - 2.0 * mj + 2.0 * me) * cfac) + \
+        1.6 * np.cos((109.4933 - 2.0 * mj + me) * cfac)
     sunlon += jupcorr
 
     # Allow for the Moon's perturbations using the mean elongation of
     # the Moon from the Sun D
     d = 350.7376814 + idlMod((445267.11422 * time), 360.0)
-    mooncorr = 6.5 * np.sin(d * np.pi / 180.)
+    mooncorr = 6.5 * np.sin(d * cfac)
     sunlon += mooncorr
 
     # Allow for long period terms
-    longterm = 6.4 * np.sin((231.19 + 20.20 * time) * np.pi / 180.)
+    longterm = 6.4 * np.sin((231.19 + 20.20 * time) * cfac)
     sunlon += longterm
     sunlon = idlMod((sunlon + 2592000.0), 1296000.0)
     longmed = sunlon / 3600.0
@@ -191,28 +193,28 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
 
     # Allow for Nutation using the longitude of the Moons mean node OMEGA
     omega = 259.183275 - idlMod((1934.142008 * time), 360.0)
-    sunlon = sunlon - 17.2 * np.sin(omega * np.pi / 180.)
+    sunlon = sunlon - 17.2 * np.sin(omega * cfac)
 
     # Calculate the True Obliquity
     oblt = 23.452294 - 0.0130125 * time + \
-        (9.2 * np.cos(omega * np.pi / 180.)) / 3600.0
+        (9.2 * np.cos(omega * cfac)) / 3600.0
 
     # Right Ascension and Declination
     sunlon /= 3600.0
-    ra = np.arctan2(np.sin(sunlon * np.pi / 180.) *
-                    np.cos(oblt * np.pi / 180.), np.cos(sunlon * np.pi / 180.))
+    ra = np.arctan2(np.sin(sunlon * cfac) *
+                    np.cos(oblt * cfac), np.cos(sunlon * cfac))
 
     ra = ra % (2.*np.pi)
 
-    dec = np.arcsin(np.sin(sunlon * np.pi / 180.)
-                    * np.sin(oblt * np.pi / 180.))
+    dec = np.arcsin(np.sin(sunlon * cfac)
+                    * np.sin(oblt * cfac))
 
     if radian:
-        oblt *= (np.pi / 180.)
-        longmed *= (np.pi / 180.)
+        oblt *= (cfac)
+        longmed *= (cfac)
     else:
-        ra /= (np.pi / 180.)
-        dec /= (np.pi / 180.)
+        ra /= (cfac)
+        dec /= (cfac)
 
     jd = time * 36525.0 + 2415020.0
 
