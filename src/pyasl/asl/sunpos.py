@@ -29,8 +29,8 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
     plot : boolean, optional
          If True, the result is plotted.
     full_output: boolean, optional
-         If True, `sunpos`, additionally, returns the elongation and
-         obliquity of the Sun.
+         If True, `sunpos`, additionally, returns the elongation along and
+         obliquity of the ecliptic.
 
     Returns
     -------
@@ -44,7 +44,7 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
         Ecliptic longitude of the Sun (only of `full_output`
         is set to True).
     Obliquity : array, optional
-        Obliquity of the Sun (only of `full_output`
+        Obliquity of the ecliptic (only of `full_output`
         is set to True).
 
     Notes
