@@ -24,7 +24,7 @@ Example
     print("JD = " + str(jd))
     pos = pyasl.sunpos(jd, full_output=True)
     print("Coordinates of the Sun (ra, dec): %g, %g" % (pos[1][0], pos[2][0]))
-    print("Solar elongation = %g and obliquity = %g" % (pos[3][0], pos[4][0]))
+    print("Solar ecliptic longitude = %g and obliquity = %g" % (pos[3][0], pos[4][0]))
     
     # Get the Sun's RA and DEC values for a period of time.
     startjd = datetime.datetime(2013, 4, 16)
