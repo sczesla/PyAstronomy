@@ -40,8 +40,8 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
         Right ascension of the Sun.
     Dec : array
         Declination of the Sun.
-    Elongation : array, optional
-        Elongation of the Sun (only of `full_output`
+    Longitude : array, optional
+        Ecliptic longitude of the Sun (only of `full_output`
         is set to True).
     Obliquity : array, optional
         Obliquity of the Sun (only of `full_output`
