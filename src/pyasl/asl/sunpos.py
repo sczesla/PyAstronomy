@@ -37,9 +37,9 @@ def sunpos(jd, end_jd=None, jd_steps=None, outfile=None, radian=False, plot=Fals
     Time : array
         The JDs for which calculations where carried out.
     Ra : array
-        Right ascension of the Sun.
+        Right ascension of the Sun (in the given date's equinox).
     Dec : array
-        Declination of the Sun.
+        Declination of the Sun (in the given date's equinox).
     Longitude : array, optional
         Ecliptic longitude of the Sun (only of `full_output`
         is set to True).
