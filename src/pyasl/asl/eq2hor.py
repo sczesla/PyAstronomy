@@ -1422,7 +1422,7 @@ def eq2hor(jd, ra, dec, observatory=None, lon=None, lat=None, alt=None, B1950=Fa
 
     # Make nutation and aberration corrections
     if nutate:
-            # Calculate NUTATION and ABERRATION Corrections to Ra-Dec
+        # Calculate NUTATION and ABERRATION Corrections to Ra-Dec
         dra1, ddec1, eps, d_psi, dump = co_nutate(
             jd_vals, ra_vals, dec_vals, full_output=True)
         ra_vals += dra1
