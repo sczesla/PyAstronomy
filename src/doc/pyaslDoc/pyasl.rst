@@ -99,6 +99,7 @@ Coordinates, time, and observation tools
    aslDoc/properMotion.rst
    aslDoc/gal_uvw.rst
    aslDoc/aslExt_1Doc/parallactic_angle.rst
+   aslDoc/aslExt_1Doc/solarDirectFlux.rst
 
 Transit and planet routines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
