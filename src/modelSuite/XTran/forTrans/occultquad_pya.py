@@ -432,7 +432,7 @@ class OccultQuadPy:
 
 # C the occulting star partly occults the source and crosses the limb:
 # C Table 3, Case III:
-            if ((z > 0.5+abs(p-0.5)) and (z < 1+p)) or ((p > 0.5) and (z > abs(1-p)*1.0001) and (z < p)):
+            if ((z > 0.5+abs(p-0.5)) and (z < 1+p)) or ((p > 0.5) and (z > abs(1-p)*1.000001) and (z < p)):
                 lam = 0.5*pi
                 q = sqrt((1-(p-z)**2)/4/z/p)
                 Kk = self.ellk(q)
@@ -451,7 +451,7 @@ class OccultQuadPy:
                 continue
 # C the occulting star transits the source:
 # C Table 3, Case IV.:
-            if (p <= 1) and (z <= (1-p)*1.0001):
+            if (p <= 1) and (z <= (1-p)*1.000001):
                 lam = 0.5*pi
                 q = sqrt((x2-x1)/(1-x1))
                 Kk = self.ellk(q)

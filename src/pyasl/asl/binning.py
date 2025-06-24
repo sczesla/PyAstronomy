@@ -209,7 +209,7 @@ def binningx0dt(
     # Sort data into the bins
     # Create output array (time, flux, error, data-point-counter)
     result = np.empty((nbins, 4))
-    result[:] = np.NAN
+    result[:] = np.nan
     # Assign time axis (beginning of bins)
     result[::, 0] = x0 + np.arange(nbins) * dt
     if useBinCenter:
@@ -230,7 +230,7 @@ def binningx0dt(
                 result[b, 2] = np.std(y[indi]) / np.sqrt(result[b, 3])
             else:
                 # No error if there is only a single point in the bin
-                result[b, 2] = np.NAN
+                result[b, 2] = np.nan
         else:
             # There are errors on the data points
             # Use error propagation

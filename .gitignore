@@ -7,3 +7,4 @@ src/doc/_build/
 build
 *.test
 *.so
+/.pytest_cache/

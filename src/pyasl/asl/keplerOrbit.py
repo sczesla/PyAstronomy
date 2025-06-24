@@ -910,8 +910,8 @@ class BinaryOrbit(object):
             self._MSun = msun
         
         # Dummies to be replaced shortly
-        self._m2m1 = numpy.NaN
-        self._mtot_kg = numpy.NaN
+        self._m2m1 = numpy.nan
+        self._mtot_kg = numpy.nan
         
         self.per = per
         self.mtot = mtot

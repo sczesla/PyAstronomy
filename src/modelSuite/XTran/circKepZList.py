@@ -84,7 +84,7 @@ class _ZList:
 
         # Initialize the z-list (NaN values will be neglected)
         self._zlist = np.empty(len(time))
-        self._zlist[:] = np.NAN
+        self._zlist[:] = np.nan
         # Get position of body from Keplerian orbit
         pos = self._ke.xyzPos(time)
 

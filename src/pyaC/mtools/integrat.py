@@ -98,18 +98,18 @@ def ibtrapz(x, y, x0, x1, iaout=False, jne=False):
         # Produce a leave-one-out jackknife error
         if len(xi) < 3:
             # This is technically impossible
-            return scinteg.trapz(yi, xi), None, None
+            return scinteg.trapezoid(yi, xi), None, None
         m = np.ones_like(xi, dtype=bool)
         estis = []
         for i in range(1, len(m) - 1):
             m[i] = False
-            estis.append(scinteg.trapz(yi[m], xi[m]))
+            estis.append(scinteg.trapezoid(yi[m], xi[m]))
             m[i] = True
         estis = np.array(estis)
         me = np.mean(estis)
         var = (len(estis) - 1) / len(estis) * np.sum((estis - me) ** 2)
-        return scinteg.trapz(yi, xi), np.sqrt(var), estis
+        return scinteg.trapezoid(yi, xi), np.sqrt(var), estis
 
     if iaout:
-        return scinteg.trapz(yi, xi), xi, yi
-    return scinteg.trapz(yi, xi)
+        return scinteg.trapezoid(yi, xi), xi, yi
+    return scinteg.trapezoid(yi, xi)

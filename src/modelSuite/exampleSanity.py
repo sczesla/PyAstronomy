@@ -520,7 +520,7 @@ class TestModSuiteSanity(unittest.TestCase):
             x["eps"] = np.random.random()
 
             d = x.evaluate(vv)
-            a = sci.trapz(d, vv)
+            a = sci.trapezoid(d, vv)
             self.assertAlmostEqual(x["A"], a, delta=1.0 / 200., msg="Incorrect profile normalization (" +
                                    "%g vs %g)" % (x["A"], a))
 

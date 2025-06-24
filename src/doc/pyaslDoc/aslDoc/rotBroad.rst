@@ -59,9 +59,9 @@ result equivalent widths.
     
     # Check that the area of the line did not change
     # in response to the broadening
-    print("Initial EW [A]: ", 4. - sci.trapz(flux, wvl))
-    print("After broadening without LD: ", 4. - sci.trapz(rflux, wvl))
-    print("After broadening with LD: ", 4. - sci.trapz(lflux, wvl))
+    print("Initial EW [A]: ", 4. - sci.trapezoid(flux, wvl))
+    print("After broadening without LD: ", 4. - sci.trapezoid(rflux, wvl))
+    print("After broadening with LD: ", 4. - sci.trapezoid(lflux, wvl))
     
     # Plot the results
     plt.title("Rotational broadening")

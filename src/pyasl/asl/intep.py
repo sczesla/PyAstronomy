@@ -38,7 +38,7 @@ def intep(x, y, xinter, boundsError=True, fillValue=None):
         used to represent values outside of the given
         bounds. Note that `boundsError` must be set
         False for this to have an effect. For instance,
-        use np.NaN.
+        use np.nan.
     
     Returns
     -------

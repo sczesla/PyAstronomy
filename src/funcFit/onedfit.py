@@ -780,7 +780,7 @@ class FuFPrior(object):
             if (ps[n] >= kwargs["lower"]) and (ps[n] <= kwargs["upper"]):
                 return p
             else:
-                return -np.Inf
+                return -np.inf
         return unilimit
 
     def _jeffreyPoissonScale(self, **kwargs):
@@ -1897,7 +1897,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # Save the chain to a file
         if not dbfile is None:
             np.savez_compressed(open(dbfile, 'wb'), chain=self.emceeSampler.chain, lnp=self.emceeSampler.lnprobability,
-                                pnames=np.array(fpns, dtype=np.unicode_))
+                                pnames=np.array(fpns, dtype=np.str_))
 
         if toMD:
             # Set to lowest-deviance (highest likelihood) solution
@@ -2618,6 +2618,6 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
     # Save the chain to a file
     if not dbfile is None:
         np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnp=emceeSampler.lnprobability,
-                            pnames=np.array(fpns, dtype=np.unicode_))
+                            pnames=np.array(fpns, dtype=np.str_))
 
     return pos, state

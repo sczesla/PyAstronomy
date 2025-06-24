@@ -19,9 +19,9 @@ class TestFuncFitSanity(unittest.TestCase):
         for k, v in zip(origVars, vals):
             gf[k] = v
         for k, v in zip(origVars, vals):
-            self.assertEquals(v, gf[k])
+            self.assertEqual(v, gf[k])
         gf.assignValue(dict(zip(origVars, numpy.zeros(len(origVars)))))
-        self.assertEquals(numpy.sum(list(gf.parameters().values())), 0.0)
+        self.assertEqual(numpy.sum(list(gf.parameters().values())), 0.0)
 
     def testsanity_combine1(self):
         gf = fuf.GaussFit1d()

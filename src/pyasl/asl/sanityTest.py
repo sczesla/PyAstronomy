@@ -1272,9 +1272,9 @@ class TestSanityOfrotBroad(unittest.TestCase, SaniBase):
 
         # Check that the area of the line did not change
         # in response to the broadening
-        print("Initial EW [A]: ", 4. - sci.trapz(flux, wvl))
-        print("After broadening without LD: ", 4. - sci.trapz(rflux, wvl))
-        print("After broadening with LD: ", 4. - sci.trapz(lflux, wvl))
+        print("Initial EW [A]: ", 4. - sci.trapezoid(flux, wvl))
+        print("After broadening without LD: ", 4. - sci.trapezoid(rflux, wvl))
+        print("After broadening with LD: ", 4. - sci.trapezoid(lflux, wvl))
 
         # Plot the results
         plt.title("Rotational broadening")
@@ -1313,7 +1313,7 @@ class TestSanityOfrotBroad(unittest.TestCase, SaniBase):
         for broad in np.linspace(0.1, 100., 10):
             for eps in np.arange(0., 1., 0.2):
                 nflux = rotBroad(wvl, flux, epsilon=eps, vsini=broad)
-                ew = 4. - sci.trapz(nflux, wvl)
+                ew = 4. - sci.trapezoid(nflux, wvl)
                 self.assertAlmostEqual(ew, refEW, 5, "The EW in rotbroad changes for: vsini = " +
                                        str(broad) + ", and eps = " + str(eps))
 
@@ -2441,7 +2441,7 @@ class TestSanityOfTransit(unittest.TestCase, SaniBase):
         
             b = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="p")
             
-            b = [np.NaN if b[j] is None else b[j] for j in range(4)]
+            b = [np.nan if b[j] is None else b[j] for j in range(4)]
             #print(b)
             
             bim = sma * np.cos(inc/180.*np.pi)
@@ -2453,7 +2453,7 @@ class TestSanityOfTransit(unittest.TestCase, SaniBase):
             tt = (1+k)/(1-k)
             
             bs = pyasl.transit_T1_T4_ell(sma, rprs, inc, p, tau, e, w, transit="s")
-            bs = [np.NaN if bs[j] is None else bs[j] for j in range(4)]
+            bs = [np.nan if bs[j] is None else bs[j] for j in range(4)]
             
             self.assertAlmostEqual((tt-(bs[3]-bs[0])/(b[3]-b[0]))/tt, 0.0, delta=0.1, msg="Problem with transit duration ratio (elliptical) at iteration %d" % i)
             

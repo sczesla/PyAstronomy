@@ -50,17 +50,17 @@ class SpecTypeDeJager(object):
     # Table to resolve Chebychev polynomials (use self._cij[i,j])
     self._cij = np.array([[ 3.82573, -2.13868, -0.46357,  0.02076, -0.11937],
                           [-1.55607, -1.89216, -0.96916, -0.08869, -0.20423],
-                          [ 1.05165,  0.42330, -0.94379, -0.07438, np.NaN],
-                          [-0.01663, -0.20024, -0.18552, np.NaN,   np.NaN],
-                          [-0.07576, -0.10934, np.NaN  , np.NaN,   np.NaN],
-                          [ 0.11008, np.NaN  , np.NaN  , np.NaN,   np.NaN]])
+                          [ 1.05165,  0.42330, -0.94379, -0.07438, np.nan],
+                          [-0.01663, -0.20024, -0.18552, np.nan,   np.nan],
+                          [-0.07576, -0.10934, np.nan  , np.nan,   np.nan],
+                          [ 0.11008, np.nan  , np.nan  , np.nan,   np.nan]])
     # Table to resolve Chebychev polynomials (use self._dij[i,j])
     self._dij = np.array([[ 3.96105,  0.03165, -0.02963,  0.01307, -0.01172],
                           [-0.62945,  0.02596, -0.06009,  0.01881, -0.01121],
-                          [ 0.14370, -0.00977, -0.03265,  0.01649, np.NaN],
-                          [ 0.00791,  0.00076, -0.03006, np.NaN,   np.NaN],
-                          [ 0.00723, -0.02621, np.NaN  , np.NaN,   np.NaN],
-                          [ 0.02755, np.NaN  , np.NaN  , np.NaN,   np.NaN]])
+                          [ 0.14370, -0.00977, -0.03265,  0.01649, np.nan],
+                          [ 0.00791,  0.00076, -0.03006, np.nan,   np.nan],
+                          [ 0.00723, -0.02621, np.nan  , np.nan,   np.nan],
+                          [ 0.02755, np.nan  , np.nan  , np.nan,   np.nan]])
   
   def _indexSpecType(self, spt):
     """

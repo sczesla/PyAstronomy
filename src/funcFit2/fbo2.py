@@ -1669,7 +1669,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
         
         lnprior, lnl = deblob(emceeSampler.blobs)
         np.savez_compressed(open(dbfile, 'wb'), chain=emceeSampler.chain, lnpost=emceeSampler.lnprobability, lnprior=lnprior, lnl=lnl,
-                            pnames=np.array(fpns, dtype=np.unicode_))
+                            pnames=np.array(fpns, dtype=np.str_))
     
     if toMAP:
         # Set to Maximum-A-Posteriori solution

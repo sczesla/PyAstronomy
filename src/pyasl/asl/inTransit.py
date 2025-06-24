@@ -356,7 +356,7 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     return t1, t2, t3, t4
 
 
-def collectTransitDataFromDB(pn, dbp=("nexa", "eorg", "eeu"), verbose=False):
+def collectTransitDataFromDB(pn, dbp=("nexa", "eeu"), verbose=False):
     """
     Get transit timing data from database
 
@@ -365,7 +365,7 @@ def collectTransitDataFromDB(pn, dbp=("nexa", "eorg", "eeu"), verbose=False):
     pn : string
         Planet name (e.g., 'WASP-12 b')
     dbp : tuple of strings
-        A tuple with the strings 'nexa', 'eorg', and 'eeu', which specify the priorities
+        A tuple with the strings 'nexa' and 'eeu', which specify the priorities
         of the exoplanet databases. Data is collected from the first DB, which returns
         useful results.
     verbose : boolean, optional
@@ -376,26 +376,10 @@ def collectTransitDataFromDB(pn, dbp=("nexa", "eorg", "eeu"), verbose=False):
     Transit data : dictionary
         A dictionary with keys: ra, dec, T0, orbPer, orbInc, SMA, RpJ, RsSun, and optionally Tdur.
         Suitable to be used with the `transitTimes` function.
-    DB name : string, {nexa, eorg, eeu}
+    DB name : string, {nexa, eeu}
         The name of the database from which the data were collected.
     """
 
-    def colfromorg(pn):
-        epl = pyasl.ExoplanetsOrg()
-        d = epl.selectByPlanetName(pn)
-        m = {
-            "ra": "ra",
-            "dec": "dec",
-            "T0": "pl_tranmid",
-            "orbPer": "pl_orbper",
-            "orbInc": "pl_orbincl",
-            "SMA": "pl_orbsmax",
-            "RpJ": "pl_radj",
-            "RsSun": "st_rad",
-            "Tdur": "pl_trandur",
-        }
-        r = {k: d[m[k]] for k in list(m)}
-        return r
 
     def colfromnexa(pn):
         nexa = pyasl.NasaExoplanetArchive()
@@ -433,7 +417,7 @@ def collectTransitDataFromDB(pn, dbp=("nexa", "eorg", "eeu"), verbose=False):
         r["Tdur"] = None
         return r
 
-    dbm = {"nexa": colfromnexa, "eorg": colfromorg, "eeu": colfromeu}
+    dbm = {"nexa": colfromnexa, "eeu": colfromeu}
     for db in dbp:
         try:
             r = dbm[db](pn)
