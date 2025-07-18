@@ -323,6 +323,8 @@ class TransmissionCurves:
         https://heasarc.gsfc.nasa.gov/docs/tess/data/tess-response-function-v1.0.csv
 
         and added as 'TESS'.
+        
+        .. note:: After version 0.24.0, the TESS passband is no longer downloaded but has been integrated into PyAstronomy.
 
         Parameters
         ----------
@@ -333,23 +335,7 @@ class TransmissionCurves:
             If True (default), download process will print information
             on progress.
         """
-
-        fno = os.path.join("pyasl", "resBased", "tess-response-function-v1.0.csv")
-
-        if (not self._fs.fileExists(fno)) or forceDownload:
-            self._fs.downloadToFile(
-                "https://heasarc.gsfc.nasa.gov/docs/tess/data/tess-response-function-v1.0.csv",
-                fno,
-                forceDownload,
-                verbose,
-            )
-
-        dat = np.loadtxt(self._fs.requestFile(fno), delimiter=",", skiprows=8)
-        # Convert into A
-        dat[::, 0] *= 10.0
-
-        bn = "TESS"
-        self.addPassband(bn, dat[::, 0], dat[::, 1], snc=True)
+        pass
 
     def __init__(self, fn="default"):
         self._fs = PP.PyAFS()
