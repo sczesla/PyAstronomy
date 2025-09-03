@@ -4,7 +4,7 @@ import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 
 
-def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err=None):
+def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err=None, wvlOrdered=False):
     """
     Doppler shift a given spectrum.
 
@@ -51,7 +51,8 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err
         Doppler shift in km/s
     edgeHandling : string, {"fillValue", "firstlast"}, optional
         The method used to handle the edges of the
-        output spectrum.
+        output spectrum. If not specified, NaN will be used as
+        fill value.
     fillValue : float, optional
         If the "fillValue" is specified as edge handling method,
         the value used to fill the edges of the output spectrum.
@@ -62,6 +63,9 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err
         The uncertainties of the data points in the spectrum. If given,
         updated uncertainties are obtained by linear interpolation of the
         uncertainties.
+    wvlOrdered : bool, optional
+        If True, the check of the ordering of the wavelength axis will be
+        skipped. Default is False.
 
     Returns
     -------
@@ -73,9 +77,10 @@ def dopplerShift(wvl, flux, v, edgeHandling=None, fillValue=None, vlim=0.05, err
         Uncertainties of the shifted spectrum.
     """
     # Order check
-    if np.any(np.diff(wvl) < 0.0):
-        raise(PE.PyAValError("Wavelength axis must be sorted in ascending order.", \
-                             solution="Use sorted axis.")) 
+    if not wvlOrdered:
+        if np.any(np.diff(wvl) < 0.0):
+            raise(PE.PyAValError("Wavelength axis must be sorted in ascending order.", \
+                                 solution="Use sorted axis.")) 
         
     # Speed of light [km/s]
     cvel = 299792.458
