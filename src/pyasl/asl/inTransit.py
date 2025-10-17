@@ -144,7 +144,7 @@ def ingressDuration_Rs(sma, rprs, inc, period):
     """
     Calculate transit duration
 
-    Invokes :py:func:`transitDuration` after parameter transformation.
+    Invokes :py:func:`ingressDuration` after parameter transformation.
 
     Parameters
     ----------
@@ -159,8 +159,8 @@ def ingressDuration_Rs(sma, rprs, inc, period):
 
     Returns
     -------
-    Transit duration : float
-        The duration of the transit (same units as `period`).
+    Ingress duration : float
+        The duration of in- and egress (same units as `period`).
     """
     from PyAstronomy import constants as PC
 
