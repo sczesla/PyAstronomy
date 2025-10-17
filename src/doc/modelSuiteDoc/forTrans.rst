@@ -6,8 +6,8 @@ Analytical transit model (Mandel & Agol 2002)
 
 The *forTrans* module provides easy access to the FORTRAN
 routines by Mandel & Agol 2002 [#ManAg02]_, which can be used to
-calculate transit light curves. While the FORTRAN code ensures
-fast computation of the light curve, PyAstronomy supplies
+calculate transit light curves. Using the FORTRAN code ensures
+fast computation of the light curve, and PyAstronomy supplies
 funcFit's fitting framework.
 
 .. note:: The code contained within the files *occultnl.f* and *occultquad.f* is used
@@ -15,6 +15,28 @@ funcFit's fitting framework.
           explanations are given in Eastman et al. 2013 (PASP 125, 83).
 
 .. [#ManAg02] Mandel & Agol 2002, "Analytic Light Curves for Planetary Transit Searches", ApJ, 580, 171.
+
+
+FORTRAN or Python fallback
+-----------------------------
+
+.. currentmodule:: PyAstronomy.modelSuite.XTran.forTrans.mandelAgol
+.. autoclass:: MandelAgolLC
+
+PyAstronomy provides Python fallbacks for some of the FORTRAN code.
+To check which implementation is currently in use
+
+::
+
+    from PyAstronomy.modelSuite import forTrans as ft
+    
+    # Create a MandelAgolLC object 
+    ma = ft.MandelAgolLC(orbit="circular", ld="quad")
+    
+    # Check status of 'backend'
+    ma.backendStatus()
+
+
 
 The MandelAgolLC class
 ----------------------------
