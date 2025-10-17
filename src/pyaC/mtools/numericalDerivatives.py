@@ -11,7 +11,7 @@ class _FDs:
     self.fds = {}
     with open(fn) as f:
       for line in f:
-        r = re.match("^\s*(\d+)\s+(\d+)\s+(.*)$", line)
+        r = re.match(r"^\s*(\d+)\s+(\d+)\s+(.*)$", line)
         if r is None:
           continue
         derivative = int(r.group(1))
@@ -21,7 +21,7 @@ class _FDs:
         coeffs = np.zeros(len(fdsStrings))
         offsets = np.arange(len(fdsStrings), dtype=int) - len(fdsStrings)//2
         for i, s in enumerate(fdsStrings):
-          r = re.match("(-)?(\d+)(/(\d+))?", s)
+          r = re.match(r"(-)?(\d+)(/(\d+))?", s)
           coeffs[i] = float(r.group(2))
           if r.group(4) is not None:
             coeffs[i] /= float(r.group(4))

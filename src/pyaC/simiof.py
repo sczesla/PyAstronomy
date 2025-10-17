@@ -55,7 +55,7 @@ class SimIOF:
     """
     self.args = {}
     for l in self.file:
-      r = re.match("^#\s+([^:]+):\s*(.*)$", l)
+      r = re.match(r"^#\s+([^:]+):\s*(.*)$", l)
       if r is not None:
         p = r.group(2)
         try:
