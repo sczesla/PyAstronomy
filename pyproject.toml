@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 # Core metadata, replaces setup() arguments
 name = "PyAstronomy"
-version = "0.24.0beta"  
+version = "0.24.0b1"  
 description = "A collection of astronomy related tools for Python."
 readme = "README.md"
 authors = [
@@ -45,18 +45,18 @@ dev = [
     "twine",
 ]
 
-[tool.setuptools]
-package-dir = {"" = "src"}
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
 
 [tool.setuptools.package-data]
-"PyAstronomy" = ["setup.cfg"]
 "PyAstronomy.pyasl.asl" = ["*.cfg", "*.dat", "testPro/*.pro"]
 "PyAstronomy.pyasl.resBased" = ["*.dat"]
 "PyAstronomy.pyasl.asl.aslExt_1" = ["*.dat"]
 "PyAstronomy.constants" = ["*.dat"]
 "PyAstronomy.pyaC" = ["*.dat"]
 "PyAstronomy.pyaC.mtools" = ["*.dat"]
+
+
+
 
