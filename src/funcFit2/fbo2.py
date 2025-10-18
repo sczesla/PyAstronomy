@@ -1363,8 +1363,8 @@ def _introdefarg(f, **kwargs):
         kwargs as provided by the callable.
     """
     # Get dictionary of default arguments and default values
-    fi = inspect.getargspec(f)
-    odefargs = dict(zip(fi.args[-len(fi.defaults):],fi.defaults))
+    fi = inspect.signature(f)
+    odefargs = {param.name: param.default for param in fi.parameters.values() if param.default is not inspect.Parameter.empty}
     
     defargs = odefargs.copy()
     # Update entries for which kwargs holds values
