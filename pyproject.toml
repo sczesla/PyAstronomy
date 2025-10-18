@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 # Core metadata, replaces setup() arguments
 name = "PyAstronomy"
-version = "0.24.0"  
+version = "0.25.0b1"  
 description = "A collection of astronomy related tools for Python."
 readme = "README.md"
 authors = [
