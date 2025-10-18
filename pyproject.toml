@@ -1,0 +1,62 @@
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Core metadata, replaces setup() arguments
+name = "PyAstronomy"
+version = "0.24.0beta"  
+description = "A collection of astronomy related tools for Python."
+readme = "README.md"
+authors = [
+    {name = "PyA group", email = "stefan.czesla@hs.uni-hamburg.de"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+
+dependencies = [
+    "numpy",
+    "six",
+    "scipy",
+    "quantities",
+    "bidict",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/sczesla/PyAstronomy"
+"Bug Tracker" = "https://github.com/sczesla/PyAstronomy/issues"
+
+[project.optional-dependencies]
+# This is the modern replacement for 'extras_require'.
+# A user can install this with 'pip install PyAstronomy[occult]'.
+occult = ["PyAstronomy_ext"]
+
+dev = [
+    "pytest",
+    "build",
+    "twine",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"PyAstronomy" = ["setup.cfg"]
+"PyAstronomy.pyasl.asl" = ["*.cfg", "*.dat", "testPro/*.pro"]
+"PyAstronomy.pyasl.resBased" = ["*.dat"]
+"PyAstronomy.pyasl.asl.aslExt_1" = ["*.dat"]
+"PyAstronomy.constants" = ["*.dat"]
+"PyAstronomy.pyaC" = ["*.dat"]
+"PyAstronomy.pyaC.mtools" = ["*.dat"]
+
