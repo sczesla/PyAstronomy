@@ -40,13 +40,6 @@ Installation
     
   to install the current state from github including non-Python dependencies. Remove [occult]
   to skip these dependencies.
-  
-  Alternatively, download the source and use
-  
-    python setup.py [--with-ext] install
-    
-  If you specify the `--with-ext` flag, setup will try to
-  compile non-Python modules.
 
 Documentation and further information
 -------------------------------------
