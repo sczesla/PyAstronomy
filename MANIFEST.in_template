@@ -1,9 +1,0 @@
-# Documentation
-include src/doc/conf.py
-include src/doc/Makefile
-include src/doc/*.rst
-include src/doc/logo/*.png
-include src/doc/logo/*.ico
-include src/setup.cfg
-include src/doc/changeLog/*.rst
-include src/constants/*.dat
