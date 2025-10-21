@@ -1378,7 +1378,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                 app += r[2][k] + ", "
                             app += r[2][len(r[2]) - 1] + ")"
 
-                    if re.match("\s*[^\s]+", app):
+                    if re.match(r"\s*[^\s]+", app):
                         lines.append(app)
 
         for i in smo.range(len(lines)):
@@ -1740,7 +1740,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                                   solution="Use 'thaw' to free same parameters."))
 
         if not dbfile is None:
-            if re.match(".*\.emcee$", dbfile) is None:
+            if re.match(r".*\.emcee$", dbfile) is None:
                 PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.",
                                        solution="Use a filename of the form *.emcee"))
 
@@ -2518,7 +2518,7 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
                               solution="TBD."))
 
     if not dbfile is None:
-        if re.match(".*\.emcee$", dbfile) is None:
+        if re.match(r".*\.emcee$", dbfile) is None:
             PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.",
                                    solution="Use a filename of the form *.emcee"))
 

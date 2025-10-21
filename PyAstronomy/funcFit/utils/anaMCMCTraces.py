@@ -24,7 +24,7 @@ except ImportError:
 
 
 def hpd(trace, cred):
-    """
+    r"""
     Estimate the highest probability density interval.
 
     This function determines the shortest, continuous interval
@@ -46,9 +46,9 @@ def hpd(trace, cred):
         The start and end points of the interval.
     """
     if (cred > 1.0) or (cred < 0.0):
-        raise(PE.PyAValError("Invalid value for credibility (cred). Received: " + str(cred),
-                             where="hpd",
-                             solution="Use a value between 0 and 1."))
+        raise (PE.PyAValError("Invalid value for credibility (cred). Received: " + str(cred),
+                              where="hpd",
+                              solution="Use a value between 0 and 1."))
 
     # Sort the trace steps in ascending order
     st = np.sort(trace)
@@ -71,50 +71,50 @@ def hpd(trace, cred):
 
 
 def modeGrenander(trace, k, p):
-    """
+    r"""
     Estimate the mode using estimator by Grenander 1965
-    
+
     Evaluate the estimator, where x represents the trace sorted in ascending order,
-    
+
     .. math::
-    
-        M^*_{p,k} = \\frac{ \\frac{1}{2} \sum_{i=1}^{n-k} (x_{i+k} + x_k)/(x_{i+k} - x_k)^p }{\sum_{i=1}^{n-k} 1/(x_{i+k} - x_k)^p }
-    
+
+        M^*_{p,k} = \frac{ \frac{1}{2} \sum_{i=1}^{n-k} (x_{i+k} + x_k)/(x_{i+k} - x_k)^p }{\sum_{i=1}^{n-k} 1/(x_{i+k} - x_k)^p }
+
     given by Grenander 1965 ("Some Direct Estimates of the Mode." Ann. Math. Statist. 36 (1) 131 - 138).
-    
+
     Parameters
     ----------
     k : int
         Index offset (should be >2*p for asymptotic normality)
     p : float
         Parameter of estimator (1 < p < k)
-    
+
     Returns
     -------
     mode : float
         Estimate of mode
     """
     if (p < 1) or (p > k):
-        raise(PE.PyAValError("1 < p < k is required.", \
-                             where="modeGrenander"))
+        raise (PE.PyAValError("1 < p < k is required.",
+                              where="modeGrenander"))
     if k < 2*p:
-        PE.warn(PE.PyAValError("For asymptotic normality, k > 2p is required.", \
+        PE.warn(PE.PyAValError("For asymptotic normality, k > 2p is required.",
                                where="modeGrenander"))
     s = np.sort(trace)
     spk = s[k:]
     smk = s[0:-k]
     ssp = (spk-smk)**p
     if np.any(ssp == 0):
-        raise(PE.PyAValError("sorted(trace)[i+k] - sorted(trace)[i] = 0 encountered.", \
-                             where="modeGrenander", \
-                             solution="Increase k"))
+        raise (PE.PyAValError("sorted(trace)[i+k] - sorted(trace)[i] = 0 encountered.",
+                              where="modeGrenander",
+                              solution="Increase k"))
     oben = 0.5 * np.sum((spk+smk)/ssp)
     unten = np.sum(1/ssp)
     return oben/unten
 
 
 def quantiles(trace, qs):
-    """
+    r"""
     Get quantiles for trace.
 
     Parameters
@@ -142,7 +142,7 @@ def quantiles(trace, qs):
 
 
 class TraceAnalysis:
-    """
+    r"""
     Support to analyze MCMC chains.
 
     This class provides a number of plotting methods. Note that
@@ -171,7 +171,7 @@ class TraceAnalysis:
     """
 
     def _parmCheck(self, parm):
-        """
+        r"""
         Checks whether a trace is available for the given parameter.
         If not, it throws an exception.
 
@@ -181,11 +181,11 @@ class TraceAnalysis:
             Variable name.
         """
         if not parm in self.tracesDic:
-            raise(PE.PyAValError("No trace available for parameter " + parm + ".\n  Available parameters: " + ', '.join(list(self.tracesDic.keys())),
-                                 where="TraceAnalysis"))
+            raise (PE.PyAValError("No trace available for parameter " + parm + ".\n  Available parameters: " + ', '.join(list(self.tracesDic.keys())),
+                                  where="TraceAnalysis"))
 
     def __plotsizeHelper(self, size):
-        """
+        r"""
         Helps to define the optimum plot size for large big-picture plots.
         """
         c = 1
@@ -199,7 +199,7 @@ class TraceAnalysis:
         return c, r
 
     def _loadEMCEEChain(self, fn=None, burn=0):
-        """
+        r"""
         Load chains from file or adjust parameters.
 
         Based on the loaded data base, burn-in and walker selection
@@ -241,8 +241,8 @@ class TraceAnalysis:
 
         # Check selected chains
         if np.any(selectedWalker > s[0]) or np.any(selectedWalker < 0):
-            raise(PE.PyAValError("You selected at least one walker beyond the valid range (0 - " + str(s[0] - 1) + ").",
-                                 solution="Adjust walker selection."))
+            raise (PE.PyAValError("You selected at least one walker beyond the valid range (0 - " + str(s[0] - 1) + ").",
+                                  solution="Adjust walker selection."))
 
         self.emceechain = np.zeros((nchains * (s[1] - burn), s[2] + 1))
         self.emceechain[::, 0:-1] = self._emceedat["chain"][selectedWalker,
@@ -258,7 +258,7 @@ class TraceAnalysis:
         self.stateDic["sampler"]["_thin"] = None
 
     def _checkPackage(self, p):
-        """
+        r"""
         Check whether package is availabel and raise exception otherwise.
 
         Parameters
@@ -267,11 +267,11 @@ class TraceAnalysis:
             Name of package
         """
         if not ic.check[p]:
-            raise(PE.PyARequiredImport("The package '" + str(p) + "' is not currently installed.",
-                                       solution="Please install " + str(p)))
+            raise (PE.PyARequiredImport("The package '" + str(p) + "' is not currently installed.",
+                                        solution="Please install " + str(p)))
 
     def selectWalkers(self, ws):
-        """
+        r"""
         Select walkers for emcee chains.
 
         Parameters
@@ -285,11 +285,11 @@ class TraceAnalysis:
             # Apply burn-in to individual walkers
             self._loadEMCEEChain(burn=self.burn)
         else:
-            raise(PE.PyAAlgorithmFailure(
+            raise (PE.PyAAlgorithmFailure(
                 "Walkers can only be selected for emcee data bases. Current data base type: " + str(self.dbtype)))
 
     def selectedWalkers(self):
-        """
+        r"""
         Get the list of selected walkers.
 
         Parameters
@@ -298,12 +298,12 @@ class TraceAnalysis:
             The selected walkers.
         """
         if not hasattr(self, "_selectedWalker"):
-            raise(PE.PyAValError(
+            raise (PE.PyAValError(
                 "Cannot determine the selected walkers. It appears that no emcee chain was loaded."))
         return self._selectedWalker[:]
 
     def numberOfWalkers(self):
-        """
+        r"""
         Get number of walkers in emcee chain.
 
         Returns
@@ -312,7 +312,7 @@ class TraceAnalysis:
             Number of available walkers
         """
         if not hasattr(self, '_emceedat'):
-            raise(PE.PyAValError(
+            raise (PE.PyAValError(
                 "Cannot determine the number of walkers. It appears that no emcee chain was loaded."))
         return self._emceedat["chain"].shape[0]
 
@@ -320,14 +320,14 @@ class TraceAnalysis:
         if isinstance(resource, six.string_types):
             # Resource is a filename
             if not os.path.isfile(resource):
-                raise(PE.PyAFileError(resource, "ne"))
+                raise (PE.PyAFileError(resource, "ne"))
             self.file = resource
 
-            if not (re.match(".*\.hdf5", resource) is None):
+            if not (re.match(r".*\.hdf5", resource) is None):
                 db = "hdf5"
-            if not (re.match(".*\.zlib", resource) is None):
+            if not (re.match(r".*\.zlib", resource) is None):
                 db = "hdf5"
-            if not (re.match(".*\.emcee", resource) is None):
+            if not (re.match(r".*\.emcee", resource) is None):
                 db = "emcee"
 
             if db == "pickle":
@@ -346,13 +346,13 @@ class TraceAnalysis:
                 self.dbtype = "emcee"
                 self._loadEMCEEChain(resource)
             else:
-                raise(PE.PyAValError("Database type '" +
-                                     db + "' is currently not supported."))
+                raise (PE.PyAValError("Database type '" +
+                                      db + "' is currently not supported."))
 
         elif isinstance(resource, pymc.database.base.Database):
             self.db = resource
         else:
-            raise(PE.PyAValError(
+            raise (PE.PyAValError(
                 "'resource' must be a filename or a pymc database object.", where="TraceAnalysis::__init__"))
 
         # Set default burn-in and thinning
@@ -360,7 +360,7 @@ class TraceAnalysis:
         self.thin = 1
 
     def __getitem__(self, parm):
-        """
+        r"""
         Returns the trace for parameter `parm`.
 
         Parameters
@@ -382,7 +382,7 @@ class TraceAnalysis:
             return self.emceechain[0::self.thin, index]
 
     def __str__(self):
-        """
+        r"""
         Prints basic information on the current MCMC sample file.
         """
         info = "MCMC database - Basic information:\n"
@@ -401,26 +401,26 @@ class TraceAnalysis:
         return info
 
     def availableParameters(self):
-        """
+        r"""
         Returns list of available parameter names.
         """
         return list(self.stateDic["stochastics"].keys())
 
     def availableTraces(self):
-        """
+        r"""
         Returns a list of available PyMC *Trace* objects
         """
         return list(self.tracesDic.values())
 
     def state(self):
-        """
+        r"""
         Returns dictionary containing basic information
         on the sampling process.
         """
         return self.stateDic
 
     def plotTrace(self, parm, fmt='b-'):
-        """
+        r"""
         Plots the trace.
 
         Parameters
@@ -440,7 +440,7 @@ class TraceAnalysis:
         plt.legend()
 
     def plotTraceHist(self, parm):
-        """
+        r"""
         Plots trace and histogram (distribution).
 
         Parameters
@@ -460,7 +460,7 @@ class TraceAnalysis:
         self.plotHist(parm)
 
     def plotHist(self, parsList=None):
-        """
+        r"""
         Plots distributions for a number of traces.
 
         Parameters
@@ -494,7 +494,7 @@ class TraceAnalysis:
             plt.legend()
 
     def plotDeviance(self, parsList=None):
-        """
+        r"""
         Plots value of deviance over parameter values encountered during sampling.
 
         Parameters
@@ -532,7 +532,7 @@ class TraceAnalysis:
         self.plotHist(parsList, **histArgs)
 
     def hpd(self, parm, trace=None, cred=0.95):
-        """
+        r"""
         Calculates highest probability density interval (HPD, minimum width BCI).
 
         Parameters
@@ -559,7 +559,7 @@ class TraceAnalysis:
             return hpd(trace, cred)
 
     def quantiles(self, parm, qlist=None):
-        """
+        r"""
         Quantiles for given trace.
 
         Parameters
@@ -580,7 +580,7 @@ class TraceAnalysis:
         return quantiles(self[parm], qlist)
 
     def plotCorr(self, parsList=None, **plotArgs):
-        """
+        r"""
         Produces correlation plots.
 
         Parameters
@@ -603,8 +603,8 @@ class TraceAnalysis:
                 self._parmCheck(parm)
                 tracesDic[parm] = self[parm]
             if len(tracesDic) < 2:
-                raise(PE.PyAValError("For plotting correlations, at least two valid parameters are needed.",
-                                     where="TraceAnalysis::plotCorr"))
+                raise (PE.PyAValError("For plotting correlations, at least two valid parameters are needed.",
+                                      where="TraceAnalysis::plotCorr"))
         else:
             # Use all available traces
             for parm in self.availableParameters():
@@ -635,7 +635,7 @@ class TraceAnalysis:
                     k += 1
 
     def __hist2d(self, x, y, contour=False, bins=(200, 200), cmap="Purples", interpolation='nearest', origin="lower", colors="k"):
-        """
+        r"""
         Parameters
         ----------
         bins : tuple of two ints
@@ -651,7 +651,7 @@ class TraceAnalysis:
             plt.clabel(CS, inline=1, fontsize=10)
 
     def correlationTable(self, parsList=None, coeff="pearson", noPrint=False):
-        """
+        r"""
         Calculate and show parameter correlations
 
         Parameters
@@ -677,15 +677,15 @@ class TraceAnalysis:
         else:
             pars = parsList[:]
         if len(pars) < 1:
-            raise(PE.PyAValError("You need to specify at least one parameter!"))
+            raise (PE.PyAValError("You need to specify at least one parameter!"))
 
         if coeff == "pearson":
             coeFunc = self.pearsonr
         elif coeff == "spearman":
             coeFunc = self.spearmanr
         else:
-            raise(PE.PyAValError("Unknown coefficient '" + str(coeff) + "'.",
-                                 solution="Use either of 'pearson' or 'spearman'."))
+            raise (PE.PyAValError("Unknown coefficient '" + str(coeff) + "'.",
+                                  solution="Use either of 'pearson' or 'spearman'."))
 
         corrs = {}
         cc = itertools.combinations_with_replacement(pars, 2)
@@ -716,7 +716,7 @@ class TraceAnalysis:
         return corrs
 
     def plotCorrEnh(self, parsList=None, **plotArgs):
-        """
+        r"""
         Produces enhanced correlation plots.
 
         Parameters
@@ -740,8 +740,8 @@ class TraceAnalysis:
                 self._parmCheck(parm)
                 tracesDic[parm] = self[parm]
             if len(tracesDic) < 2:
-                raise(PE.PyAValError("For plotting correlations, at least two valid parameters are needed.",
-                                     where="TraceAnalysis::plotCorr"))
+                raise (PE.PyAValError("For plotting correlations, at least two valid parameters are needed.",
+                                      where="TraceAnalysis::plotCorr"))
         else:
             # Use all available traces
             for parm in self.availableParameters():
@@ -772,7 +772,7 @@ class TraceAnalysis:
                     k += 1
 
     def correlationMatrix(self, toScreen=True, method="pearson", parList=None, covariance=False):
-        """
+        r"""
         Calculates the correlation or covariance matrix.
 
         Parameters
@@ -807,8 +807,8 @@ class TraceAnalysis:
         if method == "spearman":
             corFunc = self.spearmanr
         if corFunc is None:
-            raise(PE.PyAValError("The method " + str(method) + " is currently not supported.",
-                                 solution="Change method argument e.g. to 'pearson'."))
+            raise (PE.PyAValError("The method " + str(method) + " is currently not supported.",
+                                  solution="Change method argument e.g. to 'pearson'."))
         for p in parList:
             self._parmCheck(p)
         if covariance:
@@ -834,7 +834,7 @@ class TraceAnalysis:
         return parList, matrix, lines
 
     def pearsonr(self, parm1, parm2):
-        """
+        r"""
         Calculates a Pearson correlation coefficient and the
         p-value for testing non-correlation.
 
@@ -873,7 +873,7 @@ class TraceAnalysis:
         return pearsonr(self[parm1], self[parm2])
 
     def spearmanr(self, parm1, parm2):
-        """
+        r"""
         Calculates a Spearman rank-order correlation coefficient
         and the p-value to test for non-correlation.
 
@@ -913,7 +913,7 @@ class TraceAnalysis:
         return spearmanr(self[parm1], self[parm2])
 
     def mean(self, parm):
-        """
+        r"""
         Calculate mean.
 
         Parameters
@@ -929,7 +929,7 @@ class TraceAnalysis:
         return mean(self[parm])
 
     def median(self, parm):
-        """
+        r"""
         Calculate median.
 
         Parameters
@@ -945,7 +945,7 @@ class TraceAnalysis:
         return median(self[parm])
 
     def std(self, parm):
-        """
+        r"""
         Calculate standard deviation.
 
         Parameters
@@ -961,7 +961,7 @@ class TraceAnalysis:
         return std(self[parm])
 
     def show(self):
-        """
+        r"""
         Call *show()* from matplotlib to bring graphs to screen.
         """
         try:
@@ -971,7 +971,7 @@ class TraceAnalysis:
                                             + str(e)))
 
     def setBurn(self, burn):
-        """
+        r"""
         Change value of "post burn-in".
 
         In the case of an emcee trace, the "post burn-in" is
@@ -988,7 +988,7 @@ class TraceAnalysis:
             self._loadEMCEEChain(burn=self.burn)
 
     def setThin(self, thin):
-        """
+        r"""
         Change value of "post thinning".
 
         Parameters
@@ -1005,7 +1005,7 @@ class TraceAnalysis:
         self.thin = thin
 
     def parameterSet(self, prescription="lowestDev"):
-        """
+        r"""
         Find parameter values for a particular prescription.
 
         Parameters
@@ -1043,12 +1043,12 @@ class TraceAnalysis:
                 result[par] = self.median(par)
             return result
         else:
-            raise(PE.PyAValError("Unknown state '" + str(prescription) + "'.",
-                                 solution="Use either of 'lowestDev', 'mean', or 'median'.",
-                                 where="parameterSet"))
+            raise (PE.PyAValError("Unknown state '" + str(prescription) + "'.",
+                                  solution="Use either of 'lowestDev', 'mean', or 'median'.",
+                                  where="parameterSet"))
 
     def setToState(self, model, state="best", verbose=True):
-        """
+        r"""
         Set the parameter values to a certain state.
 
         Parameters

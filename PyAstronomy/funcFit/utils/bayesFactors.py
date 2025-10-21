@@ -4,8 +4,9 @@ from PyAstronomy.funcFit.utils import ic
 from PyAstronomy.pyaC import pyaErrors as PE
 import scipy.misc as sm
 
+
 def bayesFactors(model1, model2):
-    """
+    r"""
     Computes the Bayes factor for two competing models.
 
     The computation is based on Newton & Raftery 1994 (Eq. 13).

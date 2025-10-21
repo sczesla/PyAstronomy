@@ -48,7 +48,7 @@ class ModelNameIdentBase:
         root : string
             Concise description of the model.
         """
-        if re.match("^[^_^\(^\)]*$", root) is None:
+        if re.match(r"^[^_^\(^\)]*$", root) is None:
             raise (PE.PyAValError("The proposed root '"+root +
                    "' contains forbidden characters: '_()'."))
         self._root = root
@@ -194,5 +194,5 @@ class ModelNameIdentBase:
         name : string
             The variable name.
         """
-        r = re.match("([^_]+)(_([^\(]*)(\(([0-9]+)\))?)?", name)
+        r = re.match(r"([^_]+)(_([^\(]*)(\(([0-9]+)\))?)?", name)
         return r.group(1), r.group(3), r.group(5)
