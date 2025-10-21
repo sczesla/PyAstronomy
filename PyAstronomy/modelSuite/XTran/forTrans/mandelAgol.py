@@ -29,16 +29,16 @@ except ImportError:
 
 
 class MandelAgolLC(_ZList, fuf.OneDFit):
-    """
+    r"""
     Analytical transit light-curves using the formulae provided by Mandel & Agol 2002.
 
     .. note :: The computation of transit light curves
                is done using the external *occultquad* FORTRAN library.
-               
+
                This library can be installed, e.g., via
-               
+
                pip install PyAstronomy_ext
-               
+
                It can also be compiled manually using SciPy's f2py
                wrapper (http://www.scipy.org/F2py). Simply go to the
                *forTrans* directory of the source distribution of PyAstronomy,
@@ -47,7 +47,7 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
                f2py -c occultquad.pyf occultquad.f
 
                f2py -c occultnl.pyf occultnl.f
-               
+
                If no FORTRAN implementation is available, a python re-implementation is used.
                Performance may be impacted.
 
@@ -93,14 +93,14 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
 
     The quadratic limb-darkening law is given by:
 
-    .. math :: \\frac{I(\mu)}{I(1)}= 1 - linLimb \\times (1-\mu) - quadLimb \\times (1-\mu)^2
+    .. math :: \frac{I(\mu)}{I(1)}= 1 - linLimb \times (1-\mu) - quadLimb \times (1-\mu)^2
 
     The non-linear limb-darkening law is given by:
 
-    .. math :: \\frac{I(\mu)}{I(1)}= 1 - \\sum_{n=1}^{4}{a_n(1-\mu^{n/2})}
+    .. math :: \frac{I(\mu)}{I(1)}= 1 - \sum_{n=1}^{4}{a_n(1-\mu^{n/2})}
 
     :Modeling of secondary eclipse:
-    
+
     If the parameter `sed` is not equal zero, a secondary eclipse (occultation) is added to the model. The
     secondary eclipse is modeled via a purely geometric eclipse of the stellar and planetary disk, which would
     then be behind the star (no limb darkening). The parameter `sed` specifies the depth of the secondary eclipse
@@ -133,11 +133,11 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
 
     def __init__(self, orbit="circular", ld="quad", collCheck=True, pyfo=False):
         if not orbit in ["circular", "keplerian"]:
-            raise(PE.PyAValError("Invalid option for orbit: " + str(orbit),
-                                 soltuion="Use either 'circular' or 'keplerian'."))
+            raise (PE.PyAValError("Invalid option for orbit: " + str(orbit),
+                                  soltuion="Use either 'circular' or 'keplerian'."))
         if not ld in ["quad", "nl"]:
-            raise(PE.PyAValError("Invalid option for orbit: " + str(ld),
-                                 soltuion="Use either 'quad' or 'nl'."))
+            raise (PE.PyAValError("Invalid option for orbit: " + str(ld),
+                                  soltuion="Use either 'quad' or 'nl'."))
         _ZList.__init__(self, orbit, collCheck)
 
         self._oq = OccultQuadPy()
@@ -147,11 +147,11 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
             self._oqcalc = occultquad.occultquad
 
         if (not _importOccultnl) and (ld == "nl"):
-            raise(PE.PyARequiredImport("Could not import required shared object library 'occultnl.so'",
-                                       solution=["Use 'pip install PyAstronomy_ext' to get it.",
-                                                 "Invoke PyA's install script (setup.py) with the --with-ext option.",
-                                                 "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultnl.pyf occultnl.f"]
-                                       ))
+            raise (PE.PyARequiredImport("Could not import required shared object library 'occultnl.so'",
+                                        solution=["Use 'pip install PyAstronomy_ext' to get it.",
+                                                  "Invoke PyA's install script (setup.py) with the --with-ext option.",
+                                                  "Go to 'forTrans' directory of PyAstronomy and invoke\n    f2py -c occultnl.pyf occultnl.f"]
+                                        ))
 
         if orbit == "circular":
             plist = ["p", "a", "i", "T0", "per", "b", "sed"]
@@ -177,7 +177,7 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
         self._ld = ld
 
     def backendStatus(self):
-        """
+        r"""
         Print information on the code being used for evaluation
         """
         print("Backend status for MandelAgolLC")
@@ -186,13 +186,14 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
             print("        Using Python reimplementation of FORTRAN routines")
             print(" "*8 + "To install compiled FORTRAN code you may attempt to:")
             print(" "*10 + "- Use 'pip install PyAstronomy_ext' to get it")
-            print(" "*10 + "- Invoke PyA's install script (setup.py) with the --with-ext option")
+            print(
+                " "*10 + "- Invoke PyA's install script (setup.py) with the --with-ext option")
             print(" "*10 + "- Go to 'forTrans' directory of PyAstronomy and invoke 'f2py -c occultquad.pyf occultquad.f'")
         else:
             print("        Using FORTRAN implementation")
 
     def evaluate(self, time):
-        """ 
+        r"""
         Calculate a light curve according to the analytical models
         given by Mandel and Agol.
 
@@ -222,14 +223,14 @@ class MandelAgolLC(_ZList, fuf.OneDFit):
             if self._ld == "quad":
                 # Use occultquad Fortran library to compute flux decrease
                 result = self._oqcalc(self._zlist[self._intrans], self["linLimb"], self["quadLimb"],
-                                               self["p"], len(self._intrans))
+                                      self["p"], len(self._intrans))
             else:
                 result = occultnl.occultnl(self["p"], self["a1"], self["a2"], self["a3"],
                                            self["a4"], self._zlist[self._intrans])
             df[self._intrans] = (1.0 - result[0])
             if self["sed"] != 0:
-                df[self._inocc] = (1.0 - occultquad.occultquad(self._zlist[self._inocc], 0, 0, \
-                                               self["p"], len(self._inocc))[0])/self["p"]**2*self["sed"]
+                df[self._inocc] = (1.0 - occultquad.occultquad(self._zlist[self._inocc], 0, 0,
+                                                               self["p"], len(self._inocc))[0])/self["p"]**2*self["sed"]
 
         self.lightcurve = (1. - df) * 1. / \
             (1. + self["b"]) + self["b"] / (1.0 + self["b"])
