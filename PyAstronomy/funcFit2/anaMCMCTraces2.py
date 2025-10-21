@@ -205,11 +205,11 @@ class TraceAnalysis2:
                 raise (PE.PyAFileError(resource, "ne"))
             self.file = resource
 
-            if not (re.match(".*\.hdf5", resource) is None):
+            if not (re.match(r".*\.hdf5", resource) is None):
                 db = "hdf5"
-            if not (re.match(".*\.zlib", resource) is None):
+            if not (re.match(r".*\.zlib", resource) is None):
                 db = "hdf5"
-            if not (re.match(".*\.emcee", resource) is None):
+            if not (re.match(r".*\.emcee", resource) is None):
                 db = "emcee"
 
             if db == "emcee":

@@ -508,7 +508,7 @@ class PyABaSoS(object):
         r"""
         Decompose parameter name into Base, Root, Number
         """
-        r = re.match("([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", n)
+        r = re.match(r"([^_]+)((_([^\(]+)?)?(\(([0-9]+)\))?)?", n)
         if r is None:
             return None, None, None
         else:
@@ -1598,7 +1598,7 @@ def sampleEMCEE2(m, pargs=(), walkerdimfac=4, scales=None,
                               solution="Use 'thaw' to free same parameters."))
 
     if not dbfile is None:
-        if re.match(".*\.emcee$", dbfile) is None:
+        if re.match(r".*\.emcee$", dbfile) is None:
             PE.warn(PE.PyAValError("The db filename (" + str(dbfile) + ") does not end in .emcee. TraceAnalysis will not recognize it as an emcee trace file.",
                                    solution="Use a filename of the form *.emcee"))
 

@@ -679,7 +679,7 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
         
         for dec in decs:
             q = pyasl.parallacticAngle(t, gl, dec)
-            plt.plot(t/15, q, '-', label="$\delta = $" + f"{dec} deg")
+            plt.plot(t/15, q, '-', label=r"$\delta = $" + f"{dec} deg")
         
         plt.ylabel("Parallactic angle [deg]")
         plt.xlabel("Hour angle [h]")

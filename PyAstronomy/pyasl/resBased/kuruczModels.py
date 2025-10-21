@@ -43,10 +43,10 @@ class KuruczMT:
             Effective temperatures, logg, and log10 of metallicity
             as encoded in the model header.
         """
-        r = re.match("\s*TEFF\s+([^\s]+)\s+GRAVITY\s+([^\s]+).*", model[0])
+        r = re.match(r"\s*TEFF\s+([^\s]+)\s+GRAVITY\s+([^\s]+).*", model[0])
         teff = float(r.group(1))
         logg = float(r.group(2))
-        r = re.match("\s*ABUNDANCE SCALE\s+([^\s]+).*", model[4])
+        r = re.match(r"\s*ABUNDANCE SCALE\s+([^\s]+).*", model[4])
         met = np.log10(float(r.group(1)))
         met = np.floor(met * 10.0 + 0.5) / 10.0
         return teff, logg, met
@@ -251,20 +251,20 @@ class KuruczModels:
                         if gfn is None:
                             # Check for .dat file (with k2)
                             for fn in fns:
-                                r = re.match("^a.*k2.*\.dat$", fn)
+                                r = re.match(r"^a.*k2.*\.dat$", fn)
                                 if r is not None:
                                     gfn = fn
                                     break
                         if gfn is None:
                             for fn in fns:
-                                r = re.match("^a.*k2.*\.datcd$", fn)
+                                r = re.match(r"^a.*k2.*\.datcd$", fn)
                                 if r is not None:
                                     gfn = fn
                                     break
                         if gfn is None:
                             # Check for .dat file (with any k)
                             for fn in fns:
-                                r = re.match("^a.*k?.*\.dat$", fn)
+                                r = re.match(r"^a.*k?.*\.dat$", fn)
                                 if r is not None:
                                     gfn = fn
                                     break

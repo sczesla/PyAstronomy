@@ -74,7 +74,7 @@ class TransmissionCurves:
         cb = None
         lcol = None
         for l in open(fn):
-            r = re.match("^\s*#\s*BAND:\s+'([^']+)'.*", l)
+            r = re.match(r"^\s*#\s*BAND:\s+'([^']+)'.*", l)
             if not r is None:
                 # New current band
                 # Add the previous data set
@@ -270,7 +270,7 @@ class TransmissionCurves:
             dat[::, 0] *= 1e4
 
             wl = re.match(
-                ".*IRAC\s+(\d+\.\d+)\s+.*", self._fs.requestFile(fno).readline()
+                r".*IRAC\s+(\d+\.\d+)\s+.*", self._fs.requestFile(fno).readline()
             ).group(1)
             if fn.find("_full") != -1:
                 win = "_full"

@@ -45,7 +45,7 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
             plt.plot(wvl, trans, c+'--', label="Johnson " + b)
 
         plt.legend()
-        plt.xlabel("Wavelength [$\AA$]")
+        plt.xlabel(r"Wavelength [$\AA$]")
         plt.ylabel("Transmission")
         # plt.show()
 

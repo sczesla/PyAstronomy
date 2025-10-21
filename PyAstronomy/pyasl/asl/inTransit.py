@@ -1553,7 +1553,7 @@ def transitVisibilityPlot(
         allData[n]["Star ra"],
         allData[n]["Star dec"],
     )
-    obsco = "Obs coord.: (%8.4f$^\circ$, %8.4f$^\circ$, %4d m)" % (
+    obsco = r"Obs coord.: (%8.4f$^\circ$, %8.4f$^\circ$, %4d m)" % (
         allData[n]["Obs coord"][0],
         allData[n]["Obs coord"][1],
         allData[n]["Obs coord"][2],

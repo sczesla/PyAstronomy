@@ -168,7 +168,7 @@ def coordsSexaToDeg(c, fullOut=False):
         representation.
     """
     r = re.match(
-        "^\s*(\d+)([\s:])(\d+)([\s:])(\d+(\.\d*)?)\s+(([+-])(\d+))([\s:])(\d+)([\s:])(\d+(\.\d*)?)\s*$", c)
+        r"^\s*(\d+)([\s:])(\d+)([\s:])(\d+(\.\d*)?)\s+(([+-])(\d+))([\s:])(\d+)([\s:])(\d+(\.\d*)?)\s*$", c)
     if r is None:
         raise (PE.PyAValError("Could not decompose coordinate string: \"" + str(c) + "\"",
                               solution="Use, e.g., 00 05 08.83239 +67 50 24.0135 or 00:05:08.83239 +67:50:24.0135"))

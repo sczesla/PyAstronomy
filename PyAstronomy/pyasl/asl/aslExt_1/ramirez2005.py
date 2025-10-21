@@ -115,7 +115,7 @@ class Ramirez2005:
         result = np.zeros((len(dat), 10))
         for i, l in enumerate(dat):
             # zero can be used instead of ldots
-            l = l.replace("\ldots", "0.0")
+            l = l.replace(r"\ldots", "0.0")
             s = l.split()
             if len(s) > 10:
                 # A new band identifier is given

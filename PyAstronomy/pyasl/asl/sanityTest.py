@@ -1495,7 +1495,7 @@ class TestSanityOfSVD(unittest.TestCase, SaniBase):
             m, mind = svd.getModel(b, modelIndices=True, asarray=True)
             chi.append(((nflux[mind] - m)**2 / 0.005**2).sum() / len(mind))
 
-        plt.title("Reduced $\chi^2$ vs. number of neglected singular values")
+        plt.title(r"Reduced $\chi^2$ vs. number of neglected singular values")
         plt.plot(range(1, len(sv), 5), chi, 'bp-')
 #    plt.show()
 

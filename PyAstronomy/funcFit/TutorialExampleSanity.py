@@ -769,9 +769,9 @@ odel.
         cmin = min(chis)
 
         # Plot A vs. chi square
-        plt.title("A vs. $\chi^2$ with 68% and 90% confidence levels")
+        plt.title(r"A vs. $\chi^2$ with 68% and 90% confidence levels")
         plt.xlabel("A")
-        plt.ylabel("$\chi^2$")
+        plt.ylabel(r"$\chi^2$")
         plt.plot(As, chis, "bp-")
         plt.plot(As, [cmin + 1.0] * len(As), "k--")
         plt.plot(As, [cmin + 2.706] * len(As), "k:")
@@ -892,9 +892,9 @@ odel.
         print("  number of iterations needed: ", cfi68["iters"])
 
         # Plot A vs. chi square
-        plt.title("A vs. $\chi^2$ 90% (black) and 68% (blue) confidence intervals")
+        plt.title(r"A vs. $\chi^2$ 90% (black) and 68% (blue) confidence intervals")
         plt.xlabel("A")
-        plt.ylabel("$\chi^2$")
+        plt.ylabel(r"$\chi^2$")
         plt.plot(As, chis, "bp-")
         # Indicate confidence levels by vertical lines
         plt.plot(As, [cfi90["OFMin"] + 1.0] * len(As), "g:")

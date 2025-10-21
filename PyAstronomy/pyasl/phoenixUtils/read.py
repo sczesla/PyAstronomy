@@ -36,7 +36,7 @@ def readUnit7(fn, minwl=None, maxwl=None):
     if not os.path.isfile(fn):
         raise (PE.PyAValError("There is no file named: " + str(fn)))
     # Check whether it is a gzipped file
-    r = re.match(".*\.gz", fn)
+    r = re.match(r".*\.gz", fn)
     if r is not None:
         f = gzip.open(fn, "r")
     else:
@@ -83,7 +83,7 @@ def readDTable(fn, sort=None):
     if not os.path.isfile(fn):
         raise (PE.PyAValError("There is no file named: " + str(fn)))
     # Check whether it is a gzipped file
-    r = re.match(".*\.gz", fn)
+    r = re.match(r".*\.gz", fn)
     if r is not None:
         f = gzip.open(fn, "r")
     else:
@@ -123,7 +123,7 @@ def decomposeFilename(fn):
         Note that `None` is returned if the filename could not be
         parsed.
     """
-    r = re.match("lte(\d+)([+-])(\d+\.\d+)([-+]\d+\.\d+)(.*)", fn)
+    r = re.match(r"lte(\d+)([+-])(\d+\.\d+)([-+]\d+\.\d+)(.*)", fn)
     if r is None:
         PE.warn(PE.PyAValError("Cannot decompose PHOENIX filename: " + str(fn)))
         return None

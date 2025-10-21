@@ -146,7 +146,7 @@ class SpecTypeDeJager(object):
         Subtype : float
             Subtype as a float (e.g., 8.5)
         """
-        r = re.match("^\s*([OBAFGKM])(([\d])(\.\d+)?)\s*$", spt)
+        r = re.match(r"^\s*([OBAFGKM])(([\d])(\.\d+)?)\s*$", spt)
         if r is None:
             raise (PE.PyAValError("'" + str(spt) + "' is not a valid spectral type.",
                                   where="SpecTypeDeJager",
