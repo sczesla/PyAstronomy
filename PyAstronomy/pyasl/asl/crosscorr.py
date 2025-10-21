@@ -17,7 +17,7 @@ def crosscorrRV(
     weights=None,
     meanwvl=None,
 ):
-    """
+    r"""
     Cross-correlate a spectrum with a template.
 
     The algorithm implemented here works as follows: For
@@ -30,24 +30,24 @@ def crosscorrRV(
 
     If N data points :math:`f_i` at wavelengths :math:`w_i` are given, the cross
     correlation function :math:`CC(v_j)`, depending on the velocity :math:`v_j` and
-    optional weights :math:`\\alpha_i` is calculated as:
+    optional weights :math:`\alpha_i` is calculated as:
 
     .. math::
 
-        CC(v_j) = \\sum_{i=1}^N \\alpha_i \\times \left(f_i \\times t(w_i-\Delta_{i,j}) \\right)
+        CC(v_j) = \sum_{i=1}^N \alpha_i \times \left(f_i \times t(w_i-\Delta_{i,j}) \right)
 
-    If the mode is `lin`, the shift is implemented as :math:`\Delta_{i,j} = \\bar{w} (v_j/c)`, where
-    :math:`\\bar{w}` is the mean wavelength (i.e., the mean of the input w unless meanwvl is specified).
+    If the mode is `lin`, the shift is implemented as :math:`\Delta_{i,j} = \bar{w} (v_j/c)`, where
+    :math:`\bar{w}` is the mean wavelength (i.e., the mean of the input w unless meanwvl is specified).
     For any velocity, the shift is a constant across the entire wavelength
     axis. If the mode is `doppler`, the shift is implemented as
     :math:`\Delta_{i,j} = w_i (v_j/c)`, which depends both on the wavelength and the velocity.
     The evaluation of the shifted template :math:`t(w_i-\Delta_{i,j})` is carried out using linear interpolation.
-    
-    If no weights are specified, :math:`\\alpha_i = 1` is adopted. If uncertainties, :math:`\\sigma_i`, for the
-    :math:`f_i` are known, a useful choice for the weights is :math:`\\alpha_i = \sigma_i^{-2}`, because this makes
+
+    If no weights are specified, :math:`\alpha_i = 1` is adopted. If uncertainties, :math:`\sigma_i`, for the
+    :math:`f_i` are known, a useful choice for the weights is :math:`\alpha_i = \sigma_i^{-2}`, because this makes
     maximizing the CCF equivalent to maximizing the likelihood 
     (see, e.g., `Lookwood et al. 2014, ApJ 783 <https://ui.adsabs.harvard.edu/abs/2014ApJ...783L..29L/abstract>`_).
-    
+
     Parameters
     ----------
     w : array
@@ -97,7 +97,7 @@ def crosscorrRV(
         uncertainty of the i-th data point.
     meanwvl : float, optional
         If given, this value will be adopted for the mean wavelength
-        :math:`\\bar{w}` to calculate shifts in 'lin' mode instead of
+        :math:`\bar{w}` to calculate shifts in 'lin' mode instead of
         the mean of the input array w.
 
     Returns
@@ -191,7 +191,8 @@ def crosscorrRV(
                 PE.PyAValError(
                     "The minimum wavelength is not covered by the template for all indicated RV shifts.",
                     where="crosscorrRV",
-                    solution=["Provide a larger template", "Try to use skipedge"],
+                    solution=["Provide a larger template",
+                              "Try to use skipedge"],
                 )
             )
         if (tw[-1] + dwlmin) < w[-1]:
@@ -199,7 +200,8 @@ def crosscorrRV(
                 PE.PyAValError(
                     "The maximum wavelength is not covered by the template for all indicated RV shifts.",
                     where="crosscorrRV",
-                    solution=["Provide a larger template", "Try to use skipedge"],
+                    solution=["Provide a larger template",
+                              "Try to use skipedge"],
                 )
             )
     elif mode == "doppler":
@@ -211,7 +213,8 @@ def crosscorrRV(
                 PE.PyAValError(
                     "The minimum wavelength is not covered by the template for all indicated RV shifts.",
                     where="crosscorrRV",
-                    solution=["Provide a larger template", "Try to use skipedge"],
+                    solution=["Provide a larger template",
+                              "Try to use skipedge"],
                 )
             )
         if maxwl < w[-1]:
@@ -219,7 +222,8 @@ def crosscorrRV(
                 PE.PyAValError(
                     "The maximum wavelength is not covered by the template for all indicated RV shifts.",
                     where="crosscorrRV",
-                    solution=["Provide a larger template", "Try to use skipedge"],
+                    solution=["Provide a larger template",
+                              "Try to use skipedge"],
                 )
             )
     else:
