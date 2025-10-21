@@ -7,7 +7,7 @@ from PyAstronomy import constants as PC
 
 
 def _bisect_root_find(f, ab, nroot, eps, roots=None, bqargs={}):
-    """
+    r"""
     Find roots by bisection method and scipy's brentq
     
     Parameters are the same is those of bisect_root_find.
@@ -54,7 +54,7 @@ def _bisect_root_find(f, ab, nroot, eps, roots=None, bqargs={}):
     return _bisect_root_find(f, nab, nroot, eps, roots=roots)
     
 def bisect_root_find(f, a, b, nroot, eps, bqargs={}):
-    """
+    r"""
     Find multiple roots using bisection method and scipy's brentq algorithm
     
     Parameters
@@ -82,7 +82,7 @@ def bisect_root_find(f, a, b, nroot, eps, bqargs={}):
 
 
 def _r1r2_dl(x, y, z):
-    """
+    r"""
     Calculate r1 and r2 for dimensionless Roche potential
     """
     r1 = np.sqrt(x**2 + y**2 + z**2)
@@ -103,8 +103,8 @@ def _checkm(m):
                              solution="Use 1 or 2."))
 
 def rochepot_dl(x, y, z, q):
-    """
-    Dimensionless Roche potential (:math:`\\Phi_n`, synchronous rotation)
+    r"""
+    Dimensionless Roche potential (:math:`\Phi_n`, synchronous rotation)
     
     More massive component (:math:`m_1`) is centered at (x,y,z) = (0,0,0). Less massive
     component (:math:`m_2`) is at (1,0,0). The unit of length is the distance between
@@ -130,7 +130,7 @@ def rochepot_dl(x, y, z, q):
     return p
 
 def ddx_rochepot_dl(x, q, y=0, z=0):
-    """
+    r"""
     Derivative of dimensionless Roche potential along x-axis
     
     Parameters
@@ -151,7 +151,7 @@ def ddx_rochepot_dl(x, q, y=0, z=0):
     return ddx
 
 def ddz_rochepot_dl(z, q, x=1, y=0):
-    """
+    r"""
     Derivative of dimensionless Roche potential along z-axis
     
     Parameters
@@ -172,7 +172,7 @@ def ddz_rochepot_dl(z, q, x=1, y=0):
     return ddz
 
 def ddy_rochepot_dl(y, q, x=1, z=0):
-    """
+    r"""
     Derivative of dimensionless Roche potential along y-axis
     
     Parameters
@@ -193,7 +193,7 @@ def ddy_rochepot_dl(y, q, x=1, z=0):
     return ddy
 
 def roche_lobe_radius_eggleton(q, m):
-    """
+    r"""
     Approximate effective dimensionless Roche lobe radius according to Eggelton 1983 (ApJ 268, 368).
     
     The effective Roche lobe radius is the radius of a sphere with the same
@@ -201,7 +201,7 @@ def roche_lobe_radius_eggleton(q, m):
     
     .. math::
     
-        r_L \\approx \\frac{0.49\,q^{2/3}}{0.6\,q^{2/3} + \\ln(1+q^{1/3})}
+        r_L \approx \frac{0.49\,q^{2/3}}{0.6\,q^{2/3} + \ln(1+q^{1/3})}
     
     Parameters
     ----------
@@ -219,7 +219,7 @@ def roche_lobe_radius_eggleton(q, m):
     return 0.49*q23 / (0.6*q23 + np.log(1+q**(1./3)))
 
 def _get_lagrange_123(q, a, b, getdlrp=True):
-    """
+    r"""
     Find root of derivative along x-axis
     
     Parameters
@@ -238,7 +238,7 @@ def _get_lagrange_123(q, a, b, getdlrp=True):
     return r
 
 def get_lagrange_1(q, getdlrp=True, eps=1e-4):
-    """
+    r"""
     Get location of first Lagrange point
     
     Parameters
@@ -263,7 +263,7 @@ def get_lagrange_1(q, getdlrp=True, eps=1e-4):
     return _get_lagrange_123(q, eps, 1-eps, getdlrp)
 
 def get_epradius_ss_polar_side(q, pot=None, eps=1e-6):
-    """
+    r"""
     Get dimensionless radii of equipotential surface for secondary mass in three directions
     
     Assumes that the equipotential surface is enclosed within the Roche lobe
@@ -314,7 +314,7 @@ def get_epradius_ss_polar_side(q, pot=None, eps=1e-6):
     return rx[0], rz[0], ry[0]
 
 def get_radius_ss_polar_side(q, sma, reff, eps=1e-6):
-    """
+    r"""
     Calculate substellar, polar, and side radii of secondary body
     
     The function first finds the dimensionless Roche potential corresponding
@@ -363,7 +363,7 @@ def get_radius_ss_polar_side(q, sma, reff, eps=1e-6):
     return *rjs, rpot
     
 def get_lagrange_2(q, getdlrp=True, eps=1e-4):
-    """
+    r"""
     Get location of second Lagrange point
     
     Parameters
@@ -390,7 +390,7 @@ def get_lagrange_2(q, getdlrp=True, eps=1e-4):
     return _get_lagrange_123(q, 1+eps, 1+10*rl, getdlrp)
 
 def get_lagrange_3(q, getdlrp=True, eps=1e-4):
-    """
+    r"""
     Get location of third Lagrange point
     
     Parameters
@@ -415,7 +415,7 @@ def get_lagrange_3(q, getdlrp=True, eps=1e-4):
     return _get_lagrange_123(q, -10, -eps, getdlrp)
 
 def get_lagrange_4():
-    """
+    r"""
     Get location of forth Lagrange point
     
     Orbital angular momentum is supposed to point into +z direction.
@@ -429,7 +429,7 @@ def get_lagrange_4():
     return (0.5, np.sin(np.radians(60)), 0)
 
 def get_lagrange_5(getdlrp=True):
-    """
+    r"""
     Get location of fifth Lagrange point
     
     Orbital angular momentum is supposed to point into +z direction.
@@ -443,7 +443,7 @@ def get_lagrange_5(getdlrp=True):
     return (0.5, -np.sin(np.radians(60)), 0)
 
 def roche_yz_extent(q, m=2, pl=None, eps=1e-4):
-    """
+    r"""
     Extent of equipotential surface in y and z direction
     
     Parameter
@@ -478,7 +478,7 @@ def roche_yz_extent(q, m=2, pl=None, eps=1e-4):
     return p1y, p1z
 
 def roche_vol_MC(q, m=2, n=100000, pl=None, eps=1e-4, fullout=True):
-    """
+    r"""
     Calculate (dimensionless) volume of equipotential surface such as the Roche lobe
     
     Uses Monte Carlo (MC) integration
@@ -546,8 +546,8 @@ def roche_vol_MC(q, m=2, n=100000, pl=None, eps=1e-4, fullout=True):
     return vol, dvol
 
 def rochepot(x, y, z, m1, m2, a):
-    """
-    Roche potential (:math:`\\Phi`, synchronous rotation)
+    r"""
+    Roche potential (:math:`\Phi`, synchronous rotation)
     
     More massive component (:math:`m_1`) is at (x,y,z) = (0,0,0). Less massive
     component (:math:`m_2`) is at (a,0,0).
@@ -572,7 +572,7 @@ def rochepot(x, y, z, m1, m2, a):
     return -(G*M)/(2*a) * rochepot_dl(x/a, y/a, z/a, m2/m1)
     
 def coriolisAcceleration(omega,v):
-    """
+    r"""
     Get Coriolis acceleration
     
     In the rotating frame, moving material is subject to the Coriolis
@@ -581,7 +581,7 @@ def coriolisAcceleration(omega,v):
     
     .. math::
     
-        a_C = -2 \\vec{\omega} \\times \\vec{v}
+        a_C = -2 \vec{\omega} \times \vec{v}
     
     Parameters
     ----------
@@ -606,7 +606,7 @@ def coriolisAcceleration(omega,v):
     return c
     
 def roche_limit_fluid(q, R2):
-    """
+    r"""
     Calculate the Roche limit for a fluid body on circular orbit
     
     An expression for the Roche limit, :math:`a_R`, was given by the eponymous
@@ -616,9 +616,9 @@ def roche_limit_fluid(q, R2):
     
     .. math::
     
-        a_R = 2.44 R_1 \sqrt[3]{\\frac{\\rho_1}{\\rho_2}} = 2.44 R_2 q^{-1/3}
+        a_R = 2.44 R_1 \sqrt[3]{\frac{\rho_1}{\rho_2}} = 2.44 R_2 q^{-1/3}
         
-    where :math:`R_{1,2}` are the radii of the primary and secondary bodies, :math:`\\rho_{1,2}`
+    where :math:`R_{1,2}` are the radii of the primary and secondary bodies, :math:`\rho_{1,2}`
     the respective densities, and :math:`q` the mass ratio; the second equality relies on spherical
     shapes.
     
