@@ -10,7 +10,7 @@ import scipy.interpolate as sci
 
 
 class TransmissionCurves:
-    """
+    r"""
     Photometric transmission curves for various photometric bands.
 
     A list of supported bands can be obtained by calling `availableBands`.
@@ -23,7 +23,7 @@ class TransmissionCurves:
     """
 
     def _createSet(self, bn, lines):
-        """
+        r"""
         Create data set from band name and set of lines.
 
         Parameters
@@ -47,7 +47,7 @@ class TransmissionCurves:
             self.bands[bn][i, ::] = np.array(lines[i].split(), dtype=float)
 
     def _readData(self, fn):
-        """
+        r"""
         Read data file.
 
         The file must introduce each band via a row like
@@ -100,7 +100,7 @@ class TransmissionCurves:
             self._createSet(cb, lcol)
 
     def _checkBand(self, bn):
-        """
+        r"""
         Check whether band name is defined.
         """
         if not bn in self.bands:
@@ -113,7 +113,7 @@ class TransmissionCurves:
             )
 
     def availableBands(self):
-        """
+        r"""
         Band names of available transmission curves.
 
         Returns
@@ -124,7 +124,7 @@ class TransmissionCurves:
         return sorted(list(self.bands))
 
     def getTransCurve(self, bn, ik="linear"):
-        """
+        r"""
         Get a transmission curve.
 
         Parameters
@@ -154,7 +154,7 @@ class TransmissionCurves:
         return fi
 
     def getTransCurveData(self, bn):
-        """
+        r"""
         Get data specifying the transmission curve.
 
         Returns
@@ -167,7 +167,7 @@ class TransmissionCurves:
         return self.bands[bn]
 
     def convolveWith(self, wvl, spec, bn, ik="linear"):
-        """
+        r"""
         Convolve spectrum with transmission curve.
 
         Parameters
@@ -192,7 +192,7 @@ class TransmissionCurves:
         return spec * tc(wvl)
 
     def addPassband(self, name, wvl, trans, snc=False):
-        """
+        r"""
         Add a new passband to the inventory.
 
         Parameters
@@ -213,7 +213,8 @@ class TransmissionCurves:
             if name in self.bands:
                 raise (
                     PE.PyANameClash(
-                        "A passband with name '" + str(name) + "' is already present.",
+                        "A passband with name '" +
+                        str(name) + "' is already present.",
                         solution=[
                             "Change the name.",
                             "Use `snc=True` to ignore and overwrite old passband.",
@@ -223,7 +224,7 @@ class TransmissionCurves:
         self.bands[name] = np.vstack((wvl, trans)).transpose()
 
     def addSpitzerIRACPassbands(self, forceDownload=False, verbose=True):
-        """
+        r"""
         Adds Spitzer IRAC passbands.
 
         On first call, the passband files are downloaded.
@@ -280,7 +281,7 @@ class TransmissionCurves:
             self.addPassband(bn, dat[::, 0], dat[::, 1], snc=True)
 
     def addKeplerPassband(self, forceDownload=False, verbose=True):
-        """
+        r"""
         Adds Kepler mission passband.
 
         Kepler high-resolution passband is downloaded from:
@@ -298,7 +299,8 @@ class TransmissionCurves:
             on progress.
         """
 
-        fno = os.path.join("pyasl", "resBased", "kepler_response_hires1.txt.gz")
+        fno = os.path.join("pyasl", "resBased",
+                           "kepler_response_hires1.txt.gz")
 
         if (not self._fs.fileExists(fno)) or forceDownload:
             self._fs.downloadToFile(
@@ -316,14 +318,14 @@ class TransmissionCurves:
         self.addPassband(bn, dat[::, 0], dat[::, 1], snc=True)
 
     def addTESSPassband(self, forceDownload=False, verbose=True):
-        """
+        r"""
         Adds TESS mission passband.
 
         TESS passband is downloaded from:
         https://heasarc.gsfc.nasa.gov/docs/tess/data/tess-response-function-v1.0.csv
 
         and added as 'TESS'.
-        
+
         .. note:: After version 0.24.0, the TESS passband is no longer downloaded but has been integrated into PyAstronomy.
 
         Parameters
@@ -339,4 +341,5 @@ class TransmissionCurves:
 
     def __init__(self, fn="default"):
         self._fs = PP.PyAFS()
-        self._readData(os.path.join(os.path.dirname(__file__), "transCurves.dat"))
+        self._readData(os.path.join(
+            os.path.dirname(__file__), "transCurves.dat"))
