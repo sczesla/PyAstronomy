@@ -10,12 +10,12 @@ def chi2test():
 
 
 def bayesFactors(model1, model2):
-    raise(PE.PyAUnclassifiedError(
+    raise (PE.PyAUnclassifiedError(
         "The function 'bayesFactors' has moved to funcFit.utils."))
 
 
 def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
-    """
+    r"""
     Performs an F-test. 
 
     Parameters
@@ -88,21 +88,21 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
     The :math:`F`-test of the null hypothesis can
     then be computed as
 
-    .. math:: \\hat{F} = (Q/k) / s^2
+    .. math:: \hat{F} = (Q/k) / s^2
 
-    where :math:`s^2` is an unbiased estimate of :math:`\\sigma^2`, e.g., derived from the
+    where :math:`s^2` is an unbiased estimate of :math:`\sigma^2`, e.g., derived from the
     full model. In the case of error-weighted data, the :math:`F` statistic reads
 
-    .. math:: \\hat{F} = \\frac{(\chi^2_{reduced}-\chi^2_{full})/(\\nu_{reduced}-\\nu_{full})}{\chi^2_{full}/\\nu_{full}}
+    .. math:: \hat{F} = \frac{(\chi^2_{reduced}-\chi^2_{full})/(\nu_{reduced}-\nu_{full})}{\chi^2_{full}/\nu_{full}}
 
-    where :math:`\\nu` denotes the number of degrees of freedom, which may be calculated as
+    where :math:`\nu` denotes the number of degrees of freedom, which may be calculated as
     :math:`N-p-1` given a model with :math:`p` parameters and an additional constant.
-    The expectation value of :math:`F` is :math:`1`, thus, if :math:`\\hat{F}=1` 
+    The expectation value of :math:`F` is :math:`1`, thus, if :math:`\hat{F}=1` 
     there is no significant difference
     between the RSS of both models. If, however, :math:`F` deviates from :math:`1`, we can compute
-    the probability for :math:`F` to equal or exceed the obtained value :math:`\\hat{F}` by
+    the probability for :math:`F` to equal or exceed the obtained value :math:`\hat{F}` by
 
-    .. math:: Prob(F\\geq \\hat{F}) = CDF(F( \\nu_{reduced}-\\nu_{full}, \\nu_{full} ))
+    .. math:: Prob(F\geq \hat{F}) = CDF(F( \nu_{reduced}-\nu_{full}, \nu_{full} ))
 
     For details on the principles of the formalism,
     see Sect. 4.5.4 in Rawlings' "Applied Regression Analysis".
@@ -131,15 +131,15 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
 
     Then the quantity
 
-    .. math:: \\hat{F} = \\frac{s_1^2}{s_2^2}
+    .. math:: \hat{F} = \frac{s_1^2}{s_2^2}
 
     is :math:`F`-distributed with :math:`N_1-1` and :math:`N_2-1` degrees of freedom.
     In the case of weighted errors we have
 
-    .. math:: \\hat{F} = \\frac{\\chi_1^2/\\nu_1}{\\chi_2^2/\\nu_2}
+    .. math:: \hat{F} = \frac{\chi_1^2/\nu_1}{\chi_2^2/\nu_2}
 
-    and :math:`\\hat{F}` is distributed according to an
-    :math:`F`-distribution with :math:`\\nu_1` and :math:`\\nu_2`
+    and :math:`\hat{F}` is distributed according to an
+    :math:`F`-distribution with :math:`\nu_1` and :math:`\nu_2`
     degrees of freedom.
 
     **References**
@@ -151,10 +151,10 @@ def ftest(chi1, chi2, dof1, dof2, compute_ratio_of_variance=False):
     """
     # Some consistency checks
     if not dof2 < dof1:
-        raise(PE.PyAValError("The number of degrees of freedom in the new fit, dof2, should be less" +
-                             " than the number of degrees of freedom in the original fit, dof1."))
+        raise (PE.PyAValError("The number of degrees of freedom in the new fit, dof2, should be less" +
+                              " than the number of degrees of freedom in the original fit, dof1."))
     if not chi2 < chi1:
-        raise(PE.PyAValError(
+        raise (PE.PyAValError(
             "The new fit (2) should have lower chi-squared than the original fit (1)."))
 
     # Compute the test statistic and the probability

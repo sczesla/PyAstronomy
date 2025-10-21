@@ -22,7 +22,7 @@ import scipy.optimize as sco
 
 
 def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
-    """
+    r"""
     Check whether time is inclosed by transit interval.
 
     This function uses the given ephemerides (T0, period, and
@@ -91,7 +91,7 @@ def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
 
 
 def ingressDuration(sma, rp, rs, inc, period):
-    """
+    r"""
     Calculate the ingress (and egress) duration of the transit.
 
     The routine calculates the transit in- and egress duration assuming
@@ -101,9 +101,9 @@ def ingressDuration(sma, rp, rs, inc, period):
 
     .. math::
 
-        T_I = \\frac{P}{2 \\pi} \\left( \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a \\sin(i)} \\right) - \\arcsin\\left(\\frac{\\sqrt{(R_s-R_p)^2 - b^2}}{a \\sin(i)} \\right)  \\right)
+        T_I = \frac{P}{2 \pi} \left( \arcsin\left(\frac{\sqrt{(R_s+R_p)^2 - b^2}}{a \sin(i)} \right) - \arcsin\left(\frac{\sqrt{(R_s-R_p)^2 - b^2}}{a \sin(i)} \right)  \right)
 
-    is evaluated, where b is the impact parameter (:math:`b=a \\cos(i)`).
+    is evaluated, where b is the impact parameter (:math:`b=a \cos(i)`).
 
     .. note:: The units of the ingress duration are the same as the units
               of the input orbital period.
@@ -135,13 +135,14 @@ def ingressDuration(sma, rp, rs, inc, period):
     # Calculate the geometric transit duration
     idur = (period / (2.0 * np.pi)) * (
         np.arcsin(np.sqrt((rs * c.RSun + rp * c.RJ) ** 2 - impact**2) / imsin)
-        - np.arcsin(np.sqrt((rs * c.RSun - rp * c.RJ) ** 2 - impact**2) / imsin)
+        - np.arcsin(np.sqrt((rs * c.RSun - rp * c.RJ)
+                    ** 2 - impact**2) / imsin)
     )
     return idur
 
 
 def ingressDuration_Rs(sma, rprs, inc, period):
-    """
+    r"""
     Calculate transit duration
 
     Invokes :py:func:`ingressDuration` after parameter transformation.
@@ -171,7 +172,7 @@ def ingressDuration_Rs(sma, rprs, inc, period):
 
 
 def transitDuration(sma, rp, rs, inc, period, exact=False):
-    """
+    r"""
     Calculate the transit duration.
 
     The routine calculates the transit duration assuming
@@ -181,16 +182,16 @@ def transitDuration(sma, rp, rs, inc, period, exact=False):
 
     .. math::
 
-        T_D = \\frac{P}{\\pi} \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a} \\right)
+        T_D = \frac{P}{\pi} \arcsin\left(\frac{\sqrt{(R_s+R_p)^2 - b^2}}{a} \right)
 
-    where P is the orbital period, b the impact parameter (:math:`b=a \\cos(i)`),
+    where P is the orbital period, b the impact parameter (:math:`b=a \cos(i)`),
     and a the semi-major axis.
 
     If the `exact` flag is set True, the slightly more accurate expression
 
     .. math::
 
-        T_D = \\frac{P}{\\pi} \\arcsin\\left(\\frac{\\sqrt{(R_s+R_p)^2 - b^2}}{a \\sin(i)} \\right)
+        T_D = \frac{P}{\pi} \arcsin\left(\frac{\sqrt{(R_s+R_p)^2 - b^2}}{a \sin(i)} \right)
 
     is evaluated, where the additional sine term accounts for orbit curvature.
 
@@ -227,13 +228,14 @@ def transitDuration(sma, rp, rs, inc, period, exact=False):
     cfac = 1.0 if not exact else np.sin(inc / 180.0 * np.pi)
     # Calculate the geometric transit duration
     dur = (period / np.pi) * np.arcsin(
-        np.sqrt((rs * c.RSun + rp * c.RJ) ** 2 - impact**2) / (sma * c.AU * cfac)
+        np.sqrt((rs * c.RSun + rp * c.RJ) ** 2 -
+                impact**2) / (sma * c.AU * cfac)
     )
     return dur
 
 
 def transitDuration_Rs(sma, rprs, inc, period, exact=False):
-    """
+    r"""
     Calculate transit duration
 
     Invokes :py:func:`transitDuration` after parameter transformation.
@@ -266,7 +268,7 @@ def transitDuration_Rs(sma, rprs, inc, period, exact=False):
 
 
 def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
-    """
+    r"""
     Calculate first to fourth contact times for elliptical orbit.
 
     The contact times are numerically estimated using the algorithms
@@ -303,7 +305,8 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
     if not transit in ["p", "s"]:
         raise (
             PE.PyAValError(
-                "transit must be 'p' or 's' ('" + str(transit) + "' was given).",
+                "transit must be 'p' or 's' ('" +
+                str(transit) + "' was given).",
                 where="transit_T1_T4_ell",
             )
         )
@@ -357,7 +360,7 @@ def transit_T1_T4_ell(sma, rprs, inc, period, tau, e, w, transit="p"):
 
 
 def collectTransitDataFromDB(pn, dbp=("nexa", "eeu"), verbose=False):
-    """
+    r"""
     Get transit timing data from database
 
     Parameters
@@ -379,7 +382,6 @@ def collectTransitDataFromDB(pn, dbp=("nexa", "eeu"), verbose=False):
     DB name : string, {nexa, eeu}
         The name of the database from which the data were collected.
     """
-
 
     def colfromnexa(pn):
         nexa = pyasl.NasaExoplanetArchive()
@@ -425,7 +427,8 @@ def collectTransitDataFromDB(pn, dbp=("nexa", "eeu"), verbose=False):
                 r["ra"] = float(r["ra"])
             except ValueError:
                 # Convert into deg
-                r["ra"], r["dec"] = pyasl.coordsSexaToDeg(r["ra"] + " " + r["dec"])
+                r["ra"], r["dec"] = pyasl.coordsSexaToDeg(
+                    r["ra"] + " " + r["dec"])
             m = ["ra", "dec", "T0", "orbPer", "orbInc", "SMA", "RpJ", "RsSun"]
             for k in m:
                 if not np.isfinite(r[k]):
@@ -457,7 +460,7 @@ def transitTimes(
     fileOutput=None,
     psT0=0.0,
 ):
-    """
+    r"""
     Calculate transit times for a given planet and a given period of time.
 
     The `planetData` dictionary must contain the following information:
@@ -659,7 +662,8 @@ def transitTimes(
                 planetData["SMA"] = pdin["pl_orbsmax"]
                 planetData["RpJ"] = pdin["pl_radj"]
                 planetData["RsSun"] = pdin["st_rad"]
-                planetData["Tdur"] = pdin["pl_trandur"] / 24  # Convert into days
+                planetData["Tdur"] = pdin["pl_trandur"] / \
+                    24  # Convert into days
                 planetData["plName"] = pdin["pl_name"]
                 if np.isnan(planetData["Tdur"]):
                     del planetData["Tdur"]
@@ -673,7 +677,8 @@ def transitTimes(
                     PE.PyAValError(
                         f"Could not download transit data for target '{pn}' from data base.",
                         where="transitTimes",
-                        solution=["Check name of planet", "Specify parameter manually"],
+                        solution=["Check name of planet",
+                                  "Specify parameter manually"],
                     )
                 )
             planetData["plName"] = pn
@@ -681,7 +686,8 @@ def transitTimes(
                 del planetData["Tdur"]
 
         # Check whether required keys are present
-        reke = ["ra", "dec", "orbPer", "T0", "orbInc", "SMA", "RpJ", "RsSun", "plName"]
+        reke = ["ra", "dec", "orbPer", "T0",
+                "orbInc", "SMA", "RpJ", "RsSun", "plName"]
         msg = ""
         fail = False
         for key in reke:
@@ -705,7 +711,7 @@ def transitTimes(
                     solution="Specify all required input values.",
                 )
             )
-            
+
         if psT0 != 0.0:
             print()
             pst = planetData["orbPer"] * psT0
@@ -717,7 +723,7 @@ def transitTimes(
 
         print("-"*30)
         print("Adopted transit parameters")
-        for k,v in planetData.items():
+        for k, v in planetData.items():
             print(f"    {k} = {v}")
         print("-"*30)
 
@@ -903,7 +909,8 @@ def transitTimes(
             obs_end_hjd = Tmid + (dur / 2.0) + obsOffset
             obs_end = daycnv(obs_end_hjd)
             time_temp = np.array([obs_start_hjd, Tmid, obs_end_hjd])
-            transit_only = np.array([Tmid - (dur / 2.0), Tmid, Tmid + (dur / 2.0)])
+            transit_only = np.array(
+                [Tmid - (dur / 2.0), Tmid, Tmid + (dur / 2.0)])
 
             # Get visibility
             if (lon is not None) and (lat is not None):
@@ -1080,7 +1087,7 @@ def transitTimes(
 def transitVisibilityPlot(
     allData, markTransit=False, plotLegend=True, showMoonDist=True, print2file=False
 ):
-    """
+    r"""
     Plot the visibility of transits.
 
     This function can conveniently be used with the output of
@@ -1161,7 +1168,8 @@ def transitVisibilityPlot(
         )
 
     # Check whether all relevant data have been specified
-    reqK = ["Obs jd", "Obs coord", "Star ra", "Star dec", "Obs cal", "Planet name"]
+    reqK = ["Obs jd", "Obs coord", "Star ra",
+            "Star dec", "Obs cal", "Planet name"]
     if markTransit:
         reqK.append("Transit jd")
     missingK = []
@@ -1192,7 +1200,8 @@ def transitVisibilityPlot(
     for n in six.iterkeys(allData):
         # JD array
         jdbinsize = 1.0 / 24.0 / 10.0
-        jds = np.arange(allData[n]["Obs jd"][0], allData[n]["Obs jd"][2], jdbinsize)
+        jds = np.arange(allData[n]["Obs jd"][0],
+                        allData[n]["Obs jd"][2], jdbinsize)
         # Get JD floating point
         jdsub = jds - np.floor(jds[0])
         # Get alt/az of object
@@ -1305,9 +1314,11 @@ def transitVisibilityPlot(
                 plotdat = np.insert(altaz[0][twi], linebreak + 1, np.nan)
                 ax.plot(plotrjd, plotdat, "-", color="#BEBEBE", linewidth=1.5)
             else:
-                ax.plot(jdsub[twi], altaz[0][twi], "-", color="#BEBEBE", linewidth=1.5)
+                ax.plot(jdsub[twi], altaz[0][twi], "-",
+                        color="#BEBEBE", linewidth=1.5)
 
-        ax.plot(jdsub[night], altaz[0][night], "k", linewidth=1.5, label=plabel)
+        ax.plot(jdsub[night], altaz[0][night],
+                "k", linewidth=1.5, label=plabel)
         ax.plot(jdsub[day], altaz[0][day], color="#FDB813", linewidth=1.5)
 
         altmax = np.argmax(altaz[0])
@@ -1463,15 +1474,15 @@ def transitVisibilityPlot(
 
     ax.yaxis.set_major_locator(MultipleLocator(15))
     ax.yaxis.set_minor_locator(MultipleLocator(5))
-   
-    # Major tick format and font size 
+
+    # Major tick format and font size
     ax.yaxis.set_major_formatter('{x:.0f}'+r"$^\circ$")
     ax.tick_params(axis='y', which='major', labelsize=20)
     # Minor tick format (fontsize default)
     ax.yaxis.set_minor_formatter('{x:.0f}'+r"$^\circ$")
 
     ax.set_ylabel("Altitude", fontsize=18)
-    
+
     ax.yaxis.grid(color="gray", linestyle="dashed")
     ax.yaxis.grid(color="gray", which="minor", linestyle="dotted")
     ax2.xaxis.grid(color="gray", linestyle="dotted")
@@ -1567,7 +1578,8 @@ def transitVisibilityPlot(
     )
 
     if print2file == True:
-        outfile = "transVis-" + str(allData[n]["Planet name"]).replace(" ", "") + ".png"
+        outfile = "transVis-" + \
+            str(allData[n]["Planet name"]).replace(" ", "") + ".png"
         plt.savefig(outfile, format="png", dpi=300)
     elif isinstance(print2file, six.string_types):
         plt.savefig(print2file, format="png", dpi=300)
