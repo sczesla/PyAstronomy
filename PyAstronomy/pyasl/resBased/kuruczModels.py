@@ -10,7 +10,7 @@ import six.moves.urllib as urllib
 
 
 class KuruczMT:
-    """
+    r"""
     Provides access to individual models in a model grid.
 
     Parameters
@@ -34,7 +34,7 @@ class KuruczMT:
     """
 
     def _extractModelProperties(self, model):
-        """
+        r"""
         Extract Teff, logg, and logg from a model.
 
         Returns
@@ -52,7 +52,7 @@ class KuruczMT:
         return teff, logg, met
 
     def _readModelTable(self, fn):
-        """
+        r"""
         Read file, extract models, and store in class.
 
         Parameters
@@ -89,10 +89,10 @@ class KuruczMT:
             if self.met is None:
                 self.met = props[2]
             elif self.met != props[2]:
-                raise(PE.PyAValError("Abundance of models differ. This should not happen!\n" +
-                                     "The values are: " +
-                                     str(props[2]) + " and " + str(self.met),
-                                     where="KuruczMT::_readModelTable"))
+                raise (PE.PyAValError("Abundance of models differ. This should not happen!\n" +
+                                      "The values are: " +
+                                      str(props[2]) + " and " + str(self.met),
+                                      where="KuruczMT::_readModelTable"))
         # Build array of available models
         self._modelsAvailable = np.zeros(
             (len(teffs), len(loggs)), dtype=bool)
@@ -105,7 +105,7 @@ class KuruczMT:
                     self._modelsAvailable[i, j] = True
 
     def availableTeffs(self):
-        """
+        r"""
         Get available effective temperatures.
 
         Returns
@@ -117,7 +117,7 @@ class KuruczMT:
         return self.teffs.copy()
 
     def availableLoggs(self):
-        """
+        r"""
         Get available logg values.
 
         Note that not all models are available
@@ -132,7 +132,7 @@ class KuruczMT:
         return self.loggs.copy()
 
     def metallicity(self):
-        """
+        r"""
         Get metallicity of model grid.
 
         Returns
@@ -143,7 +143,7 @@ class KuruczMT:
         return self.met
 
     def modelAvailable(self, teff, logg, met=None):
-        """
+        r"""
         Determine whether model is available.
 
         Parameters
@@ -166,7 +166,7 @@ class KuruczMT:
         return ((teff, logg, met) in self.models)
 
     def getModel(self, teff, logg, met=None):
-        """
+        r"""
         Get a model.
 
         Parameters
@@ -185,7 +185,7 @@ class KuruczMT:
             The model as found on the file.
         """
         if not self.modelAvailable(teff, logg, met):
-            raise(PE.PyAValError(
+            raise (PE.PyAValError(
                 ("No model for the combination: Teff = %6.3e, logg = %6.3e, met = " + str(met)) % (teff, logg)))
         if met is None:
             met = self.met
@@ -193,23 +193,23 @@ class KuruczMT:
 
     def __init__(self, fn):
         if not os.path.isfile(fn):
-            raise(PE.PyAValError("No such file: " + str(fn)))
+            raise (PE.PyAValError("No such file: " + str(fn)))
         self._readModelTable(fn)
 
 
 class KuruczModels:
-    """
+    r"""
     Provides access to the Kurucz models.
     """
 
     def getListOfGridsFN(self):
-        """
+        r"""
         Get filename for list of grids
         """
         return os.path.join("pyasl", "resBased", "kuruczMG.dat.gz")
 
     def _getListOfModelGrids(self):
-        """
+        r"""
         Get list of available grids from http://kurucz.harvard.edu/grids.html
         """
         gridFile = self.getListOfGridsFN()
@@ -222,9 +222,9 @@ class KuruczModels:
                             "http://kurucz.harvard.edu/grids.html").read()
                         d = d.decode("utf8")
                     except urllib.error.URLError as e:
-                        raise(PE.PyADownloadError("Could not access URL: http://kurucz.harvard.edu/grids.html\n" +
-                                                  "Error: " + str(e),
-                                                  solution="Are you online?"))
+                        raise (PE.PyADownloadError("Could not access URL: http://kurucz.harvard.edu/grids.html\n" +
+                                                   "Error: " + str(e),
+                                                   solution="Are you online?"))
                     pattern = '<A HREF=\"(.*)\">(.*)</A>'
                     self.grids = {}
                     for grid in re.findall(pattern, d):
@@ -288,10 +288,10 @@ class KuruczModels:
                 ffn = self._fs.composeFilename(gridFile)
                 per = PE.PyAValError("Reading the pickle file: " + str(ffn) + ", the error: '" + str(ve) + "' occurred.",
                                      solution="Likely, the file was written using Python 3 and you try to read it using Python 2.x. Try to delete the file.")
-                raise(per)
+                raise (per)
 
     def _abundToStr(self, met):
-        """
+        r"""
         Convert metallicity into a grid-naming compatible string
 
         Parameters
@@ -309,7 +309,7 @@ class KuruczModels:
         else:
             result = "P"
         if (met * 10) - int(abs(met) * 10) > 1e-14:
-            raise(PE.PyAValError("Inappropriate met value: " + str(met)))
+            raise (PE.PyAValError("Inappropriate met value: " + str(met)))
         met = int(abs(met) * 10)
         if met < 10:
             result += "0"
@@ -321,7 +321,7 @@ class KuruczModels:
         return gfn
 
     def _downloadGrid(self, name):
-        """
+        r"""
         Download a model-grid file from the Kurucz page.
 
         Only downloads, if the file does not already exist
@@ -347,7 +347,7 @@ class KuruczModels:
         return gfn
 
     def requestModelGrid(self, met, add=""):
-        """
+        r"""
         Get a model grid.
 
         Parameters
@@ -362,14 +362,14 @@ class KuruczModels:
             easy access to the models.
         """
         if not self.gridAvailable(met, add):
-            raise(PE.PyAValError("No appropriate grid available",
-                                 solution="Use 'availableGrids' to see what is available."))
+            raise (PE.PyAValError("No appropriate grid available",
+                                  solution="Use 'availableGrids' to see what is available."))
         gfn = self._downloadGrid(self._gridName(met, add))
         ffn = self._fs.composeFilename(gfn)
         return KuruczMT(ffn)
 
     def _gridName(self, met, add):
-        """
+        r"""
         Compose metallicity and name addition to obtain name of model grid.
 
         Parameters
@@ -382,7 +382,7 @@ class KuruczModels:
         return "GRID" + self._abundToStr(met) + add
 
     def gridAvailable(self, met, add=""):
-        """
+        r"""
         Check whether model grid is available.
 
         Parameters
@@ -398,7 +398,7 @@ class KuruczModels:
         return (self._gridName(met, add) in self.grids)
 
     def availableGrids(self):
-        """
+        r"""
         All available model grids.
 
         Returns
@@ -409,11 +409,11 @@ class KuruczModels:
         return list(self.grids.keys())
 
     def listGridLinks(self):
-        """
+        r"""
         List links to available grids
         """
         print("List of grids stored in file:", self.getListOfGridsFN())
-        for k,v in self.grids.items():
+        for k, v in self.grids.items():
             print("%20s  " % k, v)
 
     def __init__(self):
@@ -422,12 +422,12 @@ class KuruczModels:
 
 
 def purgeKuruczData():
-    """
+    r"""
     Remove downloaded Kurucz data from PyA's data directory
     """
     km = KuruczModels()
     gfn = km.getListOfGridsFN()
-    fns = km._fs.globglob(os.path.join("pyasl", "resBased"), "GRID*.dat.gz" )
+    fns = km._fs.globglob(os.path.join("pyasl", "resBased"), "GRID*.dat.gz")
     print("Deleting grid compilation: ", gfn)
     km._fs.removeFile(gfn)
     for fn in fns:
@@ -436,7 +436,7 @@ def purgeKuruczData():
 
 
 def getKuruczModel(teff, logg, met, nameadd=""):
-    """
+    r"""
     Obtain a Kurucz model
 
     Parameters
@@ -458,12 +458,12 @@ def getKuruczModel(teff, logg, met, nameadd=""):
     """
     km = KuruczModels()
     if not km.gridAvailable(met, nameadd):
-        raise(PE.PyAValError("No model grid with logarithmic metallicity of " + str(met) +
-                             " and name addition " + str(nameadd) + " available."))
+        raise (PE.PyAValError("No model grid with logarithmic metallicity of " + str(met) +
+                              " and name addition " + str(nameadd) + " available."))
     mt = km.requestModelGrid(met, nameadd)
     if not mt.modelAvailable(teff, logg, met):
-        raise(PE.PyAValError("No model available in grid for parameters: teff = %6.3e, logg = %6.3e, met = %6.3e "
-                             % (teff, logg, met),
-                             solution=["Available Teffs: " + str(list(mt.availableTeffs())),
-                                       "Available Loggs: " + str(list(mt.availableLoggs()))]))
+        raise (PE.PyAValError("No model available in grid for parameters: teff = %6.3e, logg = %6.3e, met = %6.3e "
+                              % (teff, logg, met),
+                              solution=["Available Teffs: " + str(list(mt.availableTeffs())),
+                                        "Available Loggs: " + str(list(mt.availableLoggs()))]))
     return mt.getModel(teff, logg, met)
