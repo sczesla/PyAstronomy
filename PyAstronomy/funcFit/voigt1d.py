@@ -8,7 +8,7 @@ import six.moves as smo
 
 
 class Voigt1d(OneDFit):
-    """
+    r"""
     Implements a Voigt profile (convolution of Cauchy-Lorentz
     and Gaussian distribution).
 
@@ -34,7 +34,7 @@ class Voigt1d(OneDFit):
     of a Gaussian distribution
 
     .. math::
-        G=1/(\\sqrt{2 \pi} \ ad)\exp(-(x-mu)^2/(2 \ ad^2))
+        G=1/(\sqrt{2 \pi} \ ad)\exp(-(x-mu)^2/(2 \ ad^2))
 
     and a Cauchy-Lorentz distribution
 
@@ -58,7 +58,7 @@ class Voigt1d(OneDFit):
         self.setRootName("Voigt")
 
     def evaluate(self, x):
-        """
+        r"""
         Evaluates the model for current parameter values.
 
         Parameters
@@ -76,15 +76,15 @@ class Voigt1d(OneDFit):
 
             y[numpy.where(numpy.isnan(y))] = 0.0
         except FloatingPointError as fpe:
-            raise(PE.PyAFloatingPointError("The following floating point error occurred:\n  " + str(fpe) + "\n" +
-                                           "Current Parameter values:\n" +
-                                           str(self.parameters()),
-                                           solution=["Try to rescale/shift your abscissa. For instance, put" +
-                                                     "the spectral line you try to fit at position `0`."]))
+            raise (PE.PyAFloatingPointError("The following floating point error occurred:\n  " + str(fpe) + "\n" +
+                                            "Current Parameter values:\n" +
+                                            str(self.parameters()),
+                                            solution=["Try to rescale/shift your abscissa. For instance, put" +
+                                                      "the spectral line you try to fit at position `0`."]))
         return y
 
     def FWHM(self):
-        """
+        r"""
         Calculates an approximation of the FWHM.
 
         The approximation is accurate to 
@@ -103,7 +103,7 @@ class Voigt1d(OneDFit):
 
 
 class MultiVoigt1d(OneDFit):
-    """
+    r"""
     Multicomponent Voigt with a single linear continuum component.
 
     The parameters are the same as for *Voigt1d*,
@@ -134,7 +134,7 @@ class MultiVoigt1d(OneDFit):
         self._v1d["lin"] = 0.0
 
     def evaluate(self, x):
-        """
+        r"""
         Evaluates the model for current parameter values.
 
         Parameters
@@ -153,7 +153,7 @@ class MultiVoigt1d(OneDFit):
         return y
 
     def evalComponent(self, x, p):
-        """
+        r"""
         Evaluate the model considering only a single component.
 
         Parameters
@@ -177,5 +177,5 @@ class MultiVoigt1d(OneDFit):
             y += self._v1d.evaluate(x)
             return y
         else:
-            raise(PE.PyAValError("No such component (no. " + str(p) + ")", where="MultiVoigt1d::evalComponent",
-                                 solution="Use value between 1 and " + str(self.n)))
+            raise (PE.PyAValError("No such component (no. " + str(p) + ")", where="MultiVoigt1d::evalComponent",
+                                  solution="Use value between 1 and " + str(self.n)))

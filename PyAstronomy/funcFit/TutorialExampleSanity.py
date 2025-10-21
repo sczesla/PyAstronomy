@@ -83,7 +83,7 @@ class TestExampleSanity(unittest.TestCase):
     #     plt.show()
 
     def testsanity_fmin_powell_example(self):
-        """
+        r"""
         Checking fmin_powell example
         """
         # Import numpy and matplotlib
@@ -136,7 +136,7 @@ class TestExampleSanity(unittest.TestCase):
         from PyAstronomy import funcFit as fuf
 
         class StraightLine(fuf.OneDFit):
-            """
+            r"""
             Implements a straight line of the form y = "off" + x * "lin".
             """
 
@@ -144,13 +144,13 @@ class TestExampleSanity(unittest.TestCase):
                 fuf.OneDFit.__init__(self, ["off", "lin"])
 
             def evaluate(self, x):
-                """
-          Calculates and returns model according to the \
-          current parameter values.
-    
-          Parameters:
-            - `x` - Array specifying the positions at \
-                    which to evaluate the model.
+                r"""
+the \
+lues.
+
+ters:
+ at \
+odel.
         """
                 y = self["off"] + (self["lin"] * x)
                 return y
@@ -186,7 +186,7 @@ class TestExampleSanity(unittest.TestCase):
         from PyAstronomy import funcFit as fuf
 
         class StraightLine(fuf.OneDFit):
-            """
+            r"""
             Implements a straight line of the form y = "off" + x * "lin".
             """
 
@@ -194,7 +194,7 @@ class TestExampleSanity(unittest.TestCase):
                 fuf.OneDFit.__init__(self, ["off", "lin"])
 
             def evaluate(self, x):
-                """
+                r"""
                 Calculates and returns model according to the current parameter values.
 
                 Parameters:
@@ -207,7 +207,7 @@ class TestExampleSanity(unittest.TestCase):
 
         def getLinearRelation(factor):
             def linOffRel(off):
-                """
+                r"""
                 Function used to relate parameters "lin" and "off".
                 """
                 return factor * off
@@ -480,8 +480,10 @@ class TestExampleSanity(unittest.TestCase):
         gauss = fuf.GaussFit1d()
         calor = fuf.CauchyLorentz1d()
         # and assign parameters.
-        gauss.assignValue({"A": 0.02, "sig": 0.1, "mu": 0.0, "off": 1.0, "lin": 0.0})
-        calor.assignValue({"A": 0.07, "g": 0.1, "mu": 0.2, "off": 1.0, "lin": 0.0})
+        gauss.assignValue(
+            {"A": 0.02, "sig": 0.1, "mu": 0.0, "off": 1.0, "lin": 0.0})
+        calor.assignValue(
+            {"A": 0.07, "g": 0.1, "mu": 0.2, "off": 1.0, "lin": 0.0})
 
         # Create noisy data.
         y1 = gauss.evaluate(x1) + numpy.random.normal(0.0, 0.01, 100)
@@ -532,7 +534,8 @@ class TestExampleSanity(unittest.TestCase):
 
         # Set up the data appropriately.
         data = {gaussCno: [x1, y1], calorCno: [x2, y2]}
-        yerr = {gaussCno: numpy.ones(100) * 0.01, calorCno: numpy.ones(150) * 0.01}
+        yerr = {gaussCno: numpy.ones(
+            100) * 0.01, calorCno: numpy.ones(150) * 0.01}
 
         # Start the fit.
         sf.fit(data, yerr=yerr)
@@ -582,7 +585,8 @@ class TestExampleSanity(unittest.TestCase):
         model = c.evaluate(tt)
 
         # Plot the result
-        plt.errorbar(pos[::, 0], pos[::, 1], yerr=err[::, 1], xerr=err[::, 0], fmt="bp")
+        plt.errorbar(pos[::, 0], pos[::, 1], yerr=err[::, 1],
+                     xerr=err[::, 0], fmt="bp")
         plt.plot(model[::, 0], model[::, 1], "r--")
 
     #    plt.show()
@@ -826,14 +830,15 @@ class TestExampleSanity(unittest.TestCase):
         # interval and correlation.
         plt.xlabel("mu")
         plt.ylabel("A")
-        plt.contour(np.sort(np.unique(mus)), np.sort(np.unique(As)), z, levels=levels)
+        plt.contour(np.sort(np.unique(mus)), np.sort(
+            np.unique(As)), z, levels=levels)
         # Plot the input value
         plt.plot([1.0], [0.87], "k+", markersize=20)
 
     #    plt.show()
 
     def testsanity_errorConfInterval(self):
-        """
+        r"""
         Checking example of errorConfInterval
         """
         import numpy as np
@@ -903,7 +908,7 @@ class TestExampleSanity(unittest.TestCase):
     #     plt.show()
 
     def testsanity_conditionalRestrictions(self):
-        """
+        r"""
         Check the conditional restriction example.
         """
         import numpy as np
@@ -923,7 +928,7 @@ class TestExampleSanity(unittest.TestCase):
         yerr = np.ones(len(x)) * 0.1
 
         def myRestriction(A, sig):
-            """
+            r"""
             A conditional restriction.
 
             Returns
@@ -1231,7 +1236,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
     # ===============================================================================
 
     def testsanity_TAtut_createTrace(self):
-        """
+        r"""
         TA tutorial, all examples
         """
         # Import some required modules
@@ -1292,7 +1297,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
             priors=priors,
         )
 
-        ######## Second example
+        # Second example
 
         from PyAstronomy import funcFit as fuf
 
@@ -1316,7 +1321,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
         ta.plotTrace("deviance")
         #    ta.show()
 
-        ######## Third example
+        # Third example
 
         from PyAstronomy import funcFit as fuf
 
@@ -1342,7 +1347,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
                 % (p, ta.mean(p), ta.median(p), ta.std(p), hpd[0], hpd[1])
             )
 
-        ######## Fourth example
+        # Fourth example
 
         from PyAstronomy import funcFit as fuf
 
@@ -1368,7 +1373,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
         # ta.plotCorrEnh(parsList=["ad", "al"])
         #     ta.show()
 
-        ######## Fifth example
+        # Fifth example
 
         from PyAstronomy import funcFit as fuf
         import matplotlib.pylab as plt
@@ -1406,7 +1411,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
         plt.plot(x, vp.evaluate(x), "g.-")
         #     plt.show()
 
-        ######## Sixth example
+        # Sixth example
 
         from PyAstronomy import funcFit as fuf
 
@@ -1474,7 +1479,8 @@ class TestMCMCExampleSanity(unittest.TestCase):
         # Creating a Gaussian with some noise
         # Choose some parameters...
         gf = fuf.GaussFit1d()
-        gf.assignValues({"A": -5.0, "sig": 2.5, "mu": 10.0, "off": 1.0, "lin": 0.0})
+        gf.assignValues(
+            {"A": -5.0, "sig": 2.5, "mu": 10.0, "off": 1.0, "lin": 0.0})
         # Calculate profile
         x = arange(100) - 50.0
         y = gf.evaluate(x)
@@ -1548,14 +1554,16 @@ class TestMCMCExampleSanity(unittest.TestCase):
         # Plot the distributions of the chains
         # NOTE: the order of the parameters in the chain object is the same
         #       as the order of the parameters returned by freeParamNames()
-        h = plt.hist(pf.emceeSampler.flatchain[::, 0], label="c0", density=True)
+        h = plt.hist(
+            pf.emceeSampler.flatchain[::, 0], label="c0", density=True)
         # Construct "data points" in the middle of the bins
         xhist = (h[1][1:] + h[1][0:-1]) / 2.0
         yhist = h[0]
 
         # Fit the histogram using a Gaussian
         gf = fuf.GaussFit1d()
-        gf.assignValues({"A": 1.0, "mu": c, "sig": 1.0 / snr / np.sqrt(npoint)})
+        gf.assignValues(
+            {"A": 1.0, "mu": c, "sig": 1.0 / snr / np.sqrt(npoint)})
         # First fitting only "mu" is simply quite stable
         gf.thaw("mu")
         gf.fit(xhist, yhist)
@@ -1625,7 +1633,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
         print(gp(cvals, "b"))
 
     def testsanity_sampleEMCEE_sampleFromGaussian(self):
-        """
+        r"""
         Checking first sampleEMCEE example (sample from Gaussian distribution)
         """
         import numpy as np
@@ -1633,7 +1641,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
         import matplotlib.pylab as plt
 
         def lfGauss(v, sigma, mu):
-            """
+            r"""
             Gaussian density
 
             Parameters
@@ -1688,7 +1696,8 @@ class TestMCMCExampleSanity(unittest.TestCase):
         # Plot histogram of chain
         #     plt.hist(ta["x"], 60, normed=True)
         # Overplot Gaussian model
-        xx = np.linspace(la["mu"] - 6 * la["sigma"], la["mu"] + 6 * la["sigma"], 1000)
+        xx = np.linspace(la["mu"] - 6 * la["sigma"],
+                         la["mu"] + 6 * la["sigma"], 1000)
         yy = (
             1.0
             / np.sqrt(2.0 * np.pi * la["sigma"] ** 2)
@@ -1699,14 +1708,14 @@ class TestMCMCExampleSanity(unittest.TestCase):
     #     plt.show()
 
     def testsanity_sampleEMCEE_estimateMuSig(self):
-        """
+        r"""
         Checking sampleEMCEE example (estimate mu and sigma)
         """
         import numpy as np
         from PyAstronomy import funcFit as fuf
 
         def lfGaussMS(v, x=None):
-            """
+            r"""
             Gaussian posterior with 1/sigma prior on sigma.
 
             Parameters

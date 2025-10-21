@@ -14,7 +14,7 @@ def equal(dependsOn):
 
 
 class Params:
-    """
+    r"""
     Manage a set of parameters.
 
     This class provides a framework for managing parameter values
@@ -100,7 +100,7 @@ class Params:
     """
 
     def __add__(self, right):
-        """
+        r"""
         This member allows to combine the properties of two Param class \
         instances. All parameter properties will be copied into the new \
         Parameter class instance, which is returned by this function.
@@ -112,7 +112,7 @@ class Params:
         # Check whether parameters have unique names
         for p in paLeft:
             if p in paRight:
-                raise(PE.PyANameClash(
+                raise (PE.PyANameClash(
                     "At least two parameters share the same name.", where="Params::__add__"))
         # List of new names
         nlist = list(paLeft.keys())
@@ -139,7 +139,7 @@ class Params:
         return result
 
     def renameParameter(self, old, new):
-        """
+        r"""
         Rename an existing parameter.
 
         Parameters
@@ -151,8 +151,8 @@ class Params:
         """
         self.__checkForParam(old)
         if new in self.__params:
-            raise(PE.PyAValError("Parameter already exists: " +
-                                 new, where="Params::renameParameter"))
+            raise (PE.PyAValError("Parameter already exists: " +
+                                  new, where="Params::renameParameter"))
         self.__params[new] = self.__params[old]
         del self.__params[old]
         for i in smo.range(len(self.paramNum)):
@@ -209,7 +209,7 @@ class Params:
             self.relations[n] = []
 
     def addConditionalRestriction(self, pars, func):
-        """
+        r"""
         Define a conditional restriction.
 
         Conditional restrictions can be used to modify the
@@ -245,7 +245,7 @@ class Params:
         return name
 
     def removeConditionalRestriction(self, id):
-        """
+        r"""
         Remove an existing conditional constraint.
 
         Parameters
@@ -255,11 +255,11 @@ class Params:
             constraint (returned by `addConditionalRestriction`).
         """
         if not id in self.conditionalRestrictions:
-            raise(PE.PyAValError("No conditional restriction with ID '" + str(id)))
+            raise (PE.PyAValError("No conditional restriction with ID '" + str(id)))
         del self.conditionalRestrictions[id]
 
     def showConditionalRestrictions(self, toScreen=True):
-        """
+        r"""
         Show conditional restrictions.
 
         Parameters
@@ -288,7 +288,7 @@ class Params:
         return ll
 
     def applyConditionalRestrictions(self, fullout=False):
-        """
+        r"""
         Apply all conditional restrictions.
 
         Parameters
@@ -316,8 +316,8 @@ class Params:
                 vs += (self[p],)
             val = v[1](*vs)
             if val is None:
-                raise(PE.PyAValError("Conditional restriction with ID '" + str(name) + "' returned None.",
-                                     solution="Did you forget to return 0.0, in case the condition is not fulfilled?"))
+                raise (PE.PyAValError("Conditional restriction with ID '" + str(name) + "' returned None.",
+                                      solution="Did you forget to return 0.0, in case the condition is not fulfilled?"))
             if fullout:
                 fo[name] = val
             result += val
@@ -327,7 +327,7 @@ class Params:
             return result
 
     def __toList(self, x):
-        """
+        r"""
         Return a list of x is a string and do nothing of x is already a list.
         """
         if isinstance(x, six.string_types):
@@ -335,16 +335,16 @@ class Params:
         return x
 
     def __checkForParam(self, name):
-        """
+        r"""
         Checks whether parameter exists and throws an exception if this is not the case.
         No return value.
         """
         if not self.hasParam(name):
-            raise(PE.PyAValError("No such parameter: \"" + name + "\".\n  Available parameters: " +
-                                 ', '.join(list(self.parameters().keys())), where="Params::__checkForParam"))
+            raise (PE.PyAValError("No such parameter: \"" + name + "\".\n  Available parameters: " +
+                                  ', '.join(list(self.parameters().keys())), where="Params::__checkForParam"))
 
     def hasParam(self, name):
-        """
+        r"""
         Check whether parameter exists.
 
         Parameters
@@ -362,7 +362,7 @@ class Params:
         return True
 
     def availableParameters(self):
-        """
+        r"""
         Provides a list of existing parameters.
 
         Returns
@@ -373,7 +373,7 @@ class Params:
         return list(self.__params.keys())
 
     def parameters(self):
-        """
+        r"""
         Obtain parameter names and values.
 
         Returns
@@ -385,7 +385,7 @@ class Params:
         return self.__params.copy()
 
     def __getitem__(self, name):
-        """
+        r"""
         Access parameter values.
 
         Parameters
@@ -402,7 +402,7 @@ class Params:
         return self.__params[name]
 
     def assignValue(self, namval):
-        """
+        r"""
         Define new parameter values.
 
         Parameters
@@ -430,7 +430,7 @@ class Params:
                     self.assignValue({tie[0]: tie[1](*arg)})
 
     def thaw(self, name):
-        """
+        r"""
         Thaw (regard as free) a parameter.
 
         Parameters
@@ -445,14 +445,14 @@ class Params:
             for pn, rels in six.iteritems(self.relations):
                 for rel in rels:
                     if rel[0] == n:
-                        raise(PE.PyAParameterConflict("You tried to free the parameter '" + n +
-                                                      "', which is a dependent variable in a relation.",
-                                                      solution="Use 'untie' first to remove the relation."))
+                        raise (PE.PyAParameterConflict("You tried to free the parameter '" + n +
+                                                       "', which is a dependent variable in a relation.",
+                                                       solution="Use 'untie' first to remove the relation."))
             self.__checkForParam(n)
             self.isFree[n] = True
 
     def freeze(self, name):
-        """
+        r"""
         Freeze parameter(s) (contrary of thaw).
 
         Parameters
@@ -466,7 +466,7 @@ class Params:
             self.isFree[n] = False
 
     def freeParameters(self):
-        """
+        r"""
         Get names and values of free parameters.
 
         Returns
@@ -484,7 +484,7 @@ class Params:
         return result
 
     def frozenParameters(self):
-        """
+        r"""
         Get names and values of frozen parameters.
 
         Returns
@@ -502,7 +502,7 @@ class Params:
         return result
 
     def numberOfFreeParams(self):
-        """
+        r"""
         Get number of free parameters.
 
         Returns
@@ -517,7 +517,7 @@ class Params:
         return c
 
     def freeParamNames(self):
-        """
+        r"""
         Get the names of the free parameters.
 
         Returns
@@ -535,7 +535,7 @@ class Params:
         return result
 
     def setFreeParams(self, X):
-        """
+        r"""
         Change the values of the free parameters.
 
         Parameters
@@ -549,7 +549,7 @@ class Params:
         This method is primarily implemented to be used by fit routines.
         """
         if len(X) != self.numberOfFreeParams():
-            raise(PE.PyAValError(
+            raise (PE.PyAValError(
                 "Number of supplied parameters does not match number of free parameters.", where="Params::setFreeParams"))
         c = 0
         for i in smo.range(len(self.__params)):
@@ -559,7 +559,7 @@ class Params:
                 c += 1
 
     def getFreeParams(self):
-        """
+        r"""
         Get values of free parameters.
 
         Returns
@@ -576,7 +576,7 @@ class Params:
         return result
 
     def setRestriction(self, restricts):
-        """
+        r"""
         Apply restrictions to parameter ranges.
 
         Parameters
@@ -589,13 +589,13 @@ class Params:
             self.__checkForParam(name)
             if (v[0] is not None) and (v[1] is not None):
                 if v[0] >= v[1]:
-                    raise(PE.PyAValError(
+                    raise (PE.PyAValError(
                         "Lower bound < upper bound must be fulfilled!", where="Params::setRestriction"))
             self.isRestricted[name] = [(v[0] is not None), (v[1] is not None)]
             self.restrictions[name] = v
 
     def delRestriction(self, parName):
-        """
+        r"""
         Delete restriction
 
         Parameters
@@ -608,7 +608,7 @@ class Params:
         self.restrictions[parName] = [None, None]
 
     def getRestrictions(self):
-        """
+        r"""
         Get all restrictions.
 
         Returns
@@ -620,7 +620,7 @@ class Params:
         return self.restrictions
 
     def untie(self, parName, forceFree=False):
-        """
+        r"""
         Remove all relations of parameter "parName".
 
         After this operation, the parameter no longer depends 
@@ -640,7 +640,7 @@ class Params:
         self.isFree[parName] = forceFree
 
     def relate(self, parName1, pars, func=None, force=False):
-        """
+        r"""
         Apply functional relation between parameters.
 
         Relates parameters, i.e., par1 = func(pars). The two values are related by 'func'. \
@@ -661,16 +661,16 @@ class Params:
         """
         self.__checkForParam(parName1)
         if not self.isFree[parName1] and not force:
-            raise(PE.PyAValError(parName1 + " is not free.",
-                                 where="Params::relate", solution="Use 'thaw' to free parameter."))
+            raise (PE.PyAValError(parName1 + " is not free.",
+                                  where="Params::relate", solution="Use 'thaw' to free parameter."))
         if isinstance(pars, six.string_types):
             pars = [pars]
         for p in pars:
             self.__checkForParam(p)
         # Check whether the dependent variable is in the list of independent ones
         if parName1 in pars:
-            raise(PE.PyAValError("The dependent variable (" + parName1 +
-                                 ") cannot be in the list of independent variables."))
+            raise (PE.PyAValError("The dependent variable (" + parName1 +
+                                  ") cannot be in the list of independent variables."))
         # Use equal function if None is specified.
         if func is None:
             func = equal
@@ -685,7 +685,7 @@ class Params:
         self.isFree[parName1] = False
 
     def getPenalty(self, penaltyFact=1e20):
-        """
+        r"""
         Get applied penalty for current parameter set.
 
         Parameters
@@ -725,7 +725,7 @@ class Params:
         return (totval, result)
 
     def getRelationsOf(self, parName):
-        """
+        r"""
         Obtain relations for a parameter.
 
         Parameters
@@ -749,7 +749,7 @@ class Params:
         return result
 
     def saveState(self, fn=None, clobber=False):
-        """
+        r"""
         Save the state of the fitting object.
 
         This method collects the parameter values, the applied restrictions,
@@ -779,13 +779,13 @@ class Params:
         dat["frozenParameters"] = self.frozenParameters()
         if isinstance(fn, six.string_types):
             if os.path.isfile(fn) and (not clobber):
-                raise(PE.PyANameClash("The file '" + fn + "' exists.", where="saveState",
-                                      solution="Change filename or set clobber to True."))
+                raise (PE.PyANameClash("The file '" + fn + "' exists.", where="saveState",
+                                       solution="Change filename or set clobber to True."))
             pickle.dump(dat, open(fn, 'wb'))
         return dat
 
     def restoreState(self, resource):
-        """
+        r"""
         Restores parameter values from file or dictionary.
 
         Parameters
@@ -812,7 +812,7 @@ class Params:
         self.freeze(pd["frozenParameters"])
 
     def parameterSummary(self, lines=None, toScreen=True, prefix="", onlyParams=False):
-        """
+        r"""
         Writes a summary of the parameters in text form.
 
         Parameters

@@ -6,16 +6,16 @@ from PyAstronomy.pyaC import pyaErrors as PE
 
 
 class Sech1d(OneDFit):
-    """
+    r"""
     Implements a one dimensional hyperbolic secant
 
     The functional form is:
 
-    .. math:: \\frac{2 A}{e^{(x-mu)/w} + e^{-(x-mu)/w} } + x \\times lin + off
+    .. math:: \frac{2 A}{e^{(x-mu)/w} + e^{-(x-mu)/w} } + x \times lin + off
 
     Here, `lin` and `off` denote the linear and the offset term.
 
-    .. note:: The area under the curve is given by :math:`\\pi \\times A`
+    .. note:: The area under the curve is given by :math:`\pi \times A`
 
     *Fit parameters*:
      - `A` - Amplitude (maximum/minimum of the curve, not area)
@@ -30,7 +30,7 @@ class Sech1d(OneDFit):
         self.setRootName("Sech")
 
     def evaluate(self, x):
-        """
+        r"""
         Evaluates the model for current parameter values.
 
         Parameters
@@ -39,10 +39,9 @@ class Sech1d(OneDFit):
             Specifies the points at which to evaluate the model.
         """
         if self["w"] == 0.0:
-            raise(PE.PyAValError("Width of Sech must be larger than zero.",
-                                 solution="Change width ('w')."))
+            raise (PE.PyAValError("Width of Sech must be larger than zero.",
+                                  solution="Change width ('w')."))
         z = (x-self["mu"]) / self["w"]
-        y = (2. * self["A"]) / (np.exp(z) + np.exp(-z))  + \
+        y = (2. * self["A"]) / (np.exp(z) + np.exp(-z)) + \
             + self["off"] + (self["lin"] * x)
         return y
-

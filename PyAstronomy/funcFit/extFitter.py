@@ -5,21 +5,21 @@ import six.moves as smo
 
 
 class NelderMead:
-    """
+    r"""
     Downhill-Simplex algorithm for minimization.
-    
+
     This implementation is based on the publication:
     Nelder and Mead, The Computer Journal 7, 308-313, 1965 (NM 1965)
-    
+
     :Halting criterion:
     The default stop criterion is the one used by NM 1965. In
     particular, the value
-    
-    .. math:: \\sqrt{\\sum (\\bar{y}-y_i) / n}
-    
+
+    .. math:: \sqrt{\sum (\bar{y}-y_i) / n}
+
     is calculated. If it falls below the limit defined by the
     attribute `nmCritLim`, the iteration stops.
-    
+
     Parameters
     ----------
     abg : tuple of three floats, optional
@@ -28,7 +28,7 @@ class NelderMead:
         Initial step width for simplex.
     critlim : float, optional
         Critical limit for stopping criterion.
-    
+
     Attributes
     ----------
     alpha, beta, gamma : float
@@ -57,9 +57,9 @@ class NelderMead:
         self._stopCrit = self._stopNM1965
 
     def _initSimplex(self, m, initDelta):
-        """
+        r"""
         Define the initial simplex.
-        
+
         Parameters
         ----------
         m : Instance of OneDFit
@@ -91,7 +91,7 @@ class NelderMead:
             self._yi[i + 1] = m.miniFunc(self._simplex[i + 1, ::])
 
     def _step(self, m):
-        """
+        r"""
         Proceed one step of the simplex algorithm.
         """
         # Indices with lowest and highest objective function value
@@ -138,11 +138,11 @@ class NelderMead:
                 self._simplex[h, ::] = pssb
                 self._yi[h] = yssb
                 return
-        raise(PE.PyAOrderError(
+        raise (PE.PyAOrderError(
             "Nothing done in Nelder-Mead step. If you see this, there is a coding error."))
 
     def _stopNM1965(self):
-        """
+        r"""
         Apply the NM 1965 stopping criterion.
 
         Returns
@@ -154,14 +154,14 @@ class NelderMead:
         return (np.sqrt(np.sum((self._yi - ym)**2)) / self._n) < self.nmCritLim
 
     def fit(self, m, ds, objf="chisqr", initDelta=None, maxIter=1e4, callback=None, nmCritLim=None):
-        """
+        r"""
         Carry out the model fit.
-        
+
         After the iteration, the `iterCount` attribute contains the
         number of iterations. The `maxIterReached` attribute flag is
         False, if the maximum number of iterations has not been reached
         and True otherwise. 
-        
+
         Parameters
         ----------
         m : Instance of OneDFit
@@ -188,7 +188,7 @@ class NelderMead:
             If not None, "callback" will be called with the
             three parameters: number of iteration (int), current
             best parameter set (array), and current simplex (array).
-        
+
         Returns
         -------
         Best-fit values : dictionary

@@ -5,7 +5,7 @@ import six.moves as smo
 
 
 def turnIntoRebin(CO):
-    """
+    r"""
     Turn a "normal" fitting object into rebinning fitting object.
 
     This function accepts a class object representing a model and
@@ -25,8 +25,8 @@ def turnIntoRebin(CO):
 
     # Check for evaluate
     if not hasattr(CO, "evaluate"):
-        raise(PE.PyANotImplemented("The class object has no evaluate method. Is it really a model?",
-                                   where="turnIntoRebin"))
+        raise (PE.PyANotImplemented("The class object has no evaluate method. Is it really a model?",
+                                    where="turnIntoRebin"))
     # Check for other properties and methods
     for p in ["setRebinArray_Ndt", "rebinTimes", "rebinIdent"]:
         if hasattr(CO, p):
@@ -34,7 +34,7 @@ def turnIntoRebin(CO):
                                     solution="Check class object, maybe rename attribute", where="turnIntoRebin"))
 
     class _ModelRebin(CO):
-        """
+        r"""
         Base class providing rebinning functionality.
 
         The model is evaluated at more points than actually needed.
@@ -59,7 +59,7 @@ def turnIntoRebin(CO):
             self.rebinIdent = None
 
         def setRebinArray_Ndt(self, time, N, dt):
-            """  
+            r"""
             Defines the overbinning parameters (`rebinTimes`, `rebinIdent`).
 
             It is assumed that the time points given in the `time`
@@ -90,7 +90,7 @@ def turnIntoRebin(CO):
                 self.rebinIdent[i] = list(range(i * N, (i + 1) * N))
 
         def evaluate(self, x):
-            """
+            r"""
             Calculate the model.
 
             Parameters
@@ -112,8 +112,8 @@ def turnIntoRebin(CO):
             in the `binnedModel` property.
             """
             if (self.rebinTimes is None) or (self.rebinIdent is None):
-                raise(PE.PyAValError("Rebinning parameters (properties rebinTimes and/or rebinIdent) not appropriately defined.",
-                                     solution=["Use setRebinArray_Ndt method.", "Define the properties by accessing them directly."]))
+                raise (PE.PyAValError("Rebinning parameters (properties rebinTimes and/or rebinIdent) not appropriately defined.",
+                                      solution=["Use setRebinArray_Ndt method.", "Define the properties by accessing them directly."]))
             # Calculate the model using current parameters at the time points
             # defined in the `rebinTimes` array
             self.unbinnedModel = CO.evaluate(self, self.rebinTimes)

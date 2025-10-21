@@ -5,7 +5,7 @@ from .onedfit import OneDFit
 
 
 class SinusFit1d(OneDFit):
-    """
+    r"""
     Implements a sinusoidal function of the form:
        A * sin[ 2*pi * (nu * t + phi) ] + off.
 
@@ -21,7 +21,7 @@ class SinusFit1d(OneDFit):
         self.setRootName("Sine")
 
     def evaluate(self, x):
-        """
+        r"""
         Evaluates the model for current parameter values.
 
         Parameters
@@ -35,7 +35,7 @@ class SinusFit1d(OneDFit):
 
 
 class ExpDecayFit1d(OneDFit):
-    """
+    r"""
     Implements an exponential decay function of the form
        A * exp[ - (t-t0)/tau] + off.
 
@@ -51,7 +51,7 @@ class ExpDecayFit1d(OneDFit):
         self.setRootName("ExpDecay")
 
     def evaluate(self, x):
-        """
+        r"""
         Evaluates the model for current parameter values.
 
         Parameters

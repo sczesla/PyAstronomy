@@ -47,7 +47,7 @@ def powEval(self, x):
 
 
 class MiniFunc:
-    """
+    r"""
     This decorator can be applied to use
     self-defined objective functions.
 
@@ -64,7 +64,7 @@ class MiniFunc:
     """
 
     def __init__(self, odf):
-        """
+        r"""
         Parameter:
           - `odf` - An instance of a fitting objects such as for example *GaussFit1d*.
         """
@@ -72,7 +72,7 @@ class MiniFunc:
         self.odf = odf
 
     def __call__(self, f):
-        """
+        r"""
         Parameter:
          - `f` - The user-defined objective function.
         """
@@ -103,11 +103,11 @@ class MiniFunc:
                     # behavior, preventing annoying errors)
                     return val
                 # If no penalty is present, raise exception
-                raise(PE.PyAAlgorithmFailure("Could not evaluate model for parameters: " + str(self.odf.parameters()), \
-                                             where="ondeDFit", \
-                                             tbfe=e, \
-                                             solution=["Try to define 'restrictions' via setRestriction if parameter values are invalid.", \
-                                                       "Adjust implementation of model to prevent error."]))
+                raise (PE.PyAAlgorithmFailure("Could not evaluate model for parameters: " + str(self.odf.parameters()),
+                                              where="ondeDFit",
+                                              tbfe=e,
+                                              solution=["Try to define 'restrictions' via setRestriction if parameter values are invalid.",
+                                                        "Adjust implementation of model to prevent error."]))
             # Add value of actual objective function
             val += f(self.odf, P)
             return val
@@ -115,13 +115,13 @@ class MiniFunc:
 
 
 class _PyMCSampler:
-    """
+    r"""
     This class encapsulates a number of methods helping to set up the
     PyMC sampler.
     """
 
     def _dictComplete(self, l, d, whichDict, forget=[]):
-        """
+        r"""
         Checks whether the list `l` contains all keys present in dictionary `d`.
 
         Parameters:
@@ -141,16 +141,16 @@ class _PyMCSampler:
             given = list(d)
             given.extend(forget)
             message += "  Given entries: " + ', '.join(given)
-            raise(PE.PyAValError(message, where="fitMCMC",
-                                 solution="Adjust input dictionary."))
+            raise (PE.PyAValError(message, where="fitMCMC",
+                                  solution="Adjust input dictionary."))
         for elem in l:
             if elem in forget:
                 continue
             if elem not in d:
                 message = "Error in " + whichDict + " dictionary.\n"
                 message += "  Key " + elem + " is missing!"
-                raise(PE.PyAValError(message, where="fitMCMC",
-                                     solution="Adjust input dictionary."))
+                raise (PE.PyAValError(message, where="fitMCMC",
+                                      solution="Adjust input dictionary."))
 
     def _basicStatMCMCOutput(self, bs):
         print("Basic statistics of MCMC analysis: ")
@@ -171,7 +171,7 @@ class _PyMCSampler:
             print("-----------------------------------------------------")
 
     def _checkDbArgs(self, dbArgs):
-        """
+        r"""
         Check whether database arguments are given. If not, use default parameters.
         """
         # If no db is specified, use pickle
@@ -193,12 +193,12 @@ class _PyMCSampler:
                 dbArgs["dbcomplib"] = "zlib"
             return dbArgs
         else:
-            raise(PE.PyAValError("Database: " + str(dbArgs["db"] + " currently not supported.",
-                                                    solution="Use another database (e.g., pickle or hdf5).")))
+            raise (PE.PyAValError("Database: " + str(dbArgs["db"] + " currently not supported.",
+                                                     solution="Use another database (e.g., pickle or hdf5).")))
         return dbArgs
 
     def MCMCautoParameters(self, ranges, picky=True, stepsize=1e-2, setRestrictionsFromPriors=False):
-        """
+        r"""
         Convenience function to generate parameters for MCMC fit.
 
         This function prepares the `X0`, `Lims`, and `Steps` dictionaries
@@ -300,15 +300,15 @@ class _PyMCSampler:
         # Raise exception if missing or extra parameters exits unless picky=False
         if picky:
             if len(missingParams) > 0:
-                raise(PE.PyAValError("Not enough parameters: " + str(missingParams), where="_PyMCSampler::MCMCautoParameters",
-                                     why="Ranges for these free fit parameters are missing."))
+                raise (PE.PyAValError("Not enough parameters: " + str(missingParams), where="_PyMCSampler::MCMCautoParameters",
+                                      why="Ranges for these free fit parameters are missing."))
             if len(extraParams) > 0:
-                raise(PE.PyAValError("Too many parameters: " + str(extraParams), where="_PyMCSampler::MCMCautoParameters",
-                                     why="Ranges were given for non-free parameters."))
+                raise (PE.PyAValError("Too many parameters: " + str(extraParams), where="_PyMCSampler::MCMCautoParameters",
+                                      why="Ranges were given for non-free parameters."))
 
         if stepsize >= 1.0:
-            raise(PE.PyAValError("The step size is larger than one. Must be a fraction of the range, i.e., smaller than 1.",
-                                 solution="Redefine the step size. Use, e.g., 0.01."))
+            raise (PE.PyAValError("The step size is larger than one. Must be a fraction of the range, i.e., smaller than 1.",
+                                  solution="Redefine the step size. Use, e.g., 0.01."))
 
         # Loop through given parameters
         for p in ranges:
@@ -328,7 +328,7 @@ class _PyMCSampler:
     def autoFitMCMC(self, x, y, ranges, picky=True, stepsize=1e-3, yerr=None,
                     pymcPars={}, pyy=None, potentials=[], dbfile="mcmcSample.tmp",
                     dbArgs={}, **sampleArgs):
-        """
+        r"""
         Convenience function to using auto-generated sampling parameters in MCMC.
 
         This function is essentially a wrapper around :py:func:`fitMCMC`.
@@ -388,7 +388,7 @@ class _PyMCSampler:
 
     def fitMCMC(self, x, y, X0, Lims, Steps, yerr=None, pymcPars={}, pyy=None,
                 potentials=[], dbfile="mcmcSample.tmp", dbArgs={}, **sampleArgs):
-        raise(PE.PyANotImplemented("This method has to be implemented"))
+        raise (PE.PyANotImplemented("This method has to be implemented"))
 
 
 class _OndeDFitParBase:
@@ -409,8 +409,8 @@ class _OndeDFitParBase:
             if name in self.parameters():
                 return self.pars.__getitem__(name)
             else:
-                raise(PE.PyAValError("No such parameter: " + str(name), where="OneDFit::__getitem__",
-                                     why="Did you perhaps misspell the parameter name?"))
+                raise (PE.PyAValError("No such parameter: " + str(name), where="OneDFit::__getitem__",
+                                      why="Did you perhaps misspell the parameter name?"))
         return self.pars.__getitem__(self.propMap[name])
 
     def __setitem__(self, specifier, value):
@@ -419,12 +419,12 @@ class _OndeDFitParBase:
             if name in self.parameters():
                 self.pars.assignValue({name: value})
                 return
-            raise(PE.PyAValError("No such parameter: " + str(name), where="OneDFit::__setitem__",
-                                 why="Did you perhaps misspell the parameter name?"))
+            raise (PE.PyAValError("No such parameter: " + str(name), where="OneDFit::__setitem__",
+                                  why="Did you perhaps misspell the parameter name?"))
         self.pars.assignValue({self.propMap[name]: value})
 
     def hasVariable(self, specifier):
-        """
+        r"""
         Determine whether the variable exists.
 
         Parameters
@@ -442,7 +442,7 @@ class _OndeDFitParBase:
         return self.pars.hasParam(varName)
 
     def assignValue(self, specval):
-        """
+        r"""
         Assign new values to variables.
 
         Parameters
@@ -458,7 +458,7 @@ class _OndeDFitParBase:
     assignValues.__doc__ = assignValue.__doc__
 
     def thaw(self, specifiers):
-        """
+        r"""
         Consider variables fixed.
 
         Parameters
@@ -470,7 +470,7 @@ class _OndeDFitParBase:
         self.pars.thaw(self.naming.specifierToName(specifiers))
 
     def freeze(self, specifiers):
-        """
+        r"""
         Consider variables free to float.
 
         Parameters
@@ -482,7 +482,7 @@ class _OndeDFitParBase:
         self.pars.freeze(self.naming.specifierToName(specifiers))
 
     def setRestriction(self, restricts):
-        """
+        r"""
         Define restrictions.
 
         Parameters
@@ -496,7 +496,7 @@ class _OndeDFitParBase:
         self.pars.setRestriction(self.naming.specifierToName(restricts))
 
     def untie(self, parName, forceFree=False):
-        """
+        r"""
         Remove all relations of parameter parName, i.e., the parameter is not dependend 
         on other parameters. The parameter parName is set to "freeze".
 
@@ -511,7 +511,7 @@ class _OndeDFitParBase:
             parName), forceFree=forceFree)
 
     def relate(self, dependentVar, independentVars, func=None, **kwargs):
-        """
+        r"""
         Define a relation.
 
         Parameters
@@ -531,7 +531,7 @@ class _OndeDFitParBase:
             dependentVar), self.naming.specifierToName(independentVars), func, **kwargs)
 
     def getRelationsOf(self, specifier):
-        """
+        r"""
         Return relations of a variable.
 
         Parameters
@@ -601,7 +601,7 @@ class _OndeDFitParBase:
 
 
 class IFitterBase:
-    """
+    r"""
     Base class for internal fitter.
     """
 
@@ -609,7 +609,7 @@ class IFitterBase:
         self._objfval = None
 
     def fit(self, minifunc, x0):
-        """
+        r"""
         Carry out the minimization.
 
         Parameters
@@ -625,11 +625,11 @@ class IFitterBase:
             First item is a list of the best-fit values and second
             item is the value of the objective function.
         """
-        raise(PE.PyANotImplemented(
+        raise (PE.PyANotImplemented(
             "IFitterBase: fit method needs to be implemented"))
 
     def _digestkwargs(self, kwargs):
-        """
+        r"""
         Check validity of keywords.
 
         Tests whether all given keywords are included in the list
@@ -641,17 +641,17 @@ class IFitterBase:
             Keyword arguments handed to the minimizer.
         """
         if not hasattr(self, "_allowedKWs"):
-            raise(PE.PyANotImplemented("No _allowedKWs attribute. Must be set to use '_digestkwargs'.",
-                                       solution="Specify _allowedKWs, e.g., in constructor."))
+            raise (PE.PyANotImplemented("No _allowedKWs attribute. Must be set to use '_digestkwargs'.",
+                                        solution="Specify _allowedKWs, e.g., in constructor."))
         for k in six.iterkeys(kwargs):
             if not k in self._allowedKWs:
-                raise(PE.PyAValError("Keyword " + k + " not allowed in algorithm: " + self.name,
-                                     solution="Allowed keywords: " +
-                                     ', '.join(self._allowedKWs),
-                                     where=self.name))
+                raise (PE.PyAValError("Keyword " + k + " not allowed in algorithm: " + self.name,
+                                      solution="Allowed keywords: " +
+                                      ', '.join(self._allowedKWs),
+                                      where=self.name))
 
     def getObjFuncValue(self):
-        """
+        r"""
         Access value of objective function.
 
         Returns
@@ -662,14 +662,14 @@ class IFitterBase:
         return self._objfval
 
     def __call__(self, *args, **kwargs):
-        """
+        r"""
         Wrapper around the actual fit method.
         """
         return self.fit(*args, **kwargs)
 
 
 class ScipyFMIN(IFitterBase):
-    """
+    r"""
     Wrapper around scipy.optimize.fmin.
     """
 
@@ -680,7 +680,7 @@ class ScipyFMIN(IFitterBase):
         self.name = "scipy.optimize.fmin"
 
     def fit(self, miniFunc, x0, *fminpars, **fminargs):
-        """
+        r"""
         Wrapper around scipy.optimize.fmin.
         """
         self._digestkwargs(fminargs)
@@ -691,7 +691,7 @@ class ScipyFMIN(IFitterBase):
 
 
 class ScipyFMIN_POWELL(IFitterBase):
-    """
+    r"""
     Wrapper around scipy.optimize.fmin_powell.
     """
 
@@ -702,12 +702,12 @@ class ScipyFMIN_POWELL(IFitterBase):
         self.name = "scipy.optimize.fmin_powell"
 
     def fit(self, miniFunc, x0, *fminpars, **fminargs):
-        """
+        r"""
         Wrapper around scipy.optimize.fmin_powell
         """
         self._digestkwargs(fminargs)
         self._result = sco.fmin_powell(miniFunc, x0, *fminpars,
-                                full_output=True, **fminargs)
+                                       full_output=True, **fminargs)
         self._objfval = self._result[1]
         return self._result[0], self._result[1]
 
@@ -722,7 +722,7 @@ class FuFNM(IFitterBase):
         self._nm = NelderMead(**kwargs)
 
     def fit(self, miniFunc, x0, *fminpars, **fminargs):
-        """
+        r"""
         Wrapper around funcFit's NelderMead implementation.
 
         See the implementation of the `fit` method of :py:func:`NelderMead`
@@ -740,7 +740,7 @@ FuFNM.__doc__ = NelderMead.__doc__
 
 
 class FuFPrior(object):
-    """
+    r"""
     A number of priors.
 
     Properly initialized, an object of type "FuFPrior"
@@ -771,9 +771,9 @@ class FuFPrior(object):
 
     def _uniformLimit(self, **kwargs):
         if kwargs["upper"] < kwargs["lower"]:
-            raise(PE.PyAValError("upper needs to be larger than lower",
-                                 where="FuFPrior (limited uniform distribution)",
-                                 solution="Adapt upper and lower."))
+            raise (PE.PyAValError("upper needs to be larger than lower",
+                                  where="FuFPrior (limited uniform distribution)",
+                                  solution="Adapt upper and lower."))
         p = np.log(1.0 / (kwargs["upper"] - kwargs["lower"]))
 
         def unilimit(ps, n, **rest):
@@ -797,7 +797,7 @@ class FuFPrior(object):
 
     def _callDelegator(self, *args, **kwargs):
         """ Overwritten by the method to represent __call__ """
-        raise(PE.PyANotImplemented("_callDelegator is not implemented."))
+        raise (PE.PyANotImplemented("_callDelegator is not implemented."))
 
     def __call__(self, *args, **kwargs):
         return self._callDelegator(*args, **kwargs)
@@ -813,13 +813,13 @@ class FuFPrior(object):
             elif lnp == "gaussian":
                 self._callDelegator = self._gaussian(**kwargs)
             else:
-                raise(PE.PyAValError("No prior defined for " + str(lnp),
-                                     where="FuFPrior",
-                                     solution="Use either of {uniform, limuniform, jeffreyPS, gaussian}"))
+                raise (PE.PyAValError("No prior defined for " + str(lnp),
+                                      where="FuFPrior",
+                                      solution="Use either of {uniform, limuniform, jeffreyPS, gaussian}"))
 
 
 class OneDFit(_OndeDFitParBase, _PyMCSampler):
-    """
+    r"""
     The base class for fitting objects.
 
     Parameters
@@ -930,7 +930,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         self._stepparEnabled = False
 
     def _compoWalk(self):
-        """
+        r"""
         TBD
         """
         def walk(c, refs):
@@ -946,7 +946,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             yield c
 
     def renameVariable(self, oldName, newName):
-        """
+        r"""
         Change name of variable.
 
         Parameters
@@ -977,15 +977,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             # Ignore identical transformations
             return
         if newName in list(self.propMap.values()):
-            raise(PE.PyANameClash("A variable named " + newName +
-                                  " does already exist.", where="OneDFit::renameVariable"))
+            raise (PE.PyANameClash("A variable named " + newName +
+                                   " does already exist.", where="OneDFit::renameVariable"))
         if newName in self.propMap:
             if self.propMap[newName] != oldName:
-                raise(PE.PyANameClash("You may not assign a name to a variable, which corresponds to the name of another property.",
-                                      where="OneDFit::renameVariable"))
+                raise (PE.PyANameClash("You may not assign a name to a variable, which corresponds to the name of another property.",
+                                       where="OneDFit::renameVariable"))
         if not oldName in list(self.propMap.values()):
-            raise(PE.PyAValError("A variable named " + oldName +
-                                 " does not exist.", where="OneDFit::renameVariable"))
+            raise (PE.PyAValError("A variable named " + oldName +
+                                  " does not exist.", where="OneDFit::renameVariable"))
         for k in six.iterkeys(self.propMap):
             if self.propMap[k] == oldName:
                 self.propMap[k] = newName
@@ -995,7 +995,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             self.pars.renameParameter(oldName, newName)
 
     def _isComposed(self):
-        """
+        r"""
         Determines whether current model is "composed".
 
         A model is composed, if there are left and right components.
@@ -1005,7 +1005,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return ((self.leftCompo is not None) and (self.rightCompo is not None))
 
     def __combineRemapping(self, left, right):
-        """
+        r"""
         This member is essentially a renaming machine. When combining models
         it can easily happen that two variables share the same name. If the
         models are combined, unique variable names are needed. This method
@@ -1089,7 +1089,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             renameIfNecessary(c, right)
 
     def _newPars(self, npars):
-        """
+        r"""
         Change pars reference for left/right Compo recursively.
         """
         if self.leftCompo is not None:
@@ -1100,7 +1100,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             self.rightCompo._newPars(npars)
 
     def __combineFittingObjects(self, right):
-        """
+        r"""
         Creates and returns a fitting object combining the properties/variables of
         the current objects and that given by `right`.
 
@@ -1196,7 +1196,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return miniCash79
 
     def setRootName(self, root, rename=False):
-        """
+        r"""
         Define the root name of the model.
 
         Parameters
@@ -1207,8 +1207,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             If true, all model variables will be renaming using the root.
         """
         if not hasattr(self, "naming"):
-            raise(PE.PyAUnclassifiedError("No attribute 'naming' found.",
-                                          solution="Did you call the constructor of OneDFit before you tried to access this? If not, you should do that."))
+            raise (PE.PyAUnclassifiedError("No attribute 'naming' found.",
+                                           solution="Did you call the constructor of OneDFit before you tried to access this? If not, you should do that."))
         self.naming.setRootName(root)
         if rename:
             for par in six.iterkeys(self.propMap):
@@ -1217,7 +1217,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 self.renameVariable(oldName, newName)
 
     def updateModel(self):
-        """
+        r"""
         Recalculate the model using current settings.
 
         Notes
@@ -1231,7 +1231,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         self.model = self.evaluate(self._fufDS.x)
 
     def setPenaltyFactor(self, penalFac):
-        """
+        r"""
         Change the penalty factor.
 
         Parameters
@@ -1247,7 +1247,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         self.penaltyFactor = penalFac
 
     def description(self, parenthesis=False):
-        """
+        r"""
         Returns a description of the model based on the names of the individual components.
 
         Parameters
@@ -1274,7 +1274,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 return c.naming.getRoot()
 
     def parameterSummary(self, toScreen=True, prefix="", sorting='none'):
-        """
+        r"""
         Writes a summary of the parameters in text form.
 
         Parameters
@@ -1345,9 +1345,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 elif sorting == "ps":
                     cprops = sorted(cprops)
                 else:
-                    raise(PE.PyAValError("Unknown sorting mode: " + str(sorting),
-                                         where="OneDFit::parameterSummary",
-                                         solution="Use 'None' or 'ps'"))
+                    raise (PE.PyAValError("Unknown sorting mode: " + str(sorting),
+                                          where="OneDFit::parameterSummary",
+                                          solution="Use 'None' or 'ps'"))
 
                 for prop in cprops:
                     var = c.propMap[prop]
@@ -1391,7 +1391,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return lines
 
     def setObjectiveFunction(self, miniFunc="chisqr"):
-        """
+        r"""
         Define the objective function.
 
         This function sets the `miniFunc` attribute, which is used
@@ -1418,9 +1418,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             return
         else:
             if not hasattr(miniFunc, '__call__'):
-                raise(PE.PyAValError("`miniFunc` is neither None, a valid string, or a function.",
-                                     where="OneDFit::fit",
-                                     solution="Use, e.g., 'chisqr' or another valid choice from the documentation."))
+                raise (PE.PyAValError("`miniFunc` is neither None, a valid string, or a function.",
+                                      where="OneDFit::fit",
+                                      solution="Use, e.g., 'chisqr' or another valid choice from the documentation."))
 
             # A function has been specified
             self.miniFunc = miniFunc
@@ -1429,7 +1429,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
     def fitMCMC(self, x, y, X0, Lims, Steps, yerr=None, pymcPars=None, pyy=None,
                 potentials=None, dbfile="mcmcSample.tmp", quiet=False, dbArgs=None,
                 adaptiveMetropolis=False, **sampleArgs):
-        """
+        r"""
         Carry out MCMC fit/error estimation.
 
         This member is designed to provide a flexible but *easy to use*
@@ -1504,13 +1504,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         """
         global _pymcImport
         if not _pymcImport:
-            raise(PE.PyARequiredImport("pymc package could not be imported.",
-                                       solution="Install pymc (see http://code.google.com/p/pymc/"))
+            raise (PE.PyARequiredImport("pymc package could not be imported.",
+                                        solution="Install pymc (see http://code.google.com/p/pymc/"))
         if (pymc.__version__).startswith('3'):
-            raise(PE.PyARequiredImport("pymc is available in version '" + str(pymc.__version__) + "'. " +
-                                       "Please note that funcFit does not yet support pymc3, which is a " +
-                                       "complete rewrite of pymc2.",
-                                       solution="Please install pymc in version 2.3."))
+            raise (PE.PyARequiredImport("pymc is available in version '" + str(pymc.__version__) + "'. " +
+                                        "Please note that funcFit does not yet support pymc3, which is a " +
+                                        "complete rewrite of pymc2.",
+                                        solution="Please install pymc in version 2.3."))
         # Assign mutable default parameters
         if pymcPars is None:
             pymcPars = {}
@@ -1640,7 +1640,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
     def fitEMCEE(self, x=None, y=None, yerr=None, nwalker=None, priors=None, pots=None, scales=None,
                  sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None, toMD=True):
-        """
+        r"""
         MCMC sampling using emcee package.
 
         Sample from the posterior probability distribution using the emcee
@@ -1707,25 +1707,25 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         """
 
         if not ic.check["emcee"]:
-            raise(PE.PyARequiredImport("Could not import the 'emcee' package.",
-                                       solution="Please install 'emcee'."))
+            raise (PE.PyARequiredImport("Could not import the 'emcee' package.",
+                                        solution="Please install 'emcee'."))
 
         if (not x is None) and (not y is None) and (not yerr is None):
             # Assign attributes and check x, y, and yerr.
             self._fufDS = FufDS(x, y, yerr)
         elif (not x is None) and (not y is None) and (yerr is None):
-            raise(PE.PyAValError("An error on the y values is required.",
-                                 where="fitEMCEE",
-                                 solution="Please specify 'yerr'"))
+            raise (PE.PyAValError("An error on the y values is required.",
+                                  where="fitEMCEE",
+                                  solution="Please specify 'yerr'"))
         if self._fufDS is None:
-            raise(PE.PyAValError("Please specify the data completely.",
-                                 where="fitEMCEE",
-                                 solution="Specify x, y, and yerr."))
+            raise (PE.PyAValError("Please specify the data completely.",
+                                  where="fitEMCEE",
+                                  solution="Specify x, y, and yerr."))
 
         if not self._fufDS.xyyerrDefined():
-            raise(PE.PyAValError("Please specify the data completely. Either of x, y, and/or yerr are missing.",
-                                 where="fitEMCEE",
-                                 solution="Specify x, y, and yerr."))
+            raise (PE.PyAValError("Please specify the data completely. Either of x, y, and/or yerr are missing.",
+                                  where="fitEMCEE",
+                                  solution="Specify x, y, and yerr."))
 
         # Names and values of free parameters
         fps = self.freeParameters()
@@ -1735,9 +1735,9 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         ndims = len(fps)
 
         if ndims == 0:
-            raise(PE.PyAValError("At least one free parameter is required for sampling.",
-                                 where="fitEMCEE",
-                                 solution="Use 'thaw' to free same parameters."))
+            raise (PE.PyAValError("At least one free parameter is required for sampling.",
+                                  where="fitEMCEE",
+                                  solution="Use 'thaw' to free same parameters."))
 
         if not dbfile is None:
             if re.match(".*\.emcee$", dbfile) is None:
@@ -1751,13 +1751,13 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             self.nwalker = nwalker
 
         if self.nwalker < ndims * 2:
-            raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.",
-                                 where="fitEMCEE",
-                                 solution="Increase the number of walkers."))
+            raise (PE.PyAValError("The number of walkers must be at least twice the number of free parameters.",
+                                  where="fitEMCEE",
+                                  solution="Increase the number of walkers."))
         if self.nwalker % 2 == 1:
-            raise(PE.PyAValError("The number of walkers must be even.",
-                                 where="fitEMCEE",
-                                 solution="Use an even number of walkers."))
+            raise (PE.PyAValError("The number of walkers must be even.",
+                                  where="fitEMCEE",
+                                  solution="Use an even number of walkers."))
 
         # Use default prior for those parameters not listed
         if priors is None:
@@ -1797,10 +1797,10 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             for p in pots:
                 pdf += p(ps)
             if np.isnan(pdf):
-                raise(PE.PyAValError("Posterior value is NaN for parameters: " + str(self.parameters()) + ".", \
-                                     where="fitEmcee", \
-                                     solution="Possibly, a prior (e.g., 'limuniform') can be used to restrict parameter range. " + \
-                                     "Note that restrictions are not automatically converted into priors."))
+                raise (PE.PyAValError("Posterior value is NaN for parameters: " + str(self.parameters()) + ".",
+                                      where="fitEmcee",
+                                      solution="Possibly, a prior (e.g., 'limuniform') can be used to restrict parameter range. " +
+                                      "Note that restrictions are not automatically converted into priors."))
             return pdf
 
         # Set default values for sampleArgs
@@ -1835,15 +1835,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                         s = 1.0
                     else:
                         s = scales[n]
-                    
+
                     # Trial counter -- avoid values beyond restrictions
                     tc = 0
                     while True:
                         if tc == 100:
-                            raise(PE.PyAAlgorithmFailure("Could not determine valid starting point for parameter: " + str(fps) + " due to restrictions", \
-                                                         where="fitEmcee", \
-                                                         solution=["Try to use 'scale' to limit range of trial starting values.", \
-                                                                   "Change starting value before MCMC call into valid range."]))
+                            raise (PE.PyAAlgorithmFailure("Could not determine valid starting point for parameter: " + str(fps) + " due to restrictions",
+                                                          where="fitEmcee",
+                                                          solution=["Try to use 'scale' to limit range of trial starting values.",
+                                                                    "Change starting value before MCMC call into valid range."]))
                         propval = np.random.normal(fps[n], s)
                         if n in rrs:
                             # There is a restriction
@@ -1877,14 +1877,16 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 widgets=widgets, maxval=sampleArgs["iters"]).start()
 
         n = 0
-        
+
         # Manage emcee 2/3 incompatibility
         try:
-            sit = self.emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True)
+            sit = self.emceeSampler.sample(
+                pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, storechain=True)
         except TypeError:
             # emcee 3
-            sit = self.emceeSampler.sample(pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, store=True)
-        
+            sit = self.emceeSampler.sample(
+                pos, rstate0=state, iterations=sampleArgs["iters"], thin=1, store=True)
+
         for pos, prob, state in sit:
             n += 1
             if (not sampleArgs["progress"] is None) and (n % sampleArgs["progress"] == 0):
@@ -1908,7 +1910,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return pos, state
 
     def _resolveMinAlgo(self, minAlgo, default=None, mAA=None):
-        """
+        r"""
         Resolve minimization algorithm (minAlgo).
 
         Parameters
@@ -1935,8 +1937,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
         if minAlgo is None:
             # This should not happen. Default must be specified.
-            raise(PE.PyAValError("No minimization algorithm specified.",
-                                 solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
+            raise (PE.PyAValError("No minimization algorithm specified.",
+                                  solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
 
         if hasattr(minAlgo, '__call__'):
             # It is a callable. Just assume that it can be used
@@ -1955,28 +1957,28 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             elif minAlgo == "spfmin":
                 # scipy.optimize.fmin
                 if not _scoImport:
-                    raise(PE.PyARequiredImport("SciPy.optimize could not be imported.",
-                                               solution=["Install SciPy (see www.scipy.org/).",
-                                                         "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
+                    raise (PE.PyARequiredImport("SciPy.optimize could not be imported.",
+                                                solution=["Install SciPy (see www.scipy.org/).",
+                                                          "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
                 return ScipyFMIN(**maa)
             elif minAlgo == "spfmp":
                 # scipy.optimize.fmin
                 if not _scoImport:
-                    raise(PE.PyARequiredImport("SciPy.optimize could not be imported.",
-                                               solution=["Install SciPy (see www.scipy.org/).",
-                                                         "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
-                return ScipyFMIN_POWELL(**maa)                
+                    raise (PE.PyARequiredImport("SciPy.optimize could not be imported.",
+                                                solution=["Install SciPy (see www.scipy.org/).",
+                                                          "Use funcFit's Nelder-Mead simplex implementation (minAlgo='fufnm')"]))
+                return ScipyFMIN_POWELL(**maa)
             else:
-                raise(PE.PyAValError("Unknown string identifier for minimization algorithm: " + minAlgo,
-                                     solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
+                raise (PE.PyAValError("Unknown string identifier for minimization algorithm: " + minAlgo,
+                                      solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
 
         else:
-            raise(PE.PyAValError("Could not resolve 'minAlgo'.",
-                                 where="funcFit::OneDFit",
-                                 solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
+            raise (PE.PyAValError("Could not resolve 'minAlgo'.",
+                                  where="funcFit::OneDFit",
+                                  solution="Use, e.g., minAlgo='spfmin' or minAlgo='fufnm'"))
 
     def fit(self, x, y, yerr=None, X0=None, minAlgo=None, mAA=None, miniFunc=None, printTime=False, *fminPars, **fminArgs):
-        """
+        r"""
         Carries out a fit.
 
         Uses an internal optimizer to find the best-fit parameters.
@@ -2035,7 +2037,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         # Choose minimization algorithm
         self.mAA = copy.copy(mAA)
         self.minAlgo = self._resolveMinAlgo(minAlgo, default="spfmin", mAA=mAA)
-        
+
         # Determine function to be minimized
         if (miniFunc is None) and (yerr is not None):
             miniFunc = "chisqr"
@@ -2046,7 +2048,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         if X0 is not None:
             self.pars.setFreeParams(X0)
         # Save fminPars and fminArgs to internal variables
-        self.fminArgs, self.fminPars = fminArgs['fminArgs'] if 'fminArgs' in fminArgs else {}, fminPars
+        self.fminArgs, self.fminPars = fminArgs['fminArgs'] if 'fminArgs' in fminArgs else {
+        }, fminPars
         # Carry out fit
         fitStartTime = timestamp()
         # For "historical" reasons, the fitResult must hold a list of the
@@ -2065,7 +2068,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             print("The fit took " + str(self.requiredTime) + " seconds.")
 
     def __extractFunctionValue(self, fr):
-        """
+        r"""
         Returns the function value (e.g., chi-square).
 
         Parameters
@@ -2082,7 +2085,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return fr[1]
 
     def steppar(self, pars, ranges, extractFctVal=None, quiet=False):
-        """
+        r"""
         Allows to step a parameter through a specified range.
 
         This function steps the specified parameters through the given
@@ -2129,8 +2132,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             an arrow to plot, e.g., contours. 
         """
         if not self._stepparEnabled:
-            raise(PE.PyAOrderError("Before you can use steppar, you must call a function, which enables its use (e.g., `fit`).",
-                                   solution="Call the `fit` method first and then try again."))
+            raise (PE.PyAOrderError("Before you can use steppar, you must call a function, which enables its use (e.g., `fit`).",
+                                    solution="Call the `fit` method first and then try again."))
         if isinstance(pars, six.string_types):
             # Make it a list
             pars = [pars]
@@ -2139,15 +2142,15 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
             # Check existence
             tmp = self[p]
             if not p in ranges:
-                raise(PE.PyAValError("There is no range for parameter: " + p,
-                                     solution="Specify a range; e.g., {'xyz':[0.5,1.9,20,'lin']}"))
+                raise (PE.PyAValError("There is no range for parameter: " + p,
+                                      solution="Specify a range; e.g., {'xyz':[0.5,1.9,20,'lin']}"))
         # Function to extract function value from the fit result
         if extractFctVal is None:
             self._extractFctVal = self.__extractFunctionValue
         else:
             if not hasattr(extractFctVal, "__call__"):
-                raise(PE.PyAValError("`extractFctVal` needs to be callable!",
-                                     solution="Specify a function here or try to use None."))
+                raise (PE.PyAValError("`extractFctVal` needs to be callable!",
+                                      solution="Specify a function here or try to use None."))
             self._extractFctVal = extractFctVal
         # Set up ranges
         rs = []
@@ -2162,8 +2165,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 mode = 'lin'
             else:
                 if not isinstance(r[3], six.string_types):
-                    raise(PE.PyAValError("If the range has 4 entries, the fourth must be a string specifying the mode.",
-                                         solution="Use either 'lin' or 'log' as the fourth entry."))
+                    raise (PE.PyAValError("If the range has 4 entries, the fourth must be a string specifying the mode.",
+                                          solution="Use either 'lin' or 'log' as the fourth entry."))
                 mode = r[3]
             if mode == 'lin':
                 rs.append(np.linspace(r[0], r[1], r[2]))
@@ -2172,8 +2175,8 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                 s = np.power((r[1] / r[0]), 1.0 / r[2])
                 rs.append(r[0] * np.power(s, np.arange(r[2])))
             else:
-                raise(PE.PyAValError("Unknown mode: " + str(mode),
-                                     solution="Use either 'lin' or 'log'."))
+                raise (PE.PyAValError("Unknown mode: " + str(mode),
+                                      solution="Use either 'lin' or 'log'."))
         # Save state of object
         saveObj = self.saveState()
         saveFitResult = self.fitResult
@@ -2213,7 +2216,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
         return result
 
     def errorConfInterval(self, par, dstat=2.706, statTol=1e-2, hardLimit=None, maxiter=100, scale=None):
-        """
+        r"""
         Calculate confidence interval for a parameter.
 
         This function uses linear extrapolation (similar
@@ -2267,28 +2270,28 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
                           number of iterations is exceeded.
         """
         if not self._stepparEnabled:
-            raise(PE.PyAOrderError("No data available. Did you carry out a fit already?",
-                                   solutions="Fit the data first using `fit` method."))
+            raise (PE.PyAOrderError("No data available. Did you carry out a fit already?",
+                                    solutions="Fit the data first using `fit` method."))
         # Set up hard limit
         if hardLimit is None:
             hardLimit = [None, None]
         # Check whether hard limits are already violated
         if hardLimit[0] is not None:
             if self[par] < hardLimit[0]:
-                raise(PE.PyAValError("The parameter value (" + str(self[par]) + ") is below the lower hard limit" +
-                                     " of " + str(hardLimit[0]),
-                                     solution="Check parameter values and hard limits."))
+                raise (PE.PyAValError("The parameter value (" + str(self[par]) + ") is below the lower hard limit" +
+                                      " of " + str(hardLimit[0]),
+                                      solution="Check parameter values and hard limits."))
         if hardLimit[1] is not None:
             if self[par] > hardLimit[1]:
-                raise(PE.PyAValError("The parameter value (" + str(self[par]) + ") is above the upper hard limit" +
-                                     " of " + str(hardLimit[1]),
-                                     solution="Check parameter values and hard limits."))
+                raise (PE.PyAValError("The parameter value (" + str(self[par]) + ") is above the upper hard limit" +
+                                      " of " + str(hardLimit[1]),
+                                      solution="Check parameter values and hard limits."))
         # Set up scale parameter
         if scale is None:
             scale = abs(self[par] * 0.1)
         if scale == 0.0:
-            raise(PE.PyAValError("The `scale` is 0.0.",
-                                 solution="Provide a scale via the corresponding keyword."))
+            raise (PE.PyAValError("The `scale` is 0.0.",
+                                  solution="Provide a scale via the corresponding keyword."))
         # Save state of object
         saveObj = self.saveState()
         saveFitResult = self.fitResult
@@ -2438,7 +2441,7 @@ class OneDFit(_OndeDFitParBase, _PyMCSampler):
 
 
 def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArgs=None, dbfile="chain.emcee", ps=None, emcp=None):
-    """
+    r"""
     MCMC sampling from specific density using the emcee package.
 
     This function may be used to use emcee to sample from any user-specified
@@ -2503,16 +2506,16 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
     """
 
     if not ic.check["emcee"]:
-        raise(PE.PyARequiredImport("Could not import the 'emcee' package.",
-                                   solution="Please install 'emcee'."))
+        raise (PE.PyARequiredImport("Could not import the 'emcee' package.",
+                                    solution="Please install 'emcee'."))
 
     # Number of dimensions
     ndims = len(fpns)
 
     if ndims == 0:
-        raise(PE.PyAValError("At least one free parameter is required for sampling.",
-                             where="sampleEMCEE",
-                             solution="TBD."))
+        raise (PE.PyAValError("At least one free parameter is required for sampling.",
+                              where="sampleEMCEE",
+                              solution="TBD."))
 
     if not dbfile is None:
         if re.match(".*\.emcee$", dbfile) is None:
@@ -2524,13 +2527,13 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
         nwalker = ndims * 4
 
     if nwalker < ndims * 2:
-        raise(PE.PyAValError("The number of walkers must be at least twice the number of free parameters.",
-                             where="sampleEMCEE",
-                             solution="Increase the number of walkers."))
+        raise (PE.PyAValError("The number of walkers must be at least twice the number of free parameters.",
+                              where="sampleEMCEE",
+                              solution="Increase the number of walkers."))
     if nwalker % 2 == 1:
-        raise(PE.PyAValError("The number of walkers must be even.",
-                             where="sampleEMCEE",
-                             solution="Use an even number of walkers."))
+        raise (PE.PyAValError("The number of walkers must be even.",
+                              where="sampleEMCEE",
+                              solution="Use an even number of walkers."))
 
     # Set default values for sampleArgs
     if sampleArgs is None:
@@ -2553,7 +2556,7 @@ def sampleEMCEE(fpns, fv0, lnp, largs=None, nwalker=None, scales=None, sampleArg
 
     # Generate log posterior function required by emcee
     def logpost(x):
-        """
+        r"""
         Calls user-specified log posterior function with
         properly updated parameter dictionary.
         """

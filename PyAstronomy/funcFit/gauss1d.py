@@ -6,12 +6,12 @@ from PyAstronomy.pyaC import pyaErrors as PE
 
 
 class GaussFit1d(OneDFit):
-    """
+    r"""
     A one-dimensional Gaussian
 
     The functional form is:
 
-    .. math:: \\frac{A}{\\sqrt{2\\pi\\sigma^2}}e^{-(x-\\mu)^2/(2\\sigma^2)} + x \\times lin + off
+    .. math:: \frac{A}{\sqrt{2\pi\sigma^2}}e^{-(x-\mu)^2/(2\sigma^2)} + x \times lin + off
 
     Here, `lin` and `off` denote the linear and the offset term.
 
@@ -21,10 +21,10 @@ class GaussFit1d(OneDFit):
      - `sig` - Standard deviation
      - `off` - Offset
      - `lin` - Linear term
-    
+
     .. note::
         Other parameterizations using FWHM and 'height' of the curve can be used.
-    
+
     Parameters
     ----------
     prm : optional tuple of two strings, {("A", "sig"), ("h", "sig"), ("A", "FWHM"), ("h", "FWHM")}
@@ -45,7 +45,8 @@ class GaussFit1d(OneDFit):
                 PE.PyAValError(
                     f"Invalid parameterization (f{str(prm)}).",
                     where="GaussFit1d",
-                    solution="Choose any of: " + ", ".join([str(x) for x in GaussFit1d._valid_prms]),
+                    solution="Choose any of: " +
+                    ", ".join([str(x) for x in GaussFit1d._valid_prms]),
                 )
             )
 
@@ -54,7 +55,7 @@ class GaussFit1d(OneDFit):
         self.setRootName("Gaussian")
 
     def _check_zero_width(self):
-        """
+        r"""
         Check if width (sig/FWHM) is zero. Raise exception if so.
         """
         if self[self._prm[1]] == 0.0:
@@ -66,14 +67,14 @@ class GaussFit1d(OneDFit):
             )
 
     def evaluate_h_sig(self, x, h, sig):
-        """
+        r"""
         Evaluates the model for given height and standard deviation (sig)-
 
         Parameters
         ----------
         x : array
             Specifies the points at which to evaluate the model.
-        
+
         Returns
         -------
         model : array
@@ -89,25 +90,27 @@ class GaussFit1d(OneDFit):
     def evaluate(self, x):
         self._check_zero_width()
         if self._prm == ("h", "sig"):
-                return self.evaluate_h_sig(x, self["h"], self["sig"])
+            return self.evaluate_h_sig(x, self["h"], self["sig"])
         elif self._prm == ("A", "sig"):
-                return self.evaluate_h_sig(
-                    x, self["A"] / np.sqrt(2 * np.pi * self["sig"] ** 2), self["sig"]
-                )
+            return self.evaluate_h_sig(
+                x, self["A"] / np.sqrt(2 * np.pi *
+                                       self["sig"] ** 2), self["sig"]
+            )
         elif self._prm == ("h", "FWHM"):
-                return self.evaluate_h_sig(
-                    x, self["h"], self["FWHM"] / GaussFit1d._fwhm_to_sig
-                )
+            return self.evaluate_h_sig(
+                x, self["h"], self["FWHM"] / GaussFit1d._fwhm_to_sig
+            )
         elif self._prm == ("A", "FWHM"):
-                return self.evaluate_h_sig(
-                    x,
-                    self["A"] / np.sqrt(2 * np.pi * (self["FWHM"]/self._fwhm_to_sig) ** 2),
-                    self["FWHM"] / GaussFit1d._fwhm_to_sig,
-                )
+            return self.evaluate_h_sig(
+                x,
+                self["A"] / np.sqrt(2 * np.pi *
+                                    (self["FWHM"]/self._fwhm_to_sig) ** 2),
+                self["FWHM"] / GaussFit1d._fwhm_to_sig,
+            )
 
 
 class MultiGauss1d(OneDFit):
-    """
+    r"""
     A multicomponent Gaussian with a single linear continuum component.
 
     The parameters are the same as for the *GaussFit1d*,
@@ -132,7 +135,7 @@ class MultiGauss1d(OneDFit):
         self.setRootName("MultiGauss")
 
     def evaluate(self, x):
-        """
+        r"""
         Evaluates the model for current parameter values.
 
         Parameters
@@ -151,7 +154,7 @@ class MultiGauss1d(OneDFit):
         return y
 
     def evalComponent(self, x, p):
-        """
+        r"""
         Evaluate the model considering only a single component.
 
         Parameters
