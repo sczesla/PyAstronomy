@@ -6,7 +6,7 @@ import six.moves as smo
 
 
 class Ramirez2005:
-    """
+    r"""
     Relation between effective temperature and color given by Ramirez and Melendez 2005.
 
     Ramirez and Melendez 2015, ApJ 626, 465-485 (please not that Ramirez has a non-ASCII
@@ -16,7 +16,7 @@ class Ramirez2005:
     """
 
     def _extractTableData(self, lines, tableno):
-        """
+        r"""
         Extract lines pertaining to specified table.
 
         Parameters
@@ -50,7 +50,7 @@ class Ramirez2005:
         return result
 
     def _convertBandName(self, bn):
-        """
+        r"""
         Convert band name used in tables to internal representation.
 
         Parameters
@@ -69,7 +69,7 @@ class Ramirez2005:
         return name
 
     def _readTab23(self, lines, tableno):
-        """
+        r"""
         Read tables 2 and 3.
 
         Parameters
@@ -91,12 +91,12 @@ class Ramirez2005:
         bands = [None] * len(dat)
         for i, l in enumerate(dat):
             s = l.split()
-            bands[i] = self._convertBandName("".join(s[0 : len(s) - 8]))
+            bands[i] = self._convertBandName("".join(s[0: len(s) - 8]))
             result[i, ::] = np.array(s[-8:], dtype=float)
         return bands, result
 
     def _readTab45(self, lines, tableno):
-        """
+        r"""
         Read tables 4 and 5.
 
         Parameters
@@ -125,7 +125,7 @@ class Ramirez2005:
         return result
 
     def _readData(self, fn):
-        """
+        r"""
         Read the table data.
 
         Parameters
@@ -144,7 +144,7 @@ class Ramirez2005:
         self._tab5 = self._readTab45(lines, 5)
 
     def _checkBand(self, band):
-        """
+        r"""
         Check whether band identifier is valid.
         """
         if not band in self._bands:
@@ -156,7 +156,7 @@ class Ramirez2005:
             )
 
     def _checkST(self, st):
-        """
+        r"""
         Check whether stellar type (main-sequence/giant) is valid.
         """
         if not st in ["ms", "g"]:
@@ -168,7 +168,7 @@ class Ramirez2005:
             )
 
     def _resolveMetallicityIndex(self, feh):
-        """
+        r"""
         Determine where to find coefficients for given metallicity in Tables 4 and 5.
 
         Parameters
@@ -188,7 +188,7 @@ class Ramirez2005:
         )
 
     def colorToTeff_nop(self, band, X, feH, stype="ms"):
-        """
+        r"""
         Converts color into effective temperature according to Eq. 1.
 
         The conversion using to Eq. 1 neglects a polynomial correction
@@ -233,7 +233,7 @@ class Ramirez2005:
         return teff
 
     def colorToTeff(self, band, X, feH, stype="ms", ignoreRange=False):
-        """
+        r"""
         Converts color into effective temperature according to Eq. 2.
 
         This method takes the polynomial correction into account. Note
@@ -311,7 +311,7 @@ class Ramirez2005:
         return teff
 
     def teffToColor(self, band, teff, feH, stype="ms", dteff=0.01, maxiter=100):
-        """
+        r"""
         Converts effective temperature into color according to Eq. 2.
 
         This method inverts Eq. 2 using an iterative scheme.
@@ -372,7 +372,7 @@ class Ramirez2005:
         return x0
 
     def teffToColor_nop(self, band, teff, feH, stype="ms", noRaise=False):
-        """
+        r"""
         Converts effective temperature into color according to Eq. 1.
 
         This method inverts Eq. 1. Note that the equation is parabolic
@@ -471,7 +471,7 @@ class Ramirez2005:
             return X[1]
 
     def availableBands(self):
-        """
+        r"""
         Get a list of available band identifiers.
 
         Returns
@@ -482,4 +482,5 @@ class Ramirez2005:
         return self._bands[:]
 
     def __init__(self):
-        self._readData(os.path.join(os.path.dirname(__file__), "ramirez2005tables.dat"))
+        self._readData(os.path.join(os.path.dirname(
+            __file__), "ramirez2005tables.dat"))
