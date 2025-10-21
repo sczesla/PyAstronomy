@@ -8,7 +8,7 @@ import six.moves as smo
 
 
 def readUnit7(fn, minwl=None, maxwl=None):
-    """
+    r"""
     Read PHOENIX Unit 7 files.
 
     The documentation of the PHOENIX output
@@ -61,7 +61,7 @@ def readUnit7(fn, minwl=None, maxwl=None):
 
 
 def readDTable(fn, sort=None):
-    """
+    r"""
     Read a table with numbers in d-format.
 
     In d-format, a number, e.g., looks 1.3d-3.
@@ -94,7 +94,8 @@ def readDTable(fn, sort=None):
     ncol = len(lines[0].split())
     result = np.zeros((len(lines), ncol))
     for i in smo.range(len(lines)):
-        result[i, ::] = np.array(lines[i].replace("D", "E").split(), dtype=float)
+        result[i, ::] = np.array(
+            lines[i].replace("D", "E").split(), dtype=float)
     if sort is not None:
         # Sort with respect to column
         result = result[np.argsort(result[::, sort]), ::]
@@ -102,7 +103,7 @@ def readDTable(fn, sort=None):
 
 
 def decomposeFilename(fn):
-    """
+    r"""
     Decompose PHOENIX filename.
 
     Parameters
