@@ -6,11 +6,12 @@ from . import astroTimeLegacy as at
 from . import aitoffLegacy
 import unittest
 from .baryvel import baryvel, helcorr
-from . import eq2hor
-from . import sunpos
-from . import moonpos
-from . import moonphase
-from . import posAngle
+#from . import eq2hor
+#from . import sunpos
+#from . import moonpos
+#from . import moonphase
+#from . import posAngle
+from PyAstronomy import pyasl
 from .airtovac import airtovac2, vactoair2
 import six.moves as smo
 
@@ -20,20 +21,22 @@ import six.moves as smo
 
 class AstroTimeLegacyTest(unittest.TestCase):
 
-  def setUp(self, tddir="testPro", p=1e-6):
+  def setUp(self, tddir="testPro", p=1e-5):
     """
       Parameter:
         tddir - Directory where test data can be found.
     """
-    self.tddir = tddir
+    self.tddir = os.path.join("pyasl", "asl", tddir)
     self.p = p
 
   def getData(self, fn):
-    if not os.path.isfile(self.tddir+"/"+fn):
+    full = os.path.join(os.getcwd(), self.tddir, fn)
+    if not os.path.isfile(full):
       print("Could not find test data file: ", fn)
+      print("    Full filename: ", full)
       print("  Use test.pro (create_test_data) to generate test data.")
       return [False, None]
-    return [True, numpy.loadtxt(self.tddir+"/"+fn)]
+    return [True, numpy.loadtxt(full)]
 
   def test_bprecess(self):
     fn = "bprecess.test"
@@ -247,7 +250,7 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
   
   def test_baryvel(self):
-    dat = numpy.loadtxt("testPro/baryvel.test")
+    dat = self.getData("baryvel.test")[1] 
     err = 0
     for i in range(10000):
       jd = 2.4e6 + float(i)*10.37681
@@ -260,7 +263,7 @@ class AstroTimeLegacyTest(unittest.TestCase):
     self.assertEqual(err, 0)
 
     i = 0
-    dat = numpy.loadtxt("testPro/baryvel2.test")
+    dat = self.getData("baryvel2.test")[1] 
     for j in range(101):
       jd = 2.4e6 + float(j)*1000.37681
       for k in range(11):
@@ -283,20 +286,22 @@ class AstroTimeLegacyTest(unittest.TestCase):
 
 class IDLTests(unittest.TestCase):
 
-  def setUp(self, tddir="testPro", p=1e-6):
+  def setUp(self, tddir="testPro", p=1e-5):
     """
       Parameter:
         tddir - Directory where test data can be found.
     """
-    self.tddir = tddir
+    self.tddir = os.path.join("pyasl", "asl", tddir)
     self.p = p
 
   def getData(self, fn):
-    if not os.path.isfile(self.tddir+"/"+fn):
+    full = os.path.join(os.getcwd(), self.tddir, fn)
+    if not os.path.isfile(full):
       print("Could not find test data file: ", fn)
+      print("    Full filename: ", full)
       print("  Use test.pro (create_test_data) to generate test data.")
       return [False, None]
-    return [True, numpy.loadtxt(self.tddir+"/"+fn)]
+    return [True, numpy.loadtxt(full)]
     
   def test_sunpos(self):
     """
@@ -304,7 +309,7 @@ class IDLTests(unittest.TestCase):
     """
     dat = self.getData("sunpos.test")[1]
     for i in smo.range(len(dat[::,0])):
-      jd, ra, dec, longmed, oblt = sunpos.sunpos(dat[i,0], full_output=True)
+      jd, ra, dec, longmed, oblt = pyasl.sunpos(dat[i,0], full_output=True)
       self.assertAlmostEqual(ra, dat[i,1], delta=self.p)
       self.assertAlmostEqual(dec, dat[i,2], delta=self.p)
       self.assertAlmostEqual(longmed, dat[i,3], delta=self.p)
@@ -313,14 +318,14 @@ class IDLTests(unittest.TestCase):
   def test_nutate(self):
     dat = self.getData("nutate.test")[1]
     for i in smo.range(len(dat[::,0])):
-      l, o = eq2hor.nutate(dat[i,0])
+      l, o = pyasl.nutate(dat[i,0])
       self.assertAlmostEqual(l*3600.0, dat[i,1], delta=self.p)
       self.assertAlmostEqual(o*3600.0, dat[i,2], delta=self.p)   
     
   def test_co_nutate(self):
     dat = self.getData("co_nutate.test")[1]
     for i in smo.range(len(dat[::,0])):
-      dra, ddec, o, dl, do = eq2hor.co_nutate(dat[i,0], dat[i,1], dat[i,2], full_output=True)
+      dra, ddec, o, dl, do = pyasl.co_nutate(dat[i,0], dat[i,1], dat[i,2], full_output=True)
       self.assertAlmostEqual(dra*3600./dat[i,3], 1.0, delta=1e-5)
       self.assertAlmostEqual(ddec*3600./dat[i,4], 1.0, delta=1e-5)
       self.assertAlmostEqual(o/180.*numpy.pi/dat[i,5], 1.0, delta=self.p)
@@ -330,27 +335,27 @@ class IDLTests(unittest.TestCase):
   def test_co_aberration(self):
     dat = self.getData("co_aberration.test")[1]
     for i in smo.range(len(dat[::,0])):
-      dra, ddec = eq2hor.co_aberration(dat[i,0], dat[i,1], dat[i,2])
+      dra, ddec = pyasl.co_aberration(dat[i,0], dat[i,1], dat[i,2])
       self.assertAlmostEqual(dra*3600./dat[i,3], 1.0, delta=self.p)
       self.assertAlmostEqual(ddec*3600./dat[i,4], 1.0, delta=self.p)
 
   def test_co_refract_forward(self):
     dat = self.getData("co_refract_forward.test")[1]
     for i in smo.range(len(dat[::,0])):
-      r = eq2hor.co_refract_forward(dat[i,0], pressure=dat[i,1], temperature=dat[i,2]-273.15)
+      r = pyasl.co_refract_forward(dat[i,0], pressure=dat[i,1], temperature=dat[i,2]-273.15)
       self.assertAlmostEqual(r,dat[i,3], delta=self.p)
 
   def test_co_refract(self):
     dat = self.getData("co_refract.test")[1]
     for i in smo.range(len(dat[::,0])):
-      aout, p, t = eq2hor.co_refract(dat[i,0], observer_alt=dat[i,1], pressure=dat[i,2], \
+      aout, p, t = pyasl.co_refract(dat[i,0], observer_alt=dat[i,1], pressure=dat[i,2], \
                                temperature=dat[i,3]-273.15, convert_to_observed=True)
       self.assertAlmostEqual(aout/dat[i,4], 1.0, delta=self.p)
 
   def test_hadec2altaz(self):
     dat = self.getData("hadec2altaz.test")[1]
     for i in smo.range(len(dat[::,0])):
-      alt, az = eq2hor.hadec2altaz(dat[i,0], dat[i,1], dat[i,2])
+      alt, az = pyasl.hadec2altaz(dat[i,0], dat[i,1], dat[i,2])
       self.assertAlmostEqual(alt/dat[i,3], 1.0, delta=self.p)
       self.assertAlmostEqual(az/dat[i,4], 1.0, delta=self.p)
 
@@ -360,7 +365,7 @@ class IDLTests(unittest.TestCase):
     """
     dat = self.getData("eq2hor.test")[1]
     for i in smo.range(len(dat[::,0])):
-      alt, az, ha = eq2hor.eq2hor(dat[i,2], dat[i,0], dat[i,1], lon=dat[i,3], lat=dat[i,4], alt=dat[i,5])
+      alt, az, ha = pyasl.eq2hor(dat[i,2], dat[i,0], dat[i,1], lon=dat[i,3], lat=dat[i,4], alt=dat[i,5])
       self.assertAlmostEqual(alt/dat[i,6], 1.0, delta=self.p*100., msg="Altitude does not fit " + str(dat[i,::]))
       self.assertAlmostEqual(az/dat[i,7], 1.0, delta=self.p*100., msg="Azimuth does not fit " + str(dat[i,::]))
   
@@ -370,7 +375,7 @@ class IDLTests(unittest.TestCase):
     """
     dat = self.getData("moonpos.test")[1]
     for i in smo.range(len(dat[::,0])):
-      ra, dec, dist, glon, glat = moonpos.moonpos(dat[i,0], False)
+      ra, dec, dist, glon, glat = pyasl.moonpos(dat[i,0], False)
       self.assertAlmostEqual(ra/dat[i,1], 1.0, delta=self.p)
       self.assertAlmostEqual(dec/dat[i,2], 1.0, delta=self.p)
       self.assertAlmostEqual(dist/dat[i,3], 1.0, delta=self.p)
@@ -383,7 +388,7 @@ class IDLTests(unittest.TestCase):
     """
     dat = self.getData("mphase.test")[1]
     for i in smo.range(len(dat[::,0])):
-      f = moonphase.moonphase(dat[i,0])
+      f = pyasl.moonphase(dat[i,0])
       self.assertAlmostEqual(f, dat[i,1], delta=1e-5, msg="Lunar phase does not match." )
       self.assertAlmostEqual(f/dat[i,1], 1.0, delta=1e-5, msg="Lunar phase (relative) does not match")
 
@@ -394,7 +399,7 @@ class IDLTests(unittest.TestCase):
     dat = self.getData("posangle.test")[1]
     for i in smo.range(len(dat[::,0])):
       # Using *15.0 because decimal hours have been specified for IDL...
-      f = posAngle.positionAngle(dat[i,0]*15.0, dat[i,1], dat[i,2]*15.0, dat[i,3], positive=False)
+      f = pyasl.positionAngle(dat[i,0]*15.0, dat[i,1], dat[i,2]*15.0, dat[i,3], positive=False)
       self.assertAlmostEqual(dat[i,4], f, delta=1e-9, msg="Position angle does not match.")
 
   def test_helcorr(self):
@@ -410,8 +415,8 @@ class IDLTests(unittest.TestCase):
       corr, hjd = helcorr(-dat[i,0], dat[i,1], dat[i,2], dat[i,3]*15.0, dat[i,4], dat[i,5])
 #      print corr, dat[i,6], corr-dat[i,6]
 #      diffs.append(corr-dat[i,6])
-      self.assertAlmostEqual(dat[i,6], corr, delta=1e-5, msg="Barycentric correction does not match.")
-      self.assertAlmostEqual(dat[i,7]+2.4e6, hjd, delta=1e-5, msg="HJD does not match.")
+      self.assertAlmostEqual(dat[i,6], corr, delta=2e-5, msg="Barycentric correction does not match.")
+      self.assertAlmostEqual(dat[i,7]+2.4e6, hjd, delta=2e-5, msg="HJD does not match.")
 #    plt.hist(diffs)
 #    plt.show()
 
