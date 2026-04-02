@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
-from PyAstronomy.pyasl import _ic
-
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 def planck(T, lam=None, nu=None):
     """
@@ -41,13 +40,7 @@ def planck(T, lam=None, nu=None):
         will be W/(m^2 m) if `lam` was given and W/(m^2 Hz) if `nu` was
         specified.
     """
-    if _ic.check["quantities"]:
-        from PyAstronomy import constants
-        c = constants.PyAConstants(unitSystem="SI")
-    else:
-        raise(PE.PyARequiredImport(
-            "You need to install 'quantities' to use this function.\n 'quantities' can be obtained from 'http://pypi.python.org/pypi/quantities'."))
-        return None
+    c = getPyAConstantsObject()
     if (lam is not None) and (nu is not None):
         raise(PE.PyAParameterConflict(
             "Specify either 'lam' OR 'nu', but not both."))

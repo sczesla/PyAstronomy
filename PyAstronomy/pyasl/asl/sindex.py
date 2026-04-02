@@ -1,6 +1,7 @@
 from __future__ import print_function
 from PyAstronomy.pyaC import pyaErrors as PE
 import numpy as np
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 
 class SMW_RHK:
@@ -120,9 +121,8 @@ class SMW_RHK:
             raise (PE.PyARequiredImport("The 'quantities' package is not installed, which is required to use 'SMW_RHK'.",
                                         where="SMW_RHK",
                                         solution="Install quantities (https://pypi.python.org/pypi/quantities/0.10.1)."))
-        from PyAstronomy import constants as PC
-        self._pc = PC.PyAConstants()
-        self._pc.setSystem("cgs")
+        self._pc = getPyAConstantsObject()
+        self._pc.setSystem("SI")
 
     def logRphotNoyes(self, bv, lc="ms"):
         """
@@ -275,7 +275,8 @@ class SMW_RHK:
         # Convert arbitrary units to physical units
         surfaceFlux = fhfk * self._absCal[self._afc]
         # Get RHK (includes photospheric contribution)
-        rhk = surfaceFlux/(self._pc.sigma * Teff**4)
+        # 1e3 converts SI -> cgs
+        rhk = surfaceFlux/((self._pc.sigma*1e3) * Teff**4)
         # Get the photospheric correction
         logrphot = self._logrphot(bv, lc=lc)
         # Correct RHK for photospheric contribution

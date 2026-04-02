@@ -1,5 +1,5 @@
 from PyAstronomy.pyaC import pyaErrors as PE
-from PyAstronomy import constants as PC
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 def atmosphericScaleHeight(T, mu, g):
     """
@@ -28,7 +28,7 @@ def atmosphericScaleHeight(T, mu, g):
     if g <= 0:
         raise(PE.PyAValError("Gravitational acceleration must be positive.", \
                              where="atmosphericScaleHeight"))
-    pc = PC.PyAConstants()
+    pc = getPyAConstantsObject()
     pc.setSystem("SI")
     H = pc.k * T / (mu*pc.u*g)
     H /= 1e3
@@ -68,7 +68,7 @@ def atmosphericScaleHeight_MR(T, mu, Mp, Rp, ref):
         raise(PE.PyAValError("ref must either be 'E' or 'J'.", \
                              where="atmosphericScaleHeight"))
     
-    pc = PC.PyAConstants()
+    pc = getPyAConstantsObject()
     pc.setSystem("SI")
     if ref == "E":
         r0 = pc.REarth

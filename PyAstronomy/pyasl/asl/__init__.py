@@ -9,7 +9,8 @@ _modules = ["astroTimeLegacy", "airtovac", "aitoffLegacy", "folding", \
 
 
 _modules.extend(["idlMod", "idlCirrange", "rotBroad", "svd", "unred", "estimateSNR", \
-                "outlier", "intep", "magnitudes", "eq2hor", "sunpos", "observatory"])
+                "outlier", "intep", "magnitudes", "eq2hor", "sunpos", "observatory",
+                "pseudoConstants"])
 
 
 _modules.extend(["moonpos", "moonphase", "localtime", "lineWidth", "cardinalPoint", \

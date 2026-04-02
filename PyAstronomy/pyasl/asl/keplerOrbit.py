@@ -3,7 +3,7 @@ import numpy
 from numpy import pi, abs, sqrt, cos, sin, arccos, arctan, tan, cbrt
 from PyAstronomy.pyaC import pyaErrors as PE
 import six.moves as smo
-from PyAstronomy import constants as _PC
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 import copy
 
 
@@ -902,7 +902,7 @@ class BinaryOrbit(object):
     tau = property(fget=lambda self:self._tau_d, fset=_settau, doc="Time of periapsis [days]")
             
     def __init__(self, m2m1, mtot, per, e=0, tau=0, Omega=0, w=0, i=0, msun=None, ks=MarkleyKESolver):
-        self._pc = _PC.PyAConstants()
+        self._pc = getPyAConstantsObject()
         self._pc.setSystem("SI")
         if msun is None:
             self._MSun = self._pc.MSun

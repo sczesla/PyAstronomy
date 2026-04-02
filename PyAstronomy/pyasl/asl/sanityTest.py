@@ -16,6 +16,7 @@ from .coordinates import hmsToDeg, degToHMS, degToDMS, dmsToDeg, coordsSexaToDeg
 import six
 import six.moves as smo
 from PyAstronomy.pyaC import pyaErrors as PE
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 
 class TestSanityOfPyasl(unittest.TestCase, SaniBase):
@@ -386,9 +387,8 @@ class TestSanityOfPyasl(unittest.TestCase, SaniBase):
         """
         import numpy as np
         from PyAstronomy import pyasl
-        from PyAstronomy import constants as PC
 
-        pc = PC.PyAConstants()
+        pc = getPyAConstantsObject()
         pc.setSystem("SI")
 
         m2m1 = pc.MJ / pc.MSun
@@ -2220,7 +2220,7 @@ class TestSanityOfTransit(unittest.TestCase, SaniBase):
         Transit duration example
         """
         from PyAstronomy import pyasl
-        from PyAstronomy import constants as pc
+        pc = getPyAConstantsObject()
 
         # Earth radius expressed in Jovian radii
         reJ = pc.REarth / pc.RJ
@@ -2257,11 +2257,10 @@ class TestSanityOfTransit(unittest.TestCase, SaniBase):
         """
         """
         from PyAstronomy import pyasl
-        from PyAstronomy import constants as PC
         
         td1 = pyasl.transitDuration(0.05, 0.1, 1.5, 88.0, 10.)
         
-        pc = PC.PyAConstants()
+        pc = getPyAConstantsObject()
         rs = 1.5*pc.RSun
         
         trs = pyasl.transitDuration_Rs(0.05*pc.AU/rs, 0.1*pc.RJ/rs, 88., 10.)
@@ -2275,7 +2274,8 @@ class TestSanityOfTransit(unittest.TestCase, SaniBase):
         """
         from PyAstronomy import pyasl
         import numpy as np
-        from PyAstronomy import constants as pc
+        
+        pc = getPyAConstantsObject()
         
         rp = pc.RSun / pc.RJ * 0.4
         rprs = 0.4

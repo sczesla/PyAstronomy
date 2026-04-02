@@ -3,7 +3,7 @@ import numpy as np
 import inspect
 from PyAstronomy.pyaC import pyaErrors as PE
 from scipy import optimize as sco
-from PyAstronomy import constants as PC
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 
 def _bisect_root_find(f, ab, nroot, eps, roots=None, bqargs={}):
@@ -344,7 +344,7 @@ def get_radius_ss_polar_side(q, sma, reff, eps=1e-6):
         radius.
     """
     _checkq(q)
-    pc = PC.PyAConstants()
+    pc = getPyAConstantsObject()
     # Dimensionless effective radius
     reff_dl = reff*pc.RJ / (sma*pc.AU)
     # Potential at effective radius
@@ -359,7 +359,7 @@ def get_radius_ss_polar_side(q, sma, reff, eps=1e-6):
     rpot = sco.brentq(darea, l1pot+1e-10, peff*10)
     
     rr = get_epradius_ss_polar_side(q, rpot, eps=eps)
-    rjs = [r*sma*PC.AU/pc.RJ for r in rr]
+    rjs = [r*sma*pc.AU/pc.RJ for r in rr]
     return *rjs, rpot
     
 def get_lagrange_2(q, getdlrp=True, eps=1e-4):

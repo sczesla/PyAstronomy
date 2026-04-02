@@ -500,7 +500,7 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
     def testsanity_roche(self):
         """ Sanity checks of Roche and root finding """
         from PyAstronomy import pyasl
-        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
         
         def yp(x):
             return (x-0.1)*(x-0.5)*(x-0.7)*(x-0.5000002)
@@ -511,7 +511,7 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
         for i, r in enumerate(roots):
             self.assertAlmostEqual(r, rro[i], 5, msg=f"Problem with bisect root finding. Roots are {roots}")
             
-        pc = PC.PyAConstants()
+        pc = getPyAConstantsObject()
         pc.setSystem("SI")
         q = pc.MEarth/pc.MSun
         rads = pyasl.get_epradius_ss_polar_side(q, pot=None)
@@ -524,10 +524,10 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
         Roche lobe example 2 (radii of Earth and hot Jupiter)
         """
         from PyAstronomy import pyasl
-        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
         
         # Shape of the Earth and its Roche lobe (no rotation of Earth)
-        pc = PC.PyAConstants()
+        pc = getPyAConstantsObject()
         pc.setSystem("SI")
         
         # Mass ratio (m2/m1)
@@ -575,9 +575,9 @@ class TestSanityOfPyaslExt1(unittest.TestCase):
         """
         Test sanity of roche_limit_fluid
         """
-        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
         from PyAstronomy import pyasl
-        pc = PC.PyAConstants()
+        pc = getPyAConstantsObject()
         pc.setSystem("SI")
         a_r_jup = pyasl.roche_limit_fluid(pc.MJ/pc.MSun, pc.RJ)
         self.assertAlmostEqual(a_r_jup/1e3, 1_713_025, delta=60_000, msg=f"Roche lobe limit for Jupiter does not fit ({a_r_jup} km).")

@@ -19,6 +19,7 @@ from . import localtime
 import six
 import six.moves as smo
 import scipy.optimize as sco
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 
 def isInTransit(time, T0, period, halfDuration, boolOutput=False, secin=False):
@@ -126,9 +127,7 @@ def ingressDuration(sma, rp, rs, inc, period):
     Ingress duration : float
         The duration of in- and egress (same units as `period`).
     """
-    from PyAstronomy import constants as PC
-
-    c = PC.PyAConstants()
+    c = getPyAConstantsObject()
     # Calculate the impact parameter
     impact = (sma * c.AU) * np.cos(inc / 180.0 * np.pi)
     imsin = (sma * c.AU) * np.sin(inc / 180.0 * np.pi)
@@ -163,9 +162,7 @@ def ingressDuration_Rs(sma, rprs, inc, period):
     Ingress duration : float
         The duration of in- and egress (same units as `period`).
     """
-    from PyAstronomy import constants as PC
-
-    c = PC.PyAConstants()
+    c = getPyAConstantsObject()
 
     rs = c.RSun
     return ingressDuration(sma * rs / c.AU, rprs * rs / c.RJ, 1.0, inc, period)
@@ -219,9 +216,7 @@ def transitDuration(sma, rp, rs, inc, period, exact=False):
     Transit duration : float
         The duration of the transit (same units as `period`).
     """
-    from PyAstronomy import constants as PC
-
-    c = PC.PyAConstants()
+    c = getPyAConstantsObject()
     # Calculate the impact parameter
     impact = (sma * c.AU) * np.cos(inc / 180.0 * np.pi)
     # Correction factor (inclination dependent factor)
@@ -259,9 +254,7 @@ def transitDuration_Rs(sma, rprs, inc, period, exact=False):
     Transit duration : float
         The duration of the transit (same units as `period`).
     """
-    from PyAstronomy import constants as PC
-
-    c = PC.PyAConstants()
+    c = getPyAConstantsObject()
 
     rs = c.RSun
     return transitDuration(sma * rs / c.AU, rprs * rs / c.RJ, 1.0, inc, period, exact)

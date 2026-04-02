@@ -3,7 +3,7 @@ import numpy as np
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy import funcFit as fuf
 import scipy.interpolate as sci
-from quantities.dimensionality import assert_isinstance
+from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
 
 
 def equidistantInterpolation(x, y, dxmode, ifct=sci.interp1d):
@@ -245,8 +245,7 @@ def thermalBroadeningWidth(lam0, T, m=None, fwhm=True):
         the standard deviation, set the `fwhm` flag to
         False.
     """
-    from PyAstronomy import constants as PC
-    pc = PC.PyAConstants()
+    pc = getPyAConstantsObject()
     pc.setSystem("SI")
     if m is None:
         # Use proton mass if not specified otherwise
@@ -304,8 +303,7 @@ def tempFromthermalBroadeningWidth(lam0, width, m=None, awidth=0.0):
         The thermal width used in the calculations (may be modified
         if `awidth` has been specified.
     """
-    from PyAstronomy import constants as PC
-    pc = PC.PyAConstants()
+    pc = getPyAConstantsObject()
     pc.setSystem("SI")
     if m is None:
         # Use proton mass if not specified otherwise
