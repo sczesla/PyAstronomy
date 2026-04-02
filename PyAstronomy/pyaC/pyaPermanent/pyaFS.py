@@ -221,7 +221,8 @@ class PyAFS:
                     # Disregard context
                     response = urllib.request.urlopen(url)
                 data = response.read()     # a `bytes` object
-                self.requestFile(fn, 'wb', openMethod).write(data)
+                with self.requestFile(fn, 'wb', openMethod) as ofi:
+                    ofi.write(data)
             except UnicodeDecodeError as e:
                 pr = urllib.parse.urlparse(url)
                 if pr.scheme == "ftp":
