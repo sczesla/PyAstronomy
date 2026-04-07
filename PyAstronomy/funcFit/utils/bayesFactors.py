@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import numpy
 from PyAstronomy.funcFit.utils import ic
 from PyAstronomy.pyaC import pyaErrors as PE
-import scipy.misc as sm
+import scipy.special as sm
 
 
 def bayesFactors(model1, model2):
