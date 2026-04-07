@@ -7,6 +7,7 @@ import six.moves.urllib as urllib
 from six.moves.urllib.error import URLError
 import glob
 from PyAstronomy.pyaC.pyaPermanent import pyaRC
+import socket
  
 if _ic.check["ssl"]:
     import ssl
@@ -216,10 +217,10 @@ class PyAFS:
             try:
                 if not nocontext:
                     # Use context
-                    response = urllib.request.urlopen(url, context=context)
+                    response = urllib.request.urlopen(url, context=context, timeout=self.timeout)
                 else:
                     # Disregard context
-                    response = urllib.request.urlopen(url)
+                    response = urllib.request.urlopen(url, timeout=self.timeout)
                 data = response.read()     # a `bytes` object
                 with self.requestFile(fn, 'wb', openMethod) as ofi:
                     ofi.write(data)
@@ -238,45 +239,81 @@ class PyAFS:
 
         ana = self._analyzeFilename(fn, True)
         self.touchFile(ana["fullname"])
-        try:
-            if verbose:
-                print("PyA download info:")
-                print("  - Downloading from URL: " + str(url))
-            download(url, context)
-        except (KeyboardInterrupt, SystemExit):
-            self.removeFile(ana["fullname"])
-            raise
-        except TypeError as e:
-            # Possibly, context is not supported
-            cs = self._checkContext()
-            if not cs:
-                # Network is all right, but context parameter must
-                # not be specified.
-                if verbose:
+        
+        nocontext = False
+        anotherAttempt = False
+        attempts = 0
+        maxAttempts = 3
+        while True:
+        
+            attempts += 1
+            if((attempts > 1) and (not anotherAttempt)):
+                raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n",
+                                          addInfo=f"Attempts = {attempts}, another attempt = {anotherAttempt}"))
+            if(attempts > maxAttempts):
+                raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n",
+                                          addInfo=f"Maximum no. of attempts reached ({attempts})"))    
+            
+            try:
+                if verbose and (attempts == 1):
                     print("PyA download info:")
-                    print("  - Downloading from URL: " +
-                          str(url) + ", (no context)")
-                download(url, context, nocontext=True)
-        except URLError as e:
-            # Trying to download without context (side-lining ssl verification!)
-            if verbose:
-                print("PyA download info:")
-                print("  - Downloading from URL: " +
-                      str(url) + ", (unverified context)")
-            context = ssl._create_unverified_context()
-            download(url, context)            
-        except Exception as e:
-            self.removeFile(ana["fullname"])
-            sols = ["Check whether URL exists and is spelled correctly."]
-            # Check whether network can be reached.
-            netreach = self._checkOnline(raiseNOC=False)
-            if not netreach:
-                sols.append(
-                    "Network could not be reached. Check your network status.")
-            raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n",
-                                      solution=sols,
-                                      tbfe=e,
-                                      addInfo="Could network be reached (online)? " + {True: "yes", False: "No"}[netreach]))
+                    print("  - Downloading from URL: " + str(url))
+                elif verbose and (attempts > 1):
+                    print("    retrying")
+                anotherAttempt = False
+                download(url, context, nocontext=nocontext)
+            except (KeyboardInterrupt, SystemExit):
+                self.removeFile(ana["fullname"])
+                raise
+            except TypeError as e:
+                # Possibly, context is not supported
+                cs = self._checkContext()
+                if not cs:
+                    # Network is all right, but context parameter must
+                    # not be specified.
+                    if verbose:
+                        print("PyA download info:")
+                        print("  - Downloading from URL: " +
+                              str(url) + ", (no context)")
+                    nocontext = True
+                    anotherAttempt = True
+                    continue
+            except URLError as e:
+                # Trying to download without context (side-lining ssl verification!)
+                if verbose:
+                    print("URLError: ", e)
+                    # 1. Handle Timeouts
+                if isinstance(e.reason, socket.timeout):
+                    if verbose:
+                        print(f"    Timeout reached on attempt {attempts}. ")
+                    # Strategy: You might want to increase the timeout for the next try
+                    # or simply allow anotherAttempt = True
+                    anotherAttempt = True
+                    continue
+                if isinstance(e.reason, ssl.SSLError):
+                    if verbose:
+                        print("PyA download info:")
+                        print("  - Downloading from URL: " +
+                              str(url) + ", (unverified context)")
+                    context = ssl._create_unverified_context()
+                    anotherAttempt = True
+                    continue        
+            except Exception as e:
+                self.removeFile(ana["fullname"])
+                sols = ["Check whether URL exists and is spelled correctly."]
+                # Check whether network can be reached.
+                netreach = self._checkOnline(raiseNOC=False)
+                if not netreach:
+                    sols.append(
+                        "Network could not be reached. Check your network status.")
+                raise(PE.PyADownloadError("Could not download data from URL: " + str(url) + ".\n",
+                                          solution=sols,
+                                          tbfe=e,
+                                          addInfo="Could network be reached (online)? " + {True: "yes", False: "No"}[netreach]))
+            else:
+                break
+                
+                
         if verbose:
             print("  - Downloaded " +
                   str(os.path.getsize(ana["fullname"]) / 1000.0) + " kb")
@@ -372,8 +409,9 @@ class PyAFS:
         fns = [os.path.relpath(p, start=self.dpath) for p in fns]
         return fns
 
-    def __init__(self):
+    def __init__(self, timeout=30):
         self.conf = PyAConfig()
         # The next call will throw exception, if there is
         # no valid date directory.
         self.dpath = self.conf.getDataRoot()
+        self.timeout = timeout
