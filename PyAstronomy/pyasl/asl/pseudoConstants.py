@@ -52,10 +52,8 @@ def getPyAConstantsObject():
     """ Get the true PyAConstants object or the pseudo alternative """
     try:
         from PyAstronomy import constants as PC
-        print("**********************************   normal constants")
         return PC.PyAConstants()
     except:
-        print("**********************************   PSEUDO")
         return PseudoConstants()
 
     
