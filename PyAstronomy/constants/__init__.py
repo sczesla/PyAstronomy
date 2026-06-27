@@ -10,7 +10,6 @@ import numpy
 import six
 
 _ic = _ImportCheck(["quantities"], ["quantities"])
-raise(Exception("TBD"))
 _systems = ["SI", "cgs"]
 _unitSystem = "cgs"
 inventory = {}
