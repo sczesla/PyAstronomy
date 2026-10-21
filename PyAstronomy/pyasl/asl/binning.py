@@ -46,7 +46,7 @@ def binningx0dt(
     yerr : array, optional
         Errors on the data values.
     x0 : float, optional
-        Starting time of first bin.
+        Starting time of first bin. Input points before `x0` are excluded.
         Default is lowest given x value.
     dt : float, optional
         Width of a bin (either `dt`, `nbins` or `reduceBy` must
@@ -204,8 +204,8 @@ def binningx0dt(
     # Get the number of bins (start at x0 even if the
     # first bins do not contain any data points)
     nbins = np.max(inWhichBin) + 1
-    # Bins with data
-    bwd = np.unique(inWhichBin)
+    # Bins with data at or after the requested starting point
+    bwd = np.unique(inWhichBin[inWhichBin >= 0])
     # Sort data into the bins
     # Create output array (time, flux, error, data-point-counter)
     result = np.empty((nbins, 4))
