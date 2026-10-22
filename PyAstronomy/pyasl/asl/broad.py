@@ -111,11 +111,16 @@ def broadGaussFast(x, y, sigma, edgeHandling=None, maxsig=None):
     e /= np.sum(e)
 
     if edgeHandling == "firstlast":
-        nf = len(y)
+        nf = max(len(y), len(e) // 2)
         y = np.concatenate((np.ones(nf) * y[0], y, np.ones(nf) * y[-1]))
         result = np.convolve(y, e, mode="same")[nf:-nf]
     elif edgeHandling is None:
-        result = np.convolve(y, e, mode="same")
+        if len(e) > len(y):
+            # NumPy's "same" follows the longer input. Keep the spectral grid.
+            start = (len(e) - 1) // 2
+            result = np.convolve(y, e, mode="full")[start:start + len(y)]
+        else:
+            result = np.convolve(y, e, mode="same")
     else:
         raise(PE.PyAValError("Invalid value for `edgeHandling`: " + str(edgeHandling),
                              where="broadGaussFast",
