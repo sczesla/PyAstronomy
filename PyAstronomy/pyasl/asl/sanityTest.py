@@ -2774,6 +2774,59 @@ class TestSanityOfBroad(unittest.TestCase):
         self.assertAlmostEqual(np.sum(y), np.sum(y2), delta=1e-4,
                                msg="Normalization of convoluted Gaussian (" + str(np.sum(y2)) + ") is incorrect.")
 
+    def testsanity_wideGaussianKernel(self):
+        """Broadening retains the input grid with a longer Gaussian kernel."""
+        import numpy as np
+        from PyAstronomy import pyasl
+        from scipy.signal import convolve
+
+        for n in (5, 6):
+            x = np.arange(n) * 0.125
+            flux = np.linspace(0.3, 1.0, n)
+            for maxsig in (3.75, 4.0):
+                # These produce even and odd kernels, both longer than flux.
+                size = int(2.0 * 0.25 * maxsig / 0.125) + 1
+                offsets = np.arange(size) - (size - 1) // 2
+                kernel = np.exp(-0.5 * (offsets * 0.125 / 0.25)**2)
+                kernel /= kernel.sum()
+                for edge in (None, "firstlast"):
+                    with self.subTest(n=n, maxsig=maxsig, edge=edge):
+                        padded = np.pad(flux, size, mode="constant"
+                                        if edge is None else "edge")
+                        expected = convolve(padded, kernel, mode="same",
+                                            method="direct")[size:-size]
+                        actual = pyasl.broadGaussFast(
+                            x, flux, 0.25, edgeHandling=edge, maxsig=maxsig)
+                        self.assertEqual(actual.shape, flux.shape)
+                        np.testing.assert_allclose(actual, expected, atol=1e-14)
+
+    def testsanity_wideGaussianContinuum(self):
+        """Constant edge extension covers the full broadening kernel."""
+        import numpy as np
+        from PyAstronomy import pyasl
+
+        x = np.linspace(5000.0, 5001.0, 11)
+        flux = np.ones(x.size)
+        result = pyasl.broadGaussFast(
+            x, flux, 1.0, edgeHandling="firstlast", maxsig=5.0)
+        self.assertEqual(result.shape, flux.shape)
+        np.testing.assert_allclose(result, flux, atol=1e-14)
+
+    def testsanity_wideInstrumentalKernel(self):
+        """Instrumental broadening can recover an irregular input grid."""
+        import numpy as np
+        from PyAstronomy import pyasl
+
+        x = np.linspace(5000.0, 5001.0, 11)
+        x[4] += 0.01
+        flux = np.ones(x.size)
+        result, fwhm = pyasl.instrBroadGaussFast(
+            x, flux, 2000, edgeHandling="firstlast", maxsig=5.0,
+            equid=True, fullout=True)
+        self.assertEqual(result.shape, flux.shape)
+        np.testing.assert_allclose(result, flux, atol=1e-14)
+        self.assertAlmostEqual(fwhm, 5000.5 / 2000)
+
     def testsanity_thermalBroadening(self):
         """
         Check sanity of thermal broadening width.
