@@ -871,6 +871,42 @@ class TestSanityOfBinnin(unittest.TestCase, SaniBase):
     def tearDown(self):
         pass
 
+    def test_binningx0dt_late_start(self):
+        from .binning import binningx0dt
+
+        x = numpy.arange(10.)
+        for binning in ({'dt': 1.}, {'nbins': 3}):
+            with self.subTest(binning=binning):
+                result, _ = binningx0dt(x, x, x0=7., **binning)
+                numpy.testing.assert_allclose(result[:, 1], [7., 8., 9.])
+                numpy.testing.assert_array_equal(result[:, 3], [1., 1., 1.])
+
+    def test_binningx0dt_pre_start_points_do_not_fill_gaps(self):
+        from .binning import binningx0dt
+
+        x = numpy.array([0., 1., 6., 9.])
+        y = numpy.array([100., 200., 6., 9.])
+        original = x.copy(), y.copy()
+        for useMeanX in (False, True):
+            with self.subTest(useMeanX=useMeanX):
+                result, _ = binningx0dt(x, y, x0=2., dt=1.,
+                                       useMeanX=useMeanX, removeEmpty=False)
+                numpy.testing.assert_array_equal(result[:, 3],
+                                                 [0., 0., 0., 0., 1., 0., 0., 1.])
+                numpy.testing.assert_allclose(result[[4, 7], 1], [6., 9.])
+                self.assertTrue(numpy.isnan(result[[0, 1, 2, 3, 5, 6], 1]).all())
+        numpy.testing.assert_array_equal(x, original[0])
+        numpy.testing.assert_array_equal(y, original[1])
+
+    def test_binningx0dt_start_point_is_included(self):
+        from .binning import binningx0dt
+
+        result, _ = binningx0dt([0., 2., 3., 4.], [100., 2., 3., 4.],
+                                yerr=[10., 1., 2., 3.], x0=2., dt=2.)
+        numpy.testing.assert_allclose(result[:, 1], [2.5, 4.])
+        numpy.testing.assert_allclose(result[:, 2], [numpy.sqrt(5.) / 2., 3.])
+        numpy.testing.assert_array_equal(result[:, 3], [2., 1.])
+
     def testsanity_example_binningx0dt(self):
         """
         Checking `binningx0dt` example 1.
