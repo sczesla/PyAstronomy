@@ -1490,10 +1490,11 @@ class TestSanityOfSVD(unittest.TestCase, SaniBase):
         m, mind = svd.getModel(b, modelIndices=True)
 
         # Plot the outcome
-        plt.plot(b, 'bp-')
-        plt.plot(mind, m, 'r.')
+        # 'b' and 'm' are of type numpy.matrix so conversion is required
+        plt.plot(np.asarray(b).ravel(), 'bp-')
+        plt.plot(mind, np.asarray(m).ravel(), 'r.')
         plt.plot(nflux, 'g--')
-#    plt.show()
+        #    plt.show()
 
     def testsanity_NoiseExample(self):
         """
@@ -2551,11 +2552,11 @@ class TestSanityOfTransitTimes(unittest.TestCase):
         """
         from PyAstronomy import pyasl
         import datetime as dt
-        
+
         # Convert July 14th, 2018, 10pm to a Julian date
         d = dt.datetime(2018, 7, 14, 22)
         jd = pyasl.jdcnv(d)
-        
+
         # Calculate transit data for transits within 100 days starting
         # form July 14th, 2018.
         dat = pyasl.transitTimes(jd, jd+100., "WASP-7 b",
@@ -2613,6 +2614,7 @@ class TestSanityOfTransitTimes(unittest.TestCase):
         # Transit duration is specified in Nexa (therefore, 15 min uncertainty here)
         self.assertAlmostEqual((d["Transit jd"][2] - d["Transit jd"][0]) * 24.0,
                                3.567, delta=15. / 60., msg="Duration does not match")
+
 
 
 class TestSanityOfDecimalYear(unittest.TestCase):

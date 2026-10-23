@@ -1,11 +1,12 @@
-The Singular Value Decomposition (SVD)
-========================================
+Line profile decomposition via Singular Value Decomposition (SVD)
+=================================================================
 
 .. p23ready
 
 PyA's `SVD` class provides the means to carry out a
 singular value decomposition as is, e.g., useful to
-recover line profiles.
+recover spectral line profiles. The factorization
+itself is carried out using numpy's algorithms.
 
 .. currentmodule:: PyAstronomy.pyasl
 .. autoclass:: SVD
@@ -13,6 +14,11 @@ recover line profiles.
 
 Example: Delta functions and rotational broadening
 --------------------------------------------------
+
+Two intrinsically narrow (spectral) lines are broadened using
+a rotational broadening kernel, after which they overlap. Then
+the broadening function is recovered using the template and
+the SVD.
 
 ::
     
@@ -45,14 +51,19 @@ Example: Delta functions and rotational broadening
     m, mind = svd.getModel(b, modelIndices=True)
     
     # Plot the outcome
-    plt.plot(b, 'bp-')
-    plt.plot(mind, m, 'r.')
+    # 'b' and 'm' are of type numpy.matrix so conversion is required
+    plt.plot(np.asarray(b).ravel(), 'bp-')
+    plt.plot(mind, np.asarray(m).ravel(), 'r.')
     plt.plot(nflux, 'g--')
     plt.show()
 
 
 Example: Adding noise and neglecting singular values
 ------------------------------------------------------
+
+Noise can be filtered via singular value truncation. This example
+shows the evolution of goodness of fit as the contributions of the
+smallest singular values are consecutively removed from the reconstruction.
 
 ::
     
