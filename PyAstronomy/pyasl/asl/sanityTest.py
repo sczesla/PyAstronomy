@@ -2552,18 +2552,32 @@ class TestSanityOfTransitTimes(unittest.TestCase):
         """
         from PyAstronomy import pyasl
         import datetime as dt
-
+        
+        # Data suitable for WASP-7 b
+        wasp_7_data = {
+            "plName" : "WASP-7 b",
+            "ra" : 302.85206,
+            "dec" : -20.35184,
+            "T0" : 2455446.63493,
+            "orbPer" : 4.9546416,
+            "orbInc" : 87.03,
+            "SMA" : 0.0617,
+            "RpJ" : 1.330,
+            "RsSun" : 1.44,
+            }
+        
+        
         # Convert July 14th, 2018, 10pm to a Julian date
         d = dt.datetime(2018, 7, 14, 22)
         jd = pyasl.jdcnv(d)
-
+        
         # Calculate transit data for transits within 100 days starting
         # form July 14th, 2018.
-        dat = pyasl.transitTimes(jd, jd+100., "WASP-7 b",
-                                 observatory="esoparanal", obsOffset=1./24.,
-                                 minAltitude=10.0)
+        dat = pyasl.transitTimes(jd, jd+100., wasp_7_data,
+                                    observatory="esoparanal", obsOffset=1./24.,
+                                    minAltitude=10.0)
         # Plot the result
-        #pyasl.transitVisibilityPlot(dat, markTransit=True)
+        # pyasl.transitVisibilityPlot(dat, markTransit=True)
 
     def testsanity_ETD_compare(self):
         """

@@ -461,6 +461,7 @@ def transitTimes(
     =======  =================================
     Key      Value
     -------  ---------------------------------
+    plName   Planet name
     ra       Right ascension of object [deg]
     dec      Declination of object [deg]
     T0       Time reference point (HJD)
@@ -763,7 +764,7 @@ def transitTimes(
         else:
             dur = planetData["Tdur"]
 
-        print("Transit duration: ", dur * 24.0 * 60.0, " minutes")
+        print(f"Transit duration: {dur * 24.0 * 60.0:.2f} minutes")
         print(
             "Off-transit time before and after transit: ",
             obsOffset * 24.0 * 60.0,
@@ -1389,6 +1390,7 @@ def transitVisibilityPlot(
 
     # Make ax2 responsible for "top" axis and "right" axis
     ax2 = ax.twin()
+    ax2.set_xlim(axrange)
     # Set upper x ticks
     ax2.set_xticks(jdhours)
     ax2.set_xticklabels(utchours, fontsize=18)
@@ -1448,6 +1450,7 @@ def transitVisibilityPlot(
     )
 
     ax3 = ax.twin()
+    ax3.set_xlim(axrange)
     ax3.set_frame_on(True)
     ax3.patch.set_visible(False)
     ax3.xaxis.set_ticks_position("bottom")
@@ -1569,6 +1572,7 @@ def transitVisibilityPlot(
         va="center",
         fontsize=10,
     )
+    
 
     if print2file == True:
         outfile = "transVis-" + \
@@ -1577,4 +1581,5 @@ def transitVisibilityPlot(
     elif isinstance(print2file, six.string_types):
         plt.savefig(print2file, format="png", dpi=300)
     else:
+        fig.canvas.draw()
         plt.show()
