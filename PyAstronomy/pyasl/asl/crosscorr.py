@@ -86,9 +86,10 @@ def crosscorrRV(
         observed spectrum by multiplying with a sine function. If a float number
         is specified, this will define the width (in wavelength units)
         to be used for tapering on both sides. If different tapering
-        widths shall be used, a tuple with two (positive) numbers
+        widths shall be used, a tuple with two non-negative numbers
         must be given, specifying the width to be used on the low- and
-        high wavelength end. If a nonzero 'skipedge' is given, it
+        high wavelength end. A zero width disables tapering on that side.
+        If a nonzero 'skipedge' is given, it
         will be applied first. Edge tapering can help to avoid
         edge effects (see, e.g., Gullberg and Lindegren 2002, A&A 390).
     weights : array of floats, optional
@@ -164,7 +165,7 @@ def crosscorrRV(
         # Carry out edge tapering (right edge)
         indi = np.where(w > (w[-1] - edgeTapering[1]))[0]
         f[indi] *= np.sin(
-            (w[indi] - w[indi[0]]) / edgeTapering[1] * np.pi / 2.0 + np.pi / 2.0
+            (w[-1] - w[indi]) / edgeTapering[1] * np.pi / 2.0
         )
 
     # Speed of light in km/s

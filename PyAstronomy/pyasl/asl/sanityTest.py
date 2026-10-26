@@ -2926,6 +2926,54 @@ class TestSanityOfBroad(unittest.TestCase):
 
 class TestSanityOfCrosscor(unittest.TestCase):
 
+    def testsanity_TaperedEndpoints(self):
+        """Both outer samples of a positive-width taper have zero weight."""
+        from PyAstronomy import pyasl
+        import numpy as np
+
+        w = np.linspace(5000., 5010., 21)
+        tw = np.array([4990., 5020.])
+        for skipedge in [0, 2]:
+            for width in [0.2, 1.3, 20.]:
+                for index in [skipedge, len(w) - skipedge - 1]:
+                    with self.subTest(skipedge=skipedge, width=width, index=index):
+                        f = np.zeros_like(w)
+                        f[index] = 1.
+                        rv, cc = pyasl.crosscorrRV(
+                            w, f, tw, np.ones(2), 0., 1., 1.,
+                            skipedge=skipedge, edgeTapering=width)
+                        np.testing.assert_allclose(cc, 0., atol=1e-14)
+
+    def testsanity_TaperProfile(self):
+        """A two-bin sine taper is symmetric and leaves the center unchanged."""
+        from PyAstronomy import pyasl
+        import numpy as np
+
+        w = np.arange(5000., 5005.)
+        tw = np.array([4990., 5015.])
+        for index, expected in enumerate([0., np.sqrt(0.5), 1., np.sqrt(0.5), 0.]):
+            f = np.zeros_like(w)
+            f[index] = 1.
+            rv, cc = pyasl.crosscorrRV(
+                w, f, tw, np.ones(2), 0., 1., 1., edgeTapering=2.)
+            np.testing.assert_allclose(cc, expected, atol=1e-14)
+
+    def testsanity_ZeroTaperWidth(self):
+        """Zero disables the corresponding taper, including on the right."""
+        from PyAstronomy import pyasl
+        import numpy as np
+
+        w = np.arange(5000., 5005.)
+        f = np.ones_like(w)
+        tw = np.array([4990., 5015.])
+        for taper, expected in [(0., 5.), ((0., 0.), 5.),
+                                ((2., 0.), 3. + np.sqrt(0.5)),
+                                ((0., 2.), 3. + np.sqrt(0.5))]:
+            with self.subTest(taper=taper):
+                rv, cc = pyasl.crosscorrRV(
+                    w, f, tw, np.ones(2), 0., 1., 1., edgeTapering=taper)
+                np.testing.assert_allclose(cc, expected, atol=1e-14)
+
     def setUp(self):
         pass
 
@@ -3844,5 +3892,4 @@ class TestSanityOfBetaSigma(unittest.TestCase):
 #         plt.errorbar(te, yi, yerr=np.ones(nd)*istd, fmt='r+')
 #         plt.tight_layout()
 #         plt.show()
-
 
