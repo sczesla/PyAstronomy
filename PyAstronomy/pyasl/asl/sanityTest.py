@@ -1353,6 +1353,33 @@ class TestSanityOfrotBroad(unittest.TestCase, SaniBase):
                 self.assertAlmostEqual(ew, refEW, 5, "The EW in rotbroad changes for: vsini = " +
                                        str(broad) + ", and eps = " + str(eps))
 
+    def testsanity_fastRotBroadWideKernel(self):
+        """Wide rotation kernels retain the input grid and zero-padded edges."""
+        import numpy as np
+
+        for size in [2, 3, 4, 5, 6]:
+            wvl = 5000. + np.arange(size) * 0.1
+            flux = np.arange(1., size + 1.) ** 2
+            for effWvl in [None, 5100.]:
+                reference = np.mean(wvl) if effWvl is None else effWvl
+                vsini = 299792.458 * 0.25 / reference
+                for epsilon in [0., 0.6, 1.]:
+                    # Gray's profile at five bins, with half-width 2.5 bins.
+                    x = np.arange(-2., 3.) / 2.5
+                    kernel = (2. * (1. - epsilon) * np.sqrt(1. - x ** 2)
+                              + 0.5 * np.pi * epsilon * (1. - x ** 2))
+                    kernel /= kernel.sum()
+                    expected = np.zeros(size)
+                    for i in range(size):
+                        for j in range(size):
+                            if abs(i - j) <= 2:
+                                expected[i] += flux[j] * kernel[2 + i - j]
+                    actual = fastRotBroad(wvl, flux, epsilon, vsini, effWvl=effWvl)
+                    self.assertEqual(actual.shape, flux.shape)
+                    np.testing.assert_allclose(actual, expected, rtol=2e-10, atol=1e-12)
+                    np.testing.assert_array_equal(flux, np.arange(1., size + 1.) ** 2)
+                    np.testing.assert_array_equal(wvl, 5000. + np.arange(size) * 0.1)
+
     def testsanity_slowVsFast(self):
         """
         Comparing 'slow' and 'fast' algorithm.
@@ -3844,5 +3871,3 @@ class TestSanityOfBetaSigma(unittest.TestCase):
 #         plt.errorbar(te, yi, yerr=np.ones(nd)*istd, fmt='r+')
 #         plt.tight_layout()
 #         plt.show()
-
-
