@@ -1271,7 +1271,7 @@ class TestMCMCExampleSanity(unittest.TestCase):
         # Plot the data and our guess
         plt.errorbar(x, y, yerr=yerr, fmt="b.-")
         plt.plot(x, vp.evaluate(x), "r--")
-        plt.show()
+        # plt.show()
 
         # Thaw the parameters, which we wish to vary
         # during the sampling
