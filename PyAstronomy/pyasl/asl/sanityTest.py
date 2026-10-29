@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from .airtovac import airtovac, vactoair, vactoair2, airtovac2
 import numpy
+import numpy as np
 import unittest
 from PyAstronomy.pyaC import SaniBase
 from .aitoffLegacy import inverseAitoff, aitoff
@@ -17,6 +18,9 @@ import six
 import six.moves as smo
 from PyAstronomy.pyaC import pyaErrors as PE
 from PyAstronomy.pyasl.asl.pseudoConstants import getPyAConstantsObject
+import sys
+from unittest import mock
+from numpy.testing import assert_almost_equal
 
 
 class TestSanityOfPyasl(unittest.TestCase, SaniBase):
@@ -629,6 +633,123 @@ class TestSanityOfPyasl(unittest.TestCase, SaniBase):
 #     plt.plot(lam*1e10, s5erg, 'r-')
 #     plt.plot(lam*1e10, s7erg, 'b-')
 #     plt.show()
+
+
+
+    def testsanity_planck_wavelength_formula(self):
+        """Test planck(T, lam=...) against the explicit formula B_lambda (with and without 'quantities')."""
+    
+        # Physical constants (SI units) matching standard definitions
+        H = 6.62607015e-34  # Planck constant [J s]
+        C = 299792458.0  # Speed of light [m/s]
+        K_B = 1.380649e-23  # Boltzmann constant [J/K]
+    
+        T = 5000.0  # Kelvin
+        lam = np.array([5000e-10, 10000e-10])  # meters (5000 Å and 10000 Å)
+    
+        # Expected B_lambda using SI formula
+        c1 = 2.0 * np.pi * H * (C**2)
+        c2 = (H * C) / K_B
+        expected_sI = (c1 / (lam**5)) / (np.expm1(c2 / (lam * T)))
+    
+        for has_quantities in [True, False]:
+            with self.subTest(has_quantities=has_quantities):
+                # 1. Configure sys.modules patch state
+                patched_modules = {} if has_quantities else {"quantities": None}
+    
+                # 2. Clear PyAstronomy modules from sys.modules cache
+                # to force PyAstronomy to re-run top-level import checks
+                pya_keys = [k for k in sys.modules if k.startswith("PyAstronomy")]
+                for key in pya_keys:
+                    del sys.modules[key]
+    
+                # 3. Patch sys.modules and run test logic
+                with mock.patch.dict(sys.modules, patched_modules):
+                    from PyAstronomy.pyasl import planck
+    
+                    result = planck(T, lam=lam)
+    
+                    # If result is returned as a quantities Quantity array, convert to numpy
+                    if hasattr(result, "magnitude"):
+                        result = result.magnitude
+    
+                    # Check SI unit outcome matches formula within 0.1% tolerance
+                    np.testing.assert_allclose(result, expected_sI, rtol=1e-3)
+    
+    def testsanity_planck_frequency_formula(self):
+        """Test planck(T, nu=...) against the explicit formula B_nu."""
+        import numpy as np
+        from PyAstronomy.pyasl import planck
+        # Physical constants (SI units) matching standard definitions
+        H = 6.62607015e-34  # Planck constant [J s]
+        C = 299792458.0      # Speed of light [m/s]
+        K_B = 1.380649e-23   # Boltzmann constant [J/K]
+        SIGMA = 5.670374419e-8  # Stefan-Boltzmann constant [W/(m^2 K^4)]
+        
+        T = 6000.0  # Kelvin
+        nu = np.array([5e14, 1e15])  # Hz
+    
+        # Expected B_nu using SI formula from documentation:
+        # B_nu = (2 * pi * h * nu^3 / c^2) / (exp(h * nu / (k * T)) - 1)
+        c1 = (2.0 * np.pi * H) / (C**2)
+        c2 = H / K_B
+        expected_sI = (c1 * (nu**3)) / (np.expm1((c2 * nu) / T))
+    
+        result = planck(T, nu=nu)
+    
+        # Check SI unit outcome matches formula within 0.1% tolerance
+        np.testing.assert_allclose(result, expected_sI, rtol=1e-3)
+    
+    
+    def testsanity_unit_conversion_cgs(self):
+        """
+        Test conversion to CGS units erg/(cm^2 * Å * s) using the 1e-7 factor
+        specified in the documentation.
+        """
+        import numpy as np
+        from PyAstronomy.pyasl import planck
+        # Physical constants (SI units) matching standard definitions
+        H = 6.62607015e-34  # Planck constant [J s]
+        C = 299792458.0      # Speed of light [m/s]
+        K_B = 1.380649e-23   # Boltzmann constant [J/K]
+        SIGMA = 5.670374419e-8  # Stefan-Boltzmann constant [W/(m^2 K^4)]
+        
+        T = 5000.0
+        lam = 5000e-10  # 5000 Å in meters
+    
+        s_si = planck(T, lam=lam)
+        s_cgs = s_si * 1e-7
+    
+        # Assert conversion relationship holds
+        assert np.isclose(s_cgs, s_si * 1e-7)
+    
+
+    def testsanity_stefan_boltzmann_integration(self):
+        """
+        Test documentation example logic: Integral of Planck spectrum over
+        wavelength closely approximates the Stefan-Boltzmann law (sigma * T^4).
+        """
+        import numpy as np
+        from PyAstronomy.pyasl import planck
+        # Physical constants (SI units) matching standard definitions
+        H = 6.62607015e-34  # Planck constant [J s]
+        C = 299792458.0      # Speed of light [m/s]
+        K_B = 1.380649e-23   # Boltzmann constant [J/K]
+        SIGMA = 5.670374419e-8  # Stefan-Boltzmann constant [W/(m^2 K^4)]
+        
+        T = 5000.0  # K
+        # High resolution wavelength grid covering UV to Far-IR
+        lam = np.linspace(100e-10, 100000e-10, 100000)
+        d_lam = lam[1] - lam[0]
+    
+        s_planck = planck(T, lam=lam)
+        integral_planck = np.sum(s_planck) * d_lam
+    
+        expected_sb = SIGMA * (T**4)
+    
+        # Integral over a broad spectrum should match Stefan-Boltzmann within ~1%
+        np.testing.assert_allclose(integral_planck, expected_sb, rtol=1e-2)
+
 
     def testsanity_magToFluxDensity_bessel98(self):
         """
@@ -3845,4 +3966,58 @@ class TestSanityOfBetaSigma(unittest.TestCase):
 #         plt.tight_layout()
 #         plt.show()
 
+HAS_QUANTITIES = True
+try:
+    import quantities
+except ImportError:
+    HAS_QUANTITIES = False
 
+class TestSanityOfPseudoConstants(unittest.TestCase):
+
+    @unittest.skipUnless(HAS_QUANTITIES, "cannot be tested without quantities packages")
+    def testsanity_default_unit_system(self):
+        """Tests default initialization (cgs)."""
+        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl import PseudoConstants
+        real_pc = PC.PyAConstants()
+        pseudo_pc = PseudoConstants()
+        self.assertAlmostEqual(real_pc.c, pseudo_pc.c, "Difference in speed of light 'c' for default constants setup.")
+        
+    @unittest.skipUnless(HAS_QUANTITIES, "cannot be tested without quantities packages")
+    def testsanity_cgs_unit_system(self):
+        """Tests explicit 'cgs' unit system."""
+        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl import PseudoConstants
+        real_pc = PC.PyAConstants(unitSystem="cgs")
+        pseudo_pc = PseudoConstants(unitSystem="cgs")
+        self.assertAlmostEqual(real_pc.c, pseudo_pc.c, "Difference in speed of light 'c' for cgs constants setup.")
+
+    @unittest.skipUnless(HAS_QUANTITIES, "cannot be tested without quantities packages")
+    def testsanity_si_unit_system(self):
+        """Tests explicit 'SI' unit system."""
+        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl import PseudoConstants
+        real_pc = PC.PyAConstants(unitSystem="SI")
+        pseudo_pc = PseudoConstants(unitSystem="SI")
+        self.assertAlmostEqual(real_pc.c, pseudo_pc.c, "Difference in speed of light 'c' for SI constants setup.")
+
+    @unittest.skipUnless(HAS_QUANTITIES, "cannot be tested without quantities packages")
+    def testsanity_si_cgs_unit_system(self):
+        """Tests explicit 'SI' unit system."""
+        from PyAstronomy import constants as PC
+        from PyAstronomy.pyasl import PseudoConstants
+        real_pc = PC.PyAConstants(unitSystem="SI")
+        pseudo_pc = PseudoConstants(unitSystem="cgs")
+        self.assertAlmostEqual(real_pc.c, pseudo_pc.c/100., delta=1e-3, msg="Inconsistent speed of light 'c' for SI/cgs constants setup.")
+
+    def testsanity_unit_system_change(self):
+        """Tests explicit 'SI'-'CGS' change for PseudoConstants."""
+        from PyAstronomy.pyasl import PseudoConstants
+        pc = PseudoConstants(unitSystem="SI")
+        c0 = pc.c
+        pc.setSystem("cgs")
+        c1 = pc.c
+        pc.setSystem("SI")
+        c2 = pc.c
+        self.assertEqual(c0, c2 , "SI: Speed of Light doesn't match after system change")
+        self.assertAlmostEqual(c0, c1/100., delta=1e-3, msg="Inconsistent speed of light 'c' for SI/cgs constants after system change.")

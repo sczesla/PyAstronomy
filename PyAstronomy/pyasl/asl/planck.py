@@ -40,7 +40,7 @@ def planck(T, lam=None, nu=None):
         will be W/(m^2 m) if `lam` was given and W/(m^2 Hz) if `nu` was
         specified.
     """
-    c = getPyAConstantsObject()
+    c = getPyAConstantsObject(unitSystem="SI")
     if (lam is not None) and (nu is not None):
         raise(PE.PyAParameterConflict(
             "Specify either 'lam' OR 'nu', but not both."))
