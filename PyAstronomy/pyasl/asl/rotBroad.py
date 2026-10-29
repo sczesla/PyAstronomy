@@ -159,10 +159,10 @@ def fastRotBroad(wvl, flux, epsilon, vsini, effWvl=None):
     on wavelength. This function neglects this dependence, which
     is weak if the wavelength range is not too large.
 
-    .. note:: numpy.convolve is used to carry out the convolution
-              and "mode = same" is used. Therefore, the output
-              will be of the same size as the input, but it
-              will show edge effects.
+    .. note:: numpy.convolve is used to carry out the convolution,
+              centered on the input wavelength grid. The output has
+              the same size as the input, but shows edge effects
+              from assuming zero flux outside the input spectrum.
 
     Parameters
     ----------
@@ -217,5 +217,10 @@ def fastRotBroad(wvl, flux, epsilon, vsini, effWvl=None):
     indi = np.where(g > 0.0)[0]
     g = g[indi]
 
-    result = np.convolve(flux, g, mode="same") * dwl
+    if len(g) > len(flux):
+        # NumPy's "same" mode returns the size of the longer input.
+        start = (len(g) - 1) // 2
+        result = np.convolve(flux, g, mode="full")[start:start + len(flux)] * dwl
+    else:
+        result = np.convolve(flux, g, mode="same") * dwl
     return result
