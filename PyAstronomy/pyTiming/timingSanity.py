@@ -81,3 +81,25 @@ class TestGlsSanity(unittest.TestCase):
             np.testing.assert_allclose(fast.freq, slow.freq)
             np.testing.assert_allclose(fast.power, slow.power, atol=1e-9)
             self.assertEqual(fast.hpstat["fbest"], slow.hpstat["fbest"])
+
+    def testsanity_lnL(self):
+        """Checking the lnL normalization against the direct log-likelihood"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(2)
+        t = np.sort(100 * rng.random(60))
+        e = 0.2 + 0.3 * rng.random(60)
+        y = 3 + 1.5 * np.sin(2 * np.pi * t / 7.3 + 0.4) + e * rng.normal(size=60)
+
+        for err in (e, None):
+            lc = (t, y) if err is None else (t, y, err)
+            sig = np.ones_like(t) if err is None else err
+            gls = pyPeriod.Gls(lc, norm="lnL")
+            # Gaussian log-likelihood of the best-fit sine
+            res = y - gls.sinmod(t)
+            lnL = -0.5 * np.sum(res**2 / sig**2) - 0.5 * np.sum(np.log(2 * np.pi * sig**2))
+            self.assertAlmostEqual(gls.power.max(), lnL, delta=1e-8 * abs(lnL))
+            # prob and probInv are inverse to each other
+            for prob in (1e-3, 0.1):
+                self.assertAlmostEqual(gls.prob(gls.probInv(prob)), prob, delta=1e-10)

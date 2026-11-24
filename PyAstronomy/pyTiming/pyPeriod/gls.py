@@ -68,8 +68,9 @@ class Gls:
         If given, fast and verbose option are not available.
         If not given, a frequency array will be automatically generated.
     norm : string, optional
-        The normalization; either of "ZK", "Scargle", "HorneBaliunas", "Cumming", "wrms", "chisq".
-        The default is unity ("ZK").
+        The normalization; either of "ZK", "Scargle", "HorneBaliunas", "Cumming", "wrms", "chisq",
+        "lnL", "dlnL". The default is unity ("ZK"). Without errors, "chisq", "lnL", and "dlnL"
+        assume unit errors.
     ls : boolean, optional
         If True, the conventional Lomb-Scargle periodogram will be computed
         (default is False).
@@ -95,7 +96,7 @@ class Gls:
         The ordinate data values.
     e_y : array
         The errors of the data values.
-    norm : string, {'ZK', 'Scargle', 'HorneBaliunas', 'Cumming', 'wrms', 'chisq'}
+    norm : string, {'ZK', 'Scargle', 'HorneBaliunas', 'Cumming', 'wrms', 'chisq', 'lnL', 'dlnL'}
         The used normalization.
 
     Examples
@@ -261,6 +262,12 @@ class Gls:
             w = 1 / (self.e_y * self.e_y)
         self.wsum = w.sum()
         w /= self.wsum
+        # Normalization term of the Gaussian log-likelihood,
+        # sum(ln(2 pi sigma^2)); unit errors are assumed if none are given.
+        if self.e_y is None:
+            self._lnLnorm = self.N * np.log(2*np.pi)
+        else:
+            self._lnLnorm = np.sum(np.log(2*np.pi * self.e_y**2))
 
         self._Y = dot(w, self.y)       # Eq. (7)
         wy = self.y - self._Y          # Subtract weighted mean
@@ -363,7 +370,7 @@ class Gls:
             self.label["ylabel"] = "wrms"
         elif norm == "lnL":
             chi2 = self._YY *self.wsum * (1.-p)
-            power = -0.5*chi2 - 0.5*np.sum(np.log(2*np.pi * self.e_y))
+            power = -0.5*chi2 - 0.5*self._lnLnorm
             self.label["ylabel"] = "lnL"
         elif norm == "dlnL":
             # dlnL = lnL - lnL0 = -0.5 chi^2 + 0.5 chi0^2 = 0.5 (chi0^2 - chi^2) = 0.5 chi0^2 p
@@ -625,7 +632,7 @@ class Gls:
         if self.norm == "dlnL":
             p = 2 * Pn / self._YY / self.wsum
         if self.norm == "lnL":
-            chi2 = -2*Pn - np.sum(np.log(2*np.pi * self.e_y**2))
+            chi2 = -2*Pn - self._lnLnorm
             p = 1 - chi2/self._YY/self.wsum
         return (1-p) ** ((self.N-3)/2)
 
@@ -657,7 +664,7 @@ class Gls:
         if self.norm == "chisq": return self._YY * self.wsum * Prob**(2/(self.N-3))
         p = 1 - Prob**(2/(self.N-3))
         if self.norm == "ZK": return p
-        if self.norm == "lnL": return -0.5*self._YY*self.wsum*(1.-p) - 0.5*np.sum(np.log(2*np.pi * self.e_y**2))
+        if self.norm == "lnL": return -0.5*self._YY*self.wsum*(1.-p) - 0.5*self._lnLnorm
         if self.norm == "dlnL": return 0.5 * self._YY * self.wsum * p
 
 
