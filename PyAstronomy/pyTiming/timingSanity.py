@@ -125,3 +125,18 @@ class TestGlsSanity(unittest.TestCase):
                 # Without fitted offset, the offset is the weighted mean
                 w = 1 / e**2
                 self.assertAlmostEqual(gls.hpstat["offset"], np.sum(w * y) / np.sum(w), delta=1e-12)
+
+    def testsanity_info(self):
+        """Checking that info returns numbers"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(4)
+        t = np.sort(100 * rng.random(40))
+        e = 0.2 + 0.3 * rng.random(40)
+        y = np.sin(2 * np.pi * t / 7.3) + e * rng.normal(size=40)
+
+        info = pyPeriod.Gls((t, y, e)).info(noprint=True)
+        mwie = info["mean_weighted_internal_error"]
+        self.assertIsInstance(mwie, float)
+        self.assertAlmostEqual(mwie, np.sqrt(len(e) / np.sum(1 / e**2)), delta=1e-12)

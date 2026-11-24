@@ -485,7 +485,7 @@ class Gls:
                 "offset_err":self.hpstat["offset_err"]
             }
         if self.e_y is not None:
-            info["mean_weighted_internal_error"] = sqrt(self.N/sum(1./self.e_y**2)),
+            info["mean_weighted_internal_error"] = sqrt(self.N/sum(1./self.e_y**2))
         
         if not noprint:
             print("Generalized LS - statistical output")
@@ -499,7 +499,7 @@ class Gls:
             print("Maximum power p [%s]: % f" % (self.norm, self.power.max()))
             print("RMS of residuals:     % f" % self.rms)
             if self.e_y is not None:
-                print("  Mean weighted internal error:  %f" % (sqrt(self.N/sum(1./self.e_y**2))))
+                print("  Mean weighted internal error:  %f" % info["mean_weighted_internal_error"])
             print("Best sine frequency:  % f +/- % f" % (self.hpstat["fbest"], self.hpstat["f_err"]))
             print("Best sine period:     % f +/- % f" % (1./self.hpstat["fbest"], self.hpstat["Psin_err"]))
             print("Amplitude:            % f +/- % f" % (self.hpstat["amp"], self.hpstat["amp_err"]))
