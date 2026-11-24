@@ -6,7 +6,7 @@ The Generalized Lomb-Scargle Periodogram (GLS)
 .. currentmodule:: PyAstronomy.pyTiming.pyPeriod
 
 The GLS class provides an implementation of the Generalized Lomb-Scargle periodogram
-as described by Zechmeister & Kuerster 2009 (A&A 496, 577) and earlier by Ferraz-Mello 1981 (AJ 86, 691).
+as described by Zechmeister & Kuerster 2009 (A&A 496, 577) and earlier by Ferraz-Mello 1981 (AJ 86, 619).
 Compared to the periodogram presented, e.g., by Lomb 1976, the GLS takes
 into account measurement errors and a constant term in the fit of the trigonometric function.
 
