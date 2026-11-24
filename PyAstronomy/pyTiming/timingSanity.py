@@ -140,3 +140,25 @@ class TestGlsSanity(unittest.TestCase):
         mwie = info["mean_weighted_internal_error"]
         self.assertIsInstance(mwie, float)
         self.assertAlmostEqual(mwie, np.sqrt(len(e) / np.sum(1 / e**2)), delta=1e-12)
+
+    def testsanity_FAP(self):
+        """Checking FAP and powerLevel, also for small probabilities"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(5)
+        t = np.sort(100 * rng.random(50))
+        e = 0.2 + 0.3 * rng.random(50)
+        y = np.sin(2 * np.pi * t / 7.3) + e * rng.normal(size=50)
+        gls = pyPeriod.Gls((t, y, e))
+
+        # powerLevel is the inverse of FAP, also far below 1e-16
+        for fap in (1e-20, 1e-8, 0.009, 0.011, 0.5):
+            self.assertAlmostEqual(gls.FAP(gls.powerLevel(fap)) / fap, 1, delta=1e-9)
+
+        # Exact value 1 - (1-q)^M = Mq - M(M-1)/2 q^2 + ..., not only Mq
+        q = 0.005 / gls.M
+        Pn = gls.probInv(q)
+        expected = gls.M * q - gls.M * (gls.M - 1) / 2 * q**2 \
+            + gls.M * (gls.M - 1) * (gls.M - 2) / 6 * q**3
+        self.assertAlmostEqual(gls.FAP(Pn) / expected, 1, delta=1e-6)

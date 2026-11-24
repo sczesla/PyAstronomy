@@ -699,10 +699,8 @@ class Gls:
             False alarm probability.
 
         """
-        prob = self.M * self.prob(Pn)
-        if prob > 0.01:
-            return 1. - (1.-self.prob(Pn))**self.M
-        return prob
+        # 1 - (1-prob)^M, computed without cancellation for small prob
+        return -np.expm1(self.M * np.log1p(-self.prob(Pn)))
 
     def powerLevel(self, FAPlevel):
         """
@@ -721,7 +719,8 @@ class Gls:
             smaller than FAPlevel.
 
         """
-        Prob = 1. - (1.-FAPlevel)**(1./self.M)
+        # Inverse of FAP; 1 - (1-FAPlevel)^(1/M) without cancellation
+        Prob = -np.expm1(np.log1p(-np.asarray(FAPlevel, dtype=float)) / self.M)
         return self.probInv(Prob)
 
     def stats(self, Pn):
