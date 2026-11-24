@@ -316,7 +316,12 @@ class Gls:
 
         self._a = (YC*SS-YS*CS) / D
         self._b = (YS*CC-YC*CS) / D
-        self._off = -self._a*C - self._b*S
+        if self.ls:
+            # The mean is subtracted beforehand and not fitted, so the
+            # offset is the (weighted) mean itself.
+            self._off = np.zeros(self.nf)
+        else:
+            self._off = -self._a*C - self._b*S
 
         # power
         self.p = (SS*YC*YC + CC*YS*YS - 2.*CS*YC*YS) / (self._YY*D)   # Eq. (5) in ZK09

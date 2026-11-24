@@ -103,3 +103,25 @@ class TestGlsSanity(unittest.TestCase):
             # prob and probInv are inverse to each other
             for prob in (1e-3, 0.1):
                 self.assertAlmostEqual(gls.prob(gls.probInv(prob)), prob, delta=1e-10)
+
+    def testsanity_offset(self):
+        """Checking that the best-fit sine reproduces the chi^2 of the power"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(3)
+        t = np.sort(100 * rng.random(60))
+        e = 0.2 + 0.3 * rng.random(60)
+        y = 3 + 1.5 * np.sin(2 * np.pi * t / 7.3 + 0.4) + e * rng.normal(size=60)
+
+        for ls in (False, True):
+            gls = pyPeriod.Gls((t, y, e), ls=ls)
+            # chi^2 of the best-fit sine from the power ...
+            chi2p = gls._YY * gls.wsum * (1 - gls.p.max())
+            # ... and directly from the model, including its offset
+            chi2 = np.sum((y - gls.sinmod(t))**2 / e**2)
+            self.assertAlmostEqual(chi2, chi2p, delta=1e-9 * chi2p)
+            if ls:
+                # Without fitted offset, the offset is the weighted mean
+                w = 1 / e**2
+                self.assertAlmostEqual(gls.hpstat["offset"], np.sum(w * y) / np.sum(w), delta=1e-12)
