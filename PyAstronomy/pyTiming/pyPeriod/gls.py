@@ -279,9 +279,10 @@ class Gls:
                 if k % 1000 == 0:
                     # init/refresh recurrences to stop error propagation
                     eix = exp(1j * omega * self.th)  # exp(ix) = cos(x) + i*sin(x)
+                # Note: .real and .imag are views of eix; eix may only be
+                # advanced after they have been used (end of loop body).
                 cosx = eix.real
                 sinx = eix.imag
-                eix *= eid              # increase freq for next loop
             else:
                 x = omega * self.th
                 cosx = cos(x)
@@ -295,6 +296,9 @@ class Gls:
             wcosx = w * cosx
             CC[k] = dot(wcosx, cosx)    # Eq. (13)
             CS[k] = dot(wcosx, sinx)    # Eq. (15)
+
+            if self.fast:
+                eix *= eid              # increase freq for next loop
 
         SS = 1. - CC
         if not self.ls:

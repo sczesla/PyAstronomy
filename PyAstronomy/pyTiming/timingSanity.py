@@ -61,3 +61,23 @@ class TestStringlengthSanity(unittest.TestCase):
             delta=1e-6,
             msg="stringlength (not closed) does not match",
         )
+
+
+class TestGlsSanity(unittest.TestCase):
+    def testsanity_fastMode(self):
+        """Checking that GLS fast mode reproduces the direct computation"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(1)
+        t = np.sort(100 * rng.random(80))
+        e = 0.2 + 0.3 * rng.random(80)
+        y = 1.5 * np.sin(2 * np.pi * t / 7.3 + 0.4) + e * rng.normal(size=80)
+
+        for ls in (False, True):
+            slow = pyPeriod.Gls((t, y, e), ls=ls)
+            fast = pyPeriod.Gls((t, y, e), ls=ls, fast=True)
+            # Fast mode used to shift the power by one frequency step
+            np.testing.assert_allclose(fast.freq, slow.freq)
+            np.testing.assert_allclose(fast.power, slow.power, atol=1e-9)
+            self.assertEqual(fast.hpstat["fbest"], slow.hpstat["fbest"])
