@@ -3,6 +3,7 @@ from __future__ import print_function, division
 from . import periodBase
 import numpy
 import scipy.special
+from PyAstronomy.pyaC import pyaErrors as PE
 
 
 class Fourier(periodBase.PeriodBase):
@@ -29,15 +30,13 @@ class Fourier(periodBase.PeriodBase):
 
         dt = self.t[1:]-self.t[0:-1]
         if numpy.max(dt) > 1.1 * numpy.min(dt):
-            print("timingAna::fourier() - Error: data must be equally spaced!")
-            exit()
+            raise(PE.PyAValError("Data must be evenly spaced in time.",
+                                 where="Fourier",
+                                 solution="Use, e.g., the Gls or LombScargle class for unevenly sampled data."))
 
+        # Leahy normalization (the only one available, checked in __init__)
         power = numpy.abs(numpy.fft.fft(self.y))**2.
-        if self.norm == "Leahy":
-            power = power*2./numpy.sum(self.y)
-        else:
-            print("Normalization not yet implemented!")
-            power = power*2./numpy.sum(self.y)
+        power = power*2./numpy.sum(self.y)
         freq = numpy.fft.fftfreq(numpy.size(self.y), numpy.mean(dt))
         indi = numpy.where(freq > 0)
         self.freq = freq[indi]
@@ -49,39 +48,68 @@ class Fourier(periodBase.PeriodBase):
         self.power = None
         self.t = lc.time
         self.y = lc.flux
+        if norm != "Leahy":
+            raise(PE.PyAValError("Unknown normalization: " + str(norm),
+                                 where="Fourier",
+                                 solution="Use norm='Leahy' (the only available normalization)."))
         self.norm = norm
         self.label = {'title': 'Fourier Transformation',
                       'xlabel': 'Frequency',
                       'ylabel': 'Fourier Power'}
         self.__calcPeriodogram()
 
-    def Prob(self, Pn):
+    def prob(self, Pn):
         r"""
         Returns the probability to obtain a power larger than the threshold, `Pn`.
 
         In the calculations, the noise is assumed to be Poisson-distributed.
 
         .. note::
-            According to [vdK]_ the probability \
-            to obtain a power larger than a given threshold from the noise is given by
+            According to [vdK]_, the Leahy-normalized power of pure Poisson
+            noise in a single frequency bin of a single spectrum follows a
+            :math:`\chi^2` distribution with two degrees of freedom, so that
 
             .. math::
-              Prob(p>Pn) = Q(M \times W \times Pn, 2 \times M \times W)
+              Prob(p>Pn) = Q(Pn, 2) = \exp(-Pn/2) \; ,
 
-            where :math:`Q(\chi^2, \nu)` is the cumulative :math:`\chi^2` distribution with :math:`\nu` d.o.f.
+            where :math:`Q(\chi^2, \nu)` is the probability that a
+            :math:`\chi^2` distribution with :math:`\nu` d.o.f. exceeds
+            :math:`\chi^2`.
 
         Parameters
         ----------
-        Pn : float
+        Pn : float or array
             Power threshold.
 
         Returns
         -------
-        FAP : float
+        Probability : float or array
             The probability to obtain a power larger than the specified
             threshold from noise.
         """
-        nu = 2
-        # -- Integral from x to infinity of Chi-square pdf.
-        Q = scipy.special.chdtrc(nu, Pn)
-        return Q
+        # Integral from Pn to infinity of the chi-square pdf with 2 d.o.f.
+        return scipy.special.chdtrc(2, Pn)
+
+    def Prob(self, Pn):
+        """
+        Outdated -- use "prob" instead.
+        """
+        return self.prob(Pn)
+
+    def probInv(self, Prob):
+        """
+        Returns the minimum power for a given probability level `Prob`.
+
+        This is the inverse of `prob(Pn)`.
+
+        Parameters
+        ----------
+        Prob : float or array
+            Probability.
+
+        Returns
+        -------
+        Power threshold : float or array
+            The power exceeded by noise with probability `Prob`.
+        """
+        return scipy.special.chdtri(2, Prob)

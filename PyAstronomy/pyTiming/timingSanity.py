@@ -197,3 +197,62 @@ class TestGlsSanity(unittest.TestCase):
         # Thus, also the same probabilities
         Pn = ls.power.max()
         self.assertAlmostEqual(ls.prob(Pn) / gls.prob(Pn), 1, delta=1e-8)
+
+
+class TestFourierSanity(unittest.TestCase):
+    def testsanity_probabilities(self):
+        """Checking prob, probInv, FAP, and powerLevel of Fourier"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(8)
+        lc = pyPeriod.TimeSeries(np.arange(1000.), rng.poisson(100, 1000))
+        fft = pyPeriod.Fourier(lc)
+
+        # Chi^2 distribution with 2 d.o.f.
+        for Pn in (0.5, 2., 10.):
+            self.assertAlmostEqual(fft.prob(Pn), np.exp(-Pn / 2), delta=1e-14)
+            self.assertAlmostEqual(fft.Prob(Pn), fft.prob(Pn), delta=1e-14)
+        for prob in (1e-6, 0.1, 0.5):
+            self.assertAlmostEqual(fft.prob(fft.probInv(prob)) / prob, 1, delta=1e-10)
+        for fap in (0.001, 0.05):
+            self.assertAlmostEqual(fft.FAP(fft.powerLevel(fap)) / fap, 1, delta=1e-10)
+        # Pure Poisson noise: fraction of powers above Pn is about exp(-Pn/2)
+        self.assertAlmostEqual(np.mean(fft.power > 4), np.exp(-2), delta=0.04)
+
+    def testsanity_input(self):
+        """Checking that Fourier rejects uneven sampling and unknown norms"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+        from PyAstronomy.pyaC import pyaErrors as PE
+
+        y = np.ones(10)
+        t = np.arange(10.)
+        t[5] += 0.5
+        with self.assertRaises(PE.PyAValError):
+            pyPeriod.Fourier(pyPeriod.TimeSeries(t, y))
+        with self.assertRaises(PE.PyAValError):
+            pyPeriod.Fourier(pyPeriod.TimeSeries(np.arange(10.), y), norm="other")
+
+
+class TestPeriodBaseSanity(unittest.TestCase):
+    def testsanity_FAP(self):
+        """Checking FAP and powerLevel of PeriodBase (via LombScargle)"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(9)
+        t = np.sort(100 * rng.random(50))
+        y = np.sin(2 * np.pi * t / 7.3) + rng.normal(size=50)
+        ls = pyPeriod.LombScargle(pyPeriod.TimeSeries(t, y), ofac=10, hifac=1)
+
+        # powerLevel is the inverse of FAP, also for arrays and far below 1e-16
+        faps = np.array([1e-20, 1e-8, 0.009, 0.011, 0.5])
+        np.testing.assert_allclose(ls.FAP(ls.powerLevel(faps)), faps, rtol=1e-9)
+
+        # Exact value 1 - (1-q)^M = Mq - M(M-1)/2 q^2 + ..., not only Mq
+        q = 0.005 / ls.M
+        Pn = ls.probInv(q)
+        expected = ls.M * q - ls.M * (ls.M - 1) / 2 * q**2 \
+            + ls.M * (ls.M - 1) * (ls.M - 2) / 6 * q**3
+        self.assertAlmostEqual(ls.FAP(Pn) / expected, 1, delta=1e-6)
