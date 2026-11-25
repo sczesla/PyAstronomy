@@ -763,17 +763,24 @@ class Gls:
         The output file is a standard text file with two columns,
         viz., frequency and power. 
 
+        .. note::
+            `toFile` is deprecated and will be removed in a future
+            version. Use, e.g.,
+            ``numpy.savetxt(ofile, numpy.column_stack((gls.freq, gls.power)))``.
+
         Parameters
         ----------
         ofile : string
             Name of the output file.
 
         """
+        warnings.warn("toFile is deprecated and will be removed in a future version. "
+                      "Use, e.g., numpy.savetxt(ofile, numpy.column_stack((gls.freq, gls.power))).",
+                      FutureWarning, stacklevel=2)
         with open(ofile, 'w') as f:
             if header:
                 f.write("# Generalized Lomb-Scargle periodogram\n")
                 f.write("# Parameters:\n")
-                f.write("#    Data file: %s\n" % self.df)
                 f.write("#    ofac     : %s\n" % self.ofac)
                 f.write("#    norm     : %s\n" % self.norm)
                 f.write("# 1) Frequency, 2) Normalized power\n")

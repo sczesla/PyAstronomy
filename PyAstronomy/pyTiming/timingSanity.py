@@ -198,6 +198,28 @@ class TestGlsSanity(unittest.TestCase):
         Pn = ls.power.max()
         self.assertAlmostEqual(ls.prob(Pn) / gls.prob(Pn), 1, delta=1e-8)
 
+    def testsanity_toFileDeprecated(self):
+        """Checking that toFile warns and writes the periodogram"""
+        import os
+        import tempfile
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(10)
+        t = np.sort(100 * rng.random(30))
+        y = np.sin(2 * np.pi * t / 7.3) + rng.normal(size=30)
+        gls = pyPeriod.Gls((t, y))
+
+        with tempfile.TemporaryDirectory() as d:
+            fn = os.path.join(d, "gls.txt")
+            # Default call (with header) used to fail
+            with self.assertWarns(FutureWarning):
+                gls.toFile(fn)
+            dat = np.loadtxt(fn)
+        self.assertEqual(dat.shape, (gls.nf, 2))
+        np.testing.assert_allclose(dat[:, 0], gls.freq, atol=1e-6)
+        np.testing.assert_allclose(dat[:, 1], gls.power, atol=1e-6)
+
 
 class TestFourierSanity(unittest.TestCase):
     def testsanity_probabilities(self):
