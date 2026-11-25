@@ -96,17 +96,16 @@ class PeriodBase:
 
       Parameters
       ----------
-      Pn : float
+      Pn : float or array
           Power threshold.
       
       Returns
       -------
-      FAP : float
+      FAP : float or array
           False alarm probability.
     """
-    prob = self.M * self.prob(Pn)
-    if prob > 0.01:  return 1.-(1.-self.prob(Pn))**self.M
-    return prob
+    # 1 - (1-prob)^M, computed without cancellation for small prob
+    return -numpy.expm1(self.M * numpy.log1p(-self.prob(Pn)))
   
   def probInv(self, Prob):
     raise(PE.PyANotImplemented("`probInv` is not yet implemented."))
@@ -127,7 +126,8 @@ class PeriodBase:
           false-alarm probability (FAP). Powers exceeding this
           threshold have FAPs smaller than FAPlevel.
     """
-    Prob = 1.-(1.-FAPlevel)**(1./self.M)
+    # Inverse of FAP; 1 - (1-FAPlevel)^(1/M) without cancellation
+    Prob = -numpy.expm1(numpy.log1p(-numpy.asarray(FAPlevel, dtype=float)) / self.M)
     return self.probInv(Prob)
     
   
