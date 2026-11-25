@@ -14,7 +14,8 @@ class LombScargle(periodBase.PeriodBase):
     Lomb-Scargle periodogram using a fast algorithm. The frequency array is
     constructed on the fly based on the oversampling keywords, which are
     mandatory in this case. The power is normalized according to the
-    prescription of [HB86]_.
+    prescription of [HB86]_, i.e., by the sample variance of the data
+    (dividing by N-1), as in [NR]_.
 
     The result, i.e., the power, is stored in the class attribute `power`.
 
@@ -41,7 +42,8 @@ class LombScargle(periodBase.PeriodBase):
         if self.freq is None:
             self.__buildFreq(ofac, hifac)
         nout = int(ofac*hifac*len(self.t)/2.)
-        vari = var(self.y)
+        # Sample variance (N-1), as in [NR] and assumed by prob
+        vari = var(self.y, ddof=1)
         ave = mean(self.y)
 
         xdif = max(self.t)-min(self.t)

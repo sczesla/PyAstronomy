@@ -180,3 +180,20 @@ class TestGlsSanity(unittest.TestCase):
             gls = pyPeriod.Gls((t, y))
             with self.assertWarns(FutureWarning):
                 gls.pnorm("Scargle")
+
+    def testsanity_LombScargleVariance(self):
+        """Checking that LombScargle is normalized by the sample variance"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(7)
+        t = np.sort(100 * rng.random(50))
+        y = np.sin(2 * np.pi * t / 7.3) + rng.normal(size=50)
+
+        ls = pyPeriod.LombScargle(pyPeriod.TimeSeries(t, y), ofac=10, hifac=1)
+        # Same periodogram in the normalization of Horne & Baliunas
+        gls = pyPeriod.Gls((t, y), freq=ls.freq, ls=True, norm="HorneBaliunas")
+        np.testing.assert_allclose(ls.power, gls.power, rtol=1e-8)
+        # Thus, also the same probabilities
+        Pn = ls.power.max()
+        self.assertAlmostEqual(ls.prob(Pn) / gls.prob(Pn), 1, delta=1e-8)
