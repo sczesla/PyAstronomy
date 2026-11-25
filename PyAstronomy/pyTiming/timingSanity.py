@@ -162,3 +162,21 @@ class TestGlsSanity(unittest.TestCase):
         expected = gls.M * q - gls.M * (gls.M - 1) / 2 * q**2 \
             + gls.M * (gls.M - 1) * (gls.M - 2) / 6 * q**3
         self.assertAlmostEqual(gls.FAP(Pn) / expected, 1, delta=1e-6)
+
+    def testsanity_ScargleDeprecated(self):
+        """Checking that the 'Scargle' normalization warns"""
+        import numpy as np
+        from unittest import mock
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(6)
+        t = np.sort(100 * rng.random(30))
+        y = rng.normal(size=30)
+
+        # The normalization asks for the population variance via input()
+        with mock.patch("builtins.input", return_value="1.0"):
+            with self.assertWarns(FutureWarning):
+                pyPeriod.Gls((t, y), norm="Scargle")
+            gls = pyPeriod.Gls((t, y))
+            with self.assertWarns(FutureWarning):
+                gls.pnorm("Scargle")

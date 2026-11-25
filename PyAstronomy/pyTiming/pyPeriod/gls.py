@@ -27,6 +27,7 @@ from . import periodBase
 from numpy import sum, cos, sin, arange, min, max, pi, \
                   exp, log, zeros, argmax, sqrt, arctan2, dot
 import numpy as np
+import warnings
 from PyAstronomy.pyaC import pyaErrors as PE 
 
 
@@ -70,7 +71,7 @@ class Gls:
     norm : string, optional
         The normalization; either of "ZK", "Scargle", "HorneBaliunas", "Cumming", "wrms", "chisq",
         "lnL", "dlnL". The default is unity ("ZK"). Without errors, "chisq", "lnL", and "dlnL"
-        assume unit errors.
+        assume unit errors. "Scargle" is deprecated (see `pnorm`).
     ls : boolean, optional
         If True, the conventional Lomb-Scargle periodogram will be computed
         (default is False).
@@ -349,6 +350,14 @@ class Gls:
         norm : string, optional
             The normalization to be used (default is 'ZK').
 
+            .. note::
+                The 'Scargle' normalization is deprecated and will be
+                removed in a future version. Its power is not normalized
+                as in Scargle (1982), and probabilities derived from it are
+                wrong. With correct errors, use 'dlnL', which corresponds
+                to Scargle's normalization generalized to weights; without
+                errors, use 'HorneBaliunas'.
+
         Examples
         --------
         >>> gls.pnorm('wrms')
@@ -361,6 +370,12 @@ class Gls:
         self.label["ylabel"] = "Power ("+norm+")"
 
         if norm == "Scargle":
+            warnings.warn("The 'Scargle' normalization is deprecated and will be removed "
+                          "in a future version. Its power is not normalized as in "
+                          "Scargle (1982), and probabilities derived from it are wrong. "
+                          "With correct errors, use 'dlnL', which corresponds to "
+                          "Scargle's normalization generalized to weights; without "
+                          "errors, use 'HorneBaliunas'.", FutureWarning, stacklevel=2)
             popvar = input('pyTiming::gls - Input a priori known population variance:')
             power = p / float(popvar)
         elif norm == "HorneBaliunas":
@@ -598,7 +613,7 @@ class Gls:
         .. note:: Normalization
           (see [ZK09]_ for further details).
 
-          - `Scargle`:
+          - `Scargle` (deprecated, see `pnorm`):
           .. math::
             
              exp(-Pn)
