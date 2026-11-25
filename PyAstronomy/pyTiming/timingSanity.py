@@ -141,6 +141,26 @@ class TestGlsSanity(unittest.TestCase):
         self.assertIsInstance(mwie, float)
         self.assertAlmostEqual(mwie, np.sqrt(len(e) / np.sum(1 / e**2)), delta=1e-12)
 
+    def testsanity_infoMaximumPower(self):
+        """Checking that info reports the power of the highest peak"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPeriod
+
+        rng = np.random.default_rng(11)
+        t = np.sort(100 * rng.random(40))
+        e = 0.2 + 0.3 * rng.random(40)
+        y = np.sin(2 * np.pi * t / 7.3) + e * rng.normal(size=40)
+
+        for norm in pyPeriod.Gls.norms:
+            if norm == "Scargle":
+                continue
+            gls = pyPeriod.Gls((t, y, e), norm=norm)
+            k = np.argmax(gls.p)
+            self.assertEqual(gls.info(noprint=True)["maximum_power"], gls.power[k])
+        # In chisq (and wrms), the highest peak is the smallest value
+        gls.pnorm("chisq")
+        self.assertEqual(gls.info(noprint=True)["maximum_power"], gls.power.min())
+
     def testsanity_FAP(self):
         """Checking FAP and powerLevel, also for small probabilities"""
         import numpy as np

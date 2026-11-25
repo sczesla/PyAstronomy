@@ -470,6 +470,10 @@ class Gls:
     def info(self, noprint=False):
         """
         Prints some basic statistical output screen.
+
+        The maximum power refers to the highest peak of the periodogram,
+        i.e., the best-fit sine. In the normalizations "chisq" and "wrms",
+        this is the smallest value.
         
         Parameters
         ----------
@@ -484,7 +488,7 @@ class Gls:
         
         info = {"N":self.N, "weighted_mean":self._Y, "weighted_rms":sqrt(self._YY), \
                 "time_base":self.tbase, "no_of_freq_points":self.nf, \
-                "norm":self.norm, "maximum_power":self.power.max(), \
+                "norm":self.norm, "maximum_power":self.power[argmax(self.p)], \
                 "rms_of_residuals":self.rms, \
                 "best_sine_frequency":self.hpstat["fbest"], \
                 "best_sine_frequency_err":self.hpstat["f_err"], \
@@ -511,7 +515,7 @@ class Gls:
             print("Time base:                  % f"  % self.tbase)
             print("Number of frequency points:  %-6d" % self.nf)
             print()
-            print("Maximum power p [%s]: % f" % (self.norm, self.power.max()))
+            print("Maximum power p [%s]: % f" % (self.norm, info["maximum_power"]))
             print("RMS of residuals:     % f" % self.rms)
             if self.e_y is not None:
                 print("  Mean weighted internal error:  %f" % info["mean_weighted_internal_error"])
