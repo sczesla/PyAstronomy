@@ -63,6 +63,46 @@ class TestStringlengthSanity(unittest.TestCase):
         )
 
 
+class TestPdmSanity(unittest.TestCase):
+    def testsanity_theta(self):
+        """Checking Theta against Stellingwerf's pooled variance"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPDM
+
+        rng = np.random.default_rng(12)
+        # Clustered phases: bins with zero, one, and several points
+        x = np.array([0.0, 0.1, 0.2, 0.5, 0.6, 0.7, 0.9, 1.0, 1.1, 1.2, 1.5, 1.6, 1.7]) + 0.01
+        y = np.sin(2 * np.pi * x) + 0.1 * rng.normal(size=len(x))
+        pdm = pyPDM.PyPDM(x, y)
+        phase, indi = pdm.phase(x, 1.0)
+        phase, mag = phase[indi], y[indi]
+        bbegin, bend = np.arange(10) / 10, (np.arange(10) + 1) / 10
+
+        # Sum of squares within the bins over their degrees of freedom
+        ss, dof, counts = 0.0, 0, []
+        for b, e in zip(bbegin, bend):
+            m = mag[(phase >= b) & (phase < e)]
+            counts.append(len(m))
+            if len(m) > 0:
+                ss += np.sum((m - m.mean())**2)
+                dof += len(m) - 1
+        self.assertTrue(0 in counts and 1 in counts)
+        expected = ss / dof / np.var(mag, ddof=1)
+        theta = pdm._PyPDM__getThet(phase, mag, bbegin, bend)
+        self.assertAlmostEqual(theta / expected, 1, delta=1e-12)
+
+    def testsanity_thetaUndefined(self):
+        """Checking that Theta is NaN if no bin has two points"""
+        import numpy as np
+        from PyAstronomy.pyTiming import pyPDM
+
+        pdm = pyPDM.PyPDM(np.array([0.05, 0.35, 0.75]), np.array([1., 2., 0.5]))
+        scanner = pyPDM.Scanner(minVal=1.0, maxVal=1.0, dVal=1.0)
+        periods, theta = pdm.pdmEquiBinCover(10, 1, scanner)
+        self.assertEqual(len(theta), 1)
+        self.assertTrue(np.isnan(theta[0]))
+
+
 class TestGlsSanity(unittest.TestCase):
     def testsanity_fastMode(self):
         """Checking that GLS fast mode reproduces the direct computation"""

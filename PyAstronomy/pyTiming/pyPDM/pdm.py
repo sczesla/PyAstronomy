@@ -167,15 +167,17 @@ class PyPDM:
          - phase, mag - arrays, Phase-sorted(!) light curve.
          - bbegin, bend -lists, begin and end of individual bins (``blocks'').
 
-        Returns the value of Theta.
+        Returns the value of Theta. Bins with fewer than two data points are
+        neglected; if no bin contains at least two points, Theta is undefined
+        and NaN is returned.
         """
         meanMag = mag.mean()
         N = len(mag)
-        M = len(bbegin)
         sigmaSqr = ((mag - meanMag)**2).sum() / float(N - 1)
 
         sSqrUp = 0.0
         sSqrDown = 0.0
+        mCount = 0
         for i in smo.range(len(bbegin)):
             # Points belonging to a chunk
             indi = numpy.where(numpy.logical_and(
@@ -187,7 +189,12 @@ class PyPDM:
                           ** 2).sum() / float(nj - 1)
                 sSqrUp += (nj - 1)*sigmaj
                 sSqrDown += nj
-        sSqrDown -= M
+                mCount += 1
+        sSqrDown -= mCount
+
+        if sSqrDown == 0:
+            # No bin with at least two points: Theta is undefined
+            return numpy.nan
 
         sSqr = sSqrUp / sSqrDown
         theta = sSqr / sigmaSqr
