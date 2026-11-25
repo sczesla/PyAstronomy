@@ -23,16 +23,22 @@ class Scanner:
         if (mode != "period") and (mode != "frequency"):
             raise (PE.PyAValError("`mode` must either be 'period' or 'frequency'. Current value is: "+str(mode),
                                   where="Scanner::__init__", solution="Choose either 'period' or 'frequency' for mode parameter."))
+        if not dVal > 0:
+            raise (PE.PyAValError("`dVal` must be positive. Current value is: "+str(dVal),
+                                  where="Scanner::__init__", solution="Choose a positive step size."))
         self.minVal = minVal
         self.maxVal = maxVal
         self.dVal = dVal
         self.mode = mode
 
     def __iter__(self):
-        self.curVal = self.minVal
-        while self.curVal <= self.maxVal:
+        # Compute the values from the index instead of adding up dVal, which
+        # accumulates rounding errors. The tolerance absorbs rounding errors
+        # in (max-min)/dVal, so that maxVal is included if it is on the grid.
+        n = int(numpy.floor((self.maxVal - self.minVal) / self.dVal + 1e-9))
+        for i in smo.range(n + 1):
+            self.curVal = self.minVal + i * self.dVal
             yield self.curVal
-            self.curVal += self.dVal
 
 
 class PyPDM:

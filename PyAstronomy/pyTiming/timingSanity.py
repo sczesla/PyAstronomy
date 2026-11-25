@@ -102,6 +102,25 @@ class TestPdmSanity(unittest.TestCase):
         self.assertEqual(len(theta), 1)
         self.assertTrue(np.isnan(theta[0]))
 
+    def testsanity_scanner(self):
+        """Checking the values of the Scanner"""
+        from PyAstronomy.pyTiming import pyPDM
+        from PyAstronomy.pyaC import pyaErrors as PE
+
+        # Number of values and last value; maxVal is included if on the grid
+        for minVal, maxVal, dVal, n, last in ((0.5, 1.0, 0.05, 11, 1.0),
+                                              (0.1, 10.0, 0.05, 199, 10.0),
+                                              (0.1, 0.3, 0.1, 3, 0.3),
+                                              (0.5, 5.0, 0.01, 451, 5.0),
+                                              (0.1, 0.35, 0.1, 3, 0.3)):
+            vals = list(pyPDM.Scanner(minVal, maxVal, dVal))
+            self.assertEqual(len(vals), n)
+            self.assertAlmostEqual(vals[-1], last, delta=1e-12)
+        self.assertEqual(list(pyPDM.Scanner(2.0, 1.0, 0.1)), [])
+        for dVal in (0.0, -0.1):
+            with self.assertRaises(PE.PyAValError):
+                pyPDM.Scanner(0.1, 1.0, dVal)
+
 
 class TestGlsSanity(unittest.TestCase):
     def testsanity_fastMode(self):
